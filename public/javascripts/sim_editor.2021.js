@@ -142,11 +142,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             $scope.cells[x+','+y+','+z] = {
                 isTile: true,
                 tile: {
-                    changeFloorTo: z
+                    changeFloorTo: z,
+                    halfWallIn: [0,0,0,0],
+                    curve: [0,0,0,0]
                 },
                 reachable: true
             };
         }
+        cell = $scope.cells[x+','+y+','+z];
 
         //console.log(`${x},${y},${z}`)
         //console.log(cell)
@@ -324,6 +327,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         // If this is a wall that doesn't exists
         if (!cell) return;
+        if (!cell.tile) return;
+        if (!cell.tile.curve) return;
 
         switch(from){
             case 0:
@@ -363,6 +368,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         // If this is a wall that doesn't exists
         if (!cell) return;
 
+        if(!cell.tile) return;
+        if(!cell.tile.halfWallIn) return;
         if(!cell.tile.halfWallIn[fromDir]) return;
         if(cell.explored) return;
         else cell.explored = true;
