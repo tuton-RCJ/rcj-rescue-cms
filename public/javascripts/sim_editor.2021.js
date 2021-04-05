@@ -132,8 +132,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function reachable(x,y,z){
+        
         if(x<0 || x>$scope.width*2 || y<0 || y>$scope.length*2) return;
-        if($scope.cells[x+','+y+','+z]){
+        let cell = $scope.cells[x+','+y+','+z];
+        if(cell){
             if($scope.cells[x+','+y+','+z].reachable) return;
             $scope.cells[x+','+y+','+z].reachable = true;
         }else{
@@ -146,17 +148,30 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             };
         }
 
-        //Upper
-        if($scope.cells[x+','+(y-1)+','+z]==null || !$scope.cells[x+','+(y-1)+','+z].isWall) reachable(x,y-2,z)
+        //console.log(`${x},${y},${z}`)
+        //console.log(cell)
 
+        //Upper
+        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
+            reachable(x,y-2,z)
+        }
+
+        //console.log(((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))
+        //console.log(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3]))))
         //Bottom
-        if($scope.cells[x+','+(y+1)+','+z]==null || !$scope.cells[x+','+(y+1)+','+z].isWall) reachable(x,y+2,z)
+        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
+            reachable(x,y+2,z)
+        }
 
         //Right
-        if($scope.cells[(x+1)+','+y+','+z]==null || !$scope.cells[(x+1)+','+y+','+z].isWall) reachable(x+2,y,z)
+        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
+            reachable(x+2,y,z)
+        }
 
         //Left
-        if($scope.cells[(x-1)+','+y+','+z]==null || !$scope.cells[(x-1)+','+y+','+z].isWall) reachable(x-2,y,z)
+        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
+            reachable(x-2,y,z)
+        }
     }
 
 
@@ -203,6 +218,16 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 recurs(x - 1, y + 1, z, 0);
                 recurs(x + 1, y - 1, z, 2);
                 recurs(x + 1, y + 1, z, 0);
+                // Explore the wall in the tile (TOP)
+                exploreWallInTile(x, y - 1, z, 2);
+                // Explore the wall in the tile (BOTTOM)
+                exploreWallInTile(x, y + 1, z, 0);
+
+                checkCurve(x-2, y-1, z, 3);
+                checkCurve(x-2, y+1, z, 1);
+                checkCurve(x+2, y-1, z, 2);
+                checkCurve(x+2, y-1, z, 0);
+
             } // Vertical wall
             else if (!isOdd(x) && isOdd(y)) {
                 // Set tiles around this wall to linear
@@ -219,57 +244,112 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 recurs(x - 1, y + 1, z, 1);
                 recurs(x + 1, y - 1, z, 3);
                 recurs(x + 1, y + 1, z, 3);
+                // Explore the wall in the tile (LEFT)
+                exploreWallInTile(x - 1, y, z, 1)
+                // Explore the wall in the tile (RIGHT)
+                exploreWallInTile(x + 1, y, z, 3)
+
+                checkCurve(x-1, y-2, z, 3);
+                checkCurve(x-1, y+2, z, 1);
+                checkCurve(x+1, y-2, z, 2);
+                checkCurve(x+1, y-2, z, 0);
             }
 
         }
         
         if(cell.halfWall > 0){
-            console.log(`${x},${y},${z}, from: ${fromDir}`)
             if(fromDir == 4) cell.isLinear = true;
-            console.log(cell)
             if(x%2 == 0){
                 // Vertical
                 if(cell.halfWall == 1 && (fromDir == 2 || fromDir == 4)){
+                    cell.isLinear = true;
                     recurs(x, y + 2, z, 0);
                     recurs(x + 1, y + 1, z, 3);
                     recurs(x - 1, y + 1, z, 1);
-                    cell.isLinear = true;
+                    
                     // Explore the wall in the tile (LEFT)
                     exploreWallInTile(x - 1, y, z, 1)
                     // Explore the wall in the tile (RIGHT)
                     exploreWallInTile(x + 1, y, z, 3)
+
+                    curveFromHalfWall(x-1, y, z, 1)
+                    curveFromHalfWall(x+1, y, z, 3)
                 }else if(cell.halfWall == 2 && (fromDir == 0 || fromDir == 4)){
+                    cell.isLinear = true;
                     recurs(x, y - 2, z, 2);
                     recurs(x + 1, y - 1, z, 3);
                     recurs(x - 1, y - 1, z, 1);
-                    cell.isLinear = true;
+                    
                     // Explore the wall in the tile (LEFT)
                     exploreWallInTile(x - 1, y, z, 1)
                     // Explore the wall in the tile (RIGHT)
                     exploreWallInTile(x + 1, y, z, 3)
+
+                    curveFromHalfWall(x-1, y, z, 1)
+                    curveFromHalfWall(x+1, y, z, 3)
                 }
             }else{
                 // Horizontal
                 if(cell.halfWall == 1 && (fromDir == 3 || fromDir == 4)){
+                    cell.isLinear = true;
                     recurs(x - 2, y, z, 1);
                     recurs(x - 1, y - 1, z, 2);
-                    recurs(x - 1, y + 1, z, 0);
-                    cell.isLinear = true;
+                    recurs(x - 1, y + 1, z, 0);              
                     // Explore the wall in the tile (TOP)
                     exploreWallInTile(x, y - 1, z, 2)
                     // Explore the wall in the tile (BOTTOM)
                     exploreWallInTile(x, y + 1, z, 0)
+
+                    curveFromHalfWall(x, y-1, z, 2)
+                    curveFromHalfWall(x, y+1, z, 0)
                 }else if(cell.halfWall == 2 && (fromDir == 1 || fromDir == 4)){
+                    cell.isLinear = true;
                     recurs(x + 2, y, z, 3);
                     recurs(x + 1, y - 1, z, 2);
                     recurs(x + 1, y + 1, z, 0);
-                    cell.isLinear = true;
                     // Explore the wall in the tile (TOP)
                     exploreWallInTile(x, y - 1, z, 2)
                     // Explore the wall in the tile (BOTTOM)
                     exploreWallInTile(x, y + 1, z, 0)
+
+                    curveFromHalfWall(x, y-1, z, 2)
+                    curveFromHalfWall(x, y+1, z, 0)
                 }
             }
+        }
+    }
+
+    function checkCurve(x, y, z, from){
+        let cell = $scope.cells[x + ',' + y + ',' + z];
+
+        // If this is a wall that doesn't exists
+        if (!cell) return;
+
+        switch(from){
+            case 0:
+                if(cell.tile.curve[0] == 1 || cell.tile.curve[2] == 3){
+                    halfTileFromCenter(x, y, z);
+                    curveFromCenter(x, y, z, from);
+                }
+                break;
+            case 1:
+                if(cell.tile.curve[1] == 2 || cell.tile.curve[1] == 4){
+                    halfTileFromCenter(x, y, z);
+                    curveFromCenter(x, y, z, from);
+                }
+                break;
+            case 2:
+                if(cell.tile.curve[2] == 2 || cell.tile.curve[2] == 4){
+                    halfTileFromCenter(x, y, z);
+                    curveFromCenter(x, y, z, from);
+                }
+                break;
+            case 3:
+                if(cell.tile.curve[3] == 1 || cell.tile.curve[3] == 3){
+                    halfTileFromCenter(x, y, z);
+                    curveFromCenter(x, y, z, from);
+                }
+                break;
         }
     }
 
@@ -283,15 +363,22 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         // If this is a wall that doesn't exists
         if (!cell) return;
 
+        if(!cell.tile.halfWallIn[fromDir]) return;
         if(cell.explored) return;
         else cell.explored = true;
         
-        if(!cell.tile.halfWallIn[fromDir]) return;
+        halfTileFromCenter(x, y, z, fromDir);
+        curveFromCenter(x, y, z);
+    }
 
-        
-        console.log(`${x},${y},${z},${fromDir}`)
+    function halfTileFromCenter(x, y, z, exclude=-1){
+        let cell = $scope.cells[x + ',' + y + ',' + z];
+
+        // If this is a wall that doesn't exists
+        if (!cell) return;
+
         for(let i=0; i<4; i++){
-            if(cell.tile.halfWallIn[i] && i != fromDir){
+            if(cell.tile.halfWallIn[i] && i != exclude){
                 switch(i){
                     case 0:
                         setTileLinear(x, y - 2, z);
@@ -299,9 +386,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         exploreWallInTile(x, y - 2, z, 2)
                         break;
                     case 1:
-                        console.log(`${x},${y},${z},${fromDir}`)
                         setTileLinear(x + 2, y, z);
-                        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
                         recurs(x + 1, y, z, 4);
                         exploreWallInTile(x + 2, y, z, 3);
                         break;
@@ -316,11 +401,104 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         exploreWallInTile(x - 2, y, z, 1);
                         break;
                 }
-                console.log(`${x},${y},${z},${i}`)
-                        console.log(cell)
+
             }
         }
-        
+    }
+
+    function curveFromHalfWall(x, y, z, start){
+        let cell = $scope.cells[x + ',' + y + ',' + z];
+        // If this is a wall that doesn't exists
+        if (!cell) return;
+
+        switch(start){
+            case 0:
+                if(cell.tile.curve[0] == 2 || cell.tile.curve[0] == 4){
+                    recurs(x-1, y, z, 4);
+                    setTileLinear(x-2, y, z);
+                }
+                if(cell.tile.curve[1] == 1 || cell.tile.curve[1] == 3){
+                    recurs(x+1, y, z, 4);
+                    setTileLinear(x+2, y, z);
+                }
+                break;
+            case 1:
+                if(cell.tile.curve[3] == 2 || cell.tile.curve[3] == 4){
+                    recurs(x, y+1, z, 4);
+                    setTileLinear(x, y+2, z);
+                }
+                if(cell.tile.curve[1] == 1 || cell.tile.curve[1] == 3){
+                    recurs(x, y-1, z, 4);
+                    setTileLinear(x, y-2, z);
+                }
+                break;
+            case 2:
+                if(cell.tile.curve[3] == 2 || cell.tile.curve[3] == 4){
+                    recurs(x+1, y, z, 4);
+                    setTileLinear(x+2, y, z);
+                }
+                if(cell.tile.curve[2] == 1 || cell.tile.curve[2] == 3){
+                    recurs(x-1, y, z, 4);
+                    setTileLinear(x-2, y, z);
+                }
+                break;
+            case 3:
+                if(cell.tile.curve[0] == 2 || cell.tile.curve[0] == 4){
+                    recurs(x, y-1, z, 4);
+                    setTileLinear(x, y-2, z);
+                }
+                if(cell.tile.curve[2] == 1 || cell.tile.curve[2] == 3){
+                    recurs(x, y+1, z, 4);
+                    setTileLinear(x, y+2, z);
+                }
+                break;
+        }
+    }
+
+    function curveFromCenter(x, y, z, exclude=-1){
+        let cell = $scope.cells[x + ',' + y + ',' + z];
+        // If this is a wall that doesn't exists
+        if (!cell) return;
+        if((cell.tile.curve[0] == 1 || cell.tile.curve[0] == 3) && exclude != 0){
+            // to TOP LEFT
+            recurs(x - 1, y-2, z, 2);
+            recurs(x - 1, y, z, 0);
+            recurs(x - 2, y-1, z, 1);
+            recurs(x, y-1, z, 3);
+            setTileLinear(x, y-2, z);
+            setTileLinear(x-2, y-2, z);
+            setTileLinear(x-2, y, z);
+        }
+        if((cell.tile.curve[1] == 2 || cell.tile.curve[1] == 4) && exclude != 1){
+            // to TOP RIGHT
+            recurs(x + 1, y-2, z, 2);
+            recurs(x + 1, y, z, 0);
+            recurs(x + 2, y-1, z, 3);
+            recurs(x, y-1, z, 1);
+            setTileLinear(x, y-2, z);
+            setTileLinear(x+2, y-2, z);
+            setTileLinear(x+2, y, z);
+        }
+        if((cell.tile.curve[3] == 1 || cell.tile.curve[3] == 3) && exclude != 3){
+            // to BOTTOM RIGHT
+            recurs(x + 1, y+2, z, 0);
+            recurs(x + 1, y, z, 2);
+            recurs(x + 2, y+1, z, 3);
+            recurs(x, y+1, z, 1);
+            setTileLinear(x+2, y, z);
+            setTileLinear(x+2, y+2, z);
+            setTileLinear(x, y+2, z);
+        }
+        if((cell.tile.curve[2] == 2 || cell.tile.curve[2] == 4) && exclude != 2){
+            // to BOTTOM LEFT
+            recurs(x - 1, y+2, z, 0);
+            recurs(x - 1, y, z, 2);
+            recurs(x - 2, y+1, z, 1);
+            recurs(x, y+1, z, 3);
+            setTileLinear(x-2, y, z);
+            setTileLinear(x-2, y+2, z);
+            setTileLinear(x, y+2, z);
+        }
     }
 
     function setTileLinear(x, y, z) {
@@ -540,6 +718,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 css['border-color'] = '#ed9aef';
                 css['border-width'] = '3px';
             }
+            if(!cell.reachable) css['background-color'] = '#636e72';
             return css;
         }
         return {};
