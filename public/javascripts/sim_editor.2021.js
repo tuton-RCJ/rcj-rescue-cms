@@ -416,7 +416,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         delete link;
     }
 
-    $scope.wallColor = function(x,y,z,rotate=0){
+    $scope.tileColour = function(x,y,z,rotate=0){
         let cell = $scope.cells[x+','+y+','+z];
         if(!cell) return {};
         if(cell.isWall) return cell.isLinear?{'background-color': 'black'}:{'background-color': 'navy'};
@@ -456,11 +456,45 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             return {'background': 'linear-gradient(' + gradient + ')'};
 
         }
-        if (x % 2 == 1 && y % 2 == 1)
-            return {'background-color': cell.tile.color};
-        else
-            return {};
+        if (x % 2 == 1 && y % 2 == 1){
+            if(cell.tile.color) return {'background-color': cell.tile.color};
+            if(cell.tile.swamp) return {'background-color': '#CD853F'};
+            if(cell.tile.black) return {'background-color': '#000000'};
+            if(cell.tile.checkpoint) return {'background-image': 'linear-gradient(to top left, #A5A5A5, #BABAC2, #E8E8E8, #A5A5A5, #BABAC2);'};
+            let roomNumber = checkRoomNumber(x,y,z);
+            if(roomNumber === 1){
+                if(cell.isLinear){
+                    return {'background-color': '#fffdea'};
+                }else{
+                    return {'background-color': '#b4ffd5'};
+                }
+            }else if(roomNumber === 2){
+                if(cell.isLinear){
+                    return {'background-color': '#359ef4'};
+                }else{
+                    return {'background-color': '#277cc2'};
+                }
+            }else{
+                if(cell.isLinear){
+                    return {'background-color': '#ed9aef'};
+                }else{
+                    return {'background-color': '#ac6cad'};
+                }
+
+            }
+        }
+        return {};
+            
     };
+
+    function checkRoomNumber(x,y,z){
+        for (let i = 0; i < 2; i++) {
+            if($scope.roomTiles[i].find(cord => cord === `${x},${y},${z}`)){
+                return i + 2;
+            }
+        }
+        return 1;
+    }
 
     function wallCheck(cell){
         if(!cell) return false;
@@ -558,7 +592,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             width: $scope.width,
             finished: $scope.finished,
             startTile: $scope.startTile,
-            cells: $scope.cells
+            cells: $scope.cells,
+            roomTiles: $scope.roomTiles,
+            time: $scope.time
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -948,15 +984,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     halfWallInVar = thisCell.tile.halfWallIn;
                     curveWallVar = '[' + thisCell.tile.curve.toString() + ']';
                 }
-                for (i = 0; i < 2; i++) {
-                    for (j = 0; j < $scope.roomTiles[i].length; j++) {
-                        if ($scope.roomTiles[i][j] == x+','+y+',0') {
-                            roomNum = i + 2;
-                            i = 2;
-                            break;
-                        }
-                    }
-                }
+                roomNum = checkRoomNumber(x,y,0)
                 if(thisCell.tile){
                     walls[(y-1)/2][(x-1)/2] = [u2f(thisCell.reachable), arWall, u2f(thisCell.tile.checkpoint), u2f(thisCell.tile.black), x == $scope.startTile.x && y == $scope.startTile.y, u2f(thisCell.tile.swamp), humanType, humanPlace, u2f(thisCell.isLinear), u2f(thisCell.tile.obstacle), halfWallOutVar, halfWallInVar, curveWallVar, thisCell.tile.halfWallVic, floorColor, halfWallOutInfo, roomNum];
                 }
@@ -1504,6 +1532,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.name = data.name;
                     $scope.time = data.time;
                     $scope.finished = data.finished;
+                    $scope.roomTiles = data.roomTiles;
+                    console.log($scope.roomTiles)
 
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
 
@@ -1599,8 +1629,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     }
                 };
             }
+            console.log(cell)
             if ($scope.selectRoom != -1 && cell) {
                 let undo = false
+                console.log($scope.roomTiles)
                 for (a = 0; a < 2; a++) {
                     if ($scope.roomTiles[a]) {
                         for (b = 0; b < $scope.roomTiles[a].length; b++) {

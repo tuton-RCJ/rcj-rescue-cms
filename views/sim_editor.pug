@@ -80,7 +80,7 @@ block content
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
-                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'swamp': cells[c+','+r+','+z].tile.swamp, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z)")
+                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="tileColour(c,r,z)")
                                 .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
                                     img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
                                     img.tile-image(ng-src='/images/heated_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Heated' || cells[c+','+r+','+z].tile.halfWallVic[0] == 4 ||  cells[c+','+r+','+z].tile.halfWallVic[4] == 4 || cells[c+','+r+','+z].tile.halfWallVic[1] == 4 || cells[c+','+r+','+z].tile.halfWallVic[7] == 4")
