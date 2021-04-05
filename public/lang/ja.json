@@ -744,6 +744,7 @@
             "swamp": "沼地",
             "cp" : "チェックポイント",
             "black" : "落とし穴",
+            "curve" : "カーブした壁",
             "top": "@:admin.lineMapEditor.top",
             "right": "@:admin.lineMapEditor.right",
             "left": "@:admin.lineMapEditor.left",
@@ -755,7 +756,8 @@
             "import": "@:admin.lineMapEditor.import",
             "exportW": "このマップをErebus用ワールドファイルにエクスポート",
             "oneVictim": "１体の被災者のみ配置できます",
-            "obstacle": "障害物"
+            "obstacle": "障害物",
+            "cellColor": "セルの色:  "
         },
         "mailTemplates": {
             "title": "メールテンプレート編集",

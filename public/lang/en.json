@@ -733,7 +733,7 @@
             "unset": "Remove"
         },
         "simMapEditor": {
-            "title": "Rescue Simulation world editor",
+            "title": "Rescue Simulation World Editor",
             "desc": "Click on the wall to create a maze. Click on the floor of the maze to set items such as victims, checkpoints, swamps and others.",
             "save": "@:admin.lineMapEditor.save",
             "saveAs": "@:admin.lineMapEditor.saveAs",
