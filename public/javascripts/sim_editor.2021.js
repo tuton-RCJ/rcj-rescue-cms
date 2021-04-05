@@ -52,7 +52,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     });
 
     $scope.$watchCollection('cells', function (newValue, oldValue) {
-
         $scope.recalculateLinear();
     });
 
@@ -72,6 +71,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             $scope.cells[index].isLinear = false;
             $scope.cells[index].virtualWall = false;
             $scope.cells[index].reachable= false;
+            $scope.cells[index].explored= false;
             if ($scope.cells[index].tile && $scope.cells[index].tile.curve == undefined) {
                 $scope.cells[index].tile.halfWallIn = [0, 0, 0, 0];
                 $scope.cells[index].tile.curve = [0, 0, 0, 0]; //NW quadrant, NE, SW, SE
@@ -164,14 +164,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         return num % 2;
     }
 
-    function recurs(x, y, z) {
+    function recurs(x, y, z, fromDir=-1) {
         if (x < 0 || y < 0 || z < 0) {
             return;
         }
 
-        var cell = $scope.cells[x + ',' + y + ',' + z];
-
-
+        let cell = $scope.cells[x + ',' + y + ',' + z];
 
         // If this is a wall that doesn't exists
         if (!cell)
@@ -199,12 +197,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 setTileLinear(x, y + 1, z);
                 setTileLinear(x + 2, y + 1, z);
                 // Check neighbours
-                recurs(x + 2, y, z);
-                recurs(x - 2, y, z);
-                recurs(x - 1, y - 1, z);
-                recurs(x - 1, y + 1, z);
-                recurs(x + 1, y - 1, z);
-                recurs(x + 1, y + 1, z);
+                recurs(x + 2, y, z, 3);
+                recurs(x - 2, y, z, 1);
+                recurs(x - 1, y - 1, z, 2);
+                recurs(x - 1, y + 1, z, 0);
+                recurs(x + 1, y - 1, z, 2);
+                recurs(x + 1, y + 1, z, 0);
             } // Vertical wall
             else if (!isOdd(x) && isOdd(y)) {
                 // Set tiles around this wall to linear
@@ -215,15 +213,114 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 setTileLinear(x + 1, y, z);
                 setTileLinear(x + 1, y + 2, z);
                 // Check neighbours
-                recurs(x, y - 2, z);
-                recurs(x, y + 2, z);
-                recurs(x - 1, y - 1, z);
-                recurs(x - 1, y + 1, z);
-                recurs(x + 1, y - 1, z);
-                recurs(x + 1, y + 1, z);
+                recurs(x, y - 2, z, 2);
+                recurs(x, y + 2, z, 0);
+                recurs(x - 1, y - 1, z, 1);
+                recurs(x - 1, y + 1, z, 1);
+                recurs(x + 1, y - 1, z, 3);
+                recurs(x + 1, y + 1, z, 3);
             }
 
         }
+        
+        if(cell.halfWall > 0){
+            console.log(`${x},${y},${z}, from: ${fromDir}`)
+            if(fromDir == 4) cell.isLinear = true;
+            console.log(cell)
+            if(x%2 == 0){
+                // Vertical
+                if(cell.halfWall == 1 && (fromDir == 2 || fromDir == 4)){
+                    recurs(x, y + 2, z, 0);
+                    recurs(x + 1, y + 1, z, 3);
+                    recurs(x - 1, y + 1, z, 1);
+                    cell.isLinear = true;
+                    // Explore the wall in the tile (LEFT)
+                    exploreWallInTile(x - 1, y, z, 1)
+                    // Explore the wall in the tile (RIGHT)
+                    exploreWallInTile(x + 1, y, z, 3)
+                }else if(cell.halfWall == 2 && (fromDir == 0 || fromDir == 4)){
+                    recurs(x, y - 2, z, 2);
+                    recurs(x + 1, y - 1, z, 3);
+                    recurs(x - 1, y - 1, z, 1);
+                    cell.isLinear = true;
+                    // Explore the wall in the tile (LEFT)
+                    exploreWallInTile(x - 1, y, z, 1)
+                    // Explore the wall in the tile (RIGHT)
+                    exploreWallInTile(x + 1, y, z, 3)
+                }
+            }else{
+                // Horizontal
+                if(cell.halfWall == 1 && (fromDir == 3 || fromDir == 4)){
+                    recurs(x - 2, y, z, 1);
+                    recurs(x - 1, y - 1, z, 2);
+                    recurs(x - 1, y + 1, z, 0);
+                    cell.isLinear = true;
+                    // Explore the wall in the tile (TOP)
+                    exploreWallInTile(x, y - 1, z, 2)
+                    // Explore the wall in the tile (BOTTOM)
+                    exploreWallInTile(x, y + 1, z, 0)
+                }else if(cell.halfWall == 2 && (fromDir == 1 || fromDir == 4)){
+                    recurs(x + 2, y, z, 3);
+                    recurs(x + 1, y - 1, z, 2);
+                    recurs(x + 1, y + 1, z, 0);
+                    cell.isLinear = true;
+                    // Explore the wall in the tile (TOP)
+                    exploreWallInTile(x, y - 1, z, 2)
+                    // Explore the wall in the tile (BOTTOM)
+                    exploreWallInTile(x, y + 1, z, 0)
+                }
+            }
+        }
+    }
+
+    function exploreWallInTile(x, y, z, fromDir){
+        if (x < 0 || y < 0 || z < 0) {
+            return;
+        }
+        
+        let cell = $scope.cells[x + ',' + y + ',' + z];
+
+        // If this is a wall that doesn't exists
+        if (!cell) return;
+
+        if(cell.explored) return;
+        else cell.explored = true;
+        
+        if(!cell.tile.halfWallIn[fromDir]) return;
+
+        
+        console.log(`${x},${y},${z},${fromDir}`)
+        for(let i=0; i<4; i++){
+            if(cell.tile.halfWallIn[i] && i != fromDir){
+                switch(i){
+                    case 0:
+                        setTileLinear(x, y - 2, z);
+                        recurs(x, y - 1, z, 4);
+                        exploreWallInTile(x, y - 2, z, 2)
+                        break;
+                    case 1:
+                        console.log(`${x},${y},${z},${fromDir}`)
+                        setTileLinear(x + 2, y, z);
+                        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
+                        recurs(x + 1, y, z, 4);
+                        exploreWallInTile(x + 2, y, z, 3);
+                        break;
+                    case 2:
+                        setTileLinear(x, y + 2, z);
+                        recurs(x, y + 1, z, 4);
+                        exploreWallInTile(x, y + 2, z, 0);
+                        break;
+                    case 3:
+                        setTileLinear(x - 2, y, z);
+                        recurs(x - 1, y, z, 4);
+                        exploreWallInTile(x - 2, y, z, 1);
+                        break;
+                }
+                console.log(`${x},${y},${z},${i}`)
+                        console.log(cell)
+            }
+        }
+        
     }
 
     function setTileLinear(x, y, z) {
@@ -415,28 +512,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
             //Wall color
             let color = 'navy';
-            switch (direction) {
-                case 0:
-                    if(wallCheck($scope.cells[(x-1)+','+(y+1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x+1)+','+(y+1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x)+','+(y+2)+','+z])) color = 'black';
-                    break;
-                case 90:
-                    if(wallCheck($scope.cells[(x-1)+','+(y+1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x-1)+','+(y-1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x-2)+','+(y)+','+z])) color = 'black';
-                    break;
-                case 180:
-                    if(wallCheck($scope.cells[(x-1)+','+(y-1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x+1)+','+(y-1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x)+','+(y-2)+','+z])) color = 'black';
-                    break;
-                case 270:
-                    if(wallCheck($scope.cells[(x+1)+','+(y+1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x+1)+','+(y-1)+','+z])) color = 'black';
-                    if(wallCheck($scope.cells[(x+2)+','+(y)+','+z])) color = 'black';
-                    break;
-            }
+            if(cell.isLinear) color = 'black';
 
             direction += rotate;
             if(direction>=360) direction-=360;
