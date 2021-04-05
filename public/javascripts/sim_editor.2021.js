@@ -457,31 +457,25 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         }
         if (x % 2 == 1 && y % 2 == 1){
-            if(cell.tile.color) return {'background-color': cell.tile.color};
-            if(cell.tile.swamp) return {'background-color': '#CD853F'};
-            if(cell.tile.black) return {'background-color': '#000000'};
-            if(cell.tile.checkpoint) return {'background-image': 'linear-gradient(to top left, #A5A5A5, #BABAC2, #E8E8E8, #A5A5A5, #BABAC2);'};
-            let roomNumber = checkRoomNumber(x,y,z);
-            if(roomNumber === 1){
-                if(cell.isLinear){
-                    return {'background-color': '#fffdea'};
-                }else{
-                    return {'background-color': '#b4ffd5'};
-                }
-            }else if(roomNumber === 2){
-                if(cell.isLinear){
-                    return {'background-color': '#359ef4'};
-                }else{
-                    return {'background-color': '#277cc2'};
-                }
+            let css = {};
+            if(cell.isLinear){
+                css['background-color'] = '#fffdea';
             }else{
-                if(cell.isLinear){
-                    return {'background-color': '#ed9aef'};
-                }else{
-                    return {'background-color': '#ac6cad'};
-                }
-
+                css['background-color'] = '#b4ffd5';
             }
+            if(cell.tile.color) css['background-color'] = cell.tile.color;
+            if(cell.tile.swamp) css['background-color'] = '#CD853F';
+            if(cell.tile.black) css['background-color'] = '#000000';
+            if(cell.tile.checkpoint) css['background-image'] = 'linear-gradient(to top left, #A5A5A5, #BABAC2, #E8E8E8, #A5A5A5, #BABAC2)';
+            let roomNumber = checkRoomNumber(x,y,z);
+            if(roomNumber === 2){
+                css['border-color'] = '#359ef4';
+                css['border-width'] = '3px';
+            }else if(roomNumber === 3){
+                css['border-color'] = '#ed9aef';
+                css['border-width'] = '3px';
+            }
+            return css;
         }
         return {};
             
