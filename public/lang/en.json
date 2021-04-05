@@ -759,7 +759,11 @@
             "exportW": "Export this map as a world file for Erebus",
             "oneVictim": "Only one victim can be placed.",
             "obstacle": "Obstacle",
-            "cellColor": "Cell Color:  "
+            "cellColor": "Cell Color:  ",
+            "timelimit": "Time Limit (sec)",
+            "select2": "Select Room 2 Tiles (Half-Walls)",
+            "select3": "Select Room 3 Tiles (Curved Walls)",
+            "innerTile": "Inner Tile Walls"
         },
         "mailTemplates": {
             "title": "Edit email template",

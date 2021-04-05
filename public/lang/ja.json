@@ -757,7 +757,11 @@
             "exportW": "このマップをErebus用ワールドファイルにエクスポート",
             "oneVictim": "１体の被災者のみ配置できます",
             "obstacle": "障害物",
-            "cellColor": "セルの色:  "
+            "cellColor": "タイルの色:  ",
+            "timelimit": "制限時間(秒)",
+            "select2": "部屋2のタイルを選ぶ (半分の壁)",
+            "select3": "部屋3のタイルを選ぶ (カーブした壁)",
+            "innerTile": "タイルの中の壁"
         },
         "mailTemplates": {
             "title": "メールテンプレート編集",

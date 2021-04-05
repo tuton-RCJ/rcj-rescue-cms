@@ -22,7 +22,7 @@ router.get('/editor/simulation/:rule', async function (req, res, next) {
   res.render('sim_editor', { user: req.user, rule, pubService: true });
 });
 
-router.get('/editor/line/2021', function (req, res, next) {
+router.get('/editor/line/:rule', function (req, res, next) {
   const { rule } = req.params;
   res.render('line_editor', { user: req.user, rule, pubService: true });
 });

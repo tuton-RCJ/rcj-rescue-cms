@@ -27,7 +27,7 @@ block location
     span.breadcrumb-item.active Simulation world editor
 
 block content
-    h1 {{"admin.simMapEditor.title" | translate}} 2020
+    h1 {{"admin.simMapEditor.title" | translate}} #{rule}
     p {{"admin.simMapEditor.desc" | translate}}
     div(style='margin-top:50px;')
         .row
@@ -57,14 +57,19 @@ block content
                         span.input-group-text {{"admin.simMapEditor.length" | translate}}
                     input.form-control(type='number', ng-model='length', min='1')
                     .input-group-append
-                        span.input-group-text Time Limit (sec):
+                        span.input-group-text {{"admin.simMapEditor.timelimit" | translate}}:
                     input.form-control(type='number', ng-model='time', min = '1')
-                    .input-group-append
-                .input-group.mb-3
-                    .input-group-append
-                        button.btn.btn-warning(type='button', id='room1Button', ng-click='selectRoom1()') Select Room 2 Tiles (Half-Walls)
-                        | &ensp;
-                        button.btn.btn-warning(type='button', id='room2Button', ng-click='selectRoom2()') Select Room 3 Tiles (Curved Walls)
+                
+                button.btn.btn-outline-dark(type='button', ng-click='selectRoom2()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==0? 'rgb(53, 158, 244)':'', color: selectRoom==0? '#fff':''}")
+                    i.far.fa-square(ng-hide='selectRoom == 0') &nbsp;
+                    i.far.fa-check-square(ng-show='selectRoom == 0') &nbsp;
+                    | {{"admin.simMapEditor.select2" | translate}}
+                button.btn.btn-outline-dark(type='button', ng-click='selectRoom3()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==1? '#ed9aef':''}")
+                    i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
+                    i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
+                    | {{"admin.simMapEditor.select3" | translate}}
+                
+
         .row
             .col-md-12
                 //.btn-group(style='margin-bottom:5px;')
