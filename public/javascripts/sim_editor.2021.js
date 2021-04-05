@@ -113,6 +113,22 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         recurs($scope.startTile.x, $scope.startTile.y - 1, $scope.startTile.z);
         recurs($scope.startTile.x, $scope.startTile.y + 1, $scope.startTile.z);
 
+        //Top Left
+        recurs($scope.startTile.x-1, $scope.startTile.y - 2, $scope.startTile.z);
+        recurs($scope.startTile.x-2, $scope.startTile.y - 1, $scope.startTile.z);
+
+        //Top Right
+        recurs($scope.startTile.x+1, $scope.startTile.y - 2, $scope.startTile.z);
+        recurs($scope.startTile.x+2, $scope.startTile.y - 1, $scope.startTile.z);
+
+        //Bottom Left
+        recurs($scope.startTile.x-1, $scope.startTile.y + 2, $scope.startTile.z);
+        recurs($scope.startTile.x-2, $scope.startTile.y + 1, $scope.startTile.z);
+
+        //Bottom Right
+        recurs($scope.startTile.x+1, $scope.startTile.y + 2, $scope.startTile.z);
+        recurs($scope.startTile.x+2, $scope.startTile.y + 1, $scope.startTile.z);
+
         for (var index in $scope.cells) {
             if($scope.cells[index].x != null &&$scope.cells[index].tile != null && $scope.cells[index].tile.changeFloorTo != null && $scope.cells[index].tile.changeFloorTo != $scope.cells[index].z){
                 recurs($scope.cells[index].x-1, $scope.cells[index].y, $scope.cells[index].tile.changeFloorTo);
@@ -1486,7 +1502,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.width = data.width;
                     $scope.length = data.length;
                     $scope.name = data.name;
-                    $scope.time = time;
+                    $scope.time = data.time;
                     $scope.finished = data.finished;
 
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
