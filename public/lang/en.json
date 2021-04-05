@@ -746,6 +746,7 @@
             "swamp": "Swamp",
             "cp" : "Check point",
             "black" : "Black hole",
+            "curve" : "Curved Wall",
             "top": "@:admin.lineMapEditor.top",
             "right": "@:admin.lineMapEditor.right",
             "left": "@:admin.lineMapEditor.left",
@@ -757,7 +758,8 @@
             "import": "@:admin.lineMapEditor.import",
             "exportW": "Export this map as a world file for Erebus",
             "oneVictim": "Only one victim can be placed.",
-            "obstacle": "Obstacle"
+            "obstacle": "Obstacle",
+            "cellColor": "Cell Color:  "
         },
         "mailTemplates": {
             "title": "Edit email template",
