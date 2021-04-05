@@ -82,10 +82,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
         
         // Set to virtual wall around the black tile
-        /*for (var index in $scope.cells) {
+        for (var index in $scope.cells) {
             if($scope.cells[index].tile){
                 if($scope.cells[index].tile.black){
-                    //console.log("黒発見")
                     var x = Number(index.split(',')[0]);
                     var y = Number(index.split(',')[1]);
                     var z = Number(index.split(',')[2]);
@@ -103,8 +102,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
                 }
             }
-        }*/
-        //console.log($scope.virtualWall)
+        }
 
         // Start it will all 4 walls around the starting tile
 
@@ -128,15 +126,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         //Bottom Right
         recurs($scope.startTile.x+1, $scope.startTile.y + 2, $scope.startTile.z);
         recurs($scope.startTile.x+2, $scope.startTile.y + 1, $scope.startTile.z);
-
-        for (var index in $scope.cells) {
-            if($scope.cells[index].x != null &&$scope.cells[index].tile != null && $scope.cells[index].tile.changeFloorTo != null && $scope.cells[index].tile.changeFloorTo != $scope.cells[index].z){
-                recurs($scope.cells[index].x-1, $scope.cells[index].y, $scope.cells[index].tile.changeFloorTo);
-                recurs($scope.cells[index].x+1, $scope.cells[index].y, $scope.cells[index].tile.changeFloorTo);
-                recurs($scope.cells[index].x+1, $scope.cells[index].y-1, $scope.cells[index].tile.changeFloorTo);
-                recurs($scope.cells[index].x-1, $scope.cells[index].y+1, $scope.cells[index].tile.changeFloorTo);
-            }
-        }
 
         //Search reachable tiles
         reachable($scope.startTile.x, $scope.startTile.y, $scope.startTile.z);
