@@ -1669,28 +1669,30 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     }
                 }
                 //Half Wall Humans
-                for (var i in $scope.range(16)) {
-                    if (walls[z][x][13][i] != '') {
-                        let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
-                        let score = 30
-                        let j = 0
-                        if(walls[z][x][8]) score = 10
-                        if (walls[z][x][13][i] == 4) {
-                            score = score / 2;
-                            if (Math.abs(halfWallVicPos[i][0]) == 0.075)
-                                j = 1;
-                            humanPos[j] *= (Math.abs(halfWallVicPos[i][0]) < 0.1) ? 1 : 1;
-                            allHumans = allHumans + thermalHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, score: score})
-                            humanId = humanId + 1
-                        }
-                        else if (walls[z][x][13][i] >= 0 && walls[z][x][13][i] <= 3) {
-                            score = score / 2;
-                            allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
-                            humanId = humanId + 1
-                        }
-                        else if (walls[z][x][13][i] >= 5 && walls[z][x][13][i] <= 8) {
-                            allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
-                            hazardId = hazardId + 1
+                if(walls[z][x][13]){
+                    for (var i in $scope.range(16)) {
+                        if (walls[z][x][13][i] != '') {
+                            let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
+                            let score = 30
+                            let j = 0
+                            if(walls[z][x][8]) score = 10
+                            if (walls[z][x][13][i] == 4) {
+                                score = score / 2;
+                                if (Math.abs(halfWallVicPos[i][0]) == 0.075)
+                                    j = 1;
+                                humanPos[j] *= (Math.abs(halfWallVicPos[i][0]) < 0.1) ? 1 : 1;
+                                allHumans = allHumans + thermalHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, score: score})
+                                humanId = humanId + 1
+                            }
+                            else if (walls[z][x][13][i] >= 0 && walls[z][x][13][i] <= 3) {
+                                score = score / 2;
+                                allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                humanId = humanId + 1
+                            }
+                            else if (walls[z][x][13][i] >= 5 && walls[z][x][13][i] <= 8) {
+                                allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
+                                hazardId = hazardId + 1
+                            }
                         }
                     }
                 }
