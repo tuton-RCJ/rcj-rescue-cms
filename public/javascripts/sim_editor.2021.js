@@ -1253,7 +1253,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let allObstacles = "";
 
         //
-        const fileHeader = ({y, z}) => `#VRML_SIM R2020a utf8
+        const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
         WorldInfo {
           basicTimeStep 16
         }
