@@ -1256,6 +1256,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
         WorldInfo {
           basicTimeStep 16
+          coordinateSystem "NUE"
         }
         Viewpoint {
           orientation -1 0 0 0.85
