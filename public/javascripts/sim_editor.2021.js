@@ -1078,7 +1078,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 let floorColor = '0.635 0.635 0.635';
                 let halfWallOutVar = [0, 0, 0, 0];
                 let halfWallInVar = [0, 0, 0, 0];
-                let curveWallVar = '[0, 0, 0, 0]';
+                let curveWallVar = [0, 0, 0, 0];
                 //stores shortening, lengthing of outer half walls
                 let halfWallOutInfo = [1, 1, 1, 1];
 
@@ -1086,10 +1086,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     if(thisCell.tile.victims.top){
                         switch(thisCell.tile.victims.top){
                             case 'None':
-                                break;
-                            case 'Heated':
-                                humanType = 4;
-                                humanPlace = 0;
                                 break;
                             case 'H':
                                 humanType = 1;
@@ -1125,10 +1121,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         switch(thisCell.tile.victims.right){
                             case 'None':
                                 break;
-                            case 'Heated':
-                                humanType = 4;
-                                humanPlace = 1;
-                                break;
                             case 'H':
                                 humanType = 1;
                                 humanPlace = 1;
@@ -1162,10 +1154,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         switch(thisCell.tile.victims.bottom){
                             case 'None':
                                 break;
-                            case 'Heated':
-                                humanType = 4;
-                                humanPlace = 2;
-                                break;
                             case 'H':
                                 humanType = 1;
                                 humanPlace = 2;
@@ -1178,15 +1166,27 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                                 humanType = 2;
                                 humanPlace = 2;
                                 break;
+                            case 'F':
+                                humanType = 5;
+                                humanPlace = 2;
+                                break;
+                            case 'P':
+                                humanType = 6;
+                                humanPlace = 2;
+                                break;
+                            case 'C':
+                                humanType = 7;
+                                humanPlace = 2;
+                                break;
+                            case 'O':
+                                humanType = 8;
+                                humanPlace = 2;
+                                break;
 
                         }
                     }else if(thisCell.tile.victims.left){
                         switch(thisCell.tile.victims.left){
                             case 'None':
-                                break;
-                            case 'Heated':
-                                humanType = 4;
-                                humanPlace = 3;
                                 break;
                             case 'H':
                                 humanType = 1;
@@ -1339,15 +1339,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
               }
             ]
           }
-        `;
-
-        const thermalHumanPart = ({x, z, rot, id, score}) => `
-        HeatVictim {
-            translation ${x} 0 ${z}
-            rotation 0 1 0 ${rot}
-            name "HeatVictim${id}"
-            scoreWorth ${score}
-        }
         `;
 
         const visualHumanPart = ({x, z, rot, id, type, score}) => `
@@ -1644,16 +1635,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         //Z offset for left and right
                         randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
                     }
-                    //Thermal
-                    if(walls[z][x][6] == 4){
-                        humanPos[0] = humanPos[0] + humanOffsetThermal[walls[z][x][7]][0] + randomOffset[0]
-                        humanPos[1] = humanPos[1] + humanOffsetThermal[walls[z][x][7]][1] + randomOffset[1]
-                        let score = 15
-                        if(walls[z][x][8]) score = 5
-                        allHumans = allHumans + thermalHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRot, id: humanId, score: score})
-                        humanId = humanId + 1
-                    }
-                    else if (walls[z][x][6] >= 5 && walls[z][x][6] <= 8){ //hazards
+
+                    if (walls[z][x][6] >= 5 && walls[z][x][6] <= 8){ //hazards
                         humanPos[0] = humanPos[0] + humanOffsetThermal[walls[z][x][7]][0] + randomOffset[0]
                         humanPos[1] = humanPos[1] + humanOffsetThermal[walls[z][x][7]][1] + randomOffset[1]
                         let score = 30
@@ -1677,15 +1660,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             let score = 30
                             let j = 0
                             if(walls[z][x][8]) score = 10
-                            if (walls[z][x][13][i] == 4) {
-                                score = score / 2;
-                                if (Math.abs(halfWallVicPos[i][0]) == 0.075)
-                                    j = 1;
-                                humanPos[j] *= (Math.abs(halfWallVicPos[i][0]) < 0.1) ? 1 : 1;
-                                allHumans = allHumans + thermalHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, score: score})
-                                humanId = humanId + 1
-                            }
-                            else if (walls[z][x][13][i] >= 0 && walls[z][x][13][i] <= 3) {
+                            if (walls[z][x][13][i] >= 0 && walls[z][x][13][i] <= 3) {
                                 score = score / 2;
                                 allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
                                 humanId = humanId + 1
