@@ -47,6 +47,35 @@ function getIP(req) {
   return '0.0.0.0';
 }
 
+let smtp;
+if (process.env.MAIL_SMTP &&process.env.MAIL_PORT &&process.env.MAIL_FROM) {
+  let smtp_conf;
+  if(process.env.MAIL_USER && process.env.MAIL_PASS){
+    smtp_conf = {
+      host: process.env.MAIL_SMTP,
+      port: process.env.MAIL_PORT,
+      secure: process.env.MAIL_PORT == 465,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    };
+  }else{
+    //No auth
+    smtp_conf = {
+      host: process.env.MAIL_SMTP,
+      port: process.env.MAIL_PORT,
+      use_authentication: false,
+      tls: {
+          rejectUnauthorized: false
+      }
+    };
+  }
+  smtp = nodemailer.createTransport(smtp_conf);
+} else {
+  smtp = null;
+}
+
 adminRouter.get('/templates', function (req, res, next) {
   const path = `${__dirname}/../../templates/mail/`;
   fs.readdir(path, { withFileTypes: true }, (err, dirents) => {
@@ -131,37 +160,7 @@ adminRouter.delete('/templates/:fileName', function (req, res, next) {
 
 adminRouter.post('/send', function (req, res, next) {
   const teams = req.body;
-  let smtp;
-  if (
-    process.env.MAIL_SMTP &&
-    process.env.MAIL_PORT &&
-    process.env.MAIL_FROM
-  ) {
-
-    let smtp_conf;
-    if(process.env.MAIL_USER && process.env.MAIL_PASS){
-      smtp_conf = {
-        host: process.env.MAIL_SMTP,
-        port: process.env.MAIL_PORT,
-        secure: process.env.MAIL_PORT == 465,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASS,
-        },
-      };
-    }else{
-      //No auth
-      smtp_conf = {
-        host: process.env.MAIL_SMTP,
-        port: process.env.MAIL_PORT,
-        use_authentication: false,
-        tls: {
-            rejectUnauthorized: false
-        }
-      };
-    }
-    smtp = nodemailer.createTransport(smtp_conf);
-  } else {
+  if(smtp == null){
     res.status(500).send({
       msg: 'Please check smtp parameters',
     });
@@ -467,6 +466,23 @@ publicRouter.get('/open/:mailId', function (req, res, next) {
           }
         });
       }
+    });
+});
+
+
+adminRouter.get('/mailAuth', function (req, res, next) {
+
+  mailDb.mailAuth
+    .find()
+    .exec(function (err, dbMail) {
+      if (err) {
+        logger.error(err);
+        return res.status(400).send({
+          msg: 'Could not get mails',
+          err: err.message,
+        });
+      }
+      return res.status(200).send(dbMail);
     });
 });
 

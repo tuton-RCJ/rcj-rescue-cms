@@ -376,7 +376,7 @@ adminRouter.put('/:competition/teams/documents', function (req, res, next) {
     });
 });
 
-adminRouter.get('/:competition/application', function (req, res, next) {
+adminRouter.get('/:competition/registration', function (req, res, next) {
   const id = req.params.competition;
 
   if (!ObjectId.isValid(id)) {
@@ -392,7 +392,7 @@ adminRouter.get('/:competition/application', function (req, res, next) {
   competitiondb.competition
     .findById(id)
     .select(
-      'name application'
+      'name registration consentForm'
     )
     .lean()
     .exec(function (err, data) {
@@ -408,9 +408,10 @@ adminRouter.get('/:competition/application', function (req, res, next) {
     });
 });
 
-adminRouter.put('/:competition/application', function (req, res, next) {
+adminRouter.put('/:competition/registration', function (req, res, next) {
   const id = req.params.competition;
-  const application = req.body;
+  const {registration} = req.body;
+  const {consentForm} = req.body;
 
   if (!ObjectId.isValid(id)) {
     return next();
@@ -424,7 +425,7 @@ adminRouter.put('/:competition/application', function (req, res, next) {
 
   competitiondb.competition
     .findById(id)
-    .select('application')
+    .select('registration consentForm')
     .exec(function (err, dbCompetition) {
       if (err) {
         logger.error(err);
@@ -433,14 +434,15 @@ adminRouter.put('/:competition/application', function (req, res, next) {
           err: err.message,
         });
       } else {
-        for(let ap of application){
-          let ind = dbCompetition.application.findIndex((a) => a.league === ap.league);
+        for(let ap of registration){
+          let ind = dbCompetition.registration.findIndex((a) => a.league === ap.league);
           if(ind == -1){
-            dbCompetition.application.push(ap);
+            dbCompetition.registration.push(ap);
           }else{
-            dbCompetition.application[ind] = ap;
+            dbCompetition.registration[ind] = ap;
           }
         }
+        if(consentForm != null) dbCompetition.consentForm = consentForm;
         
         dbCompetition.save(function (err) {
           if (err) {

@@ -55,6 +55,8 @@ var shortRoute = require('./routes/shortURL')
 var kioskRoute = require('./routes/kiosk')
 var serviceRoute = require('./routes/service')
 var documentRoute = require('./routes/document')
+var registrationRoute = require('./routes/registration')
+
 
 
 //========================================================================
@@ -77,6 +79,7 @@ var apiBackupRoute = require('./routes/api/backup')
 var apiShortURL = require('./routes/api/shortURL')
 var apiDocumentRoute = require('./routes/api/document')
 var apiMailRoute = require('./routes/api/mail')
+var apiRegistrationRoute = require('./routes/api/registration')
 
 //========================================================================
 //                          Configuration
@@ -166,6 +169,7 @@ app.use('/api/backup', [pass.ensureAdminApi, apiBackupRoute.admin])
 app.use('/api/short', [pass.ensureSuperApi , apiShortURL.super])
 app.use('/api/document', [apiDocumentRoute.public, pass.ensureLoginApi, apiDocumentRoute.private, pass.ensureAdminApi, apiDocumentRoute.admin])
 app.use('/api/mail', [apiMailRoute.public, pass.ensureLoginApi, apiMailRoute.private, pass.ensureAdminApi, apiMailRoute.admin])
+app.use('/api/registration', [apiRegistrationRoute.public, pass.ensureLoginApi, apiRegistrationRoute.private, pass.ensureAdminApi, apiRegistrationRoute.admin])
 
 //========================================================================
 //                          Website static pages(ish)
@@ -187,6 +191,7 @@ app.use('/signage', [pass.ensureAuthenticated, signageRoute.private, pass.ensure
 app.use('/admin', pass.ensureAdmin, adminRoute)
 app.use('/kiosk', [kioskRoute.public, pass.ensureAuthenticated, kioskRoute.private])
 app.use('/document', [documentRoute.public, pass.ensureAuthenticated, documentRoute.private, pass.ensureAdmin, documentRoute.admin])
+app.use('/registration', [registrationRoute.public, pass.ensureAuthenticated, registrationRoute.private, pass.ensureAdmin, registrationRoute.admin])
 
 //========================================================================
 //                          Custom routes

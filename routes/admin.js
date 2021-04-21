@@ -278,7 +278,7 @@ router.get('/:competitionid/application', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
-router.get('/:competitionid/application/:league', function (req, res, next) {
+router.get('/:competitionid/registration', function (req, res, next) {
   const id = req.params.competitionid;
   const league = req.params.league;
 
@@ -287,7 +287,7 @@ router.get('/:competitionid/application/:league', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('application_admin_league', { id, league, user: req.user });
+    res.render('registration/settings', { id, league, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 

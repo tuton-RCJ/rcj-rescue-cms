@@ -10,20 +10,25 @@ env('process.env')
 
 const LEAGUES_JSON = require('../leagues')
 
-var LINE_LEAGUES = [];
-var MAZE_LEAGUES = [];
+let LINE_LEAGUES = [];
+let MAZE_LEAGUES = [];
+let OTHER_LEAGUES = [];
+
 for(let i in LEAGUES_JSON){
   if(LEAGUES_JSON[i].type == "line") LINE_LEAGUES.push(LEAGUES_JSON[i].id);
   if(LEAGUES_JSON[i].type == "maze") MAZE_LEAGUES.push(LEAGUES_JSON[i].id);
+  if(LEAGUES_JSON[i].type == "other") OTHER_LEAGUES.push(LEAGUES_JSON[i].id);
 }
 
 
 logger.debug("Available line leagues : " + LINE_LEAGUES);
 logger.debug("Available maze leagues : " + MAZE_LEAGUES);
+logger.debug("Available other leagues : " + OTHER_LEAGUES);
+
 
 const SUPPORT_RULES = ["2021"];
 
-const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES);
+const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, OTHER_LEAGUES);
 
 const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', 'zip'];
 
@@ -128,30 +133,19 @@ const competitionSchema = new Schema({
       }]
     }]
   },
-  application: {
+  registration: {
     type: [new Schema({
       'league': {type: String, enum: LEAGUES},
       'enable': {type: Boolean,  default: false},
       'deadline': {type: Number, default: 0},
       'passCode': {type: String, default: function(){
         return crypto.randomBytes(8).toString('base64').substring(0, 8);
-      }},
-      'ageAsOf': {type: Number, default: 0},
-      'minAge': {type: Number, default: 0},
-      'maxAge': {type: Number, default: 100},
-      'notifications':[{
-        'color' : {type: String, default: '273c75'},
-        'bkColor' : {type: String, default: 'ccffff'},
-        'i18n':[{
-          'language' : {type: String, default: ''},
-          'title' : {type: String, default: ''},
-          'description' : {type: String, default: ''}
-        }]
-      }]
+      }}
     })],
     default: [],
     select: false
-  }
+  },
+  consentForm: {type: String, default: ""}
 })
 
 const signageSchema = new Schema({
@@ -254,27 +248,6 @@ const teamSchema = new Schema({
   }
 })
 
-teamSchema.pre('save', function (next) {
-  const self = this
-  if (self.isNew) {
-    Team.findOne({
-      competition: self.competition,
-      name       : self.name,
-      league     : self.league
-    }, function (err, dbTeam) {
-      if (err) {
-        next(err)
-      } else if (dbTeam) {
-        err = new Error('Team with name "' + self.name + '" already exists!')
-        next(err)
-      } else {
-        next()
-      }
-    })
-  } else {
-    next()
-  }
-})
 
 const fieldSchema = new Schema({
   competition: {
