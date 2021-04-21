@@ -56,6 +56,7 @@ var kioskRoute = require('./routes/kiosk')
 var serviceRoute = require('./routes/service')
 var documentRoute = require('./routes/document')
 var registrationRoute = require('./routes/registration')
+var myPageRoute = require('./routes/mypage')
 
 
 
@@ -192,6 +193,7 @@ app.use('/admin', pass.ensureAdmin, adminRoute)
 app.use('/kiosk', [kioskRoute.public, pass.ensureAuthenticated, kioskRoute.private])
 app.use('/document', [documentRoute.public, pass.ensureAuthenticated, documentRoute.private, pass.ensureAdmin, documentRoute.admin])
 app.use('/registration', [registrationRoute.public, pass.ensureAuthenticated, registrationRoute.private, pass.ensureAdmin, registrationRoute.admin])
+app.use('/mypage', [myPageRoute.public, pass.ensureAuthenticated, myPageRoute.private, pass.ensureAdmin, myPageRoute.admin])
 
 //========================================================================
 //                          Custom routes

@@ -22,6 +22,8 @@ const query = require('../../helper/query-helper');
 const mailDb = require('../../models/mail');
 const sanitizeFilename = require('sanitize-filename');
 const {escapeRegExp} = require('lodash');
+const competitiondb = require('../../models/competition');
+
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const N = 32;
@@ -483,6 +485,88 @@ adminRouter.get('/mailAuth', function (req, res, next) {
         });
       }
       return res.status(200).send(dbMail);
+    });
+});
+
+publicRouter.get('/my/:teamId/:token', function (req, res, next) {
+  const teamId = req.params.teamId;
+  const token = req.params.token;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      "_id": teamId,
+      "document.token": token
+    })
+    .exec(function (err, team) {
+      if (err || team == null) {
+        if (!err) err = { message: 'No team found' };
+          res.status(400).send({
+            msg: 'Could not get team',
+            err: err.message,
+          });
+        } else if (team) {
+          mailDb.mail
+          .find({
+            team: teamId,
+          })
+          .select('competition mailId messageId subject team time')
+          .exec(function (err, dbMail) {
+            if (err) {
+              logger.error(err);
+              return res.status(400).send({
+                msg: 'Could not get mails',
+                err: err.message,
+              });
+            }
+            return res.status(200).send(dbMail.reverse());
+          });
+      }
+    });
+});
+
+publicRouter.get('/get/:teamId/:token/:mailId', function (req, res, next) {
+  const teamId = req.params.teamId;
+  const token = req.params.token;
+  const mailId = req.params.mailId;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      "_id": teamId,
+      "document.token": token
+    })
+    .exec(function (err, team) {
+      if (err || team == null) {
+        if (!err) err = { message: 'No team found' };
+          res.status(400).send({
+            msg: 'Could not get team',
+            err: err.message,
+          });
+        } else if (team) {
+          mailDb.mail
+          .findOne({
+            team: teamId,
+            mailId,
+          })
+          .select('html plain')
+          .exec(function (err, dbMail) {
+            if (err) {
+              logger.error(err);
+              return res.status(400).send({
+                msg: 'Could not get a mail',
+                err: err.message,
+              });
+            }
+            return res.status(200).send({ html: dbMail.html, plain: dbMail.plain });
+          });
+      }
     });
 });
 

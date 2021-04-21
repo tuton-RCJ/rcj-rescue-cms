@@ -1,0 +1,54 @@
+//- -*- tab-width: 2 -*-
+extends ../includes/layout
+
+block vars
+  - var ngAppDef = 'MyPage'
+
+append scripts
+  script.
+    var competitionId = "#{competition}"
+    var leagueId = "#{league}"
+    var teamId = "#{team}"
+    var token = "#{token}"
+  script(src='/components/angular-toastr/dist/angular-toastr.tpls.min.js')
+  script(src='/javascripts/mypage/my.js')
+
+append css
+  link(rel='stylesheet', href='/components/angular-toastr/dist/angular-toastr.css')
+
+block location
+    a.breadcrumb-item(ng-click="go('/home')") Home
+    span.breadcrumb-item.active My Page
+
+
+block content
+  .row
+    .col-md-1
+    .col-md-10
+      div(style="text-align:center;")
+        h1 {{competition.name}}
+        h5 {{leagueName}}
+        h4 #{teamName}
+      hr
+
+      .row 
+        .col-md-4 
+          a.btn.btn-primary.btn-lg(style="height:200px;width:100%;",href=`/document/${team}/${token}`, target="_blank")
+            div(style="margin-top:20px;")
+              i.fas.fa-book.fa-5x(aria-hidden='true', style="margin-bottom:10px;")
+              p 提出フォーム
+      hr
+      div(ng-show="mails.length>0")
+        h5
+          i.fas.fa-envelope &nbsp;
+          | メッセージ
+        table.custom(style="margin-bottom:20px;")
+          thead
+              tr
+                th.fixedhead {{"mail.sent.time" | translate}}
+                th.fixedhead {{"mail.sent.subject" | translate}}
+          tbody
+              tr(ng-repeat='mail in mails')
+                td(ng-bind="time(mail.time)")
+                td
+                  a(ng-click="mailView(mail)", ng-bind="mail.subject", style="text-decoration: underline; color: blue;") 
