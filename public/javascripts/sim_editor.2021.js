@@ -1948,6 +1948,8 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, x, y, z
      }
      
      $scope.innerTileClick = function(r, c) {
+         console.log(r)
+         console.log(c)
         var ind = -1, tmp = r * 10 + c;
         if (tmp == 12) ind = 0;
         else if (tmp == 23) ind = 1;
@@ -1958,8 +1960,10 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, x, y, z
                 quad = parseInt(r / 2) * 2 + parseInt(c / 2);
                 $scope.cell.tile.curve[quad] = ($scope.cell.tile.curve[quad] + 1) % 5;
             }
-            else if (((r % 2 == 1) ^ (c % 2 == 1)) && (r != 0 && c != 0 && r != 4 && c != 4)) //half wall
-                $scope.cell.tile.halfWallIn[ind] = 1 - $scope.cell.tile.halfWallIn[ind];
+            else if (((r % 2 == 1) ^ (c % 2 == 1)) && (r != 0 && c != 0 && r != 4 && c != 4)){//half wall
+                $scope.cell.tile.halfWallIn[ind] = !$scope.cell.tile.halfWallIn[ind];
+            } 
+                
         }
      }
 
