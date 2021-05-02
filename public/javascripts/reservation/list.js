@@ -21,6 +21,10 @@ var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCoo
         window.location = `/admin/${competitionId}/reservation/edit/${id}`;
     }
 
+    $scope.admin = function(id){
+        window.location = `/admin/${competitionId}/reservation/admin/${id}`;
+    }
+
     $scope.delete = async function (resv) {
         const {
             value: operation
