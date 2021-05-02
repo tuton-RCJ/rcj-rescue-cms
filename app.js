@@ -82,6 +82,7 @@ var apiDocumentRoute = require('./routes/api/document')
 var apiMailRoute = require('./routes/api/mail')
 var apiRegistrationRoute = require('./routes/api/registration')
 var apiReservationRoute = require('./routes/api/reservation')
+var apiCabinetRoute = require('./routes/api/cabinet')
 
 
 //========================================================================
@@ -174,6 +175,7 @@ app.use('/api/document', [apiDocumentRoute.public, pass.ensureLoginApi, apiDocum
 app.use('/api/mail', [apiMailRoute.public, pass.ensureLoginApi, apiMailRoute.private, pass.ensureAdminApi, apiMailRoute.admin])
 app.use('/api/registration', [apiRegistrationRoute.public, pass.ensureLoginApi, apiRegistrationRoute.private, pass.ensureAdminApi, apiRegistrationRoute.admin])
 app.use('/api/reservation', [apiReservationRoute.public, pass.ensureLoginApi, apiReservationRoute.private, pass.ensureAdminApi, apiReservationRoute.admin])
+app.use('/api/cabinet', [apiCabinetRoute.public, pass.ensureLoginApi, apiCabinetRoute.private, pass.ensureAdminApi, apiCabinetRoute.admin])
 
 
 //========================================================================

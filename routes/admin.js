@@ -346,6 +346,39 @@ router.get('/:competitionid/reservation/admin/:resvId/', function (req, res, nex
   else res.render('access_denied', { user: req.user });
 });
 
+router.get('/:competitionid/cabinet', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('cabinet/admin', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/cabinet/:leagueTeam', function (req, res, next) {
+  const id = req.params.competitionid;
+  const leagueTeam = req.params.leagueTeam;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  let isTeam = false;
+  if (ObjectId.isValid(leagueTeam)) {
+    isTeam = true;
+  }else{
+    if (LEAGUES.filter(function (elm) {return elm.indexOf(leagueTeam) != -1;}).length == 0) {
+      return next();
+    }
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('cabinet/file', { id, user: req.user, isTeam , leagueTeam, isMyPage: false, teamId: "null", token: "null"});
+  else res.render('access_denied', { user: req.user });
+});
+
 router.get('/handover', function (req, res, next) {
   res.render('runs_handover', { user: req.user });
 });

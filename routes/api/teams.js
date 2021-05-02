@@ -354,7 +354,11 @@ adminRouter.post('/', function (req, res) {
               msg: 'New team has been saved',
               id: data._id,
             });
-            const path = `${__dirname}/../../documents/${dbComp._id}/${data._id}`;
+            let path = `${__dirname}/../../documents/${dbComp._id}/${data._id}`;
+            mkdirp(path, function (err) {
+              if (err) logger.error(err);
+            });
+            path = `${__dirname}/../../cabinet/${dbComp._id}/${data._id}`;
             mkdirp(path, function (err) {
               if (err) logger.error(err);
             });

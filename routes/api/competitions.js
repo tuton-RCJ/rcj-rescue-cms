@@ -888,10 +888,17 @@ adminRouter.post('/', function (req, res) {
       const competitionid = data._id;
       const aLevel = ACCESSLEVELS.ADMIN;
 
-      const path = `${__dirname}/../../documents/${competitionid}`;
+      let path = `${__dirname}/../../documents/${competitionid}`;
       mkdirp(path, function (err) {
         if (err) logger.error(err);
       });
+
+      for(let l of LEAGUES){
+        path = `${__dirname}/../../cabinet/${competitionid}/${l}`;
+        mkdirp(path, function (err) {
+          if (err) logger.error(err);
+        });
+      }
 
       userdb.user.findById(userid).exec(function (err, dbUser) {
         if (err) {

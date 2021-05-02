@@ -49,27 +49,32 @@ block content
       hr
       h3 {{"admin.competition.tools" | translate}}
       .row
-        .col-md-3(style="margin-bottom:10px;")
+        .col-md-3(style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/documents')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
             i.fas.fa-file-alt.fa-2x
             br
             span {{"document.admin.title" | translate}}
         if mailEnable
-          .col-md-3(style="margin-bottom:10px;")
+          .col-md-3(style="margin-bottom:30px;")
             button(ng-click="go('/admin/' + competitionId + '/mails')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
               i.fas.fa-mail-bulk.fa-2x
               br
               span {{"mail.home.title" | translate}}
-          .col-md-3(style="margin-bottom:10px;")
+          .col-md-3(style="margin-bottom:30px;")
             button(ng-click="go('/admin/' + competitionId + '/registration')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
               i.fas.fa-pen-fancy.fa-2x
               br
-              span 参加登録受付設定
-        .col-md-3(style="margin-bottom:10px;")
+              span 参加登録
+        .col-md-3(style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/reservation')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
             i.fas.fa-calendar-day.fa-2x
             br
-            span 予約受付設定
+            span 予約
+        .col-md-3(style="margin-bottom:30px;")
+          button(ng-click="go('/admin/' + competitionId + '/cabinet')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
+            i.fas.fa-folder.fa-2x
+            br
+            span キャビネット
       hr
       h3 {{"admin.competition.management" | translate}}
       .row 

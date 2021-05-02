@@ -111,6 +111,29 @@ publicRouter.get('/:teamId/:token/reservation/:resvId', function (req, res, next
     });
 });
 
+publicRouter.get('/:teamId/:token/cabinet', function (req, res, next) {
+  const { teamId } = req.params;
+  const { token } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      "_id": teamId,
+      "document.token": token
+    })
+    .exec(function (err, team) {
+      if (err || team == null) {
+        if (!err) err = { message: 'No team found' };
+          res.render('access_denied', { user: req.user });
+        } else if (team) {
+          res.render('cabinet/file', { id: team.competition, user: req.user, isTeam: true , teamId, isMyPage: true, token, leagueTeam: teamId});
+      }
+    });
+});
+
 publicRouter.all('*', function (req, res, next) {
   next();
 });
