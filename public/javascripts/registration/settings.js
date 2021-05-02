@@ -59,7 +59,8 @@ app.controller("RegistrationSettingsController", ['$scope', '$http', '$translate
             }
             
             if(addFlag){
-                $http.put("/api/competitions/" + $scope.competitionId + "/registration", $scope.competition.registration).then(function (response) {
+                console.log($scope.competition)
+                $http.put("/api/competitions/" + $scope.competitionId + "/registration", $scope.competition).then(function (response) {
                     Toast.fire({
                         type: 'success',
                         title: saved_mes

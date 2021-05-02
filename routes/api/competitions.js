@@ -434,12 +434,14 @@ adminRouter.put('/:competition/registration', function (req, res, next) {
           err: err.message,
         });
       } else {
-        for(let ap of registration){
-          let ind = dbCompetition.registration.findIndex((a) => a.league === ap.league);
-          if(ind == -1){
-            dbCompetition.registration.push(ap);
-          }else{
-            dbCompetition.registration[ind] = ap;
+        if(registration != null){
+          for(let ap of registration){
+            let ind = dbCompetition.registration.findIndex((a) => a.league === ap.league);
+            if(ind == -1){
+              dbCompetition.registration.push(ap);
+            }else{
+              dbCompetition.registration[ind] = ap;
+            }
           }
         }
         if(consentForm != null) dbCompetition.consentForm = consentForm;
