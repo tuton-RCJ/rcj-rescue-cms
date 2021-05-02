@@ -157,6 +157,10 @@ var app = angular.module("TeamAdmin", ['ngTouch','pascalprecht.translate', 'ngCo
         window.location = path
     }
 
+    $scope.goMyPage = function (team){
+        window.open(`/mypage/${team._id}/${team.document.token}`, '_blank');
+    }
+
     var showAllLeagues = true;
     $scope.refineName = "";
     $scope.refineCode = "";

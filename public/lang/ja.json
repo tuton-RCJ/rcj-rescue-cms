@@ -139,7 +139,8 @@
         "checkin": "チェックイン",
         "totalScore": "合計得点",
         "sort": "ソート",
-        "deleted": "正常に削除しました"
+        "deleted": "正常に削除しました",
+        "mypage": "マイページ"
     },
     "accessDenied":{
         "title" : "アクセス拒絶",

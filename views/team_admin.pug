@@ -130,6 +130,7 @@ block content
                   button#dropdownMenu.btn.btn-secondary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') {{"common.action" | translate}}
                   .dropdown-menu(aria-labelledby='dropdownMenu')
                       button.dropdown-item(type='button' ng-click="edit(team)") {{"common.edit" | translate}}
+                      button.dropdown-item(type='button' ng-click="goMyPage(team)") {{"common.mypage" | translate}}
                       .dropdown-divider
                       button.dropdown-item(type='button' ng-click='removeTeam(team._id)') {{"common.delete" | translate}}
                 

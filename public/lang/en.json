@@ -114,7 +114,7 @@
         "interview": "Inspection / Interview",
         "public": "Public",
         "private": "Private",
-        "selectAll": "Select all runs",
+        "selectAll": "Select all",
         "delS": "Delete selected collections",
         "tile": "tiles",
         "times": "times",
@@ -139,7 +139,8 @@
         "checkin": "Check in",
         "totalScore": "Total score",
         "sort": "Sorting",
-        "deleted": "Successfully deleted!"
+        "deleted": "Successfully deleted!",
+        "mypage": "Team page"
     },
     "accessDenied":{
         "title" : "Access denied",
