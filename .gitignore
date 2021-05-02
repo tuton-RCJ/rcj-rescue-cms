@@ -6,6 +6,7 @@ public/components/*
 node_modules/*
 fonts/*
 documents/*
+cabinet/*
 tmp/*
 
 .idea/
