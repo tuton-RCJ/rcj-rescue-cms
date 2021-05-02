@@ -1,0 +1,115 @@
+//- -*- tab-width: 2 -*-
+extends ../includes/layout
+
+block vars
+  - var ngAppDef = 'ReservationSettings'
+
+append scripts
+  script.
+    var competitionId = "#{id}"
+    var resvId = "#{resvId}"
+  script(src='/javascripts/reservation/settings.js')
+  script(src='/components/quill/index.js')
+  script(src='/components/ngQuill/src/ng-quill.js')
+  script(src='/components/quill-image-resize-module/image-resize.min.js')
+  script(src='/components/quill-image-drop-and-paste/quill-image-drop-and-paste.min.js')
+
+append css 
+  link(rel='stylesheet', href='/components/quill.snow/index.css')
+  style.
+    .dropdown-menu {
+      display: initial;
+    }
+    .btn-default {
+      background-color: #3498db;
+      color: #fff;
+      font-size: 10px;
+    }
+    .ui-select-bootstrap .ui-select-choices-row.active>span {
+        color: initial;
+        text-decoration: none;
+        outline: 0;
+        background-color: initial;
+    }
+
+block location
+    a.breadcrumb-item(ng-click="go('/home')") Home
+    a.breadcrumb-item(ng-click="go('/admin')") Admin
+    a.breadcrumb-item(ng-click="go('/admin/' + competitionId)") {{competition.name}}
+    a.breadcrumb-item(ng-click="go('/admin/' + competitionId + '/reservation')") Reservation
+    span.breadcrumb-item.active Edit
+
+
+block content
+  .row
+    .col-md-1
+    .col-md-10
+      h1 予約受付設定
+      hr
+
+      h5 名前
+      input.form-control(type='text', ng-model='resv.name')
+      br
+      h5 説明
+      ng-quill-editor(ng-model="resv.description")
+      br
+      h5 期限
+      input.form-control(type='datetime-local', ng-model='resv.deadline', ng-style="{backgroundColor: deadlineColour(resv.deadline)}")
+      br
+      h5 受付
+      select.custom-select(ng-model='resv.enable', ng-style="{backgroundColor: resv.enable ? '#bcffbc':'#ffcccc'}")
+        option(ng-value='true') {{"common.enable" | translate}}
+        option(ng-value='false') {{"common.disable" | translate}}  
+      br
+      br
+      h5 対象チーム(OR条件)
+      .row(style="background-color:#ecf0f1;padding:20px 0;margin-left:10px;border-radius: 10px;")
+        .col-md-5
+          h6(style="text-align:center;") リーグ
+          ui-select(multiple='' ng-model='resv.league' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
+            ui-select-match(placeholder='Select league...') {{$item.name}}
+            ui-select-choices(repeat='league.id as league in leagues | filter: {id: $select.search}')
+              div(ng-bind-html='league.name')
+        .col-md-1.d-flex.align-items-center.text-center
+          h5 OR
+        .col-md-6
+          h6(style="text-align:center;") チーム
+          ui-select(multiple='' ng-model='resv.team' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
+            ui-select-match(placeholder='Select team...') {{$item.code}} {{$item.name}}
+            ui-select-choices(repeat='team._id as team in teams | filter: {_id: $select.search}')
+              span {{team.teamCode}} {{team.name}}
+      
+      .text-center(style="margin-top:20px;")
+        button.btn.btn-success.btn-lg(type='button', ng-click='save()')
+          i.fas.fa-save &nbsp;{{"admin.settings.set" | translate}}
+      hr
+      h3 予約枠設定
+      table.custom(style="margin-bottom:20px;")
+        thead
+            tr
+              th 開始時間
+              th 長さ（分）
+              th 枠数
+              th 削除
+              
+        tbody
+            tr(ng-repeat="slot in resv.slot | orderBy: 'start' track by $index")
+              td
+                input.form-control(type='datetime-local', ng-model='slot.start')
+              td 
+                input.form-control(type='number', ng-model='slot.duration')
+              td 
+                input.form-control(type='number', ng-model='slot.max')
+              td 
+                button.btn.btn-danger.btn-sm(type='button', ng-click='removeSlot(slot)')
+                  i.fas.fa-trash-alt
+
+      .text-center(style="margin-bottom:20px;")
+        button.btn.btn-primary(type='button', ng-click='addSlot()')
+            i.fas.fa-plus
+
+      
+      .text-center
+        button.btn.btn-success.btn-lg(type='button', ng-click='save()')
+          i.fas.fa-save &nbsp;{{"admin.settings.set" | translate}}
+      br

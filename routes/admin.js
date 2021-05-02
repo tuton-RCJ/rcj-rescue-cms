@@ -280,14 +280,69 @@ router.get('/:competitionid/application', function (req, res, next) {
 
 router.get('/:competitionid/registration', function (req, res, next) {
   const id = req.params.competitionid;
-  const league = req.params.league;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('registration/settings', { id, league, user: req.user });
+    res.render('registration/settings', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/reservation', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('reservation/list', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/reservation/edit', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('reservation/settings', { id, user: req.user, resvId: null });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/reservation/edit/:resvId', function (req, res, next) {
+  const id = req.params.competitionid;
+  const resvId = req.params.resvId;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  if(!resvId){
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('reservation/settings', { id, user: req.user , resvId});
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/reservation/admin/:resvId/', function (req, res, next) {
+  const id = req.params.competitionid;
+  const resvId = req.params.resvId;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  if(!resvId){
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('reservation/admin', { id, user: req.user , resvId});
   else res.render('access_denied', { user: req.user });
 });
 

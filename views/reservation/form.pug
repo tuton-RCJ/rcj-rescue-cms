@@ -1,0 +1,69 @@
+//- -*- tab-width: 2 -*-
+extends ../includes/layout
+
+block vars
+  - var ngAppDef = 'ResvForm'
+
+append scripts
+  script.
+    var competitionId = "#{competition}"
+    var leagueId = "#{league}"
+    var teamId = "#{team}"
+    var token = "#{token}"
+    var resvId = "#{resvId}"
+  script(src='/javascripts/reservation/form.js')
+
+block location
+    a.breadcrumb-item(ng-click="go('/home')") Home
+    a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") MyPage
+    span.breadcrumb-item.active {{resv.name}}
+
+
+block content
+  .row
+    .col-md-1
+    .col-md-10
+      div(style="text-align:center;")
+        h1 {{resv.name}}
+        h5 {{competition.name}} - {{leagueName}}
+        h4 #{teamName}
+      
+      .alert.alert-primary.text-center(role='alert')
+        h4.alert-heading 締め切り: 
+          strong(ng-bind="deadline()")
+        span このページの全ての日時は，このタイムゾーンで表示されています．
+      hr
+      p(ng-bind-html="resv.description")
+
+      .alert.alert-success.text-center(role='alert', ng-if="myBook")
+        h4.alert-heading 
+          i.fas.fa-calendar-check &nbsp;
+          | 私の予約
+        h5 開始時刻:&nbsp;
+          strong(ng-bind="time(myBook.start)")
+        div(ng-if="inDeadline()")
+          p 締め切りの時間まで，予約の変更ができます．変更をする際は，まず初めに，この予約をキャンセルしてください．変更先の予約可否については，下の"予約状況"をご確認ください．
+          button.btn.btn-danger.btn-sm(type='button', ng-click='cancel(myBook)', style="margin:0 5px;")
+            i.fas.fa-times &nbsp;
+            | この予約をキャンセル
+      
+      table.custom(ng-if="inDeadline()")
+        thead
+            tr
+              th 開始時刻
+              th 長さ（分）
+              th 予約状況
+              th(ng-if="!myBook") 予約
+        tbody
+            tr(ng-repeat="r in resv.slot | orderBy: 'start'")
+              td(ng-bind="time(r.start)")
+              td(ng-bind="r.duration")
+              td 
+                i.fas.fa-calendar-check(style="color:#3498db;", ng-if="r.myBooked")
+                i.fas.fa-times-circle(style="color:#e74c3c;", ng-if="!r.myBooked && r.available == 0")
+                i.fas.fa-circle(style="color:#2ecc71;", ng-if="!r.myBooked && r.available > 0")
+              td(ng-if="!myBook")
+                button.btn.btn-success.btn-sm(type='button', ng-click='book(r.slotId)', style="margin:0 5px;", ng-if="r.available > 0 && !myBook")
+                  i.fas.fa-check &nbsp;
+                  | 予約
+      br

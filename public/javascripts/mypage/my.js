@@ -14,6 +14,10 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
         window.location = path
     }
 
+    $scope.goResv = function (id) {
+        window.open(`/mypage/${teamId}/${token}/reservation/${id}`, '_blank');
+    }
+
     $scope.getLeagueName = function (id){
         return($scope.leagues.find(l => l.id === id).name)
     }
@@ -27,6 +31,13 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
 
     $http.get(`/api/mail/my/${teamId}/${token}`).then(function (response) {
         $scope.mails = response.data;
+    })
+
+    $http.post(`/api/reservation/list/${competitionId}`,{
+        team: teamId,
+        league: leagueId
+    }).then(function (response) {
+        $scope.reservations = response.data;
     })
 
 

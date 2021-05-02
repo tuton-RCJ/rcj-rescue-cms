@@ -81,6 +81,8 @@ var apiShortURL = require('./routes/api/shortURL')
 var apiDocumentRoute = require('./routes/api/document')
 var apiMailRoute = require('./routes/api/mail')
 var apiRegistrationRoute = require('./routes/api/registration')
+var apiReservationRoute = require('./routes/api/reservation')
+
 
 //========================================================================
 //                          Configuration
@@ -171,6 +173,8 @@ app.use('/api/short', [pass.ensureSuperApi , apiShortURL.super])
 app.use('/api/document', [apiDocumentRoute.public, pass.ensureLoginApi, apiDocumentRoute.private, pass.ensureAdminApi, apiDocumentRoute.admin])
 app.use('/api/mail', [apiMailRoute.public, pass.ensureLoginApi, apiMailRoute.private, pass.ensureAdminApi, apiMailRoute.admin])
 app.use('/api/registration', [apiRegistrationRoute.public, pass.ensureLoginApi, apiRegistrationRoute.private, pass.ensureAdminApi, apiRegistrationRoute.admin])
+app.use('/api/reservation', [apiReservationRoute.public, pass.ensureLoginApi, apiReservationRoute.private, pass.ensureAdminApi, apiReservationRoute.admin])
+
 
 //========================================================================
 //                          Website static pages(ish)

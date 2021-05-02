@@ -75,6 +75,42 @@ publicRouter.get('/:teamId/:token', function (req, res, next) {
 });
 
 
+publicRouter.get('/:teamId/:token/reservation/:resvId', function (req, res, next) {
+  const { teamId } = req.params;
+  const { token } = req.params;
+  const { resvId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  if (!ObjectId.isValid(resvId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      "_id": teamId,
+      "document.token": token
+    })
+    .exec(function (err, team) {
+      if (err || team == null) {
+        if (!err) err = { message: 'No team found' };
+          res.render('access_denied', { user: req.user });
+        } else if (team) {
+          res.render('reservation/form', {
+            team: team._id,
+            competition: team.competition,
+            user: req.user,
+            league: team.league,
+            teamName: team.name,
+            token: token,
+            resvId
+          });
+      }
+    });
+});
+
 publicRouter.all('*', function (req, res, next) {
   next();
 });
