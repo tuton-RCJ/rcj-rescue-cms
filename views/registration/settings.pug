@@ -43,11 +43,11 @@ block content
       table.custom(style="margin-bottom:20px;")
         thead
             tr
-              th リーグ
+              th {{"common.league" | translate}}
               th 受付
               th 期限
               th パスコード
-              th 操作
+              th {{"common.operation" | translate}}
               
         tbody
             tr(ng-repeat='league in competition.registration')
@@ -61,5 +61,7 @@ block content
               td 
                 input.form-control(type='text', ng-model='league.passCode')              
               td 
+                button.btn.btn-dark(type='button', ng-click='copy(league.league)', style="margin-right:5px;")
+                  i.fas.fa-clipboard &nbsp;URL
                 button.btn.btn-success(type='button', ng-click='set()')
                   i.fas.fa-check &nbsp;{{"admin.settings.set" | translate}}

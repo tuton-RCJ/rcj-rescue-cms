@@ -106,6 +106,24 @@ app.controller("RegistrationSettingsController", ['$scope', '$http', '$translate
         });
     }
 
+    $scope.copy = function(league){
+        let link = `${location.protocol}//${location.host}/registration/${competitionId}/${league}`;
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(link);
+            Toast.fire({
+                type: 'success',
+                title: "Copied!",
+                html: link
+            });
+        }else{
+            Toast.fire({
+                type: 'error',
+                title: "Not supported!"
+            });
+        }
+        
+    }
+
     $scope.deadlineColour = function(deadline){
         let today = new Date();
         let tomorrow = new Date();
