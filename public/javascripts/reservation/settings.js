@@ -96,7 +96,7 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
                     type: 'success',
                     title: saved_mes
                 })
-                window.location.href = `/admin/${competitionId}/reservation/${response.data.id}`;
+                window.location.href = `/admin/${competitionId}/reservation/edit/${response.data.id}`;
             }, function (response) {
                 Toast.fire({
                     type: 'error',
@@ -137,7 +137,6 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
         }
         
         $scope.resv.slot.push(tmp);
-        console.log($scope.resv.slot)
     }
 
     $scope.removeSlot = function(slot){
