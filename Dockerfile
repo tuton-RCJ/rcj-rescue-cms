@@ -1,9 +1,9 @@
-FROM ryorobo/rcj-scoring-base:latest
+FROM ryorobo/rcj-scoring-node:latest
 
-COPY . /opt/rcj-scoring-system/
-WORKDIR /opt/rcj-scoring-system
+COPY . /opt/rcj-cms/
+WORKDIR /opt/rcj-cms
 
 RUN npm run build
 
-ENTRYPOINT ["/start.sh"]
-EXPOSE 80
+ENTRYPOINT ["node server"]
+EXPOSE 3000
