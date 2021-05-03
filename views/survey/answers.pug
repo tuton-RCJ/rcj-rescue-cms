@@ -33,8 +33,8 @@ block content
         table.custom(style="margin-bottom:20px;")
           thead
               tr
-                th チームコード
-                th チーム名
+                th {{"common.teamCode" | translate}}
+                th {{"common.team" | translate}}
                 th(ng-repeat="question in survey.questions" ng-bind="langContent(question.i18n, 'title')")
                 th {{"common.operation" | translate}}
                 

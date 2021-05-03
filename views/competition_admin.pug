@@ -64,22 +64,22 @@ block content
             button(ng-click="go('/admin/' + competitionId + '/registration')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
               i.fas.fa-pen-fancy.fa-2x
               br
-              span 参加登録
+              span {{"registration.title" | translate}}
         .col-md-3(style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/reservation')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
             i.fas.fa-calendar-day.fa-2x
             br
-            span 予約
+            span {{"reservation.title" | translate}}
         .col-md-3(style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/cabinet')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
             i.fas.fa-folder.fa-2x
             br
-            span キャビネット
+            span {{"cabinet.title" | translate}}
         .col-md-3(style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/survey')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
             i.far.fa-question-circle.fa-2x
             br
-            span アンケート
+            span {{"survey.title" | translate}}
       hr
       h3 {{"admin.competition.management" | translate}}
       .row 

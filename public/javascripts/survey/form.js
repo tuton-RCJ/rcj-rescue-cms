@@ -1,6 +1,5 @@
 // register the directive with your app module
 var app = angular.module('SurveyForm', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies', 'ngQuill', 'ngSanitize']);
-let uploading_mes;
 app.constant('NG_QUILL_CONFIG', {
     /*
      * @NOTE: this config/output is not localizable.
@@ -62,7 +61,21 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
     // = translationId;
     });
 
-    
+    let trans = [];
+    function loadTranslation(tag){
+        $translate(`survey.js.${tag}`).then(function (val) {
+            trans[tag] = val;
+        }, function (translationId) {
+        // = translationId;
+        });
+    }
+
+    loadTranslation("multiple");
+    loadTranslation("onlyOnce");
+    loadTranslation("submit");
+    loadTranslation("submitButton");
+    loadTranslation("cancelButton");
+    loadTranslation("complete");
 
     const currentLang = $translate.proposedLanguage() || $translate.use();
     const availableLangs =  $translate.getAvailableLanguageKeys();
@@ -133,25 +146,33 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
         
         let confirmMes = '';
         if($scope.survey.reEdit){
-            confirmMes = '回答内容を提出しますか？';
+            confirmMes = trans["multiple"];
         }else{
-            confirmMes = 'このフォームは１度しか提出できません．提出後の内容の修正はできません．提出してよいですか？';
+            confirmMes = trans["onlyOnce"];
         }
 
         const {
             value: operation
         } = await swal({
-            title: "提出",
+            title: trans["submit"],
             text: confirmMes,
             type: "warning",
             showCancelButton: true,
-            confirmButtonText: "Yes, submit it!",
-            confirmButtonColor: "#ec6c62",
+            confirmButtonText: trans["submitButton"],
+            cancelButtonText: trans["cancelButton"],
+            confirmButtonColor: "#2ecc71",
         })
 
         if (operation) {
             $http.put(`/api/survey/answer/${teamId}/${token}/${survId}`, sendAns).then(function (response) {
-                location.reload();
+                Swal.fire({
+                    title: trans["complete"],
+                    type: "success",
+                    confirmButtonText: `OK`,
+                  }).then((result) => {
+                    window.location = `/mypage/${teamId}/${token}`;
+                  })
+                
             }, function (response) {
                 Swal.fire(
                     'Oops!',
@@ -171,6 +192,7 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
     }
 
     $scope.langContent = function(data, target){
+        if(!data) return;
         if(data[target]) return data[target];
         data[target] = $sce.trustAsHtml(data.filter( function( value ) {
             return value.language == $scope.displayLang;        

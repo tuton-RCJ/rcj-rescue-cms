@@ -29,8 +29,8 @@ var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCoo
         const {
             value: operation
         } = await swal({
-            title: "Remove reservation setting?",
-            text: "Are you sure you want to remove the reservation setting: " +
+            title: "Remove reservation master?",
+            text: "Are you sure you want to remove the reservation master: " +
               resv.name + '?',
             type: "warning",
             showCancelButton: true,

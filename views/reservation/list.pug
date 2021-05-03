@@ -13,14 +13,14 @@ block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     a.breadcrumb-item(ng-click="go('/admin')") Admin
     a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition.name}}
-    span.breadcrumb-item.active Reservation settings
+    span.breadcrumb-item.active Reservation
 
 block content
   .row
     .col-md-2
     .col-md-8
-      h1 {{competition.name}} - 予約受付
-      button(onclick="location.href='/admin/'+competitionId+'/reservation/edit'" class='btn btn-primary') 予約受付の新規作成
+      h1 {{competition.name}} - {{"reservation.title" | translate}}
+      button(onclick="location.href='/admin/'+competitionId+'/reservation/edit'" class='btn btn-primary') {{"reservation.new" | translate}}
       br
       br
       table.custom

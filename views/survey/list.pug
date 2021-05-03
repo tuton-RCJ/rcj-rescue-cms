@@ -19,8 +19,8 @@ block content
   .row
     .col-md-2
     .col-md-8
-      h1 {{competition.name}} - アンケート
-      button(onclick="location.href='/admin/'+competitionId+'/survey/edit'" class='btn btn-primary') アンケート新規作成
+      h1 {{competition.name}} - {{"survey.title" | translate}}
+      button(onclick="location.href='/admin/'+competitionId+'/survey/edit'" class='btn btn-primary') {{"survey.new" | translate}}
       br
       br
       table.custom

@@ -37,35 +37,35 @@ block location
     a.breadcrumb-item(ng-click="go('/admin')") Admin
     a.breadcrumb-item(ng-click="go('/admin/' + competitionId)") {{competition.name}}
     a.breadcrumb-item(ng-click="go('/admin/' + competitionId + '/reservation')") Reservation
-    span.breadcrumb-item.active Edit
+    span.breadcrumb-item.active Reservation Master
 
 
 block content
   .row
     .col-md-1
     .col-md-10
-      h1 予約受付設定
+      h1 {{"reservation.master" | translate}}
       hr
 
-      h5 名前
+      h5 {{"reservation.name" | translate}}
       input.form-control(type='text', ng-model='resv.name')
       br
-      h5 説明
+      h5 {{"reservation.description" | translate}}
       ng-quill-editor(ng-model="resv.description")
       br
-      h5 期限
+      h5 {{"reservation.deadline" | translate}}
       input.form-control(type='datetime-local', ng-model='resv.deadline', ng-style="{backgroundColor: deadlineColour(resv.deadline)}")
       br
-      h5 受付
+      h5 {{"reservation.open" | translate}}
       select.custom-select(ng-model='resv.enable', ng-style="{backgroundColor: resv.enable ? '#bcffbc':'#ffcccc'}")
         option(ng-value='true') {{"common.enable" | translate}}
         option(ng-value='false') {{"common.disable" | translate}}  
       br
       br
-      h5 対象チーム(OR条件)
+      h5 {{"reservation.distribution" | translate}}
       .row(style="background-color:#ecf0f1;padding:20px 0;margin-left:10px;border-radius: 10px;")
         .col-md-5
-          h6(style="text-align:center;") リーグ
+          h6(style="text-align:center;") {{"reservation.league" | translate}}
           ui-select(multiple='' ng-model='resv.league' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
             ui-select-match(placeholder='Select league...') {{$item.name}}
             ui-select-choices(repeat='league.id as league in leagues | filter: {id: $select.search}')
@@ -73,7 +73,7 @@ block content
         .col-md-1.d-flex.align-items-center.text-center
           h5 OR
         .col-md-6
-          h6(style="text-align:center;") チーム
+          h6(style="text-align:center;") {{"reservation.team" | translate}}
           ui-select(multiple='' ng-model='resv.team' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
             ui-select-match(placeholder='Select team...') {{$item.code}} {{$item.name}}
             ui-select-choices(repeat='team._id as team in teams | filter: {_id: $select.search}')
@@ -83,14 +83,13 @@ block content
         button.btn.btn-success.btn-lg(type='button', ng-click='save()')
           i.fas.fa-save &nbsp;{{"admin.settings.set" | translate}}
       hr
-      h3 予約枠設定
       table.custom(style="margin-bottom:20px;")
         thead
             tr
-              th 開始時間
-              th 長さ（分）
-              th 枠数
-              th 削除
+              th {{"reservation.start" | translate}}
+              th {{"reservation.duration" | translate}}
+              th {{"reservation.total" | translate}}
+              th {{"reservation.delete" | translate}}
               
         tbody
             tr(ng-repeat="slot in resv.slot | orderBy: 'start' track by $index")

@@ -55,10 +55,14 @@ block content
                 h4.alert-heading {{"document.deadline" | translate}}: 
                     strong(ng-bind="deadline(survey.deadline)")
                 i.fas.fa-info-circle(ng-show="survey.reEdit" style="color:#3498db;") &nbsp;
-                    | このフォームは，一度提出しても，この期限まで何度でも回答内容を修正できます．
+                    | {{"survey.multiple" | translate}}
                 i.fas.fa-exclamation-triangle(ng-show="!survey.reEdit" style="color:#f39c12;") &nbsp;
-                    | このフォームは，この期限までに1回だけ提出可能です．提出後の回答内容の変更はできません．　
+                    | {{"survey.onlyOnce" | translate}}
             hr
+            if !editable
+                .alert.alert-warning(role='alert',style="margin-bottom: 20px;")
+                    i.fas.fa-info-circle &nbsp;
+                    span {{"survey.readOnly" | translate}}
             
             div(ng-repeat="question in survey.questions track by $index")
                 div(style="margin-bottom:10px;font-size:20px;")
@@ -90,4 +94,4 @@ block content
                 if editable
                     button.btn.btn-lg.btn-primary(type='button', ng-click='submit()')
                         i.fas.fa-paper-plane &nbsp;
-                        | 提出
+                        | {{"survey.submit" | translate}}

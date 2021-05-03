@@ -22,10 +22,10 @@ block content
     .col-md-1
     .col-md-10
       h4 {{competition.name}}
-      h1 キャビネット
-      p チームに各種資料等を配布することができます．
+      h1 {{'cabinet.title' | translate}}
+      p {{'cabinet.description' | translate}}
       hr
-      h3 リーグに一括配布
+      h3 {{'cabinet.toLeague' | translate}}
       .row 
         .col-md-3(ng-repeat='league in leagues', style="margin-bottom:30px;")
           button(ng-click="go('/admin/' + competitionId + '/cabinet/' + league.id)" class='btn btn-dark btn-lg btn-block' style="height:100%;")
@@ -34,7 +34,7 @@ block content
             span {{league.name}}
       hr
 
-      h3 チーム毎に配布
+      h3 {{'cabinet.toTeam' | translate}}
       .refine
         .card.border-dark.mb-3(style='width:100%;')
           .card-header.bg-transparent.border-dark.fa-2x

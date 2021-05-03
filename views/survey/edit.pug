@@ -71,7 +71,7 @@ block content
     .col-md-10
       .row
         .col-md-8
-            h1 アンケートエディター
+            h1 {{"survey.editor" | translate}}
             h3(style="margin-left:40px;") {{competition.name}}
         .col-md-4(style="text-align:right;")
             button.btn.btn-lg.btn-outline-success(type='button', ng-click='save()')
@@ -88,7 +88,7 @@ block content
       hr
       .row
         .col-md-12
-            h2 各種設定
+            h2 {{"survey.settings" | translate}}
             ul.nav.nav-tabs.mb-3(role='tablist')
                 i.fas.fa-globe.fa-2x &nbsp;
                 li.nav-item(ng-repeat="i18n in surv.i18n track by $index", style="margin-right:5px;")
@@ -97,33 +97,33 @@ block content
                 .tab-pane.fade.show(ng-class="{active:$first}", ng-attr-id="{{'common_lang'+ $index}}", role='tabpanel', aria-labelledby="'common_lang'+ $index + '_tab'", ng-repeat="i18n in surv.i18n track by $index")
                     .input-group(style="margin 0 auto;")
                         .input-group-prepend
-                            span.input-group-text 名前
+                            span.input-group-text {{"survey.name" | translate}}
                         input.form-control(type='text', ng-model='i18n.name')
                     br
-                    span(style="margin-top:10px;") 説明
+                    span(style="margin-top:10px;") {{"survey.description" | translate}}
                     ng-quill-editor(ng-model="i18n.topDescription")
            
             br
-            h5 期限
+            h5 {{"survey.deadline" | translate}}
             input.form-control(type='datetime-local', ng-model='surv.deadline', ng-style="{backgroundColor: deadlineColour(surv.deadline)}")
             br
-            h5 オープン
+            h5 {{"survey.open" | translate}}
             select.custom-select(ng-model='surv.enable', ng-style="{backgroundColor: surv.enable ? '#bcffbc':'#ffcccc'}")
                 option(ng-value='true') {{"common.enable" | translate}}
                 option(ng-value='false') {{"common.disable" | translate}}  
             br
             br
-            h5 提出後の再提出
-            p 一度提出した後に，回答内容を変更することを許可しますか？
+            h5 {{"survey.reSubmit" | translate}}
+            p {{"survey.reSubmitDesc" | translate}}
             select.custom-select(ng-model='surv.reEdit', ng-style="{backgroundColor: surv.reEdit ? '#bcffbc':'#ffcccc'}")
                 option(ng-value='true') {{"common.enable" | translate}}
                 option(ng-value='false') {{"common.disable" | translate}}  
             br
             br
-            h5 配信先(OR条件)
+            h5 {{"survey.distribution" | translate}}
             .row(style="background-color:#ecf0f1;padding:20px 0;margin-left:10px;border-radius: 10px;")
                 .col-md-5
-                    h6(style="text-align:center;") リーグ
+                    h6(style="text-align:center;") {{"survey.league" | translate}}
                     ui-select(multiple='' ng-model='surv.league' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
                         ui-select-match(placeholder='Select league...') {{$item.name}}
                         ui-select-choices(repeat='league.id as league in leagues | filter: {id: $select.search}')
@@ -131,7 +131,7 @@ block content
                 .col-md-1.d-flex.align-items-center.text-center
                     h5 OR
                 .col-md-6
-                    h6(style="text-align:center;") チーム
+                    h6(style="text-align:center;") {{"survey.team" | translate}}
                     ui-select(multiple='' ng-model='surv.team' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
                         ui-select-match(placeholder='Select team...') {{$item.code}} {{$item.name}}
                         ui-select-choices(repeat='team._id as team in teams | filter: {_id: $select.search}')
@@ -183,8 +183,8 @@ block content
                             h5(style="margin-top:10px;") {{"document.editor.description" | translate}}
                             ng-quill-editor(ng-model="i18n.description")
                             div(ng-if="question.type == 'select'", style="margin-top:10px;")
-                                span {{"document.editor.choices" | translate}}
-                                br
+                                h5 {{"document.editor.choices" | translate}}
+                                
                                 div(ng-repeat="option in i18n.options track by $index", style="margin:10px 0px;")
                                     .input-group(style="margin 0 auto;")
                                         .input-group-prepend
@@ -203,14 +203,12 @@ block content
                                     button.btn.btn-success(type='button', ng-click='addOption($parent.$parent.$index, $parent.$index)')
                                         i.fas.fa-plus
                             div(ng-if="question.type == 'scale'", style="margin-top:10px;")
-                                span {{"document.editor.scale" | translate}}
-                                br
-                                .input-group(style="margin 0 auto;")
+                                h5 {{"document.editor.scale" | translate}}
+                                .input-group(style="margin: 5px auto;")
                                     .input-group-prepend
                                         span.input-group-text {{"document.editor.least" | translate}}
                                     input.form-control(type='number', ng-model='question.scale.least')
-                                br
-                                .input-group(style="margin 0 auto;")
+                                .input-group(style="margin: 5px auto;")
                                     .input-group-prepend
                                         span.input-group-text {{"document.editor.most" | translate}}
                                     input.form-control(type='number', ng-model='question.scale.most')

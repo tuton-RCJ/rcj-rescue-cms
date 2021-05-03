@@ -41,13 +41,13 @@ block content
     .col-md-10
       h4 {{competition.name}} -&nbsp;
         i.fas.fa-archive &nbsp;
-        | キャビネット
+        | {{'cabinet.title' | translate}}
       h3 {{cabinetName}}
-      p このページには，オーガナイザーから配布されたファイルが格納されます．
+      p {{'cabinet.description2' | translate}}
       hr
       .text-center(ng-if="files.length == 0", style="margin-top:10vh;")
         i.fas.fa-folder-open.fa-10x
-        h4 ファイルがまだ何も格納されていないようです
+        h4 {{'cabinet.empty' | translate}}
       if !isMyPage
         .row 
           .col-md-4(ng-repeat='file in files', style="margin-top:60px;")
@@ -57,12 +57,12 @@ block content
               span {{file.name}}
             button(class='btn btn-danger btn-sm btn-block', style="margin-top:0px;border-radius: 0 0 4px 4px;", ng-click="delete(file)")
               i.fas.fa-trash &nbsp;
-              span 削除
+              span {{'cabinet.delete' | translate}}
           .col-md-4(style="margin-top:60px;")
             button(class='btn btn-success btn-lg btn-block' style="height:100%;" type='file' ngf-select='upload($file, $invalidFiles)' accept='*' ngf-max-size='500MB')
               i.fas.fa-2x.fa-file-upload
               br
-              span アップロード
+              span {{'cabinet.upload' | translate}}
               div(style="color:#e74c3c;margin-left:10px;", ng-if="errFile.$error")
                   span ERROR: {{errFile.$error}}
               .flex-fill(style="margin:10px 0px 0px 10px;", ng-show="f.progress > 0")

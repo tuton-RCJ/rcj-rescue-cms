@@ -7,6 +7,25 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate', function 
         showConfirmButton: false,
         timer: 3000
     });
+
+    let trans = [];
+    function loadTranslation(tag){
+        $translate(`reservation.js.${tag}`).then(function (val) {
+            trans[tag] = val;
+        }, function (translationId) {
+        // = translationId;
+        });
+    }
+
+    loadTranslation("booked");
+    loadTranslation("bookedMes");
+    loadTranslation("cancel");
+    loadTranslation("cancelMes");
+    loadTranslation("canceled");
+    loadTranslation("canceledMes");
+    loadTranslation("cancelButton");
+    loadTranslation("cancelKeep");
+
     
     $scope.competitionId = competitionId;
     $scope.teamId = teamId;
@@ -63,8 +82,8 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate', function 
     $scope.book = function(slotId){
         $http.post(`/api/reservation/book/${teamId}/${token}/${resvId}` , {"slotId": slotId}).then(function (response) {
             Swal.fire(
-                '予約完了!',
-                '予約に成功しました',
+                trans["booked"],
+                trans["bookedMes"],
                 'success'
             )
             updateList();
@@ -80,20 +99,20 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate', function 
 
     $scope.cancel = function(slot){
         Swal.fire({
-            title: '予約キャンセル?',
-            html: `本当にこの予約をキャンセルしますか？この操作は取り消せません．<br><strong>開始時間: ${$scope.time(slot.start)}</strong>`,
+            title: trans["cancel"],
+            html: `${trans["cancelMes"]}<br><strong>${$scope.time(slot.start)}</strong>`,
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Calcel this booking',
-            cancelButtonText: 'Keep this booking'
+            confirmButtonText: trans["cancelButton"],
+            cancelButtonText: trans["cancelKeep"]
             }).then((result) => {
             if (result.value) {
                 $http.post(`/api/reservation/cancel/${teamId}/${token}/${resvId}` , {"slotId": slot.slotId}).then(function (response) {
                     Swal.fire(
-                        'キャンセル完了',
-                        '予約をキャンセルしました．続けて，新しい予約を行ってください．',
+                        trans["canceled"],
+                        trans["canceledMes"],
                         'success'
                     )
                     updateList();

@@ -49,12 +49,12 @@ block content
       table.custom(style="margin-bottom:20px;")
         thead
             tr
-              th 開始時間
-              th 長さ（分）
-              th 総枠数
-              th 残枠数
-              th 予約状況
-              th 編集
+              th {{"reservation.start" | translate}}
+              th {{"reservation.duration" | translate}}）
+              th {{"reservation.total" | translate}}
+              th {{"reservation.remaining" | translate}}
+              th {{"reservation.status" | translate}}
+              th {{"reservation.edit" | translate}}
               
         tbody
             tr(ng-repeat="slot in resv.slot | orderBy: 'start' track by $index")

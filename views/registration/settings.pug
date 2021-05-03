@@ -25,12 +25,12 @@ block content
   .row
     .col-md-1
     .col-md-10
-      h1 参加登録受付設定 - {{competition.name}}
-      p このページでは，チーム自身による参加登録の受付可否について設定します．
+      h1 {{"registration.title" | translate}} - {{competition.name}}
+      p {{"registration.description" | translate}}
       hr
 
-      h3 共通設定
-      h5 コンセントフォームのURL
+      h3 {{"registration.common" | translate}}
+      h5 {{"registration.consentURL" | translate}}
       .row
         .col-md-8 
           input.form-control(type='text', ng-model='competition.consentForm')
@@ -39,14 +39,14 @@ block content
             i.fas.fa-save &nbsp;{{"admin.settings.set" | translate}}
 
       hr
-      h3 リーグ毎の設定
+      h3 {{"registration.league" | translate}}
       table.custom(style="margin-bottom:20px;")
         thead
             tr
               th {{"common.league" | translate}}
-              th 受付
-              th 期限
-              th パスコード
+              th {{"registration.open" | translate}}
+              th {{"registration.deadline" | translate}}
+              th {{"registration.passCode" | translate}}
               th {{"common.operation" | translate}}
               
         tbody
