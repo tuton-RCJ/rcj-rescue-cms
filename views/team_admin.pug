@@ -69,14 +69,14 @@ block content
               .input-group-prepend
                 span.input-group-text
                   i.fas.fa-users(aria-hidden='true')
-              input.form-control(type='text', placeholder='{{"common.team" | translate}}', aria-label='Username', aria-describedby='basic-addon1' ng-model='refineRegion')
+              input.form-control(type='text', placeholder='{{"common.team" | translate}}', aria-label='Username', aria-describedby='basic-addon1' ng-model='refineName')
             hr
             h6.card-title {{"common.region" | translate}}
             .input-group
               .input-group-prepend
                 span.input-group-text
                   i.fas.fa-globe-asia(aria-hidden='true')
-              input.form-control(type='text', placeholder='{{"common.region" | translate}}', aria-label='Username', aria-describedby='basic-addon1' ng-model='refineName')
+              input.form-control(type='text', placeholder='{{"common.region" | translate}}', aria-label='Username', aria-describedby='basic-addon1' ng-model='refineRegion')
             hr
             h6.card-title {{"common.league" | translate}}
             span(ng-repeat='(key, value) in Rleagues track by key')
