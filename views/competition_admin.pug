@@ -75,6 +75,11 @@ block content
             i.fas.fa-folder.fa-2x
             br
             span キャビネット
+        .col-md-3(style="margin-bottom:30px;")
+          button(ng-click="go('/admin/' + competitionId + '/survey')" class='btn btn-outline-dark btn-lg btn-block' style="height:100%;")
+            i.far.fa-question-circle.fa-2x
+            br
+            span アンケート
       hr
       h3 {{"admin.competition.management" | translate}}
       .row 

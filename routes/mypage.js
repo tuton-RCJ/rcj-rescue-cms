@@ -13,6 +13,7 @@ const auth = require('../helper/authLevels');
 const { ACCESSLEVELS } = require('../models/user');
 const { LEAGUES } = competitiondb;
 const mailDb = require('../models/mail');
+const surveyDb = require('../models/survey');
 
 
 function getIP(req) {
@@ -132,6 +133,87 @@ publicRouter.get('/:teamId/:token/cabinet', function (req, res, next) {
           res.render('access_denied', { user: req.user });
         } else if (team) {
           res.render('cabinet/file', { id: team.competition, user: req.user, isTeam: true , teamId, isMyPage: true, token, leagueTeam: teamId});
+      }
+    });
+});
+
+function renderSurveyForm(req, res, team, token, survId, editable){
+  res.render('survey/form', {
+    team: team._id,
+    competition: team.competition,
+    user: req.user,
+    league: team.league,
+    teamName: team.name,
+    token: token,
+    survId,
+    editable
+  });
+}
+
+publicRouter.get('/:teamId/:token/survey/:survId', function (req, res, next) {
+  const { teamId } = req.params;
+  const { token } = req.params;
+  const { survId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  if (!ObjectId.isValid(survId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      "_id": teamId,
+      "document.token": token
+    })
+    .exec(function (err, team) {
+      if (err || team == null) {
+        if (!err) err = { message: 'No team found' };
+          return res.render('access_denied', { user: req.user });
+        } else if (team) {
+          surveyDb.survey
+          .findOne({
+            _id: survId,
+            competition: team.competition,
+            enable: true,
+            $or: [
+              {league: team.league},
+              {team: team._id}
+            ]
+          })
+          .exec(function (err, survey) {
+            if (err || survey == null) {
+              if (!err) err = { message: 'No survey found' };
+                return res.render('access_denied', { user: req.user });
+            } else if (survey) {
+              if(auth.authCompetition(req.user,team.competition,ACCESSLEVELS.ADMIN)){
+                return renderSurveyForm(req, res, team, token, survey._id, true);
+              }else{
+                if(survey.deadline < new Date()){
+                  return renderSurveyForm(req, res, team, token, survey._id, false);
+                }
+                if(survey.reEdit){
+                  return renderSurveyForm(req, res, team, token, survey._id, true);  
+                }
+                surveyDb.surveyAnswer
+                .find({
+                  survey: survId,
+                  team: team._id,
+                  competition: team.competition
+                })
+                .exec(function (err, ans) {
+                  if (ans.length == 0) {
+                    return renderSurveyForm(req, res, team, token, survey._id, true);
+                  }else{
+                    return renderSurveyForm(req, res, team, token, survey._id, false);
+                  }
+                });
+              }
+            }
+          });
+          
       }
     });
 });

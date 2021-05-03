@@ -379,6 +379,62 @@ router.get('/:competitionid/cabinet/:leagueTeam', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
+router.get('/:competitionid/survey', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('survey/list', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/survey/edit', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('survey/edit', { id, user: req.user, survId: null });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/survey/edit/:survId', function (req, res, next) {
+  const id = req.params.competitionid;
+  const survId = req.params.survId;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  if (!ObjectId.isValid(survId)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('survey/edit', { id, user: req.user , survId});
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/survey/answers/:survId', function (req, res, next) {
+  const id = req.params.competitionid;
+  const survId = req.params.survId;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  if (!ObjectId.isValid(survId)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('survey/answers', { id, user: req.user , survId});
+  else res.render('access_denied', { user: req.user });
+});
+
 router.get('/handover', function (req, res, next) {
   res.render('runs_handover', { user: req.user });
 });

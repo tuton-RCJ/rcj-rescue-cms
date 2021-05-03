@@ -7,6 +7,9 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
         showConfirmButton: false,
         timer: 3000
     });
+
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
     
     $scope.competitionId = competitionId
 
@@ -16,6 +19,10 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
 
     $scope.goResv = function (id) {
         window.open(`/mypage/${teamId}/${token}/reservation/${id}`, '_blank');
+    }
+
+    $scope.goSurv = function (id) {
+        window.open(`/mypage/${teamId}/${token}/survey/${id}`, '_blank');
     }
 
     $scope.getLeagueName = function (id){
@@ -38,6 +45,23 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
         league: leagueId
     }).then(function (response) {
         $scope.reservations = response.data;
+    })
+
+    $http.get(`/api/survey/list/${competitionId}/${leagueId}/${teamId}`).then(function (response) {
+        $scope.survey = response.data;
+        for(let suvr of $scope.survey){
+            let name = suvr.i18n.filter(i => i.language == currentLang && suvr.languages.some( l => l.language == i.language && l.enable));
+            if(name.length == 1){
+                suvr.name = name[0].name;
+                break;
+            }else{
+                let name = suvr.i18n.filter(i => suvr.languages.some( l => l.language == i.language && l.enable));
+                if(name.length > 0){
+                    suvr.name = name[0].name;
+                    break;
+                }
+            }
+        }
     })
 
 

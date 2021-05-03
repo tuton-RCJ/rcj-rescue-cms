@@ -83,6 +83,7 @@ var apiMailRoute = require('./routes/api/mail')
 var apiRegistrationRoute = require('./routes/api/registration')
 var apiReservationRoute = require('./routes/api/reservation')
 var apiCabinetRoute = require('./routes/api/cabinet')
+var apiSurveyRoute = require('./routes/api/survey')
 
 
 //========================================================================
@@ -176,6 +177,7 @@ app.use('/api/mail', [apiMailRoute.public, pass.ensureLoginApi, apiMailRoute.pri
 app.use('/api/registration', [apiRegistrationRoute.public, pass.ensureLoginApi, apiRegistrationRoute.private, pass.ensureAdminApi, apiRegistrationRoute.admin])
 app.use('/api/reservation', [apiReservationRoute.public, pass.ensureLoginApi, apiReservationRoute.private, pass.ensureAdminApi, apiReservationRoute.admin])
 app.use('/api/cabinet', [apiCabinetRoute.public, pass.ensureLoginApi, apiCabinetRoute.private, pass.ensureAdminApi, apiCabinetRoute.admin])
+app.use('/api/survey', [apiSurveyRoute.public, pass.ensureLoginApi, apiSurveyRoute.private, pass.ensureAdminApi, apiSurveyRoute.admin])
 
 
 //========================================================================
