@@ -30,7 +30,7 @@ block location
     span.breadcrumb-item.active {{cabinetName}}
   else
     a.breadcrumb-item(ng-click="go('/home')") Home
-    a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") Team Page
+    a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") #{teamName}
     span.breadcrumb-item.active Cabinet
 
 

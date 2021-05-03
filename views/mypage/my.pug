@@ -18,7 +18,7 @@ append css
 
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
-    span.breadcrumb-item.active Team Page
+    span.breadcrumb-item.active #{teamName}
 
 
 block content
@@ -28,7 +28,7 @@ block content
       div(style="text-align:center;")
         h1 {{competition.name}}
         h5 {{leagueName}}
-        h4 #{teamName}
+        h4 #{teamCode} #{teamName}
       hr
 
       .row

@@ -158,7 +158,7 @@ publicRouter.get('/:teamid', function (req, res, next) {
       {
         _id: id,
       },
-      '_id inspected name league competition checkin country'
+      '_id inspected name teamCode league competition checkin country'
     )
     .exec(function (err, dbTeam) {
       if (err) {

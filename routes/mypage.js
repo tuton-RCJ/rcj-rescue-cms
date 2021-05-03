@@ -58,7 +58,7 @@ publicRouter.get('/:teamId/:token', function (req, res, next) {
       "_id": teamId,
       "document.token": token
     })
-    .select("_id competition league name document.enabled")
+    .select("_id competition league name teamCode document.enabled")
     .exec(function (err, team) {
       if (err || team == null) {
         if (!err) err = { message: 'No team found' };
@@ -70,6 +70,7 @@ publicRouter.get('/:teamId/:token', function (req, res, next) {
             user: req.user,
             league: team.league,
             teamName: team.name,
+            teamCode: team.teamCode,
             token: token,
             documentEnable: team.document.enabled
           });
@@ -107,6 +108,7 @@ publicRouter.get('/:teamId/:token/reservation/:resvId', function (req, res, next
             user: req.user,
             league: team.league,
             teamName: team.name,
+            teamCode: team.teamCode,
             token: token,
             resvId
           });
@@ -132,7 +134,7 @@ publicRouter.get('/:teamId/:token/cabinet', function (req, res, next) {
         if (!err) err = { message: 'No team found' };
           res.render('access_denied', { user: req.user });
         } else if (team) {
-          res.render('cabinet/file', { id: team.competition, user: req.user, isTeam: true , teamId, isMyPage: true, token, leagueTeam: teamId});
+          res.render('cabinet/file', { id: team.competition, user: req.user, isTeam: true , teamId, isMyPage: true, token, leagueTeam: teamId, teamName: team.name,teamCode: team.teamCode});
       }
     });
 });
@@ -144,6 +146,7 @@ function renderSurveyForm(req, res, team, token, survId, editable){
     user: req.user,
     league: team.league,
     teamName: team.name,
+    teamCode: team.teamCode,
     token: token,
     survId,
     editable

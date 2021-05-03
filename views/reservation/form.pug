@@ -15,7 +15,7 @@ append scripts
 
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
-    a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") Team Page
+    a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") #{teamName}
     span.breadcrumb-item.active {{resv.name}}
 
 
@@ -26,7 +26,7 @@ block content
       div(style="text-align:center;")
         h1 {{resv.name}}
         h5 {{competition.name}} - {{leagueName}}
-        h4 #{teamName}
+        h4 #{teamCode} #{teamName}
       
       .alert.alert-primary.text-center(role='alert')
         h4.alert-heading 締め切り: 
