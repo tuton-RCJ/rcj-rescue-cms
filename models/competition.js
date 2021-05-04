@@ -3,6 +3,7 @@ const validator = require('validator')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 const crypto = require('crypto')
+const cluster = require('cluster')
 
 const logger = require('../config/logger').mainLogger
 const env = require('node-env-file')
@@ -20,10 +21,12 @@ for(let i in LEAGUES_JSON){
   if(LEAGUES_JSON[i].type == "other") OTHER_LEAGUES.push(LEAGUES_JSON[i].id);
 }
 
+if(cluster.isMaster){
+  logger.debug("Available line leagues : " + LINE_LEAGUES);
+  logger.debug("Available maze leagues : " + MAZE_LEAGUES);
+  logger.debug("Available other leagues : " + OTHER_LEAGUES);
+}
 
-logger.debug("Available line leagues : " + LINE_LEAGUES);
-logger.debug("Available maze leagues : " + MAZE_LEAGUES);
-logger.debug("Available other leagues : " + OTHER_LEAGUES);
 
 
 const SUPPORT_RULES = ["2021"];

@@ -5,6 +5,8 @@ const validator = require('validator')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 const async = require('async')
+const cluster = require('cluster')
+
 
 const logger = require('../config/logger').mainLogger
 
@@ -1155,36 +1157,39 @@ for (var i in tileTypes) {
 }
 
 
-let defaultTileSet = [];
-for (var i in tileTypes) {
-  const tileType = new TileType(tileTypes[i]);
-  defaultTileSet.push(
-    {
-      'tileType': tileType._id,
-      'count':100
+if(cluster.isMaster){
+  let defaultTileSet = [];
+  for (var i in tileTypes) {
+    const tileType = new TileType(tileTypes[i]);
+    defaultTileSet.push(
+      {
+        'tileType': tileType._id,
+        'count':100
+      }
+    )
+  }
+
+  TileSet.findById('5c19d2439590f2d68b15b301', function (err, dbTileSet) {
+    if(dbTileSet){
+      dbTileSet.tiles = defaultTileSet;
+      dbTileSet.save(function (err) {
+        if (err) {
+          logger.error(err)
+        }
+      })
+    }else{
+      let newTileSet = new TileSet({
+        '_id': '5c19d2439590f2d68b15b301',
+        'name': 'Default(2021)',
+        'tiles': defaultTileSet
+      });
+      newTileSet.save(function (err) {
+        if (err) {
+          logger.error(err)
+        }
+      })
     }
-  )
+  });
 }
 
-TileSet.findById('5c19d2439590f2d68b15b301', function (err, dbTileSet) {
-  if(dbTileSet){
-    dbTileSet.tiles = defaultTileSet;
-    dbTileSet.save(function (err) {
-      if (err) {
-        logger.error(err)
-      }
-    })
-  }else{
-    let newTileSet = new TileSet({
-      '_id': '5c19d2439590f2d68b15b301',
-      'name': 'Default(2021)',
-      'tiles': defaultTileSet
-    });
-    newTileSet.save(function (err) {
-      if (err) {
-        logger.error(err)
-      }
-    })
-  }
-});
 
