@@ -145,7 +145,7 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
                       .replace(/<span class="ql-cursor">﻿<\/span>/, '');
                     let variable ={
                       "competitionName": dbCompetition.name,
-                      "registrationURL": `${process.env.PROTOCOL}://${process.env.HOSTNAME}/registration/${authData._id}/${token}`
+                      "registrationURL": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/registration/${authData._id}/${token}`
                     }
                     html = template(html, variable);
 
@@ -277,8 +277,8 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                     let variable ={
                       "teamName": teamName,
                       "competitionName": authInfo.competition.name,
-                      "mypageURL": `${process.env.PROTOCOL}://${process.env.HOSTNAME}/mypage/${teamData._id}/${team_token}`,
-                      "documentURL": `${process.env.PROTOCOL}://${process.env.HOSTNAME}/document/${teamData._id}/${team_token}`
+                      "mypageURL": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/mypage/${teamData._id}/${team_token}`,
+                      "documentURL": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/document/${teamData._id}/${team_token}`
                     }
                     html = template(html, variable);
 
@@ -297,11 +297,11 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                 
                         html = html.replace(
                           new RegExp(escapeRegExp(match[0]), 'g'),
-                          `href="${process.env.PROTOCOL}://${process.env.HOSTNAME}/api/mail/click/${mailId}/${Mtoken}"`
+                          `href="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/click/${mailId}/${Mtoken}"`
                         );
                         html4text = html4text.replace(
                           new RegExp(escapeRegExp(match[2]), 'g'),
-                          `${process.env.PROTOCOL}://${process.env.HOSTNAME}/api/mail/click/${mailId}/${Mtoken}`
+                          `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/click/${mailId}/${Mtoken}`
                         );
                 
                         const tmp = {
@@ -316,7 +316,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                       tags: { a: { options: { hideLinkHrefIfSameAsText: true } } },
                     });
 
-                    html = `<img src="${process.env.PROTOCOL}://${process.env.HOSTNAME}/api/mail/open/${mailId}">${html}`;
+                    html = `<img src="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/open/${mailId}">${html}`;
                 
                     const message = {
                       from: {
