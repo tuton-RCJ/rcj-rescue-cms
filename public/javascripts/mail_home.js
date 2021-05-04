@@ -144,7 +144,8 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
                 "deadlineUNIX": deadline,
                 "deadlineLocal": new Intl.DateTimeFormat(navigator.language, options).format(d),
                 "deadlineUTC": new Intl.DateTimeFormat('en-US', optionsUTC).format(d),
-                "documentUrl": `${location.protocol}//${location.host}/document/${$scope.toTeam[i]._id}/${$scope.toTeam[i].document.token}`
+                "documentUrl": `${location.protocol}//${location.host}/document/${$scope.toTeam[i]._id}/${$scope.toTeam[i].document.token}`,
+                "mypageUrl": `${location.protocol}//${location.host}/mypage/${$scope.toTeam[i]._id}/${$scope.toTeam[i].document.token}`
             };
         }
         $scope.mode = "write";

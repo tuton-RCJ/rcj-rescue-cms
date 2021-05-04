@@ -65,7 +65,8 @@ app.controller('TemplateEditorController', ['$scope', '$uibModal', '$log', '$htt
                 "deadlineUNIX": deadline,
                 "deadlineLocal": new Intl.DateTimeFormat(navigator.language, options).format(d),
                 "deadlineUTC": new Intl.DateTimeFormat('en-US', optionsUTC).format(d),
-                "documentUrl": `${location.protocol}//${location.host}/document/${$scope.toTeam[i]._id}/ZZZZZZZZZZZZZZZZZZZZZZZ`
+                "documentUrl": `${location.protocol}//${location.host}/document/${$scope.toTeam[i]._id}/ZZZZZZZZZZZZZZZZZZZZZZZ`,
+                "mypageUrl": `${location.protocol}//${location.host}/mypage/${$scope.toTeam[i]._id}/ZZZZZZZZZZZZZZZZZZZZZZZ`
             };
         }
     }
