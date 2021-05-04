@@ -42,7 +42,7 @@ block content
         h5 {{"reservation.start" | translate}}:&nbsp;
           strong(ng-bind="time(myBook.start)")
         div(ng-if="inDeadline()")
-          p {{"reservation.change" | translate}}"予約状況"をご確認ください．
+          p {{"reservation.change" | translate}}
           button.btn.btn-danger.btn-sm(type='button', ng-click='cancel(myBook)', style="margin:0 5px;")
             i.fas.fa-times &nbsp;
             | {{"reservation.cancel" | translate}}
