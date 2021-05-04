@@ -175,7 +175,7 @@
         "open": "Open",
         "deadline": "Deadline",
         "passCode": "Passcode",
-        "auth": "Please enter your registration code and email address and click on the verification button.",
+        "auth": "Please enter your registration code and email address then click the submit button.",
         "authError": "Either the registration code is wrong or the email address is invalid.",
         "authDesc1": "An authentication email will be sent to the email address you specify here from the following address.",
         "authDesc2": "Please make sure that you can receive e-mails from this address in advance. Please note that it has been reported that some e-mails cannot be successfully delivered to e-mail services provided by Microsoft, such as hotmail, or to addresses issued by some institutions, such as universities. Please avoid these e-mail addresses.",
