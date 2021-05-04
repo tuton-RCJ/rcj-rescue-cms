@@ -27,7 +27,7 @@ var pass = require('./config/pass')
 var passport = require('passport')
 // session
 var session = require('express-session')
-var MongoStore = require('connect-mongo')(session)
+var MongoStore = require('connect-mongo')
 
 var bodyParser = require('body-parser');
 
@@ -133,9 +133,7 @@ app.use(express.static(path.join(__dirname, 'public')))
  */
 // init passport and session
 app.use(session({
-    store: new MongoStore({
-        mongooseConnection: mongoose.connection
-    }),
+    store: MongoStore.create({ mongoUrl: process.env.DB_CONNECT_STR }),
     secret: 'rcjscoring',
     resave: false,
     saveUninitialized: false,
