@@ -5,5 +5,5 @@ WORKDIR /opt/rcj-cms
 
 RUN npm run build
 
-ENTRYPOINT ["node server"]
+CMD ["node", "server.js"]
 EXPOSE 3000
