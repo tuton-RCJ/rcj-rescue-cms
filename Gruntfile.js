@@ -12,7 +12,7 @@ module.exports = function(grunt){
                 expand: true,
                 cwd: 'public/javascripts',
                 src: '**/*.js',
-                dest: 'public/js'
+                dest: 'public/javascripts'
                 }]
             }
         },
@@ -22,7 +22,7 @@ module.exports = function(grunt){
                 expand: true,
                 cwd: 'public/stylesheets',
                 src: '**/*.css',
-                dest: 'public/css'
+                dest: 'public/stylesheets'
               }]
             }
           },
