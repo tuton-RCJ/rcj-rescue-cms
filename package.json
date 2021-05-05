@@ -83,6 +83,7 @@
     "grunt-contrib-cssmin": "4.0.0",
     "grunt-contrib-imagemin": "4.0.0",
     "grunt-contrib-uglify": "5.0.1",
+    "grunt-json-minification": "^0.2.1",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-jpegtran": "^7.0.0",
     "imagemin-optipng": "^8.0.0",

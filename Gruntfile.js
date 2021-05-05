@@ -25,8 +25,8 @@ module.exports = function(grunt){
                 dest: 'public/stylesheets'
               }]
             }
-          },
-          imagemin: {
+        },
+        imagemin: {
             dynamic: {
                 files: [{
                     expand: true,
@@ -35,11 +35,22 @@ module.exports = function(grunt){
                     dest: 'public/images'
                 }]
             }
+        },
+        json_minification: {
+            target: {
+              files: [{
+                expand: true,
+                cwd: 'public/lang',
+                src: ['*.json'],
+                dest: 'public/lang'
+              }]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-imagemin');
-    grunt.registerTask('default', ['uglify', 'cssmin', 'imagemin']);
+    grunt.loadNpmTasks('grunt-json-minification');
+    grunt.registerTask('default', ['uglify', 'cssmin', 'imagemin', 'json_minification']);
 }
