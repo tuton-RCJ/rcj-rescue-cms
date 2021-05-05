@@ -375,7 +375,7 @@ router.get('/:competitionid/cabinet/:leagueTeam', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('cabinet/file', { id, user: req.user, isTeam , leagueTeam, isMyPage: false, teamId: "null", token: "null", process: process.pid});
+    res.render('cabinet/file', { id, user: req.user, isTeam , leagueTeam, isMyPage: false, teamId: "null", token: "null"});
   else res.render('access_denied', { user: req.user });
 });
 
