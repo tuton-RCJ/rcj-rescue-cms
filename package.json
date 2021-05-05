@@ -1,10 +1,11 @@
 {
   "name": "rcj-scoring",
-  "version": "20.1.0",
+  "version": "21.3.8",
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "build": "workbox generateSW workbox-config.js"
+    "build": "workbox generateSW workbox-config.js",
+    "minify": "grunt"
   },
   "dependencies": {
     "archiver": "3.1.1",
@@ -77,6 +78,11 @@
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-import": "2.22.1",
     "eslint-plugin-prettier": "3.4.0",
+    "grunt": "1.4.0",
+    "grunt-cli": "^1.4.2",
+    "grunt-contrib-cssmin": "4.0.0",
+    "grunt-contrib-imagemin": "4.0.0",
+    "grunt-contrib-uglify": "5.0.1",
     "prettier": "2.2.1",
     "pug-cli": "1.0.0-alpha6",
     "supertest": "4.0.2",

@@ -4,6 +4,7 @@ COPY . /opt/rcj-cms/
 WORKDIR /opt/rcj-cms
 
 RUN npm run build
+RUN npm run minify
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start"]
 EXPOSE 3000
