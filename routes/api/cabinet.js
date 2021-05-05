@@ -250,7 +250,7 @@ publicRouter.get('/:competitionId/file/:teamId/:token/:folder/:file', function (
   }
 });
 
-publicRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
+adminRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
   const { competitionId } = req.params;
   const { folder } = req.params;
 
@@ -293,7 +293,7 @@ publicRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
 });
 
 
-publicRouter.delete('/:competitionId/file/:folder/:file', function (req, res, next) {
+adminRouter.delete('/:competitionId/file/:folder/:file', function (req, res, next) {
   const { competitionId } = req.params;
   const { folder } = req.params;
   const { file } = req.params;
