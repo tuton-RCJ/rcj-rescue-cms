@@ -21,6 +21,7 @@ jobs:
           node-version: 16.x
       - run: npm install --only=dev
       - run: npm run minify
+      - run: npm run build
       -
         name: Docker meta
         id: meta
