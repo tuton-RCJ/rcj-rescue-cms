@@ -1,12 +1,34 @@
 #!/usr/bin/env node
 
-const cluster = require('cluster')
-const logger = require('./config/logger').mainLogger
-const env = require('node-env-file')
-const numCPUs = require('os').cpus().length;
-const fs = require("fs");
-const app = require('./app')
-const http = require('http')
+/**
+ * Module dependencies.
+ *
+ *
+ * This is where the app is executed and doing some cool stuff, from the
+ * beginning it spawned sub processes but with the module forever it is not needed.
+ *
+ * For the future and for scalability this needs to be implemented correctly with spawning sub processes
+ * for each processor core on the hosted machine. This version of the server does not support shared memory neither
+ * does Node.js(87.7% certain). Some alternatives for sharing memory is http://memcached.org or a database containing share variables.
+ *
+ * To implement and scale this server you'll need to know what variables needs to be shared and so on (GOOD LUCK MUHAAHAHAHAHAHAHAHAHAHAHAHAHAAHAHAH!).
+ *
+ *
+ * ____Taken from app.js______
+ * One of the big things to do for scalability is to separate tcp server,static server and application server (api).
+ *
+ * Right now they are mixed and running on a single core togeather. To be able to use Node.js to 100% the  application
+ * part of the server should run alone on an own process. And the static files (CSS, HTML and Javascript(frontend)) should
+ * for performance reasons not run on Node.js but on nginx (http://nginx.org/). One of the fastest static servers out there used
+ * by many companies. Also it can work as a reverse proxy to support multi Node.js clusters.
+ *
+ */
+
+ const cluster = require('cluster')
+ const logger = require('./config/logger').mainLogger
+ const env = require('node-env-file')
+ const numCPUs = require('os').cpus().length;
+ const fs = require("fs");
  env('process.env');
  
  function isExistFile(file) {
@@ -20,10 +42,9 @@ const http = require('http')
  
  if(isExistFile("mail.env")) env('mail.env');
  
- 
+ /*
  if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
-     for (var i = 0; i < Math.min(numCPUs, process.env.PROCESS_NUM); i++) {
+     for (var i = 0; i < numCPUs; i++) {
        cluster.fork()
      }
  
@@ -35,8 +56,9 @@ const http = require('http')
    })
  }
  
- else {
-  console.log(`Worker ${process.pid} is running`);
+ else {*/
+   const app = require('./app')
+   const http = require('http')
  
    /**
     * Get port from environment and store in Express.
@@ -50,6 +72,18 @@ const http = require('http')
     * Create HTTP server.
     */
    const server = http.createServer(app)
+ 
+    //https conf
+ 
+ //  var options = {
+ //     key: fs.readFileSync('./config/ssl/privkey.pem'),
+ //     cert: fs.readFileSync('./config/ssl/new.cert.cert')
+ //  }
+ //  var https = https.createServer(options,app)
+ //  https.listen(parseInt(process.env.HTTPS_HOSTPORT, 10) || 443)
+ //  https.on('error', onError)
+ //  https.on('listening', onListening)
+ 
  
    // socket.io stuff
  
@@ -114,4 +148,3 @@ const http = require('http')
    function onListening() {
        logger.info('Webserver listening on port ' + server.address().port)
    }
-  }
