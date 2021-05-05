@@ -6,10 +6,8 @@ const logger = require('./config/logger').mainLogger
 const env = require('node-env-file')
 const numCPUs = require('os').cpus().length;
 const fs = require("fs");
-const app = require('./app')
 const http = require('http')
-const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
-app.set('port', port)
+
 env('process.env');
  
  function isExistFile(file) {
@@ -50,6 +48,9 @@ env('process.env');
  
  else {
   logger.info(`Worker ${process.pid} is running`)
+  const app = require('./app')
+  const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
+  app.set('port', port)
   const server = http.createServer(app)
  
    // socket.io stuff
