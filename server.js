@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 const cluster = require('cluster')
+const redisAdapter = require("socket.io-redis");
 const logger = require('./config/logger').mainLogger
 const env = require('node-env-file')
 const numCPUs = require('os').cpus().length;
 const fs = require("fs");
 const app = require('./app')
 const http = require('http')
- env('process.env');
+const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
+app.set('port', port)
+env('process.env');
  
  function isExistFile(file) {
    try {
@@ -19,11 +22,21 @@ const http = require('http')
  }
  
  if(isExistFile("mail.env")) env('mail.env');
+
+ let numProcess = 1;
+ if(process.env.REDIS_HOST && process.env.REDIS_PORT){
+  numProcess = Math.min(numCPUs, process.env.PROCESS_NUM);
+ }else if(process.env.PROCESS_NUM > 1){
+  logger.error(`If you want to start more than one process, you need to configure the Redis Server.`);
+ }
+ if(cluster.isMaster){
+  logger.info(`We will now launch ${numProcess} worker process(es)`)
+ }
  
- 
- if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running`);
-     for (var i = 0; i < Math.min(numCPUs, process.env.PROCESS_NUM); i++) {
+ cluster.schedulingPolicy = cluster.SCHED_RR;
+ if (cluster.isMaster && numProcess > 1) {
+  logger.info(`Master ${process.pid} is running`)
+     for (var i = 0; i < numProcess; i++) {
        cluster.fork()
      }
  
@@ -36,33 +49,24 @@ const http = require('http')
  }
  
  else {
-  console.log(`Worker ${process.pid} is running`);
- 
-   /**
-    * Get port from environment and store in Express.
-    */
- 
-   // XXX: Is this used anywhere?
-   const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
-   app.set('port', port)
- 
-   /**
-    * Create HTTP server.
-    */
-   const server = http.createServer(app)
+  logger.info(`Worker ${process.pid} is running`)
+  const server = http.createServer(app)
  
    // socket.io stuff
  
    var io = require('socket.io')(server)
+   if(process.env.REDIS_HOST && process.env.REDIS_PORT){
+      io.adapter(redisAdapter({host: process.env.REDIS_HOST, port: process.env.REDIS_PORT}));
+   }
  
    io.on('connection', function (socket) {
      socket.on('subscribe', function (data) {
        socket.join(data)
-       logger.debug(port +" : Client joined room:" + data)
+       logger.debug(`Worker ${process.pid}: Client joined room: ${data}`);
      })
      socket.on('unsubscribe', function (data) {
        socket.leave(data)
-       logger.debug(port +" : Client detached room:" + data)
+       logger.debug(`Worker ${process.pid}: Client detached room: ${data}`);
      })
    })
  
@@ -112,6 +116,6 @@ const http = require('http')
     */
  
    function onListening() {
-       logger.info('Webserver listening on port ' + server.address().port)
+       logger.info(`Worker ${process.pid}: Webserver listening on port ${server.address().port}`)
    }
   }
