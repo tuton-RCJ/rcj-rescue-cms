@@ -124,7 +124,7 @@
         "message": "Message for participants",
         "passcode": "Passcode",
         "multipliers": "Multipliers",
-        "region": "Region",
+        "region": "Region(Country)",
         "teamCode": "Team code",
         "duplicate": "Duplication",
         "print": "Print",
