@@ -251,8 +251,15 @@
         "toTeam": "チームに個別配信",
         "empty": "ファイルがまだ何も格納されていないようです",
         "delete": "削除",
-        "upload": "アップロード"
-
+        "upload": "アップロード",
+        "js":{
+            "delAsk": "ファイル削除?",
+            "delConfirm": "本当にこのファイルを削除しますか？この操作は取り消せません．",
+            "delComplete": "削除完了",
+            "delCompleteMes": "を削除しました",
+            "delConfirmButton": "削除する",
+            "delCancelButton": "残す"
+        }
     },
     "mypage":{
         "message": "メッセージ"

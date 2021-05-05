@@ -251,7 +251,15 @@
         "toTeam": "Individual distribution to teams",
         "empty": "It appears that no files have been stored yet.",
         "delete": "Delete",
-        "upload": "Upload"
+        "upload": "Upload",
+        "js":{
+            "delAsk": "Delete?",
+            "delConfirm": "Are you sure you want to delete this file? This operation cannot be undone.",
+            "delComplete": "Deleted",
+            "delCompleteMes": " has been deleted",
+            "delConfirmButton": "Yes... Delete it",
+            "delCancelButton": "Keep"
+        }
     },
     "mypage":{
         "message": "Message"

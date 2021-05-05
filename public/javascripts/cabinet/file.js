@@ -14,6 +14,24 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
     }, function (translationId) {
     // = translationId;
     });
+
+    let trans = [];
+    function loadTranslation(tag){
+        $translate(`cabinet.js.${tag}`).then(function (val) {
+            trans[tag] = val;
+        }, function (translationId) {
+        // = translationId;
+        });
+    }
+
+    loadTranslation("delAsk");
+    loadTranslation("delConfirm");
+    loadTranslation("delComplete");
+    loadTranslation("delCompleteMes");
+    loadTranslation("delConfirmButton");
+    loadTranslation("delCancelButton");
+
+
     
     $scope.competitionId = competitionId;
     $scope.teamId = teamId;
@@ -143,20 +161,20 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
 
     $scope.delete = function(file){
         Swal.fire({
-            title: 'ファイル削除?',
-            html: `本当にこのファイルを削除しますか？この操作は取り消せません．<br><strong>${file.name}</strong>`,
+            title: trans['delAsk'],
+            html: `${trans['delConfirm']}<br><strong>${file.name}</strong>`,
             type: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Delete this file',
-            cancelButtonText: 'Keep this file'
+            confirmButtonText: trans['delConfirmButton'],
+            cancelButtonText: trans['delCancelButton']
             }).then((result) => {
             if (result.value) {
                 $http.delete(`/api/cabinet/${competitionId}/file/${file.folder}/${file.name}`).then(function (response) {
                     Swal.fire(
-                        '削除完了',
-                        'ファイルを削除しました',
+                        trans['delComplete'],
+                        `${file.name} ${trans['delCompleteMes']}`,
                         'success'
                     )
                     updateFiles();
