@@ -21,6 +21,8 @@ env('process.env');
  
  if(isExistFile("mail.env")) env('mail.env');
 
+ const app = require('./app')
+
  let numProcess = 1;
  if(process.env.REDIS_HOST && process.env.REDIS_PORT){
   numProcess = Math.min(numCPUs, process.env.PROCESS_NUM);
@@ -48,7 +50,6 @@ env('process.env');
  
  else {
   logger.info(`Worker ${process.pid} is running`)
-  const app = require('./app')
   const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
   app.set('port', port)
   const server = http.createServer(app)
