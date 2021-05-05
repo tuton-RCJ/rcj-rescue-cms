@@ -12,8 +12,7 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
     function tick() {
             date = new Date();
             $scope.time = Number(date.getTime()) + Number($scope.timeDep);
-            //console.log($scope.time);
-            //$scope.$apply();
+
             $timeout(tick, 200);
         }
 
@@ -39,15 +38,11 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
         socket.on('LChanged', function (data) {
             update_line_list();
             $scope.$apply();
-            //console.log($scope.runs);
-            console.log("Updated view from socket.io");
         });
         
         socket.on('MChanged', function (data) {
             update_maze_list();
             $scope.$apply();
-            //console.log($scope.runs);
-            console.log("Updated view from socket.io");
         });
     }
     
@@ -60,7 +55,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
             $http.get("/api/competitions/" + competitionId +
                 "/Maze/fields").then(function (response) {
                 $scope.fields = $scope.fields.concat(response.data)
-                console.log($scope.fields);
             })
         })
     })
@@ -70,7 +64,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
         $http.get("/api/competitions/" + competitionId +
             "/line/runs?populate=true&minimum=true&ended=true").then(function (response) {
             lr = response.data
-            console.log(lr);
             $scope.runs=[];
             for(let run of lr){
                 if(run.status < 4){
@@ -109,7 +102,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 }
             }
             
-            console.log($scope.runs);
 
             
         });
@@ -119,7 +111,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
         $http.get("/api/competitions/" + competitionId +
             "/maze/runs?populate=true&minimum=true&ended=true").then(function (response) {
             mr = response.data
-            console.log(mr);
             $scope.runs=[];
             for(let run of lr){
                 if(run.status < 4){
@@ -158,7 +149,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 }
             }
             
-            console.log($scope.runs);
             
 
             

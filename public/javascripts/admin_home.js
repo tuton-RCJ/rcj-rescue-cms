@@ -19,7 +19,6 @@ var app = angular.module("AdminHome", ['ngTouch','pascalprecht.translate', 'ngCo
         }
 
         $http.post("/api/competitions", competition).then(function (response) {
-            console.log(response)
             updateCompetitionList()
         }, function (error) {
             console.log(error)
@@ -47,7 +46,6 @@ var app = angular.module("AdminHome", ['ngTouch','pascalprecht.translate', 'ngCo
         if (operation) {
             $http.delete("/api/competitions/" +
               competition._id).then(function (response) {
-                console.log(response)
                 updateCompetitionList()
             }, function (error) {
                 console.log(error)
@@ -58,7 +56,6 @@ var app = angular.module("AdminHome", ['ngTouch','pascalprecht.translate', 'ngCo
     function updateCompetitionList() {
         $http.get("/api/competitions/").then(function (response) {
             $scope.competitions = response.data
-            console.log($scope.competitions)
         })
     }
 })

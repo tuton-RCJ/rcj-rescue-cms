@@ -360,7 +360,6 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
                 $scope.notifications = data.notifications;
                 $scope.blocks = data.blocks;
                 $scope.languages = data.languages;
-                console.log(data)
                 $scope.$apply();
             }
 

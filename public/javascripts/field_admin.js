@@ -9,7 +9,6 @@ var app = angular.module("FieldAdmin", ['ngTouch','pascalprecht.translate', 'ngC
 
     $http.get("/api/teams/leagues").then(function (response) {
         $scope.leagues = response.data
-        console.log($scope.leagues)
     })
 
     $scope.addField = function () {
@@ -20,7 +19,6 @@ var app = angular.module("FieldAdmin", ['ngTouch','pascalprecht.translate', 'ngC
         }
 
         $http.post("/api/fields", field).then(function (response) {
-            console.log(response)
             updateFieldList()
         }, function (error) {
             console.log(error)
@@ -39,7 +37,6 @@ var app = angular.module("FieldAdmin", ['ngTouch','pascalprecht.translate', 'ngC
         }).then((result) => {
             if (result.value) {
             $http.delete("/api/fields/" + field._id).then(function (response) {
-                console.log(response)
                 updateFieldList()
             }, function (error) {
                 console.log(error)
@@ -56,7 +53,6 @@ var app = angular.module("FieldAdmin", ['ngTouch','pascalprecht.translate', 'ngC
         $http.get("/api/competitions/" + competitionId +
             "/fields").then(function (response) {
             $scope.fields = response.data
-            console.log($scope.fields)
         })
     }
 })

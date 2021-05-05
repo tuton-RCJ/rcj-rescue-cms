@@ -48,8 +48,6 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
         socket.on('StatusChanged', function (data) {
             $scope.update_list();
             $scope.$apply();
-            //console.log($scope.runs);
-            console.log("Updated view from socket.io");
         });
     }
     
@@ -124,7 +122,6 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
 
     $scope.$watch('rounds', function (newValue, oldValue) {
         showAllRounds = true
-        //console.log(newValue)
         for (let round in newValue) {
             if (newValue.hasOwnProperty(round)) {
                 if (newValue[round]) {
@@ -135,7 +132,6 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
         }
     }, true)
     $scope.$watch('fields', function (newValue, oldValue) {
-        //console.log(newValue)
         showAllFields = true
         for (let field in newValue) {
             if (newValue.hasOwnProperty(field)) {

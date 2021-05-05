@@ -113,7 +113,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             // Get the map
             $http.get("/api/maps/line/" + response.data.map +
               "?populate=true").then(function (response) {
-                console.log(response);
                 $scope.height = response.data.height;
 
                 $scope.width = response.data.width;
@@ -140,7 +139,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                     isDropTile: false
                 }
 
-                console.log(started);
 
                 if(!started && tileReset){
 
@@ -155,11 +153,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         });
                         flag = true;
                     }
-                    //console.log($scope.stiles);
                     var noCheck = [];
                     for(let i=0,t;t=response.data.tiles[i];i++){
                         for(let j=0;j<t.index.length;j++){
-                            //console.log(t.items.obstacles);
                             for(let k=0;k<t.items.obstacles;k++){
                                 let addSItem = {
                                     item: "obstacle",
@@ -220,14 +216,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                     }
                 }
 
-                //console.log($scope.stiles);
 
                 if (flag) {
                     $scope.sync++;
                     $http.put("/api/runs/line/" + runId, {
                         tiles: $scope.stiles
                     }, http_config).then(function (response) {
-                        console.log("Run Score Tileset Updated")
                         loadNewRun();
                         $scope.sync--;
                     }, function (response) {
@@ -251,7 +245,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         $scope.placedDropTiles++;
                     }
                 }
-                console.log($scope.mtiles)
 
                 $timeout($scope.tile_size, 0);
                 $timeout($scope.tile_size, 500);
@@ -363,7 +356,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             var removed = false;
 
             for (var i = 0; i < stile.length; i++) {
-                console.log(stileIndex);
                 if (stileIndex[i] < $scope.mapIndexCount - 2) {
                     // If this tile already contains a droptile, we should remove it
                     if (stile[i].isDropTile) {
@@ -403,10 +395,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var run = {};
         run.tiles = $scope.stiles;
         run.status = 1;
-        console.log("Update run", run);
         $http.put("/api/runs/line/" + runId, run).then(function (response) {
             //$scope.score = response.data.score;
-            //console.log("Run updated, got score: ", $scope.score);
         }, function (response) {
             console.log("Error: " + response.statusText);
         });
@@ -457,8 +447,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.tile_size = function () {
         try {
             var b = $('.tilearea');
-            //console.log('コンテンツ本体：' + b.height() + '×' + b.width());
-            //console.log('window：' + window.innerHeight);
             if ($scope.sRotate % 180 == 0) {
                 var tilesize_w = ($('.tilearea').width() - 2 * width) / width;
                 var tilesize_h = (window.innerHeight - 130) / length;
@@ -467,8 +455,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 var tilesize_h = (window.innerHeight - 130) / width;
             }
 
-            //console.log('tilesize_w:' + tilesize_w);
-            //console.log('tilesize_h:' + tilesize_h);
             if (tilesize_h > tilesize_w) var tilesize = tilesize_w;
             else var tilesize = tilesize_h;
             $('tile').css('height', tilesize);

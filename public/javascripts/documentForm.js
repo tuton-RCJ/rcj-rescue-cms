@@ -301,7 +301,6 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
     }
 
     $scope.checkUploaded = function(name){
-        console.log(name)
         return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
     }
 

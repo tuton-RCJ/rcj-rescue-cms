@@ -11,9 +11,7 @@ var app = angular.module("AdminUser", ['ngTouch','pascalprecht.translate', 'ngCo
             superDuperAdmin: $scope.userAuthSuper,
             competitions: []
         }
-        console.log(newUser)
         $http.post("/api/users", newUser).then(function (response) {
-            console.log(response)
             updateUserList()
         }, function (error) {
             console.log(error)
@@ -32,7 +30,6 @@ var app = angular.module("AdminUser", ['ngTouch','pascalprecht.translate', 'ngCo
         }).then((result) => {
             if (result.value) {
             $http.delete("/api/users/" + user._id).then(function (response) {
-                console.log(response)
                 updateUserList()
             }, function (error) {
                 console.log(error)

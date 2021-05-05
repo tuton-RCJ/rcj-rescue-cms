@@ -15,22 +15,18 @@ app.controller('HandOverController', ['$scope', '$uibModal', '$log', '$timeout',
     $scope.dataSended = 0;
 
     function inflate_obj(base64) {
-        console.log(base64);
         var raw = atob(base64);
         var utf8 = zip_inflate(raw);
         var utf16 = decodeURIComponent(utf8);
         var obj = JSON.parse(utf16);
-        console.log(obj);
         return obj;
     }
 
     $scope.readRunQr = function (txt) {
-        console.log(txt);
             var sp = txt.split(':');
             var num = sp[0].split('_');
             num[0] = Number(num[0]);
             num[1] = Number(num[1]);
-            console.log(num[0] + '/' + num[1] + " : " + sp[1]);
             if(!isNaN(num[0])&&!isNaN(num[1])){
                 if ($scope.total != num[1]) {
                     $scope.total = num[1];
@@ -43,11 +39,9 @@ app.controller('HandOverController', ['$scope', '$uibModal', '$log', '$timeout',
                             $scope.Rstatus.push(tmp);
                         }
                     }
-                    console.log($scope.Rstatus);
                 }
                 $scope.Rstatus[num[0]].status = 1;
                 $scope.Rstatus[num[0]].data = sp[1];
-                console.log($scope.Rstatus);
 
                 let totalst = 0;
                 let base64 = "";
@@ -55,12 +49,10 @@ app.controller('HandOverController', ['$scope', '$uibModal', '$log', '$timeout',
                     totalst += $scope.Rstatus[i].status;
                     base64 += $scope.Rstatus[i].data;
                 }
-                console.log(totalst);
                 if (totalst == $scope.Rstatus.length) { //All QR code readed
                     var run = inflate_obj(base64);
                     clearInterval($scope.decodeInt);
                     $scope.decodeStatus = 0;
-                    console.log(run);
                     if(run.evacuationLevel != null){//Line
                         putLine(run);
                     }else{//Maze
@@ -212,7 +204,6 @@ app.run(['$window', function ($window, $rootScope) {
     };
 
     var startReadQR = function () {
-        console.log("START READ QR")
         scope.decodeStatus = 1;
         scope.decodeInt = setInterval(decode, 500);
     };
@@ -271,7 +262,6 @@ app.run(['$window', function ($window, $rootScope) {
                     try {
                         video.srcObject = stream;
                     } catch (error) {
-                        console.log(stream);
                         video.src = window.URL.createObjectURL(stream);
                     }
                 }

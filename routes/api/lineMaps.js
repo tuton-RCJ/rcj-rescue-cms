@@ -285,7 +285,6 @@ adminRouter.post('/image/:map', function (req, res, next) {
   });
   path += `/${id}.png`;
   fs.writeFile(path, base64Data, 'base64', function (err) {
-    console.log(err);
     res.send(path);
   });
 });

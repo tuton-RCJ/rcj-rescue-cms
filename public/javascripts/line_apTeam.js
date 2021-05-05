@@ -62,15 +62,11 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
             "/line/runs?timetable=true&populate=true").then(function (response) {
             var runs = response.data
             $scope.runs = runs
-            console.log($scope.runs)
 
             $scope.table = []
             $scope.fields = []
             $scope.rounds = []
             for (let run of $scope.runs) {
-                console.log(run);
-                //console.log(run.field.league);
-                //console.log($scope.team.league);
                 if (run.field.league == $scope.team.league) {
                     if (!array_exist($scope.fields, run.field.name)) $scope.fields.push(run.field);
                     if (!array_exist($scope.rounds, run.round.name)) $scope.rounds.push(run.round);
@@ -91,24 +87,13 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
                             'run': []
                         }) - 1;
                     }
-                    //console.log($scope.table[round_i]);
                     $scope.table[round_i].data[time_i].run.push(run);
                     if(run.group) $scope.table[round_i].count++;
                     if(run.team && run.team._id == teamId){
                         $scope.table[round_i]['able'] = false;
                     }
-                    //$scope.table[run.round.name][run.startTime][run.field.name] = run;
                 }
             }
-
-            //console.log($scope.table);
-            //ObjArraySort($scope.table,'startTime','asc')
-
-            //console.log($scope.table);
-            //console.log($scope.fields);
-
-            //$scope.$apply();
-            //console.log($scope.teams)
         })
     }
 
@@ -171,13 +156,11 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
         if ($scope.selected) {
             $http.get("/api/runs/line/apteam/" + competitionId + "/" + teamId + "/" + $scope.selected).then(function (response) {
                 playSound(sInfo);
-                console.log(response.data);
                 var mes = "<h5>"
                 for (rep of response.data.data) {
                     mes = mes + unixTime2ymd(rep.time) + "~     フィールド： " + fieldById(rep.field) + "<br>";
                 }
                 mes = mes + "</h5>";
-                console.log(mes);
 
 
                 /*swal({
@@ -245,7 +228,6 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
     var tmpKey = "";
     function handleKeydown(event){
         let keyCode = event.keyCode;
-        console.log(keyCode);
         if(keyCode >= 48 && keyCode <= 57){//Numbers
             if($scope.selected){
                 tmpKey = "";
@@ -255,7 +237,6 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
         }
         if(keyCode == 13){//Enter
             playSound(sInfo);
-            console.log(tmpKey);
             $scope.selected = Number(tmpKey);
             $scope.$apply();
         }

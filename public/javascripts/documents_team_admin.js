@@ -20,7 +20,6 @@ app.controller('TeamAdminController', ['$scope', '$uibModal', '$log', '$http', '
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
-        console.log($scope.competition)
     })
 
     $scope.Rleagues = {};
@@ -86,7 +85,6 @@ app.controller('TeamAdminController', ['$scope', '$uibModal', '$log', '$http', '
 
     $scope.$watch('Rleagues', function (newValue, oldValue) {
         showAllLeagues = true
-        //console.log(newValue)
         for (let league in newValue) {
             if (newValue.hasOwnProperty(league)) {
                 if (newValue[league]) {

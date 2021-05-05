@@ -343,9 +343,6 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
     
     $scope.removeComment = function(id, block, question){
-        console.log(id);
-        console.log(block);
-        console.log(question);
         Swal({
             title: deleteReview,
             type: 'warning',

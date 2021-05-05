@@ -19,7 +19,6 @@ app.controller('AdminShortController', ['$scope', '$uibModal', '$log', '$http', 
             }
 
             $http.post("/api/short", data).then(function (response) {
-                console.log(response.data);
                 getSettingList();
             }, function (response) {
                 console.log("Error: " + response.statusText);
@@ -35,7 +34,6 @@ app.controller('AdminShortController', ['$scope', '$uibModal', '$log', '$http', 
 
     $scope.del = function(id){
         $http.delete("/api/short/" + id).then(function (response) {
-            console.log(response.data);
             getSettingList();
         }, function (response) {
             console.log("Error: " + response.statusText);
@@ -49,7 +47,6 @@ app.controller('AdminShortController', ['$scope', '$uibModal', '$log', '$http', 
     function getSettingList() {
         $http.get("/api/short").then(function (response) {
             $scope.list = response.data;
-            console.log($scope.list);
         }, function (response) {
             console.log("Error: " + response.statusText);
             alert(response.data.msg);

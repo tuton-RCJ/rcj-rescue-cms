@@ -6,6 +6,5 @@ var app = angular.module("Home", ['ngTouch','pascalprecht.translate', 'ngCookies
     
     $http.get("/api/competitions").then(function (response) {
         $scope.competitions = response.data
-        console.log($scope.competitions)
     })
 });

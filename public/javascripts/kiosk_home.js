@@ -9,7 +9,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $http.get("/api/teams/leagues/all/" + cid).then(function (response) {
         $scope.leagues = response.data
-        console.log($scope.leagues)
     })
 
     $scope.kioskSrc = "";
@@ -25,7 +24,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.reset = function(){
         playSound(sClick);
-        console.log("RESET");
         $scope.teamLeague = "";
         $scope.selectTeamId = "";
         $scope.selectTeamName = "";
@@ -44,7 +42,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         $scope.teamLeague = str;
         $http.get("/api/competitions/"+ cid +"/" + str +"/teams").then(function (response) {
             $scope.teams = response.data
-            console.log($scope.teams)
         })
 
         for(let l of $scope.leagues){
@@ -95,7 +92,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         $http.get("/api/teams/code/" + $scope.selectTeamId + "/" + $scope.code).then(function (response) {
             let data = response.data;
             if(data._id){
-                console.log("認証成功");
                 $scope.mode = "Menu";
                 $scope.error = null;
             }else{

@@ -97,7 +97,6 @@ app.controller('FormPreviewController', ['$scope', '$uibModal', '$log', '$http',
             }
             $scope.answers.push(ba);
         }
-        console.log($scope.answers);
         
         //Check 1st lang
         for(let l of $scope.languages){
@@ -121,7 +120,6 @@ app.controller('FormPreviewController', ['$scope', '$uibModal', '$log', '$http',
     $scope.rangeS =  (start, end) => [...Array((end - start) + 1)].map((_, i) => start + i);
     
     $scope.save = function () {
-        console.log($scope.answers);
         Toast.fire({
             type: 'success',
             title: saved_mes

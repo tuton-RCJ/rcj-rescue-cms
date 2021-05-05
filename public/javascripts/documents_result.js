@@ -26,7 +26,6 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
-        console.log($scope.competition)
     })
 
     $scope.Rleagues = {};
@@ -84,14 +83,11 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                 $scope.blockTitle.push($scope.langContent($scope.review[b].i18n ,'title'))
             }
         }
-        console.log($scope.blockTitle)
 
         $http.get("/api/document/reviews/" + competitionId).then(function (response) {
-          console.log(response.data)
             $scope.reviewCommentsTeams = response.data.filter(function(value) {
                 return value.team && value.team.league == leagueId;
             });
-            console.log($scope.reviewCommentsTeams)
 
             $scope.rating=[];
             $scope.ratingFlag = [];

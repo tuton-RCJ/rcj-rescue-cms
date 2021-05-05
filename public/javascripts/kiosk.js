@@ -3,7 +3,6 @@ var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pasca
 var scp;
 var allFieldOpen = 0;
 
-console.log(kioskNumber);
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $cookies) {
@@ -20,11 +19,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         socket.emit('subscribe', 'kiosk/' + kioskNumber);
 
         socket.on('url', function (url) {
-            console.log(url);      
             $scope.kioskSrc = url;
         });
         socket.on('show', function (show) {
-            console.log(show);
             $scope.flag_kiosk = show;
             if(!show) $scope.kioskSrc = "";
             $scope.$apply();

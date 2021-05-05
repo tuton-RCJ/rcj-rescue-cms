@@ -22,7 +22,6 @@ app.controller("DocumentsAdminController", ['$scope', '$http', '$translate', fun
     }
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
-        console.log($scope.competition)
         $scope.defaultDeadline = new Date(response.data.documents.deadline * 1000);
         $scope.docSystemEnabled = response.data.documents.enable;
     })

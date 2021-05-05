@@ -11,7 +11,6 @@ const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate'
     $scope.logo = response.data.logo;
     $scope.competitonUseRule = response.data.rule;
     let ranking  = response.data.ranking;
-    console.log(ranking)
     $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
       let leagues = response.data;
       $scope.ranking = [];
@@ -44,7 +43,6 @@ const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate'
 
   $scope.updateAuthority = function (userid, acLevel) {
     $http.put("/api/users/" + userid + "/" + competitionId + "/" + acLevel).then(function (response) {
-      console.log(response)
       updateUserList()
     }, function (error) {
       console.log(error)
@@ -70,7 +68,6 @@ const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate'
     }
 
     $http.put("/api/competitions/" + $scope.competitionId, data).then(function (response) {
-      console.log(response.data);
       location.reload();
     }, function (response) {
       console.log("Error: " + response.statusText);

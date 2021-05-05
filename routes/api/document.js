@@ -317,7 +317,7 @@ publicRouter.post('/files/:teamId/:token/:fileName', function (req, res, next) {
                               size: '640x?',
                             })
                             .on('error', function (err) {
-                              console.log(`an error happened: ${err.message}`);
+                              logger.error(`an error happened: ${err.message}`);
                             });
 
                         } catch (err) {}
@@ -1015,7 +1015,7 @@ privateRouter.post(
                                     size: '640x?',
                                   })
                                   .on('error', function (err) {
-                                    console.log(
+                                    logger.error(
                                       `an error happened: ${err.message}`
                                     );
                                   });
