@@ -88,8 +88,15 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
                 return "fa-file-word";
             case 'application/pdf':
                 return "fa-file-pdf";
+            case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                return "fa-file-excel";
+            case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+                return "fa-file-powerpoint"
+            case 'application/zip':
+                return "fa-file-archive";
         }
         if(type.includes("video")) return "fa-file-video";
+        if(type.includes("image")) return "fa-file-image";
         return "fa-file";
     }
 
