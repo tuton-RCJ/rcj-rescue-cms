@@ -1,4 +1,5 @@
-var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("ResvListController", function ($scope, $http) {
+var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("ResvListController", ['$scope', '$http', function ($scope, $http) {
     $scope.competitionId = competitionId
 
 
@@ -51,4 +52,4 @@ var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCoo
             })
         }
     }
-})
+}])

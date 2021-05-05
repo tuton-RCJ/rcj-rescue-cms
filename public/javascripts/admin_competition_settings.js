@@ -1,4 +1,5 @@
-const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate', 'ngCookies', 'color.picker','ngSanitize']).controller("AdminSettingsController", function ($scope, $http) {
+const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate', 'ngCookies', 'color.picker','ngSanitize']);
+app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, $http) {
   $scope.competitionId = competitionId
   updateUserList()
   $http.get("/api/competitions/" + competitionId).then(function (response) {
@@ -141,4 +142,4 @@ const app = angular.module("AdminSettings", ['ngTouch', 'pascalprecht.translate'
       reader.readAsDataURL(file);
     }, false);
   }
-});
+}]);

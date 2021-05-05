@@ -1,4 +1,5 @@
-var app = angular.module("AdminUser", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("AdminUserController", function ($scope, $http) {
+var app = angular.module("AdminUser", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("AdminUserController", ['$scope', '$http', function ($scope, $http) {
     
     updateUserList()
     
@@ -49,4 +50,4 @@ var app = angular.module("AdminUser", ['ngTouch','pascalprecht.translate', 'ngCo
         $scope.userAuthAdmin= false
         $scope.userAuthSuper= false
     }
-})
+}])

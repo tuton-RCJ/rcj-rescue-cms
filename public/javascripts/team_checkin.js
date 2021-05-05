@@ -1,4 +1,5 @@
-var app = angular.module("TeamCheckin", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("TeamCheckinController", function ($scope, $http) {
+var app = angular.module("TeamCheckin", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("TeamCheckinController", ['$scope', '$http', function ($scope, $http) {
     $scope.competitionId = competitionId
 
     updateTeamList()
@@ -112,4 +113,4 @@ var app = angular.module("TeamCheckin", ['ngTouch','pascalprecht.translate', 'ng
         return (showAllRounds || $scope.Rrounds[value.round.name]) &&
           (showAllFields || $scope.Rfields[value.field.name]) && (showAllTeams || ~value.team.name.indexOf($scope.teamName))
     }
-})
+}])

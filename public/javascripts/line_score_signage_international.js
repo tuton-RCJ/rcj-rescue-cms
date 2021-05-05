@@ -1,7 +1,7 @@
 var socket;
 
 var app = angular.module("LineScore", ['ngTouch','datatables', 'ui.bootstrap', 'ngAnimate', 'pascalprecht.translate', 'ngCookies','ngSanitize']);
-app.controller("LineScoreController", function ($scope, $http, $sce) {
+app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($scope, $http, $sce) {
     console.log(UseRunsNumber);
     $scope.competitionId = competitionId
 
@@ -311,7 +311,7 @@ app.controller("LineScoreController", function ($scope, $http, $sce) {
     $scope.detail = function (row) {
         //console.log(row);
     }
-});
+}]);
 
 
 

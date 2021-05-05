@@ -1,7 +1,7 @@
 var socket;
 
 var app = angular.module("TimeTable", ['ngTouch','datatables', 'ui.bootstrap', 'ngAnimate', 'pascalprecht.translate', 'ngCookies','ngSanitize']);
-app.controller("TimeTableController", function ($scope, $http, $sce) {
+app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($scope, $http, $sce) {
     $scope.competitionId = competitionId
     $scope.go = function (path) {
         window.location = path
@@ -153,4 +153,4 @@ app.controller("TimeTableController", function ($scope, $http, $sce) {
 
 
 
-});
+}]);

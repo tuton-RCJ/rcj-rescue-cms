@@ -1,4 +1,5 @@
-var app = angular.module("TeamAdmin", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("TeamAdminController", function ($scope, $http, $translate) {
+var app = angular.module("TeamAdmin", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("TeamAdminController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -182,4 +183,4 @@ var app = angular.module("TeamAdmin", ['ngTouch','pascalprecht.translate', 'ngCo
     $scope.list_filter = function (value, index, array) {
         return (showAllLeagues || $scope.Rleagues[value.league])  && (~value.name.indexOf($scope.refineName)) && (~value.teamCode.indexOf($scope.refineCode)) && (~value.country.indexOf($scope.refineRegion))
     }
-})
+}])

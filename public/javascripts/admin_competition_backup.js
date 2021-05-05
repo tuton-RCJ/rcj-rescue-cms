@@ -1,4 +1,5 @@
-var app = angular.module("AdminBackup", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("AdminBackupController", function ($scope, $http) {
+var app = angular.module("AdminBackup", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("AdminBackupController", ['$scope', '$http', function ($scope, $http) {
     $scope.competitionId = competitionId
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
@@ -14,4 +15,4 @@ var app = angular.module("AdminBackup", ['ngTouch','pascalprecht.translate', 'ng
         window.open('/api/backup/'+$scope.competitionId);
     }
 
-})
+}])

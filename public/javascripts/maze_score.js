@@ -1,5 +1,5 @@
 var app = angular.module("MazeScore", ['ngTouch','datatables', 'pascalprecht.translate', 'ngCookies','ngSanitize'])
-app.controller("MazeScoreController", function ($scope, $http) {
+app.controller("MazeScoreController", ['$scope', '$http', function ($scope, $http) {
     console.log(UseRunsNumber);
     $scope.competitionId = competitionId;
 
@@ -225,7 +225,7 @@ app.controller("MazeScoreController", function ($scope, $http) {
             return b.score - a.score
         }
     }
-})
+}])
 
 // HAX
 function scrollpage() {

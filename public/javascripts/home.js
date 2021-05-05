@@ -1,4 +1,5 @@
-var app = angular.module("Home", ['ngTouch','pascalprecht.translate', 'ngCookies','ngSanitize']).controller("HomeController", function ($scope, $http) {
+var app = angular.module("Home", ['ngTouch','pascalprecht.translate', 'ngCookies','ngSanitize']);
+app.controller("HomeController", ['$scope', '$http', function ($scope, $http) {
     
     $scope.go = function (path) {
         window.location = path
@@ -7,4 +8,4 @@ var app = angular.module("Home", ['ngTouch','pascalprecht.translate', 'ngCookies
     $http.get("/api/competitions").then(function (response) {
         $scope.competitions = response.data
     })
-});
+}]);
