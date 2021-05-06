@@ -1258,7 +1258,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           basicTimeStep 16
           coordinateSystem "NUE"
         }
-        Viewpoint {
+        DEF Viewpoint Viewpoint {
           orientation -1 0 0 0.85
           position -0.08 ${y} ${z}
         }
