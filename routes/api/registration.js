@@ -316,7 +316,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                       tags: { a: { options: { hideLinkHrefIfSameAsText: true } } },
                     });
 
-                    html = `<img src="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/open/${mailId}">${html}`;
+                    html = `${html}<img src="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/open/${mailId}"/>`;
                 
                     const message = {
                       from: {

@@ -29,7 +29,7 @@ const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const N = 32;
 
 const TRANSPARENT_GIF_BUFFER = Buffer.from(
-  'R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=',
+  'R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
   'base64'
 );
 
@@ -215,7 +215,7 @@ adminRouter.post('/send', function (req, res, next) {
       tags: { a: { options: { hideLinkHrefIfSameAsText: true } } },
     });
 
-    html = `<img src="${req.headers.origin}/api/mail/open/${mailId}">${html}`;
+    html = `${html}<img src="${req.headers.origin}/api/mail/open/${mailId}"/>`;
 
     const message = {
       from: {
