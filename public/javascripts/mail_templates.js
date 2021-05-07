@@ -1,4 +1,5 @@
-var app = angular.module("MailTemplates", ['ngTouch','pascalprecht.translate', 'ngCookies']).controller("MailTemplatesController", function ($scope, $http, $translate) {
+var app = angular.module("MailTemplates", ['ngTouch','pascalprecht.translate', 'ngCookies']);
+app.controller("MailTemplatesController",['$scope', '$http', '$translate', function ($scope, $http, $translate) {
   
   const Toast = Swal.mixin({
     toast: true,
@@ -63,4 +64,4 @@ var app = angular.module("MailTemplates", ['ngTouch','pascalprecht.translate', '
     $scope.go = function (path) {
         window.location = path
     }
-})
+}])
