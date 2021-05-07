@@ -1375,7 +1375,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $timeout, mtile, mtiles, stiles, nineTile, sRotate, startTile, startTile2) {
+app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', '$timeout', 'mtile', 'mtiles', 'stiles', 'nineTile', 'sRotate', 'startTile', 'startTile2', function ($scope, $uibModalInstance, $timeout, mtile, mtiles, stiles, nineTile, sRotate, startTile, startTile2) {
   $scope.mtile = mtile;
   $scope.sRotate = sRotate;
   $scope.stiles = stiles;
@@ -1646,7 +1646,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, $timeou
     playSound(sClick);
     $uibModalInstance.close();
   };
-});
+}]);
 
 
 app.directive('tile', function () {

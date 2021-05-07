@@ -419,14 +419,14 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         }
 
 }])
-    .directive("runsReadFinished", function ($timeout) {
+    .directive("runsReadFinished", ['$timeout', function ($timeout) {
         return function (scope, element, attrs) {
             if (scope.$last) {
                 $('.refine').css("visibility", "visible");
                 $('.loader').remove();
             }
         }
-    })
+    }])
 
 
 $(window).on('beforeunload', function () {

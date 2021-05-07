@@ -545,7 +545,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, tile) {
+app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'tile', function ($scope, $uibModalInstance, tile) {
     $scope.tile = tile;
     $scope.ok = function () {
         $uibModalInstance.close([$scope.tile.start, $scope.tile.start2]);
@@ -554,10 +554,10 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, tile) {
     $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
-});
+}]);
 
 
-app.directive('ngRightClick', function ($parse) {
+app.directive('ngRightClick', ['$parse', function ($parse) {
     return function (scope, element, attrs) {
         var fn = $parse(attrs.ngRightClick);
         element.bind('contextmenu', function (event) {
@@ -569,7 +569,7 @@ app.directive('ngRightClick', function ($parse) {
             });
         });
     };
-});
+}]);
 
 
 app.directive('tile', function () {

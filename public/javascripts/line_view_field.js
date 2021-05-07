@@ -355,7 +355,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
 
 
-}]).directive("tileLoadFinished", function ($timeout) {
+}]).directive("tileLoadFinished", ['$timeout', function ($timeout) {
     return function (scope, element, attrs) {
         if (scope.$last) {
             $timeout(function () {
@@ -369,7 +369,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             }, 1000);
         }
     }
-});
+}]);
 
 
 app.directive('tile', function () {
@@ -666,7 +666,7 @@ app.directive('tile', function () {
 });
 
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, mtile, stiles, nineTile,startTile) {
+app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'stiles', 'nineTile', 'startTile',function ($scope, $uibModalInstance, mtile, stiles, nineTile,startTile) {
     $scope.mtile = mtile;
     $scope.stiles = stiles;
     $scope.nineTile = nineTile;
@@ -805,7 +805,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, mtile, 
     $scope.ok = function () {
         $uibModalInstance.close();
     };
-});
+}]);
 
 function tile_size() {
     $(function () {

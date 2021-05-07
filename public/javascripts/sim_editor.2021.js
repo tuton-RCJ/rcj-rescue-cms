@@ -1913,7 +1913,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, x, y, z) {
+app.controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', 'x', 'y', 'z', function ($scope, $uibModalInstance, x, y, z) {
     console.log($scope.cell)
     $scope.cell = $scope.$parent.cells[x + ',' + y + ',' + z];
     $scope.isStart = $scope.$parent.startTile.x == x &&
@@ -1978,4 +1978,4 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, x, y, z
         $scope.$parent.recalculateLinear();
         $uibModalInstance.close();
     };
-});
+}]);

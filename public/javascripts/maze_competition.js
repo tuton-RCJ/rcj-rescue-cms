@@ -188,7 +188,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
             swal("Oops!", val_no_judge, "error");
         }
     }])
-    .directive("runsReadFinished", function ($timeout) {
+    .directive("runsReadFinished", ['$timeout', function ($timeout) {
         return function (scope, element, attrs) {
             if (scope.$last) {
                 $('.refine').css("visibility", "visible");
@@ -213,7 +213,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
                 });
             }
         }
-    })
+    }])
 
 
 $(window).on('beforeunload', function () {

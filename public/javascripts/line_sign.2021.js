@@ -769,7 +769,7 @@ $(window).on('load resize', function () {
 });
 
 
-}]).directive("tileLoadFinished", function ($timeout) {
+}]).directive("tileLoadFinished", ['$timeout', function ($timeout) {
     return function (scope, element, attrs) {
         if (scope.$last) {
             $timeout(function () {
@@ -780,7 +780,7 @@ $(window).on('load resize', function () {
             }, 1000);
         }
     }
-});
+}]);
 
 
 app.directive('tile', function () {
@@ -1011,7 +1011,7 @@ app.directive('tile', function () {
 
 
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, mtile, mtiles, stiles, nineTile, sRotate,startTile,startTile2) {
+app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'mtiles', 'stiles', 'nineTile', 'sRotate', 'startTile', 'startTile2', function ($scope, $uibModalInstance, mtile, mtiles, stiles, nineTile, sRotate,startTile,startTile2) {
     $scope.mtile = mtile;
     $scope.sRotate = sRotate;
     $scope.stiles = stiles;
@@ -1208,7 +1208,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, mtile, 
         $uibModalInstance.close();
     };
 
-});
+}]);
 
 
 

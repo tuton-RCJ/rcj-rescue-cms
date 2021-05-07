@@ -622,7 +622,7 @@ function tile_size() {
 }
 
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
     $scope.cell = cell;
     $scope.tile = tile;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
@@ -686,7 +686,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, t
     $scope.ok = function () {
         $uibModalInstance.close();
     };
-});
+}]);
 
 var currentWidth = -1;
 

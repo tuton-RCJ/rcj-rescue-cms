@@ -790,7 +790,7 @@ $(window).on('load resize', function () {
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
     $scope.cell = cell;
     $scope.tile = tile;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
@@ -895,7 +895,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, t
         $uibModalInstance.close();
     };
 
-});
+}]);
 
 
 

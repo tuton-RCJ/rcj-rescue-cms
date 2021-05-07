@@ -763,7 +763,7 @@ $(window).on('load resize', function () {
     }]);
 
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
     $scope.cell = cell;
     $scope.tile = tile;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
@@ -830,7 +830,7 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, cell, t
         playSound(sClick);
         $uibModalInstance.close();
     };
-});
+}]);
 
 
 
