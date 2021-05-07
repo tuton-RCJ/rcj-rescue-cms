@@ -277,8 +277,8 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                     let variable ={
                       "teamName": teamName,
                       "competitionName": authInfo.competition.name,
-                      "mypageURL": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/mypage/${teamData._id}/${team_token}`,
-                      "documentURL": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/document/${teamData._id}/${team_token}`
+                      "mypageUrl": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/mypage/${teamData._id}/${team_token}`,
+                      "documentUrl": `${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/document/${teamData._id}/${team_token}`
                     }
                     html = template(html, variable);
 
