@@ -21,6 +21,16 @@ append scripts
 append css
     link(href="/components/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet")
 
+block navbar
+    nav.navbar(style='background-color: #283655; color: #fff; position: fixed; top: 0; z-index:10 ;  width: 100%')
+        .col-sm-11
+            span(style="font-size:20px;")
+                i.fas.fa-archive &nbsp;
+                | {{competition.name}} - Cabinet
+        .col-sm-1(style="text-align:right;")
+            button.btn.btn-primary(type='button', onclick="location.href='/locales'", ng-cloak, style="padding:2px 5px 0px 3px;margin-right:10px;")
+                i.fas.fa-language(style="font-size:30px;")
+
 block location
   if !isMyPage
     a.breadcrumb-item(ng-click="go('/home')") Home

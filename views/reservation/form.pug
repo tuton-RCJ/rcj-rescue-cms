@@ -13,6 +13,16 @@ append scripts
     var resvId = "#{resvId}"
   script(src='/javascripts/reservation/form.js')
 
+block navbar
+    nav.navbar(style='background-color: #283655; color: #fff; position: fixed; top: 0; z-index:10 ;  width: 100%')
+        .col-sm-11
+            span(style="font-size:20px;")
+                i.fas.fa-calendar-day &nbsp;
+                | {{competition.name}} - {{resv.name}}
+        .col-sm-1(style="text-align:right;")
+            button.btn.btn-primary(type='button', onclick="location.href='/locales'", ng-cloak, style="padding:2px 5px 0px 3px;margin-right:10px;")
+                i.fas.fa-language(style="font-size:30px;")
+
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") #{teamName}
