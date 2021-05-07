@@ -1304,10 +1304,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             rightWall ${rw}
             bottomWall ${bw}
             leftWall ${lw}
-            tile1Walls [ ${t1w[0]}, ${t1w[1]}, ${t1w[2]}, ${t1w[3]} ]
-            tile2Walls [ ${t2w[0]}, ${t2w[1]}, ${t2w[2]}, ${t2w[3]} ]
-            tile3Walls [ ${t3w[0]}, ${t3w[1]}, ${t3w[2]}, ${t3w[3]} ]
-            tile4Walls [ ${t4w[0]}, ${t4w[1]}, ${t4w[2]}, ${t4w[3]} ]
+            tile1Walls [ ${Number(t1w[0])}, ${Number(t1w[1])}, ${Number(t1w[2])}, ${Number(t1w[3])} ]
+            tile2Walls [ ${Number(t2w[0])}, ${Number(t2w[1])}, ${Number(t2w[2])}, ${Number(t2w[3])} ]
+            tile3Walls [ ${Number(t3w[0])}, ${Number(t3w[1])}, ${Number(t3w[2])}, ${Number(t3w[3])} ]
+            tile4Walls [ ${Number(t4w[0])}, ${Number(t4w[1])}, ${Number(t4w[2])}, ${Number(t4w[3])} ]
             tile1External [ ${t1e[0]}, ${t1e[1]}, ${t1e[2]}, ${t1e[3]} ]
             tile2External [ ${t2e[0]}, ${t2e[1]}, ${t2e[2]}, ${t2e[3]} ]
             tile3External [ ${t3e[0]}, ${t3e[1]}, ${t3e[2]}, ${t3e[3]} ]
