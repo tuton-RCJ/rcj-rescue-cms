@@ -13,17 +13,14 @@ app.controller('SurveyListController', ['$scope', '$uibModal', '$log', '$http', 
     function updateList(){
         $http.get(`/api/survey/list/${competitionId}`).then(function (response) {
             $scope.survey = response.data
-            
             for(let suvr of $scope.survey){
                 let name = suvr.i18n.filter(i => i.language == currentLang && suvr.languages.some( l => l.language == i.language && l.enable));
                 if(name.length == 1){
                     suvr.name = name[0].name;
-                    break;
                 }else{
                     let name = suvr.i18n.filter(i => suvr.languages.some( l => l.language == i.language && l.enable));
                     if(name.length > 0){
                         suvr.name = name[0].name;
-                        break;
                     }
                 }
             }
