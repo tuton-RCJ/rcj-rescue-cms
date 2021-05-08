@@ -249,7 +249,7 @@
         "description2": "This page will contain the files distributed by the organisers.",
         "toLeague": "Bulk distribution to leagues",
         "toTeam": "Individual distribution to teams",
-        "empty": "It appears that no files have been stored yet.",
+        "empty": "It seems that no files have been stored yet...",
         "delete": "Delete",
         "upload": "Upload",
         "js":{
