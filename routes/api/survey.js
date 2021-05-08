@@ -349,7 +349,8 @@ publicRouter.get('/question/:teamId/:token/:survId', function (req, res, next) {
         $or: [
           {league: team.league},
           {team: team._id}
-        ]
+        ],
+        _id: survId
       })
       .exec(function (err, dbServ) {
         if (err || dbServ == null) {
