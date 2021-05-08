@@ -249,6 +249,10 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                 mkdirp(path, function (err) {
                   if (err) logger.error(err);
                 });
+                path = `${__dirname}/../../cabinet/${authInfo.competition._id}/${teamData._id}`;
+                mkdirp(path, function (err) {
+                  if (err) logger.error(err);
+                });
 
                 //Send mail
                 if(smtp == null){
@@ -349,8 +353,8 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                             events: [
                               {
                                 time: now,
-                                event: '== Emails have been sent out. ==',
-                                user: '[System] Self registration',
+                                event: '== Email have been sent out. ==',
+                                user: getIP(req),
                               },
                             ],
                             replacedURL,
