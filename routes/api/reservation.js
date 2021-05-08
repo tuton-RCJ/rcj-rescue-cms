@@ -363,6 +363,7 @@ publicRouter.get('/book/:teamId/:token/:resvId', function (req, res, next) {
     } else if (team) {
       reservationDb.reservation
       .findOne({
+        _id: resvId,
         competition: team.competition,
         enable: true,
         $or: [
@@ -429,6 +430,7 @@ publicRouter.post('/book/:teamId/:token/:resvId', function (req, res, next) {
     } else if (team) {
       reservationDb.reservation
       .findOne({
+        _id: resvId,
         competition: team.competition,
         enable: true,
         deadline: {$gte: new Date()},
@@ -522,6 +524,7 @@ publicRouter.post('/cancel/:teamId/:token/:resvId', function (req, res, next) {
     } else if (team) {
       reservationDb.reservation
       .findOne({
+        _id: resvId,
         competition: team.competition,
         enable: true,
         deadline: {$gte: new Date()},
