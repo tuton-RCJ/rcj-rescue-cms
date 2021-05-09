@@ -73,7 +73,7 @@ app.controller('MailSentController', ['$scope', '$uibModal', '$log', '$http', '$
 
 
     $http.get("/api/mail/sent/" + competitionId).then(function (response) {
-        $scope.mails = response.data;
+        $scope.mails = response.data.filter(m=>m.team != null);
         console.log($scope.mails);
     })
 
@@ -174,6 +174,7 @@ app.controller('MailSentController', ['$scope', '$uibModal', '$log', '$http', '$
     }, true);
 
     $scope.list_filter = function (value, index, array) {
+        if(value.team == null) return false;
         return (showAllLeagues || $scope.Rleagues[value.league]) && (~value.subject.indexOf($scope.refineSubject))  && (~value.team.name.indexOf($scope.refineName)) && (~value.team.teamCode.indexOf($scope.refineCode)) && (~value.team.country.indexOf($scope.refineRegion))
     }
 
