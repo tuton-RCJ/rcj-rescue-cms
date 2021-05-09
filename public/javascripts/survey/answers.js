@@ -85,11 +85,13 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
             return answer[0].answer;
         }
         return "";
-        console.log(answers)
-        console.log(questions)
     }
 
     $scope.delete = async function (ans) {
+        if(!ans.team){
+            ans.team = {};
+            ans.team.name = "Deleted team";
+        }
         const {
             value: operation
         } = await swal({
