@@ -36,7 +36,7 @@ block content
                 button.btn.btn-info(type='button', ng-click='go("/admin/mailTemplates/editor/"+mail.name)' style="margin-right:10px;")
                   i.fas.fa-edit &nbsp;
                   |{{"admin.mailTemplates.edit" | translate}}
-                button.btn.btn-danger(type='button', ng-click='removeTemplate(mail)')
+                button.btn.btn-danger(type='button', ng-click='removeTemplate(mail)', ng-if="deleteable(mail.name)")
                   i.fas.fa-trash &nbsp;
                   | {{"common.delete" | translate}}
                 

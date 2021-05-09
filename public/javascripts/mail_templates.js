@@ -17,6 +17,10 @@ app.controller("MailTemplatesController",['$scope', '$http', '$translate', funct
 
   updateTemplatesList()
 
+  $scope.deleteable = function(name){
+    return !name.startsWith('_');
+  }
+
   $scope.removeTemplate = async function (mail) {
     const {
         value: operation

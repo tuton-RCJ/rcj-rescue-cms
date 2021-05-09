@@ -126,9 +126,11 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
               if (err) {
                 logger.error(err);
               } else {
-                let fileName = "Email Verification.html";
-                if(lang == 'ja') fileName = "メール認証.html";
-                const path = `${__dirname}/../../templates/mail/${fileName}`;
+                const templateDir = `${__dirname}/../../templates/mail/`
+                let fileName = "_Email Verification.html";
+                if(lang == 'ja' && fs.existsSync(`${templateDir}_メール認証.html`)) fileName = "_メール認証.html";
+                const path = `${templateDir}${fileName}`;
+
                 fs.stat(path, (err, stat) => {
                   // Handle file not found
                   if (err !== null && err.code === 'ENOENT') {
@@ -159,7 +161,7 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
                         address: process.env.MAIL_FROM,
                       },
                       to: mail,
-                      subject: `${fileName.slice( 0, -5 )} [${dbCompetition.name}]`,
+                      subject: `${fileName.slice( 0, -5 ).replace('_','')} [${dbCompetition.name}]`,
                       html,
                       text,
                     };
@@ -261,9 +263,10 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                   });
                   return;
                 }
-                let fileName = "Team registration completed.html";
-                if(lang == 'ja') fileName = "チーム登録完了.html";
-                path = `${__dirname}/../../templates/mail/${fileName}`;
+                const templateDir = `${__dirname}/../../templates/mail/`
+                let fileName = "_Team registration completed.html";
+                if(lang == 'ja' && fs.existsSync(`${templateDir}_チーム登録完了.html`)) fileName = "_チーム登録完了.html";
+                path = `${templateDir}${fileName}`;
                 fs.stat(path, (err, stat) => {
                   // Handle file not found
                   if (err !== null && err.code === 'ENOENT') {
@@ -328,7 +331,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                         address: process.env.MAIL_FROM,
                       },
                       to: authInfo.mail,
-                      subject: `${fileName.slice( 0, -5 )} [${authInfo.competition.name}]`,
+                      subject: `${fileName.slice( 0, -5 ).replace('_','')} [${authInfo.competition.name}]`,
                       html,
                       text,
                     };
