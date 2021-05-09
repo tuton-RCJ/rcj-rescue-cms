@@ -117,7 +117,8 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
         $scope.surv.i18n.push({
             language: currentLang,
             name: '',
-            topDescription: ''
+            topDescription: '',
+            myDescription: ''
         });
         $scope.surv.languages.push({
             'language': currentLang,
@@ -128,7 +129,8 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
                 $scope.surv.i18n.push({
                     language: l,
                     name: '',
-                    topDescription: ''
+                    topDescription: '',
+                    myDescription: ''
                 });
                 $scope.surv.languages.push({
                     'language': l,
