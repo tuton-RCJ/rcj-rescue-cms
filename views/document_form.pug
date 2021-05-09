@@ -93,12 +93,6 @@ block content
                         strong {{"common.region" | translate}}
                     div(style="font-size:20px;")
                         p(ng-bind="team.country")
-            
-            if editable
-                div(style="text-align:center;margin-bottom:20px;")
-                    button.btn.btn-lg.btn-outline-success(type='button', ng-click='save()')
-                        i.fas.fa-save &nbsp;
-                        | {{"common.save" | translate}}
 
             div(ng-repeat="(blockIndex, block) in blocks track by $index")
                 .card(ng-style="{border: '3px solid #' + block.color}", style="margin-bottom:20px;")
