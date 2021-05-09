@@ -304,7 +304,11 @@ adminRouter.delete('/:teamid', function (req, res, next) {
               msg: 'Team has been removed!',
             });
             for (const id of ids) {
-              const path = `${__dirname}/../../documents/${dbTeam.competition}/${id}`;
+              let path = `${__dirname}/../../documents/${dbTeam.competition}/${id}`;
+              fs.rmdir(path, { recursive: true }, (err) => {
+                if (err) throw err;
+              });
+              path = `${__dirname}/../../cabinet/${dbTeam.competition}/${id}`;
               fs.rmdir(path, { recursive: true }, (err) => {
                 if (err) throw err;
               });
