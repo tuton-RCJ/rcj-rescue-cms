@@ -91,6 +91,12 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
                             'language': l,
                             'enable': true
                         });
+                        $scope.surv.i18n.push({
+                            language: l,
+                            name: '',
+                            topDescription: '',
+                            myDescription: ''
+                        });
                     }
                 }
             }
