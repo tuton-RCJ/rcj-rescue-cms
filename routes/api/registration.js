@@ -349,7 +349,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                             messageId: info.messageId,
                             time: now,
                             to: authInfo.mail,
-                            subject: `${fileName.slice( 0, -5 )} [${authInfo.competition.name}]`,
+                            subject: `${fileName.slice( 0, -5 ).replace('_','')} [${authInfo.competition.name}]`,
                             html,
                             plain: text,
                             status: 0,
