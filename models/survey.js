@@ -45,6 +45,13 @@ const surveySchema = new Schema({
   }]
 })
 
+surveySchema.pre('deleteOne', function (next) {
+  surveyAnswer.deleteMany({ survey: this._id }, next);
+});
+surveySchema.pre('deleteMany', function (next) {
+  surveyAnswer.deleteMany({ survey: this._conditions._id }, next);
+});
+
 const surveyAnswerSchema = new Schema({
   competition: {type: ObjectId, ref: 'Competition'},
   team: {type: ObjectId, ref: 'Team'},

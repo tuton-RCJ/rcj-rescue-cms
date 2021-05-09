@@ -151,6 +151,38 @@ const competitionSchema = new Schema({
   consentForm: {type: String, default: ""}
 })
 
+competitionSchema.pre('deleteMany', function (next) {
+  Round.deleteMany({ competition: this._conditions._id }, next);
+  Team.deleteMany({ competition: this._conditions._id }, next);
+  Field.deleteMany({ competition: this._conditions._id }, next);
+  require('./document').review.deleteMany({ competition: this._conditions._id }, next);
+  require('./lineMap').lineMap.deleteMany({ competition: this._conditions._id }, next);
+  require('./lineRun').lineRun.deleteMany({ competition: this._conditions._id }, next);
+  require('./mazeMap').mazeMap.deleteMany({ competition: this._conditions._id }, next);
+  require('./mazeRun').mazeRun.deleteMany({ competition: this._conditions._id }, next);
+  require('./mail').mail.deleteMany({ competition: this._conditions._id }, next);
+  require('./mail').mailAuth.deleteMany({ competition: this._conditions._id }, next);
+  require('./reservation').reservation.deleteMany({ competition: this._conditions._id }, next);
+  require('./survey').survey.deleteMany({ competition: this._conditions._id }, next);
+  require('./survey').surveyAnswer.deleteMany({ competition: this._conditions._id }, next);
+});
+
+competitionSchema.pre('deleteOne', function (next) {
+  Round.deleteMany({ competition: this._id }, next);
+  Team.deleteMany({ competition: this._id }, next);
+  Field.deleteMany({ competition: this._id }, next);
+  require('./document').review.deleteMany({ competition: this._id }, next);
+  require('./lineMap').lineMap.deleteMany({ competition: this._id }, next);
+  require('./lineRun').lineRun.deleteMany({ competition: this._id }, next);
+  require('./mazeMap').mazeMap.deleteMany({ competition: this._id }, next);
+  require('./mazeRun').mazeRun.deleteMany({ competition: this._id }, next);
+  require('./mail').mail.deleteMany({ competition: this._id }, next);
+  require('./mail').mailAuth.deleteMany({ competition: this._id }, next);
+  require('./reservation').reservation.deleteMany({ competition: this._id }, next);
+  require('./survey').survey.deleteMany({ competition: this._id }, next);
+  require('./survey').surveyAnswer.deleteMany({ competition: this._id }, next);
+});
+
 const signageSchema = new Schema({
   name       : {type: String, required: true},
   content :[{
@@ -250,6 +282,22 @@ const teamSchema = new Schema({
     select: false
   }
 })
+
+teamSchema.pre('deleteOne', function (next) {
+  require('./document').review.deleteMany({ team: this._id }, next);
+  require('./lineRun').lineRun.deleteMany({ team: this._id }, next);
+  require('./mazeRun').mazeRun.deleteMany({ team: this._id }, next);
+  require('./mail').mail.deleteMany({ team: this._id }, next);
+  require('./survey').surveyAnswer.deleteMany({ team: this._id }, next);
+});
+
+teamSchema.pre('deleteMany', function (next) {
+  require('./document').review.deleteMany({ team: this._conditions._id }, next);
+  require('./lineRun').lineRun.deleteMany({ team: this._conditions._id }, next);
+  require('./mazeRun').mazeRun.deleteMany({ team: this._conditions._id }, next);
+  require('./mail').mail.deleteMany({ team: this._conditions._id }, next);
+  require('./survey').surveyAnswer.deleteMany({ team: this._conditions._id }, next);
+});
 
 
 const fieldSchema = new Schema({

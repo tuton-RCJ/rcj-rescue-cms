@@ -7,7 +7,6 @@ const ObjectId = Schema.Types.ObjectId
 const async = require('async')
 const cluster = require('cluster')
 
-
 const logger = require('../config/logger').mainLogger
 
 const pathFinder = require('../helper/pathFinder')
@@ -118,6 +117,13 @@ const lineMapSchema = new Schema({
           set: v => v === '' ? 0 : v
       }
   }
+});
+
+lineMapSchema.pre('deleteOne', function (next) {
+  LineRun.lineRun.deleteMany({ map: this._id }, next);
+});
+lineMapSchema.pre('deleteMany', function (next) {
+  LineRun.lineRun.deleteMany({ map: this._conditions._id }, next);
 });
 
 lineMapSchema.pre('save', function (next) {

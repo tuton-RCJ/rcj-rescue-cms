@@ -237,6 +237,13 @@ mazeMapSchema.pre('save', function (next) {
   }
 })
 
+mazeMapSchema.pre('deleteOne', function (next) {
+  MazeRun.mazeRun.deleteMany({ map: this._id }, next);
+});
+mazeMapSchema.pre('deleteMany', function (next) {
+  MazeRun.mazeRun.deleteMany({ map: this._conditions._id }, next);
+});
+
 mazeMapSchema.plugin(mongooseInteger)
 
 const MazeMap = mongoose.model('MazeMap', mazeMapSchema)
