@@ -58,7 +58,7 @@ publicRouter.get('/:teamId/:token', function (req, res, next) {
       "_id": teamId,
       "document.token": token
     })
-    .select("_id competition league name teamCode document.enabled")
+    .select("_id competition league name teamCode document.enabled document.deadline")
     .exec(function (err, team) {
       if (err || team == null) {
         if (!err) err = { message: 'No team found' };
@@ -72,7 +72,8 @@ publicRouter.get('/:teamId/:token', function (req, res, next) {
             teamName: team.name,
             teamCode: team.teamCode,
             token: token,
-            documentEnable: team.document.enabled
+            documentEnable: team.document.enabled,
+            documentDeadline: team.document.deadline
           });
       }
     });

@@ -15,6 +15,7 @@ const surveySchema = new Schema({
     language : {type: String, default: ''},
     name: {type: String, default: ''},
     topDescription: {type: String, default: ""},
+    myDescription: {type: String, default: ""},
   }],
   league: [{type: String, enum: LEAGUES}],
   team: [{type: ObjectId, ref: 'Team'}],

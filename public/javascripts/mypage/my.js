@@ -13,6 +13,8 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
     
     $scope.competitionId = competitionId
 
+    $scope.docEditable = false;
+
     $scope.go = function (path) {
         window.location = path
     }
@@ -33,6 +35,13 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
         $scope.leagueName = response.data.find(l => l.id === leagueId).name;
         $http.get("/api/competitions/" + competitionId).then(function (response) {
             $scope.competition = response.data
+            let useDeadline = $scope.competition.documents.deadline;
+            if(teamDocDeadline){
+                useDeadline = teamDocDeadline;
+            }
+            if(new Date() < new Date(useDeadline * 1000)){
+                $scope.docEditable = true;
+            }
         })
     })
 
@@ -45,6 +54,10 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
         league: leagueId
     }).then(function (response) {
         $scope.reservations = response.data;
+        for(let resv of $scope.reservations){
+            if(new Date(resv.deadline) < new Date()) resv.editable = false;
+            else resv.editable = true;
+        }
     })
 
     $http.get(`/api/survey/list/${competitionId}/${leagueId}/${teamId}`).then(function (response) {
@@ -53,12 +66,18 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
             let name = suvr.i18n.filter(i => i.language == currentLang && suvr.languages.some( l => l.language == i.language && l.enable));
             if(name.length == 1){
                 suvr.name = name[0].name;
+                suvr.myDescription = name[0].myDescription;
             }else{
                 let name = suvr.i18n.filter(i => suvr.languages.some( l => l.language == i.language && l.enable));
                 if(name.length > 0){
                     suvr.name = name[0].name;
+                    suvr.myDescription = name[0].myDescription;
                 }
             }
+
+            suvr.editable = true;
+            if(new Date(suvr.deadline) < new Date()) suvr.editable = false;
+            else if(!suvr.reEdit && suvr.sent) suvr.editable = false;
         }
     })
 
@@ -91,6 +110,21 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
             })
         })
         
+    }
+
+    function compositeColor(code, alpha) {
+        const colorCode = parseInt(code, 16) * alpha + 255 * (1 - alpha);
+        return Math.floor(colorCode).toString(16);
+    }
+      
+    function convertToPaleColor(colorCode, alpha) {
+        const codes = [colorCode.slice(0, 2), colorCode.slice(2, 4), colorCode.slice(4, 6)];
+        return codes.map(code => compositeColor(code, alpha)).join("");
+    }
+
+    $scope.editableColour = function(colour, editable){
+        if(editable) return {'background-color': `#${colour}`};
+        return {'background-color': `#${convertToPaleColor(colour, 0.8)}`};
     }
 
     

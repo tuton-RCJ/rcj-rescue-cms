@@ -200,6 +200,7 @@
         "master": "予約マスタ",
         "name": "名前",
         "description": "説明",
+        "myDescription": "マイページに表示する短い説明",
         "distribution": "配信先",
         "league": "リーグ",
         "team": "チーム",
@@ -223,6 +224,7 @@
         "settings": "各種設定",
         "name": "名前",
         "description": "説明",
+        "myDescription": "マイページに表示する短い説明",
         "deadline": "提出期限",
         "open": "オープン",
         "reSubmit": "提出後の再提出",
@@ -262,7 +264,9 @@
         }
     },
     "mypage":{
-        "message": "メッセージ"
+        "message": "メッセージ",
+        "document": "ドキュメントや，各種ファイルを提出します．",
+        "cabinet": "オーガナイザーから配布されたファイルが格納されます．"
     },
     "interview":{
         "runs": "競技一覧",

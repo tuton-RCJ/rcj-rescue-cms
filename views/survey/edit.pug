@@ -102,8 +102,13 @@ block content
                     br
                     span(style="margin-top:10px;") {{"survey.description" | translate}}
                     ng-quill-editor(ng-model="i18n.topDescription")
+                    br
+                    .input-group(style="margin 0 auto;")
+                        .input-group-prepend
+                            span.input-group-text {{"survey.myDescription" | translate}}
+                        input.form-control(type='text', ng-model='i18n.myDescription')
            
-            br
+            hr
             h5 {{"survey.deadline" | translate}}
             input.form-control(type='datetime-local', ng-model='surv.deadline', ng-style="{backgroundColor: deadlineColour(surv.deadline)}")
             br

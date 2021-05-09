@@ -306,8 +306,8 @@ publicRouter.get('/list/:competitionId/:leagueId/:teamId', function (req, res, n
         {team: teamId}
       ]
     })
-    .select("_id name i18n languages")
-    .exec(function (err, dbResv) {
+    .select("_id name i18n languages deadline reEdit")
+    .exec(function (err, dbSurvey) {
       if (err) {
         logger.error(err);
         return res.status(400).send({
@@ -315,8 +315,38 @@ publicRouter.get('/list/:competitionId/:leagueId/:teamId', function (req, res, n
           err: err.message,
         });
       }
-      
-      return res.status(200).send(dbResv);
+
+      surveyDb.surveyAnswer
+      .find({
+        competition: competitionId,
+        team: teamId
+      })
+      .exec(function (err, dbAnswer) {
+        if (err) {
+          logger.error(err);
+          return res.status(400).send({
+            msg: 'Could not get answer',
+            err: err,
+          });
+        }
+
+        let resData = [];
+        if(dbAnswer != null){
+          for(let surv of dbSurvey){
+            resData.push({
+              '_id': surv._id,
+              'reEdit': surv.reEdit,
+              'sent': dbAnswer.some(a => a.survey.toString() === surv._id.toString()),
+              'deadline': surv.deadline,
+              'i18n': surv.i18n,
+              'languages': surv.languages
+            });
+          }
+          return res.status(200).send(resData);
+        }else{
+          return res.status(200).send(dbSurvey);
+        }
+      });
     });
 });
 

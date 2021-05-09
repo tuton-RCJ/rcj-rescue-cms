@@ -13,6 +13,7 @@ const reservationSchema = new Schema({
   team: [{type: ObjectId, ref: 'Team'}],
   name: {type: String, default: ""},
   description: {type: String, default: ""},
+  myDescription: {type: String, default: ""},
   deadline: {type: Date, default: Date.now},
   enable: {type: Boolean, default: false},
   slot: [{

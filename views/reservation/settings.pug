@@ -53,6 +53,9 @@ block content
       h5 {{"reservation.description" | translate}}
       ng-quill-editor(ng-model="resv.description")
       br
+      h5 {{"reservation.myDescription" | translate}}
+      input.form-control(type='text', ng-model='resv.myDescription')
+      br
       h5 {{"reservation.deadline" | translate}}
       input.form-control(type='datetime-local', ng-model='resv.deadline', ng-style="{backgroundColor: deadlineColour(resv.deadline)}")
       br

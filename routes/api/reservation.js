@@ -250,6 +250,7 @@ adminRouter.put('/config/:competitionId/:resvId', function (req, res, next) {
       resvData.competition = competitionId;
       dbResv.name = resvData.name;
       dbResv.description = resvData.description;
+      dbResv.myDescription = resvData.myDescription;
       dbResv.deadline = resvData.deadline;
       dbResv.enable = resvData.enable;
       dbResv.league = resvData.league;
@@ -593,7 +594,7 @@ publicRouter.post('/list/:competitionId', function (req, res, next) {
         {team: teamId}
       ]
     })
-    .select("_id name")
+    .select("_id name myDescription deadline")
     .exec(function (err, dbResv) {
       if (err) {
         logger.error(err);

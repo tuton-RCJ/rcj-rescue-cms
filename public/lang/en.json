@@ -200,6 +200,7 @@
         "master": "Booking Master",
         "name": "Name",
         "description": "Description",
+        "myDescription": "A short description to display on the personal pages",
         "distribution": "Distribution to",
         "league": "League",
         "team": "Team",
@@ -223,6 +224,7 @@
         "settings": "Configuration",
         "name": "Name",
         "description": "Description",
+        "myDescription": "A short description to display on the personal pages",
         "deadline": "Deadline",
         "open": "Open",
         "reSubmit": "Resubmission",
@@ -262,7 +264,9 @@
         }
     },
     "mypage":{
-        "message": "Message"
+        "message": "Message",
+        "document": "Submit your documentation and other files.",
+        "cabinet": "Contain the files distributed by the organisers."
     },
     "interview":{
         "runs": "All runs",
