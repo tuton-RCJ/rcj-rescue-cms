@@ -55,6 +55,18 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
     }).then(function (response) {
         $scope.reservations = response.data;
         for(let resv of $scope.reservations){
+            let name = resv.i18n.filter(i => i.language == currentLang && resv.languages.some( l => l.language == i.language && l.enable));
+            if(name.length == 1){
+                resv.name = name[0].name;
+                resv.myDescription = name[0].myDescription;
+            }else{
+                let name = resv.i18n.filter(i => resv.languages.some( l => l.language == i.language && l.enable));
+                if(name.length > 0){
+                    resv.name = name[0].name;
+                    resv.myDescription = name[0].myDescription;
+                }
+            }
+
             if(new Date(resv.deadline) < new Date()) resv.editable = false;
             else resv.editable = true;
         }

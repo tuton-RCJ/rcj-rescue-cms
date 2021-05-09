@@ -1,6 +1,6 @@
 var app = angular.module("ReservationAdmin", ['ngTouch','ngAnimate', 'pascalprecht.translate', 'ngCookies','ui.select', 'ngSanitize', 'ngQuill']);
 
-app.controller("ReservationAdminController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
+app.controller("ReservationAdminController", ['$scope', '$http', '$translate','$sce', function ($scope, $http, $translate, $sce) {
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -14,6 +14,11 @@ app.controller("ReservationAdminController", ['$scope', '$http', '$translate', f
     }, function (translationId) {
     // = translationId;
     });
+
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.currentLang = currentLang;
+    $scope.displayLang = currentLang;
 
     
     $scope.competitionId = competitionId
@@ -77,6 +82,16 @@ app.controller("ReservationAdminController", ['$scope', '$http', '$translate', f
                 html: response.data.msg
             })
         });
+    }
+
+    $scope.langContent = function(data, target){
+        if(!data) return;
+        if(data[target]) return data[target];
+        data[target] = $sce.trustAsHtml(data.filter( function( value ) {
+            return value.language == $scope.displayLang;        
+        })[0][target]);
+
+        return(data[target]);
     }
 
     socket = io(window.location.origin, {

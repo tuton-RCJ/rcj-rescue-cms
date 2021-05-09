@@ -44,13 +44,14 @@ block content
   .row
     .col-md-1
     .col-md-10
-      h1 {{resv.name}}
+      h1(ng-bind-html="langContent(resv.i18n, 'name')")
+      p(ng-bind-html="langContent(resv.i18n, 'description')")
       hr
       table.custom(style="margin-bottom:20px;")
         thead
             tr
               th {{"reservation.start" | translate}}
-              th {{"reservation.duration" | translate}}）
+              th {{"reservation.duration" | translate}}
               th {{"reservation.total" | translate}}
               th {{"reservation.remaining" | translate}}
               th {{"reservation.status" | translate}}

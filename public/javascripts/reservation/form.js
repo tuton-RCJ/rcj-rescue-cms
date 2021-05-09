@@ -1,6 +1,6 @@
 var app = angular.module("ResvForm", ['ngTouch','ngAnimate', 'pascalprecht.translate', 'ngCookies', 'ngSanitize']);
 
-app.controller("ResvFormController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
+app.controller("ResvFormController", ['$scope', '$http', '$translate','$sce', function ($scope, $http, $translate, $sce) {
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -25,6 +25,11 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate', function 
     loadTranslation("canceledMes");
     loadTranslation("cancelButton");
     loadTranslation("cancelKeep");
+
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.currentLang = currentLang;
+    $scope.displayLang = currentLang;
 
     
     $scope.competitionId = competitionId;
@@ -128,6 +133,16 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate', function 
         })
 
         
+    }
+
+    $scope.langContent = function(data, target){
+        if(!data) return;
+        if(data[target]) return data[target];
+        data[target] = $sce.trustAsHtml(data.filter( function( value ) {
+            return value.language == $scope.displayLang;        
+        })[0][target]);
+
+        return(data[target]);
     }
 
     socket = io(window.location.origin, {

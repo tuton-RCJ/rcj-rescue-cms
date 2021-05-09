@@ -11,9 +11,16 @@ const reservationSchema = new Schema({
   competition: {type: ObjectId, ref: 'Competition'},
   league: [{type: String, enum: LEAGUES}],
   team: [{type: ObjectId, ref: 'Team'}],
-  name: {type: String, default: ""},
-  description: {type: String, default: ""},
-  myDescription: {type: String, default: ""},
+  i18n:[{
+    language : {type: String, default: ''},
+    name: {type: String, default: ''},
+    description: {type: String, default: ""},
+    myDescription: {type: String, default: ""},
+  }],
+  languages: [{
+    language: {type: String, default: ''},
+    enable: {type: Boolean, default: true}
+  }],
   deadline: {type: Date, default: Date.now},
   enable: {type: Boolean, default: false},
   slot: [{

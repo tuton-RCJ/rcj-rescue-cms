@@ -15,6 +15,10 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
     // = translationId;
     });
 
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.currentLang = currentLang;
+    $scope.displayLang = currentLang;
     
     $scope.competitionId = competitionId
 
@@ -41,7 +45,6 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
 
     $http.get("/api/competitions/" + competitionId + "/teams").then(function (response) {
         $scope.teams = response.data;
-        console.log($scope.teams)
     })
 
     if(resvId){
@@ -52,8 +55,24 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
             for(let s of response.data.slot){
                 s.start = new Date(s.start);
             }
-
             $scope.resv = response.data;
+
+            if($scope.resv.languages == null || $scope.resv.languages.length != availableLangs.length){
+                for(let l of availableLangs){
+                    if(!$scope.resv.languages.some(l => l.language == l)){
+                        $scope.resv.languages.push({
+                            'language': l,
+                            'enable': true
+                        });
+                        $scope.resv.i18n.push({
+                            language: l,
+                            name: '',
+                            description: '',
+                            myDescription: ''
+                        });
+                    }
+                }
+            }
         })
     }else{
         //init reservation table
@@ -65,14 +84,39 @@ app.controller("ReservationSettingsController", ['$scope', '$http', '$translate'
         tmpDeadline.setDate(tmpDeadline.getDate() + 7);
         $scope.resv = {
             'competition': competitionId,
-            'name': "Interview reservation",
-            'description': "",
+            'i18n': [],
+            'languages': [],
             'deadline': tmpDeadline,
             'enable': false,
             'league': [],
             'team': [],
             'slot': []
         };
+
+        $scope.resv.i18n.push({
+            language: currentLang,
+            name: '',
+            description: '',
+            myDescription: ''
+        });
+        $scope.resv.languages.push({
+            'language': currentLang,
+            'enable': true
+        });
+        for(let l of availableLangs){
+            if(l != currentLang){
+                $scope.resv.i18n.push({
+                    language: l,
+                    name: '',
+                    description: '',
+                    myDescription: ''
+                });
+                $scope.resv.languages.push({
+                    'language': l,
+                    'enable': true
+                });
+            }
+        }
     }
 
     $scope.save = function(){

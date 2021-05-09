@@ -248,9 +248,8 @@ adminRouter.put('/config/:competitionId/:resvId', function (req, res, next) {
       }
 
       resvData.competition = competitionId;
-      dbResv.name = resvData.name;
-      dbResv.description = resvData.description;
-      dbResv.myDescription = resvData.myDescription;
+      dbResv.i18n = resvData.i18n;
+      dbResv.languages = resvData.languages;
       dbResv.deadline = resvData.deadline;
       dbResv.enable = resvData.enable;
       dbResv.league = resvData.league;
@@ -396,7 +395,8 @@ publicRouter.get('/book/:teamId/:token/:resvId', function (req, res, next) {
         
         return res.status(200).send({
           deadline: dbResv.deadline,
-          name: dbResv.name,
+          i18n: dbResv.i18n,
+          languages: dbResv.languages,
           description: dbResv.description,
           slot
         });
@@ -594,7 +594,7 @@ publicRouter.post('/list/:competitionId', function (req, res, next) {
         {team: teamId}
       ]
     })
-    .select("_id name myDescription deadline")
+    .select("_id deadline i18n languages")
     .exec(function (err, dbResv) {
       if (err) {
         logger.error(err);

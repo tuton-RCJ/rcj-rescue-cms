@@ -18,7 +18,7 @@ block navbar
         .col-sm-11
             span(style="font-size:20px;")
                 i.fas.fa-calendar-day &nbsp;
-                | {{competition.name}} - {{resv.name}}
+                | {{competition.name}} - {{langContent(resv.i18n, 'name')}}
         .col-sm-1(style="text-align:right;")
             button.btn.btn-primary(type='button', onclick="location.href='/locales'", ng-cloak, style="padding:2px 5px 0px 3px;margin-right:10px;")
                 i.fas.fa-language(style="font-size:30px;")
@@ -26,7 +26,7 @@ block navbar
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     a.breadcrumb-item(ng-click="go('/mypage/'+ teamId + '/' + token)") #{teamName}
-    span.breadcrumb-item.active {{resv.name}}
+    span.breadcrumb-item.active {{langContent(resv.i18n, 'name')}}
 
 
 block content
@@ -34,7 +34,7 @@ block content
     .col-md-1
     .col-md-10
       div(style="text-align:center;")
-        h1 {{resv.name}}
+        h1 {{langContent(resv.i18n, 'name')}}
         h5 {{competition.name}} - {{leagueName}}
         h4 #{teamCode} #{teamName}
       
@@ -43,7 +43,7 @@ block content
           strong(ng-bind="deadline()")
         span {{"reservation.timeZone" | translate}}
       hr
-      p(ng-bind-html="resv.description")
+      p(ng-bind-html="langContent(resv.i18n, 'description')")
 
       .alert.alert-success.text-center(role='alert', ng-if="myBook")
         h4.alert-heading 

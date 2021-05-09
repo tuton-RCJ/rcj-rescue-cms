@@ -1,7 +1,11 @@
 var app = angular.module("ResvList", ['ngTouch','pascalprecht.translate', 'ngCookies']);
-app.controller("ResvListController", ['$scope', '$http', function ($scope, $http) {
+app.controller("ResvListController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
     $scope.competitionId = competitionId
 
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.currentLang = currentLang;
+    $scope.displayLang = currentLang;
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
@@ -10,6 +14,17 @@ app.controller("ResvListController", ['$scope', '$http', function ($scope, $http
     function updateList(){
         $http.get(`/api/reservation/config/${competitionId}`).then(function (response) {
             $scope.reservation = response.data
+            for(let resv of $scope.reservation){
+                let name = resv.i18n.filter(i => i.language == currentLang && resv.languages.some( l => l.language == i.language && l.enable));
+                if(name.length == 1){
+                    resv.name = name[0].name;
+                }else{
+                    let name = resv.i18n.filter(i => resv.languages.some( l => l.language == i.language && l.enable));
+                    if(name.length > 0){
+                        resv.name = name[0].name;
+                    }
+                }
+            }
         })
     }
     updateList();
