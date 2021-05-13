@@ -186,6 +186,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
         console.log($scope.tiles)
         $scope.EvacuationAreaLoPIndex = result.EvacuationAreaLoPIndex;
         $scope.indexCount = result.indexCount;
+        $scope.maxRawScore = result.maxScore;
     }
 
 
@@ -432,6 +433,38 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
         downloadLink.setAttribute("download", $scope.name + '.json')
         downloadLink.click()
         document.body.removeChild(downloadLink);
+    }
+
+    function maxScore(multiplier){
+        return Math.round($scope.maxRawScore * multiplier);
+    }
+
+    $scope.openMaxScore = function(){
+        let html = `
+        <div class='text-center'>
+            <i class='fas fa-calculator fa-3x'></i>
+        </div><hr>
+        <table class='custom'>
+            <thead>
+                <th>Exc. multiplier</th>
+                <th>EZ:1 & Kit:1</th>
+                <th>EZ:1 & Kit:2</th>
+                <th>EZ:2 & Kit:1</th>
+                <th>EZ:2 & Kit:2</th>
+            </thead>
+            <tbody>
+                <td>${maxScore(1.0)}</td>
+                <td>${maxScore(1.1*1.2*1.2*1.2)}</td>
+                <td>${maxScore(1.3*1.2*1.2*1.2)}</td>
+                <td>${maxScore(1.2*1.4*1.4*1.4)}</td>
+                <td>${maxScore(1.6*1.4*1.4*1.4)}</td>
+            </tbody>
+        </table>
+        `;
+        Swal.fire({
+            html: html,
+            showCloseButton: true, 
+        })
     }
 
     // File APIに対応しているか確認

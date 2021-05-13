@@ -76,7 +76,7 @@ block content
                         select.custom-select#selectComp(ng-model='$parent.se_competition', ng-options='b_competitions._id as b_competitions.name for b_competitions in competitions')
                         .input-group-append
                             button.btn.btn-secondary(type='button', ng-click='saveMapAs(asname)') {{"admin.mazeMapEditor.saveAs" | translate}}
-                hr
+                    hr
                 .input-group.mb-3
                     //.input-group-prepend
                         span.input-group-text {{"admin.mazeMapEditor.height" | translate}}
@@ -117,7 +117,7 @@ block content
                     br
                     .error(ng-if='startNotSet()') {{"admin.mazeMapEditor.noStart" | translate}}
         .row
-            .col-md-12
+            .col-11
                 //.btn-group(style='margin-bottom:5px;')
                     .input-group-prepend
                         span.input-group-text
@@ -161,6 +161,9 @@ block content
                                     img.tile-image(ng-src='/images/green_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Green'")
                                     img.tile-image(ng-src='/images/green_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Green'")
                                     img.tile-image(ng-src='/images/green_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Green'")
+            .col-1 
+                button.btn.btn-info(type='button', ng-click='openMaxScore()')
+                    i.fas.fa-calculator
         hr
         .row
             .col-6

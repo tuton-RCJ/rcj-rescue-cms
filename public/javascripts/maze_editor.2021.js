@@ -629,6 +629,58 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             });
         }
     }
+
+    $scope.openMaxScore = function(){
+        let maxScore = 0;
+        let victimCount = 0;
+        let kitCount = 0;
+        const maxKits = {
+            "H": 3,
+            "S": 2,
+            "U": 0,
+            "Heated": 1,
+            "Red": 1,
+            "Yellow": 1,
+            "Green": 0
+        };
+        const coloredVictims = ["Red", "Yellow", "Green"];
+        Object.keys($scope.cells).map(function(key){
+            let cell = $scope.cells[key];
+            if(cell.isTile){
+                if(cell.tile.victims){
+                    Object.keys(cell.tile.victims).map(function(dir){
+                        victimCount++;
+                        if(cell.tile.victims[dir] in coloredVictims){
+                            maxScore += cell.isLinear ? 5 : 15;
+                        }else{
+                            maxScore += cell.isLinear ? 10 : 30;
+                        }
+                        kitCount += maxKits[cell.tile.victims[dir]];
+                    });
+                }
+                if(cell.tile.speedbump) maxScore += 5;
+                if(cell.tile.checkpoint) maxScore += 10;
+                if(cell.tile.ramp) maxScore += 10;
+                if(cell.tile.steps) maxScore += 5;
+            }
+        });
+
+        maxScore += Math.min(kitCount, 12) * 10;
+        maxScore += (victimCount + Math.min(kitCount, 12)) * 10;
+        maxScore += victimCount * 10;
+
+        let html = `
+        <div class='text-center'>
+            <i class='fas fa-calculator fa-3x'></i>
+        </div><hr>
+        <p style='font-size:50px'>${maxScore}</p>
+        `;
+        Swal.fire({
+            html: html,
+            showCloseButton: true, 
+        })
+
+    }
     
     $scope.export = function(){
         console.log($scope.cells)
