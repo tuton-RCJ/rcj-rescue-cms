@@ -40,9 +40,10 @@ block content
                 p.card-text(translate="home.maze_description")
                 button(onclick="location.href='/maze/' + competitionId" class='btn btn-primary btn-lg btn-block') {{'home.go_maze' | translate}}
 
-      button(ng-click="go('/home/' + competition._id + '/teams')" class='btn btn-outline-success btn-lg btn-block' style="margin-top:20px;margin-bottom:20px;") 
-        i.fas.fa-users(aria-hidden='true')  {{'team_home.title' | translate}}
       if judge
+        button(ng-click="go('/home/' + competition._id + '/teams')" class='btn btn-outline-success btn-lg btn-block' style="margin-top:20px;margin-bottom:20px;") 
+          i.fas.fa-users(aria-hidden='true')  {{'team_home.title' | translate}}
+      
         button(ng-click="go('/home/scanner/home')" class='btn btn-outline-dark btn-lg btn-block' style="margin-top:20px;margin-bottom:20px;")
           i.fas.fa-qrcode(aria-hidden='true')  {{'home.goScanner' | translate}}
       div(ng-if="secretCommand")

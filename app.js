@@ -187,7 +187,7 @@ app.use('/logout', pass.ensureAuthenticated, function (req, res, next) {
     req.logout()
     res.redirect('/home')
 })
-app.use('/home', homeRoute)
+app.use('/home', [homeRoute.public, pass.ensureAuthenticated, homeRoute.private, pass.ensureAdmin, homeRoute.admin])
 app.use('/locales', localesRoute)
 app.use('/s', shortRoute.public)
 app.use('/service', serviceRoute)

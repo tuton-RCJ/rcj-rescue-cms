@@ -494,7 +494,7 @@ adminRouter.get('/:competition/adminTeams', function (req, res, next) {
     });
 });
 
-publicRouter.get('/:competition/teams', function (req, res, next) {
+privateRouter.get('/:competition/teams', function (req, res, next) {
   const id = req.params.competition;
 
   if (!ObjectId.isValid(id)) {
@@ -552,7 +552,7 @@ publicRouter.get('/:competition/teams/:teamid', function (req, res, next) {
     });
 });
 
-publicRouter.get('/:competition/:league/teams', function (req, res, next) {
+privateRouter.get('/:competition/:league/teams', function (req, res, next) {
   const id = req.params.competition;
   const { league } = req.params;
 
