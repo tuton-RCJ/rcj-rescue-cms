@@ -226,6 +226,7 @@ adminRouter.post('/send', function (req, res, next) {
       subject: team.mailData.title,
       html,
       text,
+      replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
     };
 
     try {

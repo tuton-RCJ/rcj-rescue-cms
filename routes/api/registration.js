@@ -164,6 +164,7 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
                       subject: `${fileName.slice( 0, -5 ).replace('_','')} [${dbCompetition.name}]`,
                       html,
                       text,
+                      replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
                     };
 
                     try {
@@ -334,6 +335,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                       subject: `${fileName.slice( 0, -5 ).replace('_','')} [${authInfo.competition.name}]`,
                       html,
                       text,
+                      replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
                     };
 
                     try {
