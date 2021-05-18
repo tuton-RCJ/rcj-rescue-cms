@@ -68,6 +68,9 @@ block content
           button(ng-click="go('/admin/mailTemplates')" class='btn btn-outline-primary btn-lg btn-block')
             i.fas.fa-mail-bulk &nbsp;
             | {{"admin.mailTemplates.title" | translate}}
+          button(ng-click="go('/admin/queues')" class='btn btn-outline-danger btn-lg btn-block')
+            i.fas.fa-bullseye &nbsp;
+            | {{"admin.home.queue" | translate}}
           hr
 
           if user.superDuperAdmin

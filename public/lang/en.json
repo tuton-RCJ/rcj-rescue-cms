@@ -567,7 +567,8 @@
             "user": "User management",
             "access_level": "The you logged in account, {{account}}, does not have permission to access User management / URL Shortening.",
             "signage": "Signage setting",
-            "restore": "Restore the competition"
+            "restore": "Restore the competition",
+            "queue": "Queue Dashboard"
         },
         "settings": {
             "title": "Settings",
