@@ -26,16 +26,6 @@ module.exports = function(grunt){
               }]
             }
         },
-        imagemin: {
-            dynamic: {
-                files: [{
-                    expand: true,
-                    cwd: 'public/images/',
-                    src: ['**/*.{png,jpg,gif}'],
-                    dest: 'public/images'
-                }]
-            }
-        },
         json_minification: {
             target: {
               files: [{
@@ -50,7 +40,6 @@ module.exports = function(grunt){
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-contrib-imagemin');
     grunt.loadNpmTasks('grunt-json-minification');
-    grunt.registerTask('default', ['uglify', 'cssmin', 'imagemin', 'json_minification']);
+    grunt.registerTask('default', ['uglify', 'cssmin', 'json_minification']);
 }
