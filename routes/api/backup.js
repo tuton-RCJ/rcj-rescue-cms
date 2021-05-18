@@ -5,14 +5,13 @@
 const express = require('express');
 
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const multer = require('multer');
 const fs = require('fs-extra');
-const archiver = require('archiver');
+const glob = require('glob');
 const extract = require('extract-zip');
 const rimraf = require('rimraf');
 const chmodr = require('chmodr');
+const path = require('path');
 const competitiondb = require('../../models/competition');
 const lineMapDb = require('../../models/lineMap');
 const lineRunDb = require('../../models/lineRun');
@@ -20,310 +19,128 @@ const mazeMapDb = require('../../models/mazeMap');
 const mazeRunDb = require('../../models/mazeRun');
 const documentDb = require('../../models/document');
 const mailDb = require('../../models/mail');
+const { ObjectId } = require('mongoose').Types;
 
-const query = require('../../helper/query-helper');
+
 const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
-
-const { LINE_LEAGUES } = competitiondb;
-const { MAZE_LEAGUES } = competitiondb;
-const { LEAGUES } = competitiondb;
 
 const { ACCESSLEVELS } = require('../../models/user');
 
 const base_tmp_path = `${__dirname}/../../tmp/`;
 
-adminRouter.get('/:competition', function (req, res) {
-  const id = req.params.competition;
-  const folder = Math.random().toString(32).substring(2);
-  fs.mkdirsSync(base_tmp_path + folder);
+const {backupQueue} = require("../../queue/backupQueue")
 
-  if (!auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN)) {
+adminRouter.get('/:competition', function (req, res) {
+  const competitionId = req.params.competition;
+
+  if (!auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN)) {
     return res.status(401).send({
       msg: 'You have no authority to access this api',
     });
   }
 
-  fs.writeFileSync(
-    `${base_tmp_path + folder}/version.json`,
-    JSON.stringify({ version: 21 })
-  );
-
-  let outputCount = 0;
-  let compName = '';
-
-  // Copy Document Folder
-  fs.copySync(
-    `${__dirname}/../../documents/${id}`,
-    `${base_tmp_path}${folder}/documents/${id}`
-  );
-
-  // Competition
-  competitiondb.competition
-    .find({
-      _id: id,
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get competitions',
-          err: err.message,
-        });
-      } else {
-        compName = data[0].name;
-        fs.writeFileSync(
-          `${base_tmp_path + folder}/competition.json`,
-          JSON.stringify(data)
-        );
-        outputCount++;
-
-        // Team
-        competitiondb.team
-          .find({
-            competition: id,
-          })
-          .select(
-            'competition name league inspected docPublic country checkin teamCode email document'
-          )
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get a competition',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/team.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // Round
-        competitiondb.round
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get rounds',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/round.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // Field
-        competitiondb.field
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/field.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // LineMap
-        lineMapDb.lineMap
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/lineMap.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // MazeMap
-        mazeMapDb.mazeMap
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/mazeMap.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // LineRuns
-        lineRunDb.lineRun
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/lineRun.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // MazeRuns
-        mazeRunDb.mazeRun
-          .find({
-            competition: id,
-          })
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/mazeRun.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // Reviews
-        documentDb.review
-          .find({
-            competition: id,
-          })
-          .populate('reviewer', 'username')
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              for (const r of data) {
-                (r.name = r.reviewer.username), (r.reviewer = r.reviewer._id);
-              }
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/document.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-
-        // Mails
-        mailDb.mail
-          .find({
-            competition: id,
-          })
-          .select(
-            'competition team mailId messageId time to subject html plain status events replacedURL'
-          )
-          .lean()
-          .exec(function (err, data) {
-            if (err) {
-              logger.error(err);
-              res.status(400).send({
-                msg: 'Could not get fields',
-                err: err.message,
-              });
-            } else {
-              fs.writeFileSync(
-                `${base_tmp_path + folder}/mail.json`,
-                JSON.stringify(data)
-              );
-              outputCount++;
-              if (outputCount == 10) makeZip(res, folder, compName);
-            }
-          });
-      }
-    });
+  backupQueue.add('backup',{competitionId});
+  res.status(200).send({
+    msg: 'Backup job has been added to the queue!',
+  });
 });
 
-function makeZip(res, folder, compName) {
-  const output = fs.createWriteStream(`${base_tmp_path + folder}.zip`);
-  const archive = archiver('zip', {
-    zlib: { level: 9 }, // Sets the compression level.
-  });
 
-  output.on('close', function () {
-    res.download(
-      `${base_tmp_path + folder}.zip`,
-      `${compName}.rcjs`,
-      function (err) {
-        if (err) {
-          logger.error(err.status);
-          return;
+adminRouter.get('/list/:competitionId', function (req, res, next) {
+  const { competitionId } = req.params;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user,competitionId,ACCESSLEVELS.ADMIN)){ // Admin check
+    glob.glob(
+      `./backup/${competitionId}/*.cms`,
+      function (er, files) {
+        let fl = [];
+        for(let f of files){
+          let tmp = {
+            "time": Number(path.basename(f, path.extname(f))),
+            "name": path.basename(f)
+          }
+          fl.push(tmp);
         }
-        rimraf(base_tmp_path + folder, function (err) {});
-        fs.unlink(`${base_tmp_path + folder}.zip`, function (err) {});
+        res.status(200).send(fl);
       }
     );
-  });
+  }else{
+    res.status(403).send({
+      msg: 'Auth error'
+    });
+  }
+});
 
-  archive.pipe(output);
-  archive.directory(base_tmp_path + folder, false);
-  archive.finalize();
-}
+adminRouter.get('/archive/:competitionId/:fileName', function (req, res, next) {
+  const { competitionId } = req.params;
+  const { fileName } = req.params;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user,competitionId,ACCESSLEVELS.ADMIN)){ // Admin check
+    let path = `${__dirname}/../../backup/${competitionId}/${fileName}`;
+    fs.stat(path, (err, stat) => {
+      // Handle file not found
+      if (err !== null) {
+        if(err.code === 'ENOENT'){
+          return res.status(404).send({
+            msg: 'File not found',
+          });
+        }
+        return res.status(500).send({
+          msg: 'Cloud not get file',
+        });
+      }
+      
+      fs.readFile(path, function (err, data) {
+        res.writeHead(200, {
+          'Content-Type': "application/zip",
+        });
+        res.end(data);
+      });
+    });
+  }else{
+    res.status(403).send({
+      msg: 'Auth error'
+    });
+  }
+});
+
+adminRouter.delete('/archive/:competitionId/:fileName', function (req, res, next) {
+  const { competitionId } = req.params;
+  const { fileName } = req.params;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user,competitionId,ACCESSLEVELS.ADMIN)){ // Admin check
+    let path = `${__dirname}/../../backup/${competitionId}/${fileName}`;
+    fs.unlink(path, (err) => {
+      if (err){
+        return res.status(500).send({
+          msg: 'Could not delete backup',
+          err: err.message,
+        });
+      }else{
+        res.status(200).send({
+          msg: 'Backup is deleted'
+        });
+      }
+    });
+  }else{
+    res.status(403).send({
+      msg: 'Auth error'
+    });
+  }
+});
 
 adminRouter.post('/restore', function (req, res) {
   const folder = Math.random().toString(32).substring(2);
@@ -356,7 +173,7 @@ adminRouter.post('/restore', function (req, res) {
               'utf8'
             )
           );
-          if (version.version != 21) {
+          if (version.version != "21.4") {
             rimraf(`${base_tmp_path}uploads/${folder}`, function (err) {});
             fs.unlink(filePath, function (err) {});
             res.status(500).send({ msg: 'Version not match' });

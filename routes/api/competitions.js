@@ -900,6 +900,11 @@ adminRouter.post('/', function (req, res) {
         });
       }
 
+      path = `${__dirname}/../../backup/${competitionid}`;
+      mkdirp(path, function (err) {
+        if (err) logger.error(err);
+      });
+
       userdb.user.findById(userid).exec(function (err, dbUser) {
         if (err) {
           logger.error(err);
@@ -960,89 +965,24 @@ adminRouter.delete('/:competitionid', function (req, res, next) {
         res.status(200).send({
           msg: 'Competition has been removed!',
         });
-        const path = `${__dirname}/../../documents/${id}`;
-        fs.rmdir(path, { recursive: true }, (err) => {
+        
+        fs.rmdir(`${__dirname}/../../documents/${id}`, { recursive: true }, (err) => {
           if (err) {
             logger.error(err.message);
           }
         });
-      }
-    }
-  );
 
-  competitiondb.round.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
+        fs.rmdir(`${__dirname}/../../cabinet/${id}`, { recursive: true }, (err) => {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
 
-  competitiondb.field.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
-
-  competitiondb.team.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
-
-  lineRunDb.lineRun.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
-
-  lineMapDb.lineMap.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
-
-  mazeRunDb.mazeRun.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
-      }
-    }
-  );
-
-  mazeMapDb.mazeMap.deleteMany(
-    {
-      competition: id,
-    },
-    function (err) {
-      if (err) {
-        logger.error(err);
+        fs.rmdir(`${__dirname}/../../backup/${id}`, { recursive: true }, (err) => {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
       }
     }
   );

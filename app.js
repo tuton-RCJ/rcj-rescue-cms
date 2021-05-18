@@ -39,8 +39,10 @@ const limiter = new RateLimit({
 });
 
 const {mailQueue} = require("./queue/mailQueue")
+const {backupQueue} = require("./queue/backupQueue")
 const bullRouter = createBullBoard([
-    new BullAdapter(mailQueue)
+    new BullAdapter(mailQueue),
+    new BullAdapter(backupQueue)
 ]).router;
   
 //========================================================================

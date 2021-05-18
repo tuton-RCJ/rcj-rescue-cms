@@ -825,7 +825,8 @@
             "readed": "Read QR code"
         },
         "backup": {
-            "title": "Backup",
+            "title": "Back up",
+            "backedup": "Backed up data",
             "description": "Back up this competition to a file. The backup file contains the following information.",
             "item1": "Competition information",
             "item2": "Teams",
@@ -833,8 +834,18 @@
             "item4": "Fields",
             "item5": "Maps",
             "item6": "Runs",
+            "item7": "Document form settings, response and submission data",
+            "item8": "Email delivery records",
+            "item9": "Registration settings",
+            "item10": "Reservation master setting and reservation information",
+            "item11": "Files stored in cabinets",
+            "item12": "Questionaries' settings & answers",
             "notInclude": "Please note that permission settings is not included.",
-            "exe": "Backup!"
+            "exe": "Back up!",
+            "time": "Backed up time",
+            "js":{
+                "queued": "A backup job has been queued. When a backup file becomes available, it will be displayed at the bottom of this page."
+            }
         },
         "restore": {
             "title": "Restore the competition",

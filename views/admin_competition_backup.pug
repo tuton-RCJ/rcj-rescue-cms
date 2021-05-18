@@ -29,7 +29,30 @@ block content
         li {{"admin.backup.item4" | translate}}
         li {{"admin.backup.item5" | translate}}
         li {{"admin.backup.item6" | translate}}
+        li {{"admin.backup.item7" | translate}}
+        li {{"admin.backup.item8" | translate}}
+        li {{"admin.backup.item9" | translate}}
+        li {{"admin.backup.item10" | translate}}
+        li {{"admin.backup.item11" | translate}}
+        li {{"admin.backup.item12" | translate}}
       p {{"admin.backup.notInclude" | translate}}
       br
       button(ng-click='exeBackup()' type="button" class="btn btn-info") {{"admin.backup.exe" | translate}}
+      br
+      hr
+      h2 {{"admin.backup.backedup" | translate}}
+      table.custom
+        thead
+            tr
+              th {{"admin.backup.time" | translate}}
+              th {{"common.operation" | translate}}
+        tbody
+            tr(ng-repeat='back in backedup')
+              td
+                a(ng-bind='time(back.time)')
+              td
+                button.btn.btn-primary.btn-sm(type='button', ng-click="download(back.name)", style="margin:0 5px;")
+                  i.fas.fa-download
+                button.btn.btn-danger.btn-sm(type='button', ng-click='delete(back.name)', style="margin:0 5px;")
+                  i.fas.fa-trash-alt
       br
