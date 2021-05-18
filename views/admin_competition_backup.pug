@@ -56,10 +56,11 @@ block content
       .row 
         .col-md-8
           h2 {{"admin.backup.backedup" | translate}}
-        .col-md-4(style="text-align:right;")
-          button.btn.btn-danger(type='button', ng-click="open('/admin/queues/queue/backup')" style="margin: 5px;")
-              i.fas.fa-bullseye &nbsp;
-              | {{"admin.backup.queue" | translate}}
+        if user.superDuperAdmin
+          .col-md-4(style="text-align:right;")
+            button.btn.btn-danger(type='button', ng-click="open('/admin/queues/queue/backup')" style="margin: 5px;")
+                i.fas.fa-bullseye &nbsp;
+                | {{"admin.backup.queue" | translate}}
       table.custom
         thead
             tr
