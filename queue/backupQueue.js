@@ -1,5 +1,4 @@
 const Queue = require('bull');
-const multer = require('multer');
 const fs = require('fs-extra');
 const archiver = require('archiver');
 const extract = require('extract-zip');
@@ -14,6 +13,9 @@ const documentDb = require('../models/document');
 const mailDb = require('../models/mail');
 const reservationDb = require('../models/reservation');
 const surveyDb = require('../models/survey');
+const base_tmp_path = `${__dirname}/../tmp/`;
+
+const Bversion = "21.4";
 
 const backupQueue = new Queue('backup', {
   redis: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST},
@@ -24,7 +26,6 @@ const backupQueue = new Queue('backup', {
 });
 
 backupQueue.process('backup', function(job, done){
-  
   const {competitionId} = job.data;
   const folderName = Math.floor( new Date().getTime() / 1000 );
   const folderPath = `${__dirname}/../backup/${competitionId}/${folderName}`;
@@ -33,15 +34,15 @@ backupQueue.process('backup', function(job, done){
   jobProgress = 0;
   const maxCount = 16;
   let outputCount = 0;
-  let compName = '';
+  job.progress(0);
 
-  fs.writeFile(`${folderPath}/version.json`,JSON.stringify({ version: 21.4 }), (err) => {
+  fs.writeFile(`${folderPath}/version.json`,JSON.stringify({ version: Bversion }), (err) => {
     if(err){
       done(new Error(err));
     }else{
       outputCount ++;
       jobProgress += 100/(maxCount+1);
-      job.progress(jobProgress);
+      job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
         makeZip(job, done, folderPath);
       }
@@ -55,7 +56,7 @@ backupQueue.process('backup', function(job, done){
     }else{
       outputCount ++;
       jobProgress += 100/(maxCount+1);
-      job.progress(jobProgress);
+      job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
         makeZip(job, done, folderPath);
       }
@@ -69,7 +70,7 @@ backupQueue.process('backup', function(job, done){
     }else{
       outputCount ++;
       jobProgress += 100/(maxCount+1);
-      job.progress(jobProgress);
+      job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
         makeZip(job, done, folderPath);
       }
@@ -91,7 +92,7 @@ backupQueue.process('backup', function(job, done){
         }else{
           outputCount ++;
           jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
+          job.progress(Math.floor(jobProgress));
           if(outputCount == maxCount){
             makeZip(job, done, folderPath);
           }
@@ -99,284 +100,43 @@ backupQueue.process('backup', function(job, done){
       });
     }
   });
+
+  function backup(file, Model){
+    Model
+    .find({'competition': competitionId})
+    .lean()
+    .exec(function (err, data) {
+      if (err) {
+        done(new Error(err));
+      } else {
+        fs.writeFile(`${folderPath}/${file}.json`, JSON.stringify(data), (err) => {
+          if(err){
+            done(new Error(err));
+          }else{
+            outputCount ++;
+            jobProgress += 100/(maxCount+1);
+            job.progress(Math.floor(jobProgress));
+            if(outputCount == maxCount){
+              makeZip(job, done, folderPath);
+            }
+          }
+        });
+      }
+    });
+  }
   
-  //Round data
-  competitiondb.round
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/round.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Team data
-  competitiondb.team
-  .find({'competition': competitionId})
-  .select('competition name league inspected docPublic country checkin teamCode email members document')
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/team.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Field data
-  competitiondb.field
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/field.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Review data
-  documentDb.review
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/review.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Line Map data
-  lineMapDb.lineMap
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/lineMap.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Line Run data
-  lineRunDb.lineRun
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/lineRun.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Maze Map data
-  mazeMapDb.mazeMap
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/mazeMap.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Maze Run data
-  mazeRunDb.mazeRun
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/mazeRun.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Mail data
-  mailDb.mail
-  .find({'competition': competitionId})
-  .select('competition team mailId messageId time to subject html plain status events replacedURL')
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/mail.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Reservation data
-  reservationDb.reservation
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/reservation.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Survey setting data
-  surveyDb.survey
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/survey.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });
-
-  //Survey answer data
-  surveyDb.surveyAnswer
-  .find({'competition': competitionId})
-  .lean()
-  .exec(function (err, data) {
-    if (err) {
-      done(new Error(err));
-    } else {
-      fs.writeFile(`${folderPath}/surveyAnswer.json`, JSON.stringify(data), (err) => {
-        if(err){
-          done(new Error(err));
-        }else{
-          outputCount ++;
-          jobProgress += 100/(maxCount+1);
-          job.progress(jobProgress);
-          if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
-          }
-        }
-      });
-    }
-  });                        
+  backup('round', competitiondb.round);
+  backup('team', competitiondb.team);
+  backup('field', competitiondb.field);
+  backup('review', documentDb.review);
+  backup('lineMap', lineMapDb.lineMap);
+  backup('lineRun', lineRunDb.lineRun);
+  backup('mazeMap', mazeMapDb.mazeMap);
+  backup('mazeRun', mazeRunDb.mazeRun);
+  backup('mail', mailDb.mail);
+  backup('reservation', reservationDb.reservation);
+  backup('survey', surveyDb.survey);
+  backup('surveyAnswer', surveyDb.surveyAnswer);             
 });
 
 function makeZip(job, done, folderPath) {
@@ -407,5 +167,179 @@ function makeZip(job, done, folderPath) {
   archive.directory(folderPath, false);
   archive.finalize();
 }
+
+
+function deleteFiles(folder){
+  rimraf(`${base_tmp_path}uploads/${folder}`, function (err) {
+  });
+  fs.unlink(`${base_tmp_path}uploads/${folder}.zip`, function (err) {
+  });
+}
+
+backupQueue.process('restore', function(job, done){
+  job.progress(0);
+  const {folder} = job.data;
+  const maxCount = 16;
+  extract(
+    `${base_tmp_path}uploads/${folder}.zip`,
+    { dir: `${base_tmp_path}uploads/${folder}` },
+    function (err) {
+      if(err){
+        done(new Error(err));
+      }else{
+
+        const version = JSON.parse(
+          fs.readFileSync(
+            `${base_tmp_path}uploads/${folder}/version.json`,
+            'utf8'
+          )
+        );
+        if (version.version != "21.4") {
+          rimraf(`${base_tmp_path}uploads/${folder}`, function (err) {
+            done(new Error(err));
+            deleteFiles(folder);
+          });
+          fs.unlink(`${base_tmp_path}uploads/${folder}.zip`, function (err) {
+            done(new Error(err));
+            deleteFiles(folder);
+          });
+          done(new Error(`It is expected that the backup data is Version: ${Bversion}, but the file entered is Version: ${version.version}.`));
+          deleteFiles(folder);
+        }else{
+          let updated = 1;
+          let jobProgress = 0;
+          jobProgress += 100/(maxCount+1);
+          job.progress(Math.floor(jobProgress));
+
+          //Competition
+          const competition = JSON.parse(
+            fs.readFileSync(
+              `${base_tmp_path}uploads/${folder}/competition.json`,
+              'utf8'
+            )
+          );
+          job.update({
+            folder,
+            competitionId: competition[0]._id
+          });
+          competitiondb.competition.updateOne(
+            { _id: competition[0]._id },
+            competition[0],
+            { upsert: true },
+            function (err) {
+              if (err) {
+                done(new Error(err));
+                deleteFiles(folder);
+              } else {
+                updated ++;
+                jobProgress += 100/(maxCount+1);
+                job.progress(Math.floor(jobProgress));
+                if(updated == maxCount){
+                  deleteFiles(folder);
+                  job.progress(100);
+                  done();
+                }
+              }
+            }
+          );
+
+          function restore(fileName, Model){
+            const json = JSON.parse(
+              fs.readFileSync(
+                `${base_tmp_path}uploads/${folder}/${fileName}.json`,
+                'utf8'
+              )
+            );
+            const bulkOps = json.map(item => ({
+              updateOne: {
+                  filter: {_id: item._id},
+                  update: item,
+                  upsert: true
+              }
+            }));
+            Model.bulkWrite(bulkOps,
+              function (err) {
+                if (err) {
+                  done(new Error(err));
+                  deleteFiles(folder);
+                } else {
+                  updated ++;
+                  jobProgress += 100/(maxCount+1);
+                  job.progress(Math.floor(jobProgress));
+                  if(updated == maxCount){
+                    deleteFiles(folder);
+                    job.progress(100);
+                    done();
+                  }
+                }
+              }
+            );
+          }
+
+          restore('team', competitiondb.team);
+          restore('field', competitiondb.field);
+          restore('round', competitiondb.round);
+          restore('lineMap', lineMapDb.lineMap);
+          restore('lineRun', lineRunDb.lineRun);
+          restore('mazeMap', mazeMapDb.mazeMap);
+          restore('mazeRun', mazeRunDb.mazeRun);
+          restore('mail', mailDb.mail);
+          restore('reservation', reservationDb.reservation);
+          restore('review', documentDb.review);
+          restore('survey', surveyDb.survey);
+          restore('surveyAnswer', surveyDb.surveyAnswer);
+
+          // Copy Document Folder
+          fs.copy(`${base_tmp_path}uploads/${folder}/documents`, `${__dirname}/../documents/${competition[0]._id}`, (err) => {
+            chmodr(
+              `${__dirname}/../documents/${competition[0]._id}`,
+              0o777,
+              (err) => {
+                if (err) {
+                  done(new Error(err));
+                  deleteFiles(folder);
+                }else{
+                  updated ++;
+                  jobProgress += 100/(maxCount+1);
+                  job.progress(Math.floor(jobProgress));
+                  if(updated == maxCount){
+                    deleteFiles(folder);
+                    job.progress(100);
+                    done();
+                  }
+                }
+              }
+            );
+          });
+
+          // Copy Cabinet Folder
+          fs.copy(`${base_tmp_path}uploads/${folder}/cabinet`, `${__dirname}/../cabinet/${competition[0]._id}`, (err) => {
+            chmodr(
+              `${__dirname}/../cabinet/${competition[0]._id}`,
+              0o777,
+              (err) => {
+                if (err) {
+                  done(new Error(err));
+                  deleteFiles(folder);
+                }else{
+                  updated ++;
+                  jobProgress += 100/(maxCount+1);
+                  job.progress(Math.floor(jobProgress));
+                  if(updated == maxCount){
+                    deleteFiles(folder);
+                    job.progress(100);
+                    done();
+                  }
+                }
+              }
+            );
+          });        
+        }
+      }
+    }
+  );
+});
+
+
 
 exports.backupQueue = backupQueue;

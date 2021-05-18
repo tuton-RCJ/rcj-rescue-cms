@@ -850,8 +850,11 @@
         },
         "restore": {
             "title": "Restore the competition",
-            "description": "On this page, you can restore the competition from the file. You need a backup file of the name ending with '.rcjs'. If the version of the system you backed up is different, the process may not complete successfully.",
-            "exe": "Execute"
+            "description": "On this page, you can restore the competition from the file. You need a backup file of the name ending with '.cms'. If the version of the system you backed up is different, the process may not complete successfully.",
+            "exe": "Execute",
+            "js": {
+                "complete": "Your backup job is now complete. You can download it from the list below."
+            }
         },
         "shortURL": {
             "title": "URL Shortening",

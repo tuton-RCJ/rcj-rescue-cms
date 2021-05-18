@@ -37,10 +37,20 @@ block content
         li {{"admin.backup.item12" | translate}}
       p {{"admin.backup.notInclude" | translate}}
       br
-      .text-center
+      .text-center(ng-if="!job.state")
         button.btn.btn-info.btn-lg(ng-click='exeBackup()' type="button")
           i.fas.fa-archive &nbsp;
           | {{"admin.backup.exe" | translate}}
+      .text-center
+        h1(ng-if="job.state")
+          span.badge(ng-class="statusColour(job.state)")
+            i.fas(ng-class="statusIcon(job.state)")
+            | &nbsp;{{firstUpper(job.state)}}
+        .flex-fill(style="margin:10px 0px 0px 10px;", ng-if="job.progress > 0")
+          .progress
+            .progress-bar(role='progressbar' style='width: {{job.progress}}%;' aria-valuenow='{{job.progress}}' aria-valuemin='0' aria-valuemax='100') {{job.progress}}%
+        div(style="color:#e74c3c;margin-top:10px;", ng-if="job.reason")
+          span {{job.reason}}
       br
       hr
       .row 

@@ -1,7 +1,7 @@
 var app = angular.module("AdminBackup", ['ngTouch','pascalprecht.translate', 'ngCookies']);
 app.controller("AdminBackupController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
-    $scope.competitionId = competitionId
-
+    $scope.competitionId = competitionId;
+    $scope.job = null;
     let trans = [];
     function loadTranslation(tag){
         $translate(`admin.backup.js.${tag}`).then(function (val) {
@@ -11,7 +11,7 @@ app.controller("AdminBackupController", ['$scope', '$http', '$translate', functi
         });
     }
 
-    loadTranslation("queued");
+    loadTranslation("complete");
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
@@ -39,11 +39,7 @@ app.controller("AdminBackupController", ['$scope', '$http', '$translate', functi
     
     $scope.exeBackup = function () {
         $http.get('/api/backup/'+$scope.competitionId).then(function (response) {
-            Swal.close()
-            Swal({
-                type: 'success',
-                html: trans["queued"]
-            })
+            updateJobStatus(response.data.jobId);
         }, function (error) {
             console.log(error)
             Swal.close()
@@ -53,6 +49,71 @@ app.controller("AdminBackupController", ['$scope', '$http', '$translate', functi
                 html: error.data.msg
             })
         })
+    }
+
+    function updateJobStatus(jobId){
+        $http.get("/api/backup/job/" + jobId).then(function (response) {
+            $scope.job = response.data
+            if($scope.job.state == "completed"){
+                Swal({
+                    type: 'success',
+                    html: trans["complete"]
+                })
+                updateList();
+            }else if($scope.job.state == "failed"){
+                Swal.fire({
+                    type: 'error',
+                    html: $scope.job.reason
+                });
+            }else{
+                setTimeout(updateJobStatus, 1000, jobId);
+            }
+        })
+    }
+
+    $scope.statusIcon = function(status){
+        switch(status){
+            case 'completed':
+                return "fa-check";
+            case 'failed':
+                return "fa-times";
+            case 'delayed':
+                return "fa-clock";
+            case 'active':
+                return "fa-spinner fa-pulse";
+            case 'waiting':
+                return "fa-hourglass-half";
+            case 'paused':
+                return "fa-pause";
+            case 'stuck':
+                return "fa-layer-group";
+        }
+        return "fa-ellipsis-h";
+    }
+
+    $scope.statusColour = function(status){
+        switch(status){
+            case 'completed':
+                return "badge-success";
+            case 'failed':
+                return "badge-danger";
+            case 'delayed':
+                return "badge-warning";
+            case 'active':
+                return "badge-primary";
+            case 'waiting':
+                return "badge-secondary";
+            case 'paused':
+                return "badge-secondary";
+            case 'stuck':
+                return "badge-warning";
+        }
+        return "badge-secondary";
+    }
+
+    $scope.firstUpper = function(text){
+        if(!text) return;
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
     $scope.download = function(name){

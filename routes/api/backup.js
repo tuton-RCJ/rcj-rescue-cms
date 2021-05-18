@@ -8,21 +8,9 @@ const adminRouter = express.Router();
 const multer = require('multer');
 const fs = require('fs-extra');
 const glob = require('glob');
-const extract = require('extract-zip');
-const rimraf = require('rimraf');
-const chmodr = require('chmodr');
 const path = require('path');
-const competitiondb = require('../../models/competition');
-const lineMapDb = require('../../models/lineMap');
-const lineRunDb = require('../../models/lineRun');
-const mazeMapDb = require('../../models/mazeMap');
-const mazeRunDb = require('../../models/mazeRun');
-const documentDb = require('../../models/document');
-const mailDb = require('../../models/mail');
 const { ObjectId } = require('mongoose').Types;
 
-
-const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
 
 const { ACCESSLEVELS } = require('../../models/user');
@@ -40,9 +28,11 @@ adminRouter.get('/:competition', function (req, res) {
     });
   }
 
-  backupQueue.add('backup',{competitionId});
-  res.status(200).send({
-    msg: 'Backup job has been added to the queue!',
+  backupQueue.add('backup',{competitionId}).then((job) => {
+    res.status(200).send({
+      msg: 'Backup job has been added to the queue!',
+      jobId: job.id
+    });
   });
 });
 
@@ -146,8 +136,6 @@ adminRouter.post('/restore', function (req, res) {
   const folder = Math.random().toString(32).substring(2);
   fs.mkdirsSync(`${base_tmp_path}uploads/`);
 
-  const filePath = `${base_tmp_path}uploads/${folder}.zip`;
-
   const storage = multer.diskStorage({
     destination(req, file, callback) {
       callback(null, `${base_tmp_path}uploads/`);
@@ -159,261 +147,30 @@ adminRouter.post('/restore', function (req, res) {
 
   const upload = multer({
     storage,
-  }).single('rcjs');
+  }).single('file');
 
   upload(req, res, function (err) {
-    extract(
-      filePath,
-      { dir: `${base_tmp_path}uploads/${folder}` },
-      function (err) {
-        try {
-          const version = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/version.json`,
-              'utf8'
-            )
-          );
-          if (version.version != "21.4") {
-            rimraf(`${base_tmp_path}uploads/${folder}`, function (err) {});
-            fs.unlink(filePath, function (err) {});
-            res.status(500).send({ msg: 'Version not match' });
-            return;
-          }
-          const updated = 0;
-          // Competition
-          const competition = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/competition.json`,
-              'utf8'
-            )
-          );
-          competitiondb.competition.updateOne(
-            { _id: competition[0]._id },
-            competition[0],
-            { upsert: true },
-            function (err) {
-              if (err) {
-                logger.error(err);
-              } else {
-              }
-            }
-          );
-
-          // Team
-          const team = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/team.json`,
-              'utf8'
-            )
-          );
-          for (const i in team) {
-            competitiondb.team.updateOne(
-              { _id: team[i]._id },
-              team[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // Round
-          const round = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/round.json`,
-              'utf8'
-            )
-          );
-          for (const i in round) {
-            competitiondb.round.updateOne(
-              { _id: round[i]._id },
-              round[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // Field
-          const field = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/field.json`,
-              'utf8'
-            )
-          );
-          for (const i in field) {
-            competitiondb.field.updateOne(
-              { _id: field[i]._id },
-              field[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // LineMap
-          const lineMap = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/lineMap.json`,
-              'utf8'
-            )
-          );
-          for (const i in lineMap) {
-            lineMapDb.lineMap.updateOne(
-              { _id: lineMap[i]._id },
-              lineMap[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // LineRun
-          const lineRun = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/lineRun.json`,
-              'utf8'
-            )
-          );
-          for (const i in lineRun) {
-            lineRunDb.lineRun.updateOne(
-              { _id: lineRun[i]._id },
-              lineRun[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // MazeMap
-          const mazeMap = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/mazeMap.json`,
-              'utf8'
-            )
-          );
-          for (const i in mazeMap) {
-            mazeMapDb.mazeMap.updateOne(
-              { _id: mazeMap[i]._id },
-              mazeMap[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // MazeRun
-          const mazeRun = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/mazeRun.json`,
-              'utf8'
-            )
-          );
-          for (const i in mazeRun) {
-            mazeRunDb.mazeRun.updateOne(
-              { _id: mazeRun[i]._id },
-              mazeRun[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // Document
-          const document = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/document.json`,
-              'utf8'
-            )
-          );
-          for (const i in document) {
-            documentDb.review.updateOne(
-              { _id: document[i]._id },
-              document[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // MailDb
-          const mail = JSON.parse(
-            fs.readFileSync(
-              `${base_tmp_path}uploads/${folder}/mail.json`,
-              'utf8'
-            )
-          );
-          for (const i in mail) {
-            mailDb.mail.updateOne(
-              { _id: mail[i]._id },
-              mail[i],
-              { upsert: true },
-              function (err) {
-                if (err) {
-                  logger.error(err);
-                } else {
-                }
-              }
-            );
-          }
-
-          // Copy Document Folder
-          fs.copySync(
-            `${base_tmp_path}uploads/${folder}/documents/${competition[0]._id}`,
-            `${__dirname}/../../documents/${competition[0]._id}`
-          );
-          chmodr(
-            `${__dirname}/../../documents/${competition[0]._id}`,
-            0o777,
-            (err) => {
-              if (err) {
-                logger.error('Failed to execute chmod', err);
-              }
-            }
-          );
-
-          rimraf(`${base_tmp_path}uploads/${folder}`, function (err) {});
-          fs.unlink(filePath, function (err) {});
-
-          res.redirect(`/admin/${competition[0]._id}`);
-        } catch (e) {
-          logger.error(e);
-          res.status(500).send({ msg: 'Illegal file' });
-        }
-      }
-    );
+    backupQueue.add('restore',{folder}).then((job) => {
+      res.status(200).send({
+        msg: 'Restore job has been added to the queue!',
+        jobId: job.id
+      });
+    })
   });
+});
+
+adminRouter.get('/job/:jobId', async function (req, res, next) {
+  const { jobId } = req.params;
+  let job = await backupQueue.getJob(jobId);
+  if (job === null) {
+    res.status(404).end();
+   } else {
+    let state = await job.getState();
+    let progress = job._progress;
+    let reason = job.failedReason;
+    let competition = job.data.competitionId;
+    res.json({ jobId, state, progress, reason, competition });
+   }
 });
 
 adminRouter.all('*', function (req, res, next) {
