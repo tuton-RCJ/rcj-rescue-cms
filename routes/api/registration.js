@@ -24,6 +24,7 @@ const competitiondb = require('../../models/competition');
 const sanitizeFilename = require('sanitize-filename');
 const {escapeRegExp, toLength} = require('lodash');
 const mkdirp = require('mkdirp');
+const {mailQueue} = require("../../queue/mailQueue")
 
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -168,14 +169,9 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
                     };
 
                     try {
-                      smtp.sendMail(message, function (error, info) {
-                        if (error) {
-                          logger.error(error.message);
-                        } else {            
-                          return res.status(200).send({
-                            msg: 'Emails sent',
-                          });
-                        }
+                      mailQueue.add('send',{message, mailDbID: null}, {attempts:3, backoff:10000});
+                      return res.status(200).send({
+                        msg: 'Queued',
                       });
                     } catch (e) {
                       logger.error(e);
@@ -339,42 +335,37 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                     };
 
                     try {
-                      smtp.sendMail(message, function (error, info) {
-                        if (error) {
-                          logger.error(error.message);
-                        } else {
-                          const now = Math.floor(new Date().getTime() / 1000);     
-                          const newMail = new mailDb.mail({
-                            competition: teamData.competition,
-                            team: teamData._id,
-                            mailId,
-                            messageId: info.messageId,
+                      const now = Math.floor(new Date().getTime() / 1000);     
+                      const newMail = new mailDb.mail({
+                        competition: teamData.competition,
+                        team: teamData._id,
+                        mailId,
+                        messageId: null,
+                        time: now,
+                        to: authInfo.mail,
+                        subject: `${fileName.slice( 0, -5 ).replace('_','')} [${authInfo.competition.name}]`,
+                        html,
+                        plain: text,
+                        status: 0,
+                        events: [
+                          {
                             time: now,
-                            to: authInfo.mail,
-                            subject: `${fileName.slice( 0, -5 ).replace('_','')} [${authInfo.competition.name}]`,
-                            html,
-                            plain: text,
-                            status: 0,
-                            events: [
-                              {
-                                time: now,
-                                event: '== Email have been sent out. ==',
-                                user: getIP(req),
-                              },
-                            ],
-                            replacedURL,
+                            event: '== Email has been added to the queue. ==',
+                            user: getIP(req),
+                          },
+                        ],
+                        replacedURL,
+                      });
+                      newMail.save(function (err, data) {
+                        if (err) {
+                          logger.error(err);
+                          return res.status(500).send({
+                            msg: err.message,
                           });
-                          newMail.save(function (err, data) {
-                            if (err) {
-                              logger.error(err);
-                              return res.status(500).send({
-                                msg: err.message,
-                              });
-                            } else {
-                              return res.status(200).send({
-                                msg: 'Emails sent',
-                              });
-                            }
+                        } else {
+                          mailQueue.add('send',{message, mailDbID: data._id}, {attempts:3, backoff:10000});
+                          return res.status(200).send({
+                            msg: 'Emails sent',
                           });
                         }
                       });

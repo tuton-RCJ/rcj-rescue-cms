@@ -8,7 +8,9 @@ env('process.env')
 
 var express = require('express');
 var RateLimit = require('express-rate-limit');
-var morgan = require('morgan');
+const Queue = require('bull')
+const { createBullBoard } = require('bull-board')
+const { BullAdapter } = require('bull-board/bullAdapter')
 const compression = require('compression')
 var path = require('path')
 var fs = require('fs')
@@ -35,6 +37,11 @@ const limiter = new RateLimit({
     windowMs: 1*60*1000, // 1 minute
     max: 200
 });
+
+const {mailQueue} = require("./queue/mailQueue")
+const bullRouter = createBullBoard([
+    new BullAdapter(mailQueue)
+]).router;
   
 //========================================================================
 //                          Routes require
@@ -196,7 +203,7 @@ app.use('/line', [lineRoute.public, pass.ensureAuthenticated, lineRoute.private,
 app.use('/maze', [mazeRoute.public, pass.ensureAuthenticated, mazeRoute.private, pass.ensureAdmin, mazeRoute.admin])
 app.use('/signage', [pass.ensureAuthenticated, signageRoute.private, pass.ensureAdmin, signageRoute.admin])
 app.use('/admin', pass.ensureAdmin, adminRoute)
-app.use('/kiosk', [kioskRoute.public, pass.ensureAuthenticated, kioskRoute.private])
+app.use('/admin/queues', pass.ensureAdmin, bullRouter)
 app.use('/document', [documentRoute.public, pass.ensureAuthenticated, documentRoute.private, pass.ensureAdmin, documentRoute.admin])
 app.use('/registration', [registrationRoute.public, pass.ensureAuthenticated, registrationRoute.private, pass.ensureAdmin, registrationRoute.admin])
 app.use('/mypage', [myPageRoute.public, pass.ensureAuthenticated, myPageRoute.private, pass.ensureAdmin, myPageRoute.admin])

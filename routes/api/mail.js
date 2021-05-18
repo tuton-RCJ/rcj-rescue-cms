@@ -23,6 +23,7 @@ const mailDb = require('../../models/mail');
 const sanitizeFilename = require('sanitize-filename');
 const {escapeRegExp} = require('lodash');
 const competitiondb = require('../../models/competition');
+const {mailQueue} = require("../../queue/mailQueue")
 
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -223,65 +224,55 @@ adminRouter.post('/send', function (req, res, next) {
         address: process.env.MAIL_FROM,
       },
       to: team.email,
-      subject: team.mailData.title,
+      subject: team.mailData.title.replace("_", ""),
       html,
       text,
       replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
     };
 
     try {
-      smtp.sendMail(message, function (error, info) {
-        if (error) {
-          logger.error(error.message);
-          if (!sent) {
+      const now = Math.floor(new Date().getTime() / 1000);
+      const newMail = new mailDb.mail({
+        competition: team.competition,
+        team: team._id,
+        mailId,
+        messageId: null,
+        time: now,
+        to: team.email,
+        subject: team.mailData.title.replace("_", ""),
+        html,
+        plain: text,
+        status: -1,
+        events: [
+          {
+            time: now,
+            event: '== Email has been added to the queue. ==',
+            user: req.user.username,
+          },
+        ],
+        replacedURL,
+      });
+
+      newMail.save(function (err, data) {
+        if (err) {
+          logger.error(err);
+          sent = true;
+          res.status(500).send({
+            msg: err.message,
+          });
+        } else {
+          mailQueue.add('send',{message, mailDbID: data._id}, {attempts:3, backoff:10000});
+          count--;
+          if (count <= 0 && !sent) {
             sent = true;
-            res.status(500).send({
-              msg: error.message,
+            res.status(200).send({
+              msg: 'Emails have been added to the queue!',
             });
           }
-        } else {
-          const now = Math.floor(new Date().getTime() / 1000);
-
-          const newMail = new mailDb.mail({
-            competition: team.competition,
-            team: team._id,
-            mailId,
-            messageId: info.messageId,
-            time: now,
-            to: team.email,
-            subject: team.mailData.title,
-            html,
-            plain: text,
-            status: 0,
-            events: [
-              {
-                time: now,
-                event: '== Emails have been sent out. ==',
-                user: req.user.username,
-              },
-            ],
-            replacedURL,
-          });
-
-          newMail.save(function (err, data) {
-            if (err) {
-              logger.error(err);
-              sent = true;
-              res.status(500).send({
-                msg: err.message,
-              });
-            } else {
-              count--;
-              if (count <= 0 && !sent) {
-                sent = true;
-                res.status(200).send({
-                  msg: 'Emails sent',
-                });
-              }
-            }
-          });
         }
       });
+
+
     } catch (e) {
       if (!sent) {
         sent = true;

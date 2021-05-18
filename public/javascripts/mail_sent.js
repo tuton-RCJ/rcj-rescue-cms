@@ -114,6 +114,10 @@ app.controller('MailSentController', ['$scope', '$uibModal', '$log', '$http', '$
 
     $scope.statusColour = function(status){
         switch(status){
+            case -2:
+              return "#ffadad";
+            case 0:
+              return "#b2ffff";
             case 1:
               return "#ffffcc";
             case 2:
@@ -126,7 +130,7 @@ app.controller('MailSentController', ['$scope', '$uibModal', '$log', '$http', '$
     $scope.detail = function(mail){
         let mailUrl = `/api/mail/event/${mail.competition}/${mail.mailId}`;
         let html = `<div style="max-height:calc(100vh - 200px);overflow:auto;">`;
-        html += `<h3>${deliveredTo_mes}</h3><table class='custom'><thead><tr><th>メール</th></tr></thead><tbody>`;
+        html += `<h3>${deliveredTo_mes}</h3><table class='custom'><tbody>`;
         for(let m of mail.to){
             html += `<tr><td>${m}</td></tr>`;
         }

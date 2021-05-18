@@ -6,7 +6,7 @@ const logger = require('./config/logger').mainLogger
 const env = require('node-env-file')
 const numCPUs = require('os').cpus().length;
 const fs = require("fs");
-const http = require('http')
+const http = require('http');
 
 env('process.env');
  
@@ -26,12 +26,16 @@ env('process.env');
  let numProcess = 1;
  if(process.env.REDIS_HOST && process.env.REDIS_PORT){
   numProcess = Math.min(numCPUs, process.env.PROCESS_NUM);
- }else if(process.env.PROCESS_NUM > 1){
-  logger.error(`If you want to start more than one process, you need to configure the Redis Server.`);
+ }else{
+  throw new Error('Please configure the Redis Server.');
  }
  if(cluster.isMaster){
   logger.info(`We will now launch ${numProcess} worker process(es)`)
  }
+
+
+//Queue
+require("./queue/mailQueue")
  
  cluster.schedulingPolicy = cluster.SCHED_RR;
  if (cluster.isMaster && numProcess > 1) {
@@ -47,7 +51,6 @@ env('process.env');
      cluster.fork()
    })
  }
- 
  else {
   logger.info(`Worker ${process.pid} is running`)
   const port = (parseInt(process.env.WEB_HOSTPORT, 10) || 80) + parseInt(process.env.NODE_APP_INSTANCE || 0);
