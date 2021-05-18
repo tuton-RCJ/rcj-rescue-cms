@@ -37,10 +37,19 @@ block content
         li {{"admin.backup.item12" | translate}}
       p {{"admin.backup.notInclude" | translate}}
       br
-      button(ng-click='exeBackup()' type="button" class="btn btn-info") {{"admin.backup.exe" | translate}}
+      .text-center
+        button.btn.btn-info.btn-lg(ng-click='exeBackup()' type="button")
+          i.fas.fa-archive &nbsp;
+          | {{"admin.backup.exe" | translate}}
       br
       hr
-      h2 {{"admin.backup.backedup" | translate}}
+      .row 
+        .col-md-8
+          h2 {{"admin.backup.backedup" | translate}}
+        .col-md-4(style="text-align:right;")
+          button.btn.btn-danger(type='button', ng-click="open('/admin/queues/queue/backup')" style="margin: 5px;")
+              i.fas.fa-bullseye &nbsp;
+              | {{"admin.backup.queue" | translate}}
       table.custom
         thead
             tr
