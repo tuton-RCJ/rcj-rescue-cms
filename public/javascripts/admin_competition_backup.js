@@ -28,6 +28,10 @@ app.controller("AdminBackupController", ['$scope', '$http', '$translate', functi
         window.location = path
     }
 
+    $scope.open = function (path){
+        window.open(path, "_blank");
+    }
+
     $scope.time = function(time){
         let options = {year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"};
         return(new Intl.DateTimeFormat(navigator.language, options).format(time*1000));

@@ -98,6 +98,10 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
         window.location = path
     }
 
+    $scope.open = function (path){
+        window.open(path, "_blank");
+    }
+
     $scope.selectedAll = false;
     $scope.selectAll = function () {
         if($scope.selectedAll){

@@ -13,6 +13,10 @@ app.controller("AdminHomeController", ['$scope', '$http', function ($scope, $htt
         window.location = path
     }
 
+    $scope.open = function (path){
+        window.open(path, "_blank");
+    }
+
     $scope.addCompetition = function () {
         var competition = {
             name: $scope.competitionName,

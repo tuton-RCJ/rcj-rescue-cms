@@ -73,7 +73,7 @@ block content
             button.btn.btn-warning(type='button', ng-click="go('/admin/' + competition._id + '/mails/sent')" style="margin: 5px;")
               i.fas.fa-mail-bulk &nbsp;
               | {{"mail.home.deliveryStatus" | translate}}
-            button.btn.btn-danger(type='button', ng-click="go('/admin/queues/queue/mail%20queue')" style="margin: 5px;")
+            button.btn.btn-danger(type='button', ng-click="open('/admin/queues/queue/mail%20queue')" style="margin: 5px;")
               i.fas.fa-bullseye &nbsp;
               | {{"mail.home.mailQueue" | translate}}
         table.custom(style="margin-bottom:20px;")
