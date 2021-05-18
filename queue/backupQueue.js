@@ -13,7 +13,9 @@ const documentDb = require('../models/document');
 const mailDb = require('../models/mail');
 const reservationDb = require('../models/reservation');
 const surveyDb = require('../models/survey');
+const userdb = require('../models/user');
 const base_tmp_path = `${__dirname}/../tmp/`;
+const { ACCESSLEVELS } = require('../models/user');
 
 const Bversion = "21.4";
 
@@ -178,7 +180,7 @@ function deleteFiles(folder){
 
 backupQueue.process('restore', function(job, done){
   job.progress(0);
-  const {folder} = job.data;
+  const {folder, user} = job.data;
   const maxCount = 16;
   extract(
     `${base_tmp_path}uploads/${folder}.zip`,
@@ -220,6 +222,7 @@ backupQueue.process('restore', function(job, done){
           );
           job.update({
             folder,
+            user,
             competitionId: competition[0]._id
           });
           competitiondb.competition.updateOne(
@@ -333,7 +336,40 @@ backupQueue.process('restore', function(job, done){
                 }
               }
             );
-          });        
+          });
+          
+          userdb.user.findById(user._id).exec(function (err, dbUser) {
+            if (err) {
+              logger.error(err);
+            } else if (dbUser) {
+              if(dbUser.competitions.some(c => c.id == competition[0]._id)){
+                for(let c of dbUser.competitions){
+                  if(c.id == competition[0]._id) c.accessLevel = ACCESSLEVELS.ADMIN;
+                }
+                dbUser.save(function (err) {
+                  if (err) {
+                    logger.error(err);
+                  }else{
+  
+                  }
+                });
+              }else{
+                const newData = {
+                  id: competition[0]._id,
+                  accessLevel: ACCESSLEVELS.ADMIN,
+                };
+                dbUser.competitions.push(newData);
+      
+                dbUser.save(function (err) {
+                  if (err) {
+                    logger.error(err);
+                  }else{
+  
+                  }
+                });
+              }
+            }
+          });
         }
       }
     }

@@ -150,7 +150,7 @@ adminRouter.post('/restore', function (req, res) {
   }).single('file');
 
   upload(req, res, function (err) {
-    backupQueue.add('restore',{folder}).then((job) => {
+    backupQueue.add('restore',{folder, user: req.user}).then((job) => {
       res.status(200).send({
         msg: 'Restore job has been added to the queue!',
         jobId: job.id
