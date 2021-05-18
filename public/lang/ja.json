@@ -1014,6 +1014,7 @@
             "newMailBulk": "選択した宛先にメールを新規作成",
             "newMail": "メールを新規作成",
             "deliveryStatus": "メール配信状況",
+            "mailQueue": "メールキュー",
             "writeMail": "メール作成",
             "deliveredTo": "配信先",
             "variable": "変数",

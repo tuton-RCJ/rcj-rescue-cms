@@ -1013,6 +1013,7 @@
             "newMailBulk": "Create a new email to the selected teams",
             "newMail": "Create a new email",
             "deliveryStatus": "Delivery Status",
+            "mailQueue": "Email Queue",
             "writeMail": "Email Editor",
             "deliveredTo": "Delivery address",
             "variable": "Variables",
