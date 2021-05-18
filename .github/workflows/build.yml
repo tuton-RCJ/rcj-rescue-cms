@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
-      - run: npm install --only=dev
+      - run: npm install --only=dev --ignore-scripts
       - run: npm run minify
       - run: npm run build
       -
