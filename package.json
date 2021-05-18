@@ -46,6 +46,7 @@
     "log4js": "6.3.0",
     "mime": "2.5.2",
     "mkdirp": "0.5.5",
+    "mongo-express": "^1.0.0-alpha.2",
     "mongoose": "5.12.6",
     "mongoose-integer": "0.1.1",
     "mongoose-timestamp": "0.6.0",
