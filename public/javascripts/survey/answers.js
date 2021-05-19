@@ -45,6 +45,7 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
                 return;
             }
         }
+        updateAnswers();
     })
 
     function updateAnswers(){
@@ -63,7 +64,7 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
             }
         })
     }
-    updateAnswers();
+    
 
     $scope.edit = function(surv){
         window.open(`/mypage/${surv.team._id}/${surv.team.document.token}/survey/${survId}`, '_blank');
