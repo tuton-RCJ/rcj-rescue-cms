@@ -60,6 +60,19 @@ app.controller("ResvFormController", ['$scope', '$http', '$translate','$sce', fu
             if(booked.length == 1){
                 $scope.myBook = booked[0];
             }
+
+            //Check 1st lang
+            for(let l of $scope.resv.languages){
+                if(l.language == $scope.displayLang && l.enable) return;
+            }
+    
+            //Set alternative lang
+            for(let l of $scope.resv.languages){
+                if(l.enable){
+                    $scope.displayLang = l.language;
+                    return;
+                }
+            }
         })
     }
     updateList();

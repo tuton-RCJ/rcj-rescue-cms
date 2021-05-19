@@ -43,6 +43,9 @@ block content
           strong(ng-bind="deadline()")
         span {{"reservation.timeZone" | translate}}
       hr
+      .alert.alert-danger(role='alert',style="margin-bottom: 20px;", ng-if="currentLang != displayLang")
+        i.fas.fa-info-circle &nbsp;
+        span {{"document.form.languageError" | translate}}
       p(ng-bind-html="langContent(resv.i18n, 'description')")
 
       .alert.alert-success.text-center(role='alert', ng-if="myBook")
@@ -57,6 +60,12 @@ block content
             i.fas.fa-times &nbsp;
             | {{"reservation.cancel" | translate}}
       
+      .alert.alert-danger.text-center(role='alert', ng-if="!myBook && !inDeadline()")
+        h4.alert-heading 
+          i.fas.fa-calendar-times &nbsp;
+          | {{"reservation.noResv" | translate}}
+        p {{"reservation.noResvDesc" | translate}}
+
       table.custom(ng-if="inDeadline()")
         thead
             tr

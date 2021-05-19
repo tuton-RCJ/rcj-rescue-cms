@@ -206,6 +206,8 @@
         "team": "Team",
         "delete": "Delete",
         "open": "Open",
+        "noResv": "No Record",
+        "noResvDesc": "There is no record of your booking.",
         "js":{
             "booked": "Booking completed!",
             "bookedMes": "You have successfully booked!",

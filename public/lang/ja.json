@@ -206,6 +206,8 @@
         "team": "チーム",
         "delete": "削除",
         "open": "オープン",
+        "noResv": "予約なし",
+        "noResvDesc": "あなたの予約記録はありません．",
         "js":{
             "booked": "予約完了!",
             "bookedMes": "予約に成功しました",

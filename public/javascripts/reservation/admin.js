@@ -52,6 +52,18 @@ app.controller("ReservationAdminController", ['$scope', '$http', '$translate','$
     function updateList(){
         $http.get(`/api/reservation/config/${competitionId}/${resvId}`).then(function (response) {
             $scope.resv = response.data;
+            //Check 1st lang
+            for(let l of $scope.resv.languages){
+                if(l.language == $scope.displayLang && l.enable) return;
+            }
+    
+            //Set alternative lang
+            for(let l of $scope.resv.languages){
+                if(l.enable){
+                    $scope.displayLang = l.language;
+                    return;
+                }
+            }
         })
     }
     updateList();
