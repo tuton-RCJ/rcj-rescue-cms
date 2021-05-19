@@ -8,17 +8,14 @@ env('process.env')
 
 var express = require('express');
 var RateLimit = require('express-rate-limit');
-const Queue = require('bull')
 const { createBullBoard } = require('bull-board')
 const { BullAdapter } = require('bull-board/bullAdapter')
 const compression = require('compression')
 var path = require('path')
-var fs = require('fs')
 var favicon = require('serve-favicon')
 var logger = require('./config/logger').mainLogger
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
-var async = require('async')
 const mongo_express = require('mongo-express/lib/middleware')
 const mongo_express_config = require('./mongo_express_config')
 

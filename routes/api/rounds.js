@@ -8,11 +8,8 @@ const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
 const query = require('../../helper/query-helper');
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
 const logger = require('../../config/logger').mainLogger;
-const fs = require('fs');
 const competitiondb = require('../../models/competition');
 
 publicRouter.get('/', function (req, res) {

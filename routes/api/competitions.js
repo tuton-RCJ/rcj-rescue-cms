@@ -7,26 +7,18 @@ const express = require('express');
 const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
 const fs = require('fs');
 const mkdirp = require('mkdirp');
 const competitiondb = require('../../models/competition');
-const lineMapDb = require('../../models/lineMap');
-const lineRunDb = require('../../models/lineRun');
-const mazeMapDb = require('../../models/mazeMap');
-const mazeRunDb = require('../../models/mazeRun');
 
 const userdb = require('../../models/user');
 const lineMapsApi = require('./lineMaps');
 const lineRunsApi = require('./lineRuns');
 const mazeMapsApi = require('./mazeMaps');
 const mazeRunsApi = require('./mazeRuns');
-const query = require('../../helper/query-helper');
 const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
-const { leagues } = require('../../leagues');
 
 const { LINE_LEAGUES } = competitiondb;
 const { MAZE_LEAGUES } = competitiondb;

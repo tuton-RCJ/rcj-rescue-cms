@@ -7,27 +7,15 @@ const express = require('express');
 const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
-const multer = require('multer');
-const path = require('path');
 const mkdirp = require('mkdirp');
-const jsonfile = require('jsonfile');
 const fs = require('fs');
-const filetype = require('file-type');
 const crypto = require('crypto');
 const { ACCESSLEVELS } = require('../../models/user');
 const logger = require('../../config/logger').mainLogger;
-const query = require('../../helper/query-helper');
 const competitiondb = require('../../models/competition');
 const auth = require('../../helper/authLevels');
 
-const md5hex = function (src) {
-  const md5hash = crypto.createHash('md5');
-  md5hash.update(src, 'utf8');
-  return md5hash.digest('hex');
-};
 const { LEAGUES_JSON } = competitiondb;
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

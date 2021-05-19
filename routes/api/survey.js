@@ -7,21 +7,12 @@ const express = require('express');
 const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
-const validator = require('validator');
 const { ObjectId } = require('mongoose').Types;
-const pathL = require('path');
-const fs = require('fs');
-const mime = require('mime');
 const nodemailer = require('nodemailer');
-const { htmlToText } = require('html-to-text');
-const crypto = require('crypto');
 const { ACCESSLEVELS } = require('../../models/user');
 const auth = require('../../helper/authLevels');
 const logger = require('../../config/logger').mainLogger;
-const query = require('../../helper/query-helper');
 const surveyDb = require('../../models/survey');
-const sanitizeFilename = require('sanitize-filename');
-const {escapeRegExp} = require('lodash');
 const competitiondb = require('../../models/competition');
 
 

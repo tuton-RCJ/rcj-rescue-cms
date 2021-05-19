@@ -5,27 +5,8 @@
 const express = require('express');
 
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
 const fs = require('fs');
-const competitiondb = require('../../models/competition');
-const userdb = require('../../models/user');
-const lineMapsApi = require('./lineMaps');
-const lineRunsApi = require('./lineRuns');
-const mazeMapsApi = require('./mazeMaps');
-const mazeRunsApi = require('./mazeRuns');
-const query = require('../../helper/query-helper');
-const logger = require('../../config/logger').mainLogger;
-const auth = require('../../helper/authLevels');
-
-const { LINE_LEAGUES } = competitiondb;
-const { MAZE_LEAGUES } = competitiondb;
-const { LEAGUES } = competitiondb;
-
-const { ACCESSLEVELS } = require('../../models/user');
-
-const signagedb = competitiondb.signage;
 
 let socketIo;
 

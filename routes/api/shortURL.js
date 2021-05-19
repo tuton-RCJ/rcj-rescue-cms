@@ -5,13 +5,9 @@
 const express = require('express');
 
 const superRouter = express.Router();
-const validator = require('validator');
 const urlDb = require('../../models/shortURL');
-const query = require('../../helper/query-helper');
 const { ObjectId } = require('mongoose').Types;
 const logger = require('../../config/logger').mainLogger;
-const auth = require('../../helper/authLevels');
-const { ACCESSLEVELS } = require('../../models/user');
 
 superRouter.get('/', function (req, res) {
   urlDb.shortURL

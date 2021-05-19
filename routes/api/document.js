@@ -7,34 +7,24 @@ const express = require('express');
 const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
 const multer = require('multer');
 const path = require('path');
-const mkdirp = require('mkdirp');
-const jsonfile = require('jsonfile');
 const auth = require('../../helper/authLevels');
 var fs = require('fs-extra');
 const gracefulFs = require('graceful-fs');
 
 var fs = gracefulFs.gracefulify(fs);
 const mime = require('mime');
-const filetype = require('file-type');
 const { ACCESSLEVELS } = require('../../models/user');
-const crypto = require('crypto');
 const glob = require('glob');
 const ffmpeg = require('fluent-ffmpeg');
-const { time } = require('console');
 
 const competitiondb = require('../../models/competition');
-const { LEAGUES_JSON } = competitiondb;
-const { LEAGUES } = competitiondb;
 
 const dateformat = require('dateformat');
 let read = require('fs-readdir-recursive');
 const logger = require('../../config/logger').mainLogger;
-const query = require('../../helper/query-helper');
 const documentDb = require('../../models/document');
 const escape = require('escape-html');
 const sanitize = require("sanitize-filename");

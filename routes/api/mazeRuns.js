@@ -1,15 +1,10 @@
 const express = require('express');
-const multer = require('multer');
 
 const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
 const { ObjectId } = require('mongoose').Types;
 const logger = require('../../config/logger').mainLogger;
-const fs = require('fs');
-const { mazeMap } = require('../../models/mazeMap');
 const { mazeRun } = require('../../models/mazeRun');
 const scoreCalculator = require('../../helper/scoreCalculator');
 const scoreSheetPDF2 = require('../../helper/scoreSheetPDFMaze2');

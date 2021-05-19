@@ -6,11 +6,7 @@ const express = require('express');
 
 const adminRouter = express.Router();
 const superRouter = express.Router();
-const validator = require('validator');
-const async = require('async');
-const fs = require('fs');
 const userdb = require('../../models/user');
-const query = require('../../helper/query-helper');
 const { ObjectId } = require('mongoose').Types;
 const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
