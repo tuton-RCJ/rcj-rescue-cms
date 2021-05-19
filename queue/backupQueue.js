@@ -107,6 +107,7 @@ backupQueue.process('backup', function(job, done){
     Model
     .find({'competition': competitionId})
     .lean()
+    .select(Object.keys(Model.schema.tree))
     .exec(function (err, data) {
       if (err) {
         done(new Error(err));
