@@ -502,6 +502,7 @@ publicRouter.get('/my/:teamId/:token', function (req, res, next) {
           mailDb.mail
           .find({
             team: teamId,
+            status: {$gte: 0}
           })
           .select('competition mailId messageId subject team time')
           .exec(function (err, dbMail) {
