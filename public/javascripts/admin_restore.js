@@ -8,7 +8,7 @@ app.controller("AdminRestoreController", ['$scope', '$http', '$translate', 'Uplo
         // = translationId;
         });
     }
-    loadTranslation("queued");
+    loadTranslation("complete");
     
     $scope.competitionId = competitionId
     $scope.job = null;
@@ -28,7 +28,7 @@ app.controller("AdminRestoreController", ['$scope', '$http', '$translate', 'Uplo
             if($scope.job.state == "completed"){
                 Swal.fire({
                     type: 'success',
-                    html: trans["queued"]
+                    html: trans["complete"]
                 }).then((result) => {
                     $scope.go(`/admin/${$scope.job.competition}`);
                 })

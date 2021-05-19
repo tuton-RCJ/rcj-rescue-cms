@@ -842,11 +842,11 @@
             "item11": "Files stored in cabinets",
             "item12": "Questionaries' settings & answers",
             "notInclude": "Please note that permission settings is not included.",
-            "exe": "Back up!",
-            "time": "Backed up time",
-            "queue": "Back up queue",
+            "exe": "Backup!",
+            "time": "Backup time",
+            "queue": "Backup queue",
             "js":{
-                "queued": "A backup job has been queued. When a backup file becomes available, it will be displayed at the bottom of this page."
+                "complete": "Your backup job is now complete. You can download it from the list below."
             }
         },
         "restore": {
@@ -854,7 +854,7 @@
             "description": "On this page, you can restore the competition from the file. You need a backup file of the name ending with '.cms'. If the version of the system you backed up is different, the process may not complete successfully.",
             "exe": "Execute",
             "js": {
-                "complete": "Your backup job is now complete. You can download it from the list below."
+                "complete": "Restoration of the competition has been completed."
             }
         },
         "shortURL": {
