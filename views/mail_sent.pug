@@ -75,7 +75,9 @@ block content
               th {{"common.operation" | translate}}
         tbody
             tr(ng-repeat='mail in mails | filter:list_filter | orderBy:"[name]"')
-              td(ng-bind="time(mail.time)", ng-style="{'background-color':statusColour(mail.status)}")
+              td(ng-style="{'background-color':statusColour(mail.status)}")
+                i.fas.fa-clock(ng-if="mail.reservation") &nbsp;
+                | {{time(mail.time)}}
               td(ng-style="{'background-color':statusColour(mail.status)}")
                 a(ng-click="mailView(mail)", ng-bind="mail.subject", style="text-decoration: underline; color: blue;") 
               td(ng-bind='mail.team.teamCode', ng-style="{'background-color':statusColour(mail.status)}")

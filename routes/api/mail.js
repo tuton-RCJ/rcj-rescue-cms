@@ -160,12 +160,18 @@ adminRouter.delete('/templates/:fileName', function (req, res, next) {
 });
 
 adminRouter.post('/send', function (req, res, next) {
-  const teams = req.body;
+  const teams = req.body.data;
+  let reservation = req.body.reservation;
+  
   if(smtp == null){
     res.status(500).send({
       msg: 'Please check smtp parameters',
     });
     return;
+  }
+
+  if(reservation){
+    reservation = new Date(reservation).getTime();
   }
 
   let count = teams.length;
@@ -235,7 +241,8 @@ adminRouter.post('/send', function (req, res, next) {
         team: team._id,
         mailId,
         messageId: null,
-        time: now,
+        time: reservation / 1000 || now,
+        reservation: reservation > 0,
         to: team.email,
         subject: team.mailData.title.replace("_", ""),
         html,
@@ -259,7 +266,12 @@ adminRouter.post('/send', function (req, res, next) {
             msg: err.message,
           });
         } else {
-          mailQueue.add('send',{message, mailDbID: data._id}, {attempts:3, backoff:10000});
+          let delay = 0;
+          if(reservation){
+            delay = reservation - new Date().getTime();
+            if(delay < 0) delay = 0;
+          }
+          mailQueue.add('send',{message, mailDbID: data._id}, {attempts:3, backoff:60000, delay});
           count--;
           if (count <= 0 && !sent) {
             sent = true;
@@ -300,7 +312,7 @@ adminRouter.get('/sent/:competitionId', function (req, res, next) {
     .find({
       competition: id,
     })
-    .select('competition mailId messageId status subject team time to')
+    .select('competition mailId messageId status subject team time to reservation')
     .populate('team', 'name league teamCode country email')
     .exec(function (err, dbMail) {
       if (err) {

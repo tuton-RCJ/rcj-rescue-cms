@@ -14,6 +14,7 @@ const mailSchema = new Schema({
   mailId: {type: String},
   messageId: {type: String},
   time: {type: Number},
+  reservation: {type: Boolean, default:false},
   to: [{type: String}],
   subject: {type: String},
   html: {type: String, select: false},

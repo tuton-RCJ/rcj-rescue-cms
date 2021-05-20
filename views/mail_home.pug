@@ -126,7 +126,7 @@ block content
                   button.btn.btn-sm.btn-secondary(type='button', ng-click="showVariable(team.variable)")
                     i.fas.fa-box-open &nbsp;
                     | {{"mail.home.variable" | translate}}
-
+        
         .input-group(style="width:100%;margin-bottom:10px;")
           .input-group-prepend
               span.input-group-text {{"mail.home.loadTemplate" | translate}}
@@ -139,7 +139,12 @@ block content
           input.form-control(type='text', ng-model='mailTitle')
         
         ng-quill-editor(ng-model="mailContent" on-editor-created="quillHeight(editor)")
-        br
+        .input-group(style="margin:20px 0;")
+          .input-group-prepend
+              span.input-group-text
+                i.fas.fa-clock &nbsp;
+                | {{"mail.home.reservation" | translate}}
+          input.form-control(type='datetime-local', ng-model='reservation')
         div(style="text-align:center;margin-bottom:20px;")
           button.btn.btn-secondary(type='button', ng-click="back2TeamSelect()", style="margin-right:10px;")
             i.fas.fa-arrow-left &nbsp;
@@ -188,12 +193,17 @@ block content
         div(style="border: 1px solid #444;padding:5px;" ng-bind-html="trust(toTeam[previewNo].mailData.content)")
       
         br
+        h4(ng-if="!reservation") {{"mail.home.sendTime" | translate}}: {{"mail.home.now" | translate}}
+        h4(ng-if="reservation") {{"mail.home.sendTime" | translate}}: {{time(reservation)}}
+        br
         div(style="text-align:center;margin-bottom:20px;")
           button.btn.btn-secondary(type='button', ng-click="back2Edit()", style="margin-right:10px;")
             i.fas.fa-arrow-left &nbsp;
             | {{"mail.home.back2Edit" | translate}}
-          button.btn.btn-primary(type='button', ng-click="mailSend()", ng-disabled="sending")
+          button.btn.btn-primary(type='button', ng-click="mailSend()", ng-disabled="sending", ng-if="!reservation")
             | {{"mail.home.send" | translate}}&nbsp;
             i.fas.fa-arrow-right &nbsp;
-            
+          button.btn.btn-primary(type='button', ng-click="mailSend()", ng-disabled="sending", ng-if="reservation")
+            | {{"mail.home.reservation" | translate}}&nbsp;
+            i.fas.fa-clock &nbsp;
         

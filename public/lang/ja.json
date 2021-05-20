@@ -1047,6 +1047,9 @@
             "deliverNo": "配信番号",
             "back2Edit": "メールの編集に戻る",
             "send": "配信実行",
+            "reservation": "配信予約",
+            "sendTime": "配信時間",
+            "now": "今すぐ",
             "js": {
                 "sending": "配信処理中",
                 "wait": "しばらくお待ちください",

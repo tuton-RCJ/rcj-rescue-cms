@@ -233,6 +233,11 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
         })
     }
 
+    $scope.time = function(time){
+        let options = {year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"};
+        return(new Intl.DateTimeFormat(navigator.language, options).format(time));
+    }
+
     $scope.sending = false;
     $scope.mailSend = function(){
         $scope.sending = true;
@@ -241,7 +246,7 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
             html: wait_mes,
             onBeforeOpen: () => {
                 Swal.showLoading()
-                $http.post(`/api/mail/send`, $scope.toTeam).then(function (response) {
+                $http.post(`/api/mail/send`, {data: $scope.toTeam, reservation: $scope.reservation}).then(function (response) {
                     Swal.close()
                     Swal({
                         type: 'success',
@@ -255,6 +260,7 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
                     $scope.mode = "select";
                     $scope.selectedTemplate = null;
                     $scope.sending = false;
+                    $scope.reservation = undefined;
                     
                 }, function (error) {
                     console.log(error)
