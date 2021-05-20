@@ -897,7 +897,10 @@
             "timelimit": "制限時間(秒)",
             "select2": "部屋2のタイルを選ぶ (半分の壁)",
             "select3": "部屋3のタイルを選ぶ (カーブした壁)",
-            "innerTile": "タイルの中の壁"
+            "innerTile": "タイルの中の壁",
+            "js":{
+                "startTileError": "スタートタイルを設定してください．"
+            }
         },
         "mailTemplates": {
             "title": "メールテンプレート編集",

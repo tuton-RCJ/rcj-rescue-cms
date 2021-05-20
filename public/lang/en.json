@@ -899,7 +899,10 @@
             "timelimit": "Time Limit (sec)",
             "select2": "Select Room 2 Tiles (Half-Walls)",
             "select3": "Select Room 3 Tiles (Curved Walls)",
-            "innerTile": "Inner Tile Walls"
+            "innerTile": "Inner Tile Walls",
+            "js":{
+                "startTileError": "Please set the start tile."
+            }
         },
         "mailTemplates": {
             "title": "Edit email template",

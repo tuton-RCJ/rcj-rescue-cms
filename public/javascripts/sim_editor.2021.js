@@ -12,6 +12,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         // = translationId;
     });
 
+    let trans = [];
+    function loadTranslation(tag){
+        $translate(`admin.simMapEditor.js.${tag}`).then(function (val) {
+            trans[tag] = val;
+        }, function (translationId) {
+        // = translationId;
+        });
+    }
+
+    loadTranslation("startTileError");
+
     $scope.z = 0;
     $scope.startTile = {
         x: 0,
@@ -22,7 +33,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.width = 1;
     $scope.length = 1;
     $scope.time = 480;
-    $scope.name = "Awesome Testbana";
+    $scope.name = "Awesome world";
     $scope.cells = {};
     $scope.dice = [];
     $scope.saveasname ="";
@@ -829,7 +840,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
 
     $scope.export = function(){
-        console.log($scope.cells)
+        $scope.recalculateLinear();
         var map = {
             name: $scope.name,
             length: $scope.length,
@@ -851,6 +862,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     $scope.exportW = function(){
+        if($scope.startNotSet()){
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: trans['startTileError'],
+            });
+            return;
+        }
+        $scope.recalculateLinear();
         let w = createWorld();
         let blob = new Blob([w],{type:"text/plan"});
         let link = document.createElement('a');
@@ -1081,7 +1101,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 let curveWallVar = [0, 0, 0, 0];
                 //stores shortening, lengthing of outer half walls
                 let halfWallOutInfo = [1, 1, 1, 1];
-
+                if(!thisCell){
+                    continue;
+                }
                 if(thisCell.tile && thisCell.tile.victims){
                     if(thisCell.tile.victims.top){
                         switch(thisCell.tile.victims.top){
