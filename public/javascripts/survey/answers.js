@@ -35,17 +35,20 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
         $scope.survey = response.data;
         //Check 1st lang
         for(let l of $scope.survey.languages){
-            if(l.language == $scope.displayLang && l.enable) return;
+            if(l.language == $scope.displayLang && l.enable){
+                updateAnswers();
+                return;
+            }
         }
 
         //Set alternative lang
         for(let l of $scope.survey.languages){
             if(l.enable){
                 $scope.displayLang = l.language;
+                updateAnswers();
                 return;
             }
         }
-        updateAnswers();
     })
 
     function updateAnswers(){
