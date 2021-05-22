@@ -363,6 +363,53 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
             })
         }
         if (file) {
+            //File type check
+            if(question.type == "pdf"){
+                if(file.type != "application/pdf"){
+                    question.errFile = file;
+                    question.errFile.$error = "File type error. You should select PDF file.";
+                    Toast.fire({
+                        type: 'error',
+                        title: "Error",
+                        html: "File type error. You should select PDF file."
+                    })
+                    return;
+                }
+            }else if(question.type == "picture"){
+                if(!file.type.startsWith("image/")){
+                    question.errFile = file;
+                    question.errFile.$error = "File type error. You should select image file.";
+                    Toast.fire({
+                        type: 'error',
+                        title: "Error",
+                        html: "File type error. You should select image file."
+                    })
+                    return;
+                }
+            }else if(question.type == "movie"){
+                if(!file.type.startsWith("video/")){
+                    question.errFile = file;
+                    question.errFile.$error = "File type error. You should select video file.";
+                    Toast.fire({
+                        type: 'error',
+                        title: "Error",
+                        html: "File type error. You should select video file."
+                    })
+                    return;
+                }
+            }else if(question.type == "zip"){
+                if(file.type != "application/zip" && file.type != "application/x-zip-compressed"){
+                    question.errFile = file;
+                    question.errFile.$error = "File type error. You should select zip file.";
+                    Toast.fire({
+                        type: 'error',
+                        title: "Error",
+                        html: "File type error. You should select zip file."
+                    })
+                    return;
+                }
+            }
+            
             question.uploading = true;
             file.upload = Upload.upload({
                 url: '/api/document/review/files/' + $scope.team._id + '/' + question.fileName,
