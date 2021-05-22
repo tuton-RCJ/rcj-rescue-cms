@@ -112,12 +112,15 @@ adminRouter.get('/templates/:fileName', function (req, res, next) {
       return;
     }
 
-    fs.readFile(path, function (err, data) {
+    const stream = fs.createReadStream(path)
+      stream.on('error', (error) => {
+          res.statusCode = 500
+          res.end('Cloud not make stream')
+      })
       res.writeHead(200, {
         'Content-Type': mime.getType(path),
       });
-      res.end(data);
-    });
+      stream.pipe(res);
   });
 });
 

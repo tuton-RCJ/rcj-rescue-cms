@@ -89,12 +89,15 @@ adminRouter.get('/archive/:competitionId/:fileName', function (req, res, next) {
         });
       }
       
-      fs.readFile(path, function (err, data) {
-        res.writeHead(200, {
-          'Content-Type': "application/zip",
-        });
-        res.end(data);
+      const stream = fs.createReadStream(path)
+      stream.on('error', (error) => {
+          res.statusCode = 500
+          res.end('Cloud not make stream')
+      })
+      res.writeHead(200, {
+        'Content-Type': "application/zip",
       });
+      stream.pipe(res);
     });
   }else{
     res.status(403).send({

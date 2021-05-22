@@ -24,6 +24,7 @@ const dateformat = require('dateformat');
 let read = require('fs-readdir-recursive');
 const logger = require('../../config/logger').mainLogger;
 const escape = require('escape-html');
+const mkdirp = require('mkdirp');
 
 read = gracefulFs.gracefulify(read);
 
@@ -181,12 +182,15 @@ function returnFile(req, res, competition, folder, fileName){
         logger.error(err.message);
       }
     } else {
-      fs.readFile(path, function (err, data) {
-        res.writeHead(200, {
-          'Content-Type': mime.getType(path),
-        });
-        res.end(data);
+      const stream = fs.createReadStream(path)
+      stream.on('error', (error) => {
+          res.statusCode = 500
+          res.end('Cloud not make stream')
+      })
+      res.writeHead(200, {
+        'Content-Type': mime.getType(path),
       });
+      stream.pipe(res);
     }
   });
 }
@@ -253,6 +257,12 @@ adminRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user,competitionId,ACCESSLEVELS.ADMIN)){ // Admin check
+    const destination = `${__dirname}/../../cabinet/${competitionId}/${folder}`;
+    if (!fs.existsSync(destination)) {
+      mkdirp(destination, function (err) {
+        if (err) logger.error(err);
+      });
+    }
     const storage = multer.diskStorage({
       destination(req, file, callback) {
         callback(
