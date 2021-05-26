@@ -252,11 +252,11 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     }
     
     $scope.changeLocale = function(){
-        $scope.save();
         $scope.go('/locales');
     }
 
     $scope.go = function (path) {
+        $scope.save();
         window.location = path
     }
 
