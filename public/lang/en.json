@@ -228,6 +228,7 @@
         "description": "Description",
         "myDescription": "A short description to display on the personal pages",
         "deadline": "Deadline",
+        "openDate": "Start accepting responses",
         "open": "Open",
         "reSubmit": "Resubmission",
         "reSubmitDesc": "Do you allow changes to be made to response once it has been submitted?",
@@ -936,6 +937,9 @@
             "access": "Accessible",
             "log": "Log",
             "public": "Public Access"
+        },
+        "result": {
+            "title": "Review results"
         },
         "editor": {
             "title": "Document Form Editor",

@@ -255,6 +255,7 @@ adminRouter.put('/edit/:competitionId/:surveyId', function (req, res, next) {
       dbSurvey.i18n = sData.i18n;
       dbSurvey.languages = sData.languages;
       dbSurvey.deadline = sData.deadline;
+      dbSurvey.open = sData.open;
       dbSurvey.enable = sData.enable;
       dbSurvey.league = sData.league;
       dbSurvey.team = sData.team;
@@ -292,12 +293,13 @@ publicRouter.get('/list/:competitionId/:leagueId/:teamId', function (req, res, n
     .find({
       competition: competitionId,
       enable: true,
+      open: {$lt: new Date()},
       $or: [
         {league: leagueId},
         {team: teamId}
       ]
     })
-    .select("_id name i18n languages deadline reEdit")
+    .select("_id name i18n languages deadline open reEdit")
     .exec(function (err, dbSurvey) {
       if (err) {
         logger.error(err);
@@ -329,6 +331,7 @@ publicRouter.get('/list/:competitionId/:leagueId/:teamId', function (req, res, n
               'reEdit': surv.reEdit,
               'sent': dbAnswer.some(a => a.survey.toString() === surv._id.toString()),
               'deadline': surv.deadline,
+              'open': surv.open,
               'i18n': surv.i18n,
               'languages': surv.languages
             });
@@ -367,6 +370,7 @@ publicRouter.get('/question/:teamId/:token/:survId', function (req, res, next) {
       .findOne({
         competition: team.competition,
         enable: true,
+        open: {$lt: new Date()},
         $or: [
           {league: team.league},
           {team: team._id}
@@ -466,6 +470,7 @@ publicRouter.put('/answer/:teamId/:token/:survId', function (req, res, next) {
         _id: survId,
         competition: team.competition,
         enable: true,
+        open: {$lt: new Date()},
         $or: [
           {league: team.league},
           {team: team._id}

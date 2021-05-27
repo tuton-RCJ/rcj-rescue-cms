@@ -84,6 +84,7 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
         $http.get(`/api/survey/edit/${competitionId}/${survId}`).then(function (response) {
             $scope.surv = response.data;
             $scope.surv.deadline = new Date($scope.surv.deadline);
+            $scope.surv.open = new Date($scope.surv.open);
             if($scope.surv.languages == null || $scope.surv.languages.length != availableLangs.length){
                 for(let l of availableLangs){
                     if(!$scope.surv.languages.some(l => l.language == l)){
@@ -114,6 +115,7 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
             league: [],
             team: [],
             deadline: tmpDeadline,
+            open: tmpDeadline,
             enable: false,
             reEdit: false,
             languages: [],
@@ -319,6 +321,7 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
                 var data = JSON.parse(reader.result);
                 $scope.surv = data;
                 $scope.surv.deadline = new Date($scope.surv.deadline);
+                $scope.surv.open = new Date($scope.surv.open);
                 $scope.$apply();
             }
 

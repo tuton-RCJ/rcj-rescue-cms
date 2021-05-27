@@ -19,6 +19,7 @@ const surveySchema = new Schema({
   }],
   league: [{type: String, enum: LEAGUES}],
   team: [{type: ObjectId, ref: 'Team'}],
+  open: {type: Date, default: Date.now},
   deadline: {type: Date, default: Date.now},
   enable: {type: Boolean, default: false},
   reEdit: {type: Boolean, default: false},

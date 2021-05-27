@@ -228,6 +228,7 @@
         "description": "説明",
         "myDescription": "マイページに表示する短い説明",
         "deadline": "提出期限",
+        "openDate": "回答受付開始",
         "open": "オープン",
         "reSubmit": "提出後の再提出",
         "reSubmitDesc": "一度提出した後に，回答内容を変更することを許可しますか？",

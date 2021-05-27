@@ -109,6 +109,9 @@ block content
                         input.form-control(type='text', ng-model='i18n.myDescription')
            
             hr
+            h5 {{"survey.openDate" | translate}}
+            input.form-control(type='datetime-local', ng-model='surv.open')
+            br
             h5 {{"survey.deadline" | translate}}
             input.form-control(type='datetime-local', ng-model='surv.deadline', ng-style="{backgroundColor: deadlineColour(surv.deadline)}")
             br
