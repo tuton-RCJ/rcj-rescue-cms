@@ -155,7 +155,7 @@ publicRouter.post('/auth/:competitionId/:leagueId/:lang', function (req, res, ne
                       },
                       to: mail,
                       subject: `${fileName.slice( 0, -5 ).replace('_','')} [${dbCompetition.name}]`,
-                      html,
+                      html: `<style type="text/css">p {margin:0; padding:0; margin-bottom:0;}</style>${html}`,
                       text,
                       replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
                     };
@@ -312,7 +312,7 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                       tags: { a: { options: { hideLinkHrefIfSameAsText: true } } },
                     });
 
-                    html = `${html}<img src="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/open/${mailId}"/>`;
+                    html = `<style type="text/css">p {margin:0; padding:0; margin-bottom:0;}</style>${html}<img src="${process.env.CMS_PROTOCOL}://${process.env.CMS_HOSTNAME}/api/mail/open/${mailId}"/>`;
                 
                     const message = {
                       from: {

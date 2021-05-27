@@ -223,7 +223,7 @@ adminRouter.post('/send', function (req, res, next) {
       tags: { a: { options: { hideLinkHrefIfSameAsText: true } } },
     });
 
-    html = `${html}<img src="${req.headers.origin}/api/mail/open/${mailId}"/>`;
+    html = `<style type="text/css">p {margin:0; padding:0; margin-bottom:0;}</style>${html}<img src="${req.headers.origin}/api/mail/open/${mailId}"/>`;
 
     const message = {
       from: {
