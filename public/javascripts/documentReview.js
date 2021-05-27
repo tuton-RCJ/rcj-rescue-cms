@@ -256,7 +256,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     }
 
     $scope.go = function (path) {
-        $scope.save();
+        //$scope.save();
         window.location = path
     }
 
