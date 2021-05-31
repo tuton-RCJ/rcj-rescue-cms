@@ -1145,6 +1145,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         WorldInfo {
           basicTimeStep 16
           coordinateSystem "NUE"
+          contactProperties [
+            ContactProperties {
+              material1  "TILE"
+              material2  "NO_FRIC"
+              coulombFriction 0
+              bounce 0
+              bumpSound ""
+              rollSound ""
+              slideSound ""
+            }
+          ]
         }
         DEF Viewpoint Viewpoint {
           orientation -1 0 0 0.85
