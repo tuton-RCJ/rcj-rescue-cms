@@ -1806,6 +1806,77 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             });
         }
     };
+
+    $scope.openMaxScore = function(){
+        let maxScore = 0;
+        let victimScore = 0;
+        let checkpointScore = 0;
+        let exitBonus = 0;
+        let victimCount = 0;
+        const victims = ["H", "S", "U"];
+        const areaMultiplier = [0, 1, 1.25, 1.5];
+        Object.keys($scope.cells).map(function(key){
+            let cell = $scope.cells[key];
+            if(cell.isTile){
+                if(cell.tile.victims){
+                    Object.keys(cell.tile.victims).map(function(dir){
+                        victimCount++;
+                        if(cell.tile.victims[dir] in victims){
+                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumber(key)];
+                        }else{
+                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumber(key)];
+                        }
+                    });
+                }
+                if(cell.tile.halfWallVic){
+                    for(let v of cell.tile.halfWallVic){
+                        if(v == "") continue;
+                        if(v in victims){
+                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumber(key)];
+                        }else{
+                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumber(key)];
+                        }
+                    }
+                }
+                
+                if(cell.tile.checkpoint) checkpointScore += 10 * areaMultiplier[checkRoomNumber(key)];
+            }
+        });
+
+        if(victimScore > 0) exitBonus += (victimScore + checkpointScore) * 0.1
+
+
+        let html = `
+            <div class='text-center'>
+                <i class='fas fa-calculator fa-3x'></i>
+            </div><hr>
+            <table class='custom'>
+                <thead>
+                    <th>Victim / Hazard map score</th>
+                    <th>Checkpoint score</th>
+                    <th>Exit bonus</th>
+                    <th>Map bonus</th>
+                    <th>Total score</th>
+                </thead>
+                <tbody>
+                    <td>${victimScore}</td>
+                    <td>${checkpointScore}</td>
+                    <td>${exitBonus}</td>
+                    <td>${(victimScore + checkpointScore + exitBonus)}</td>
+                    <td>${2*(victimScore + checkpointScore + exitBonus)}</td>
+                </tbody>
+            </table>
+        `;
+        Swal.fire({
+            html: html,
+            showCloseButton: true, 
+        })
+
+    }
 }]);
 
 

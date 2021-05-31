@@ -71,7 +71,7 @@ block content
                 
 
         .row
-            .col-md-12
+            .col-11
                 //.btn-group(style='margin-bottom:5px;')
                     .input-group-prepend
                         span.input-group-text
@@ -136,6 +136,9 @@ block content
                                     img.tile-image(ng-src='/images/curvedWall/curved_SE_SE.png', ng-show="cells[c+','+r+','+z].tile.curve[3] == 2")
                                     img.tile-image(ng-src='/images/curvedWall/curved_SE_SW.png', ng-show="cells[c+','+r+','+z].tile.curve[3] == 3")
                                     img.tile-image(ng-src='/images/curvedWall/curved_SE_NW.png', ng-show="cells[c+','+r+','+z].tile.curve[3] == 4")
+            .col-1 
+                button.btn.btn-info(type='button', ng-click='openMaxScore()')
+                    i.fas.fa-calculator
         hr
         //.row
             .col-6
