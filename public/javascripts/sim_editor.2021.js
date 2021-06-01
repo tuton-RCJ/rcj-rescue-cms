@@ -704,6 +704,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         return 1;
     }
 
+    function checkRoomNumberKey(key){
+        for (let i = 0; i < 2; i++) {
+            if($scope.roomTiles[i].find(cord => cord === key)){
+                return i + 2;
+            }
+        }
+        return 1;
+    }
+
 
     $scope.export = function(){
         $scope.recalculateLinear();
@@ -1822,11 +1831,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     Object.keys(cell.tile.victims).map(function(dir){
                         victimCount++;
                         if(cell.tile.victims[dir] in victims){
-                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumber(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else{
-                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumber(key)];
-                            victimScore += 20 * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     });
                 }
@@ -1834,16 +1843,18 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     for(let v of cell.tile.halfWallVic){
                         if(v == "") continue;
                         if(v in victims){
-                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumber(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else{
-                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumber(key)];
-                            victimScore += 20 * areaMultiplier[checkRoomNumber(key)];
+                            victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     }
                 }
                 
-                if(cell.tile.checkpoint) checkpointScore += 10 * areaMultiplier[checkRoomNumber(key)];
+                if(cell.tile.checkpoint){
+                    checkpointScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
+                }
             }
         });
 
