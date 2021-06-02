@@ -1817,23 +1817,21 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     };
 
     $scope.openMaxScore = function(){
-        let maxScore = 0;
         let victimScore = 0;
         let checkpointScore = 0;
         let exitBonus = 0;
-        let victimCount = 0;
         const victims = ["H", "S", "U"];
+        const hazards = ["P", "O", "F", "C"];
         const areaMultiplier = [0, 1, 1.25, 1.5];
         Object.keys($scope.cells).map(function(key){
             let cell = $scope.cells[key];
             if(cell.isTile){
                 if(cell.tile.victims){
                     Object.keys(cell.tile.victims).map(function(dir){
-                        victimCount++;
-                        if(cell.tile.victims[dir] in victims){
+                        if(victims.includes(cell.tile.victims[dir])){
                             victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumberKey(key)];
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
-                        }else{
+                        }else if(hazards.includes(cell.tile.victims[dir])){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
                             victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
@@ -1842,10 +1840,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if(cell.tile.halfWallVic){
                     for(let v of cell.tile.halfWallVic){
                         if(v == "") continue;
-                        if(v in victims){
+                        if(v >= 0 && v <= 3){
                             victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumberKey(key)];
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
-                        }else{
+                        }else if(v >= 5 && v <= 8){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
                             victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
