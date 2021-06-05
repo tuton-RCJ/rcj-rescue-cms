@@ -641,7 +641,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             "Heated": 1,
             "Red": 1,
             "Yellow": 1,
-            "Green": 0
+            "Green": 0,
+            "None": 0
         };
         const coloredVictims = ["Red", "Yellow", "Green"];
         Object.keys($scope.cells).map(function(key){
@@ -649,11 +650,12 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             if(cell.isTile){
                 if(cell.tile.victims){
                     Object.keys(cell.tile.victims).map(function(dir){
-                        victimCount++;
-                        if(cell.tile.victims[dir] in coloredVictims){
+                        if(coloredVictims.includes(cell.tile.victims[dir])){
                             maxScore += cell.isLinear ? 5 : 15;
-                        }else{
+                            victimCount++;
+                        }else if(cell.tile.victims[dir] != "None"){
                             maxScore += cell.isLinear ? 10 : 30;
+                            victimCount++;
                         }
                         kitCount += maxKits[cell.tile.victims[dir]];
                     });
