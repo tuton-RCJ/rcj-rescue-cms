@@ -38,6 +38,7 @@ const lineMapSchema = new Schema({
   height           : {type: Number, integer: true, required: true, min: 1},
   width            : {type: Number, integer: true, required: true, min: 1},
   length           : {type: Number, integer: true, required: true, min: 1},
+  duration         : {type: Number, integer: true, min: 0, default: 480},
   indexCount       : {type: Number, integer: true, min: 1},
   EvacuationAreaLoPIndex : {type: Number, default:0},
   tiles            : [{

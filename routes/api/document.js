@@ -21,6 +21,7 @@ const glob = require('glob');
 const ffmpeg = require('fluent-ffmpeg');
 
 const competitiondb = require('../../models/competition');
+const { LEAGUES_JSON } = competitiondb;
 
 const dateformat = require('dateformat');
 let read = require('fs-readdir-recursive');
@@ -28,7 +29,8 @@ const logger = require('../../config/logger').mainLogger;
 const documentDb = require('../../models/document');
 const escape = require('escape-html');
 const sanitize = require("sanitize-filename");
-
+const { lineRun } = require('../../models/lineRun');
+const { mazeRun } = require('../../models/mazeRun');
 read = gracefulFs.gracefulify(read);
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -61,6 +63,10 @@ function writeLog(req, competitionId, teamId, message) {
       if (err) logger.error(err.message);
     }
   );
+}
+
+function GetleagueType(leagueId){
+  return LEAGUES_JSON.find(l=>l.id == leagueId).type;
 }
 
 publicRouter.get('/answer/:teamId/:token', function (req, res, next) {
@@ -1525,6 +1531,123 @@ adminRouter.get('/templates/documentForm/:fileName', function (req, res, next) {
       });
       stream.pipe(res);
   });
+});
+
+privateRouter.get('/map/:fileName',
+  function (req, res, next) {
+    const { fileName } = req.params;
+
+    glob.glob(
+      `${__dirname}/../../tmp/course/${sanitize(fileName)}.*`,
+      function (er, files) {
+        const i = files.length;
+        if (i == 1) {
+          const stream = fs.createReadStream(files[0])
+          stream.on('error', (error) => {
+              res.statusCode = 500
+              res.end('Cloud not make stream')
+          })
+          res.writeHead(200, {
+            'Content-Type': mime.getType(files[0]),
+          });
+          stream.pipe(res);
+        } else {
+          // Handle file not found
+          const path = `${__dirname}/../../public/images/NoImage.png`;
+          const stream = fs.createReadStream(path)
+          stream.on('error', (error) => {
+              res.statusCode = 500
+              res.end('Cloud not make stream')
+          })
+          res.writeHead(200, {
+            'Content-Type': mime.getType(path),
+          });
+          stream.pipe(res);
+        }
+      }
+    );
+  }
+);
+
+privateRouter.get('/run/:teamId/:questionId', function (req, res, next) {
+  const { teamId } = req.params;
+  const { questionId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findById(teamId)
+    .select('competition league')
+    .exec(function (err, dbTeam) {
+      if (err || dbTeam == null) {
+        if (!err) err = { message: 'No team found' };
+        res.status(400).send({
+          msg: 'Could not get team',
+          err: err.message,
+        });
+      } else if (dbTeam) {
+        if (auth.authCompetition(req.user, dbTeam.competition, ACCESSLEVELS.VIEW)) {
+          competitiondb.competition
+          .findById(dbTeam.competition)
+          .select('documents')
+          .exec(function (err, dbCompetition) {
+            let review = dbCompetition.documents.leagues.filter(l=>l.league == dbTeam.league)[0].review;
+            for(let b of review){
+              let q = b.questions.filter(q=>q._id == questionId && q.type=="run");
+              if(q.length > 0){
+                //Runs already exists?
+                if(GetleagueType(dbTeam.league) == "line"){
+                  //LineRun
+                  lineRun.find({
+                    competition: dbTeam.competition,
+                    team: dbTeam._id,
+                    round: q[0].runReview.round,
+                    map: q[0].runReview.map
+                  })
+                  .select('round score')
+                  .populate('round')
+                  .exec(function (err, dbRun) {
+                    if(!dbRun || dbRun.length == 0){
+                      res.status(400).send([]);
+                    }else{
+                      res.status(200).send(dbRun);
+                    }
+                  });
+                }else{
+                  //MazeRun
+                  mazeRun.find({
+                    competition: dbTeam.competition,
+                    team: dbTeam._id,
+                    round: q[0].runReview.round,
+                    map: q[0].runReview.map
+                  })
+                  .select('round score')
+                  .populate('round')
+                  .exec(function (err, dbRun) {
+                    if(!dbRun || dbRun.length == 0){
+                      res.status(400).send([]);
+                    }else{
+                      res.status(200).send(dbRun);
+                    }
+                  });
+                }
+                return;
+              }
+            }
+            res.status(401).send({
+              msg: 'Operation not permited',
+            });
+            
+          });
+        } else {
+          res.status(401).send({
+            msg: 'Operation not permited',
+          });
+        }
+      }
+    });
 });
 
 publicRouter.all('*', function (req, res, next) {

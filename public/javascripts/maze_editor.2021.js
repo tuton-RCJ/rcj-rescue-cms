@@ -36,6 +36,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
     $scope.height = 1;
     $scope.width = 1;
     $scope.length = 1;
+    $scope.duration = 480;
     $scope.name = "Awesome Testbana";
     $scope.cells = {};
     $scope.dice = [];
@@ -58,6 +59,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             $scope.startTile = response.data.startTile;
             $scope.height = response.data.height;
             $scope.width = response.data.width;
+            $scope.duration = response.data.duration || 480;
             $scope.length = response.data.length;
             $scope.name = response.data.name;
             $scope.finished = response.data.finished;
@@ -568,6 +570,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             name: name,
             length: $scope.length,
             height: $scope.height,
+            duration: $scope.duration,
             width: $scope.width,
             finished: $scope.finished,
             startTile: $scope.startTile,
@@ -596,15 +599,12 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             name: $scope.name,
             length: $scope.length,
             height: $scope.height,
+            duration: $scope.duration,
             width: $scope.width,
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells
         };
-        console.log($scope.finished);
-        console.log(map);
-        console.log("Update map", mapId);
-        console.log("Competition ID", $scope.competitionId);
         if (mapId) {
             $http.put("/api/maps/maze/" + mapId, map).then(function (response) {
                 if (!loc) alert("Updated map");
@@ -691,6 +691,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             length: $scope.length,
             height: $scope.height,
             width: $scope.width,
+            duration: $scope.duration,
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells
@@ -729,6 +730,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
                     $scope.height = data.height;
                     $scope.width = data.width;
                     $scope.length = data.length;
+                    $scope.duration = data.duration || 480;
                     $scope.name = data.name;
                     $scope.finished = data.finished;
                     

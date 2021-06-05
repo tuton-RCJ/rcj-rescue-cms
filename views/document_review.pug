@@ -202,6 +202,18 @@ block content
                                     div(ng-if="question.type=='scale'")
                                         .btn-group
                                             button.btn.btn-outline-primary(type='button', ng-click='scaleAnswer(blockIndex, questionIndex, ans);', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: myComments[blockIndex][questionIndex] == ans}')  {{ans}}
+                                    div(ng-if="question.type=='run'")
+                                        button.btn.btn-primary(ng-click="openRun(question._id)")
+                                            i.fas.fa-calculator &nbsp;
+                                            | Do Scoring
+                                        hr
+                                        table.custom(style="overflow: scroll;")
+                                            thead 
+                                                tr 
+                                                    th(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.round.name")
+                                            tbody
+                                                tr 
+                                                    td(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.score")
                                     div(ng-if="question.type=='picture'")
                                         .row(ng-if="checkUploadedReview(question.fileName)", style="width:100%;")
                                             .col-12

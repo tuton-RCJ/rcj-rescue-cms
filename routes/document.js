@@ -7,6 +7,9 @@ const adminRouter = express.Router();
 const fs = require('fs');
 const dateformat = require('dateformat');
 const competitiondb = require('../models/competition');
+const { LEAGUES_JSON } = competitiondb;
+const { lineRun } = require('../models/lineRun');
+const { mazeRun } = require('../models/mazeRun');
 const logger = require('../config/logger').mainLogger;
 const { ObjectId } = require('mongoose').Types;
 const auth = require('../helper/authLevels');
@@ -39,6 +42,10 @@ function writeLog(req, competitionId, teamId, message) {
       if (err) logger.error(err.message);
     }
   );
+}
+
+function GetleagueType(leagueId){
+  return LEAGUES_JSON.find(l=>l.id == leagueId).type;
 }
 
 privateRouter.get('/review/:teamId', function (req, res, next) {
@@ -74,6 +81,80 @@ privateRouter.get('/review/:teamId', function (req, res, next) {
       }
     });
 });
+
+privateRouter.get('/review/run/:teamId/:questionId', function (req, res, next) {
+  const { teamId } = req.params;
+  const { questionId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findById(teamId)
+    .select('competition document.token league')
+    .exec(function (err, dbTeam) {
+      if (err || dbTeam == null) {
+        if (!err) err = { message: 'No team found' };
+        res.status(400).send({
+          msg: 'Could not get team',
+          err: err.message,
+        });
+      } else if (dbTeam) {
+        if (auth.authCompetition(req.user, dbTeam.competition, ACCESSLEVELS.JUDGE)) {
+          competitiondb.competition
+          .findById(dbTeam.competition)
+          .select('documents rule')
+          .exec(function (err, dbCompetition) {
+            let review = dbCompetition.documents.leagues.filter(l=>l.league == dbTeam.league)[0].review;
+            for(let b of review){
+              let q = b.questions.filter(q=>q._id == questionId && q.type=="run");
+              if(q.length > 0){
+                //Runs already exists?
+                if(GetleagueType(dbTeam.league) == "line"){
+                  //LineRun
+                  lineRun.find({
+                    competition: dbTeam.competition,
+                    team: dbTeam._id,
+                    round: q[0].runReview.round,
+                    map: q[0].runReview.map
+                  })
+                  .exec(function (err, dbRun) {
+                    if(!dbRun || dbRun.length == 0){
+                      res.render('document/run/mapSelector', { user: req.user, team: dbTeam._id, competition: dbTeam.competition, league: dbTeam.league, token: dbTeam.document.token, map: q[0].runReview.map, movie: q[0].runReview.movie, round: q[0].runReview.round, questionId });
+                    }else{
+                      res.render('document/run/line', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
+                    }
+                  });
+                }else{
+                  //MazeRun
+                  mazeRun.find({
+                    competition: dbTeam.competition,
+                    team: dbTeam._id,
+                    round: q[0].runReview.round,
+                    map: q[0].runReview.map
+                  })
+                  .exec(function (err, dbRun) {
+                    if(!dbRun || dbRun.length == 0){
+                      res.render('document/run/mapSelector', { user: req.user, team: dbTeam._id, competition: dbTeam.competition, league: dbTeam.league, token: dbTeam.document.token, map: q[0].runReview.map, movie: q[0].runReview.movie, round: q[0].runReview.round, questionId });
+                    }else{
+                      res.render('document/run/maze', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
+                    }
+                  });
+                }
+                return;
+              }
+            }
+            res.render('access_denied', { user: req.user });
+            
+          });
+        } else {
+          res.render('access_denied', { user: req.user });
+        }
+      }
+    });
+});
+
 
 privateRouter.get('/reviewed/:teamId', function (req, res, next) {
   const { teamId } = req.params;

@@ -11,6 +11,7 @@ const scoreCalculator = require('../../helper/scoreCalculator');
 const auth = require('../../helper/authLevels');
 const scoreSheetLinePDF2 = require('../../helper/scoreSheetPDFLine2');
 const { ACCESSLEVELS } = require('../../models/user');
+const competitiondb = require('../../models/competition');
 
 let socketIo;
 
@@ -772,6 +773,73 @@ adminRouter.post('/', function (req, res) {
       err: 'New run has been saved',
       id: data._id,
     });
+  });
+});
+
+privateRouter.post('/pre_recorded', function (req, res) {
+  const data = req.body;
+  competitiondb.team
+  .findById(data.team)
+  .select('competition document.token league')
+  .exec(function (err, dbTeam) {
+    if (err || dbTeam == null) {
+      if (!err) err = { message: 'No team found' };
+      res.status(400).send({
+        msg: 'Could not get team',
+        err: err.message,
+      });
+    } else if (dbTeam) {
+      if (auth.authCompetition(req.user, dbTeam.competition, ACCESSLEVELS.JUDGE)) {
+        competitiondb.competition
+        .findById(dbTeam.competition)
+        .select('documents')
+        .exec(function (err, dbReview) {
+          let review = dbReview.documents.leagues.filter(l=>l.league == dbTeam.league)[0].review;
+          for(let b of review){
+            let q = b.questions.filter(q=>q._id == data.questionId && q.type=="run");
+            if(q.length > 0){
+              const question = q[0];
+              //Data check
+              let err = false
+              for(let r of data.runs){
+                r.team = dbTeam._id;
+                r.competition = dbTeam.competition;
+                if(!question.runReview.round.includes(r.round)){
+                  err = true;
+                  break;
+                }
+                if(!question.runReview.map.includes(r.map)){
+                  err = true;
+                  break;
+                }
+              }
+              if(err){
+                return res.status(400).send({
+                  err: 'Data validation error'
+                });
+              }else{
+                lineRun.insertMany(data.runs).then(function(){
+                  return res.status(201).send({
+                    err: 'New run has been saved',
+                    id: data._id,
+                  });
+                }).catch(function(err){
+                  return res.status(400).send({
+                    msg: 'Error saving run in db',
+                    err: err.message,
+                  });
+                });
+              }
+            }
+          }
+        });
+      } else {
+        return res.status(400).send({
+          msg: 'Error saving run in db',
+          err: err.message,
+        });
+      }
+    }
   });
 });
 

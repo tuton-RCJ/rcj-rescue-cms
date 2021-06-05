@@ -148,12 +148,22 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
         $scope.updateUploaded();
         $scope.updateReviewUploaded();
+
+        $scope.runScore = [];
         
         $http.get("/api/competitions/" + competitionId + "/documents/" + $scope.team.league + "/review").then(function (response) {
             $scope.blocks = response.data.blocks;
             $scope.notifications = response.data.notifications;
             $scope.languages = response.data.languages;
             $scope.review = response.data.review;
+
+            for(let r of $scope.review){
+                for(let q of r.questions){
+                    $http.get(`/api/document/run/${teamId}/${q._id}`).then(function (response) {
+                        $scope.runScore[q._id] = response.data;
+                    });
+                }
+            }
 
             $http.get("/api/document/answer/"+ $scope.team._id + "/" + token).then(function (response) {
                 $scope.answers = response.data;
@@ -258,6 +268,10 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     $scope.go = function (path) {
         //$scope.save();
         window.location = path
+    }
+
+    $scope.openRun = function(qId){
+        window.open(`/document/review/run/${teamId}/${qId}`);
     }
 
     $scope.getParam = function (key) {

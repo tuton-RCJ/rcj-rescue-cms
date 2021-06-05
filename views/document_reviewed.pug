@@ -192,6 +192,14 @@ block content
                                                 if admin
                                                     i.fas.fa-eraser(style="color: #e74c3c;" ng-click="removeComment(review._id, blockIndex, questionIndex)")
                                             select.custom-select(ng-model='review.comments[blockIndex][questionIndex]', ng-options="option.value as option.text for option in langArray(question.i18n, 'options')", disabled, style="margin-bottom:10px;")
+                                    div(ng-if="question.type=='run'")
+                                        table.custom(style="overflow: scroll;")
+                                            thead 
+                                                tr 
+                                                    th(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.round.name")
+                                            tbody
+                                                tr 
+                                                    td(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.score")
                                     div(ng-if="question.type=='scale'")
                                         table.custom(style="overflow: scroll;")
                                             thead 

@@ -33,7 +33,7 @@ const SUPPORT_RULES = ["2021"];
 
 const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, OTHER_LEAGUES);
 
-const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', 'zip'];
+const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', 'zip', 'run'];
 
 module.exports.LINE_LEAGUES = LINE_LEAGUES;
 module.exports.MAZE_LEAGUES = MAZE_LEAGUES;
@@ -131,6 +131,11 @@ const competitionSchema = new Schema({
           'scale': {
             'least': {type: Number, default: 1},
             'most': {type: Number, default: 5}
+          },
+          'runReview': {
+            'round': [{type: ObjectId, ref: 'Round'}],
+            'map': [{type: ObjectId}],
+            'movie': {type: String, default: ''}
           }
         }]
       }]

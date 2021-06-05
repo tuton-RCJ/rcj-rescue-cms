@@ -1,5 +1,5 @@
 // register the directive with your app module
-var app = angular.module('FormEditor', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies', 'color.picker', 'ngQuill']);
+var app = angular.module('FormEditor', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies', 'color.picker', 'ngQuill', 'ngSanitize','ui.select']);
 
 app.constant('NG_QUILL_CONFIG', {
     /*
@@ -50,7 +50,7 @@ app.constant('NG_QUILL_CONFIG', {
   ])
 
 // function referenced by the drop target
-app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', '$translate', function ($scope, $uibModal, $log, $http, $translate) {
+app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', '$translate', '$sce', function ($scope, $uibModal, $log, $http, $translate, $sce) {
 
     const Toast = Swal.mixin({
         toast: true,
@@ -81,6 +81,21 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
         // = translationId;
     });
 
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    const availableLangs =  $translate.getAvailableLanguageKeys();
+
+    $scope.currentLang = currentLang;
+    $scope.displayLang = currentLang;
+
+    $scope.langContent = function(data, target){
+        if(data[target]) return data[target];
+        data[target] = $sce.trustAsHtml(data.filter( function( value ) {
+            return value.language == $scope.displayLang;        
+        })[0][target]);
+
+        return(data[target]);
+    }
+
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
     })
@@ -105,10 +120,29 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
 
     $http.get("/api/competitions/leagues/"+leagueId).then(function (response) {
         $scope.league = response.data
+        $http.get("/api/competitions/" + competitionId + "/" + $scope.league.type + "/maps").then(function (response) {
+            $scope.maps = response.data
+          })
     });
 
-    const currentLang = $translate.proposedLanguage() || $translate.use();
-    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.videos = [];
+    $http.get("/api/competitions/" + competitionId + "/documents/" + leagueId).then(function (response) {
+        $scope.languages = response.data.languages;
+        $scope.videos = [];
+        for(let b of response.data.blocks){
+            $scope.videos = $scope.videos.concat(b.questions.filter(q=>q.type=="movie"));
+        }
+        console.log($scope.videos)
+        
+    })
+
+    $http.get("/api/competitions/" + competitionId +
+            "/rounds").then(function (response) {
+            $scope.rounds = response.data
+    })
+
+    
+
 
     $scope.blocks = [];
 

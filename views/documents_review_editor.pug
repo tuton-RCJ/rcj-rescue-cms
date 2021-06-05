@@ -19,7 +19,6 @@ append scripts
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
 
-
 append css
     style.
         .dropdown-submenu {
@@ -38,6 +37,20 @@ append css
             left: 100%;
             margin-left: .1rem;
             margin-right: .1rem;
+        }
+        .dropdown-menu {
+            display: initial;
+        }
+        .btn-default {
+            background-color: #3498db;
+            color: #fff;
+            font-size: 10px;
+        }
+        .ui-select-bootstrap .ui-select-choices-row.active>span {
+            color: initial;
+            text-decoration: none;
+            outline: 0;
+            background-color: initial;
         }
     link(rel='stylesheet', href='/components/angular-color-picker/dist/angularjs-color-picker.min.css')
     link(rel='stylesheet', href='/components/quill.snow/index.css')
@@ -132,6 +145,7 @@ block content
                                             option(value='picture') {{"document.editor.picture" | translate}}
                                             option(value='movie') {{"document.editor.video" | translate}}
                                             option(value='zip') {{"document.editor.archive" | translate}}
+                                            option(value='run') 競技動画評価
                                 .col-md-4
                                     .input-group(style="width:100%;margin 0 auto;")
                                         .input-group-prepend
@@ -200,7 +214,25 @@ block content
                                                 span.input-group-text {{"document.editor.fileName" | translate}}
                                             input.form-control(type='text', ng-model='question.fileName', ng-blur="save()")
                                         span {{"document.editor.extension" | translate}}
+                                    div(ng-if="question.type == 'run'", style="margin-top:10px;")
+                                        span 動画選択
+                                        br
+                                        .input-group(style="width:100%;margin 0 auto;")
+                                            .input-group-prepend
+                                                span.input-group-text 動画選択:
+                                            select.custom-select(ng-model='question.runReview.movie', ng-blur="save()", ng-options="video.fileName as langContent(video.i18n,'question') for video in videos")
 
+                                        span 競技ラウンド
+                                        ui-select(multiple='' ng-model='question.runReview.round' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
+                                            ui-select-match(placeholder='Select round...') {{$item.name}}
+                                            ui-select-choices(repeat='round._id as round in rounds | filter: {_id: $select.search}')
+                                                div(ng-bind-html='round.name')
+                                        
+                                        span マップ選択肢
+                                        ui-select(multiple='' ng-model='question.runReview.map' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
+                                            ui-select-match(placeholder='Select map...') {{$item.name}}
+                                            ui-select-choices(repeat='map._id as map in maps | filter: {_id: $select.search}')
+                                                div(ng-bind-html='map.name')
                             hr(ng-style="{borderTop: '3px solid #' + block.color}")
                             div(style="text-align : center;")
                                 .btn-group    

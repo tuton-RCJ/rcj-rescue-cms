@@ -52,6 +52,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
     $scope.height = 1;
     $scope.width = 1;
     $scope.length = 1;
+    $scope.duration = 480;
     $scope.liveV = 2;
     $scope.deadV = 1;
     $scope.name = "Awesome Testbana";
@@ -90,6 +91,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
                 $scope.height = response.data.height;
                 $scope.width = response.data.width;
                 $scope.length = response.data.length;
+                $scope.duration = response.data.duration || 480;
                 $scope.name = response.data.name;
                 $scope.finished = response.data.finished;
                 $scope.liveV = response.data.victims.live;
@@ -250,6 +252,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
             length: $scope.length,
             height: $scope.height,
             width: $scope.width,
+            duration: $scope.duration,
             finished: $scope.finished,
             startTile: $scope.startTile,
             startTile2: $scope.startTile2,
@@ -363,6 +366,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
             length: $scope.length,
             height: $scope.height,
             width: $scope.width,
+            duration: $scope.duration,
             finished: $scope.finished,
             startTile: $scope.startTile,
             startTile2: $scope.startTile2,
@@ -419,6 +423,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
             length: $scope.length,
             height: $scope.height,
             width: $scope.width,
+            duration: $scope.duration,
             finished: $scope.finished,
             startTile: $scope.startTile,
             startTile2: $scope.startTile2,
@@ -504,6 +509,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
                 $scope.height = data.height;
                 $scope.width = data.width;
                 $scope.length = data.length;
+                $scope.duration = data.duration || 480;
                 $scope.name = data.name;
                 $scope.finished = data.finished;
 

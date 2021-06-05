@@ -17,14 +17,59 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         // = translationId;
     });
 
+    $scope.runIds = runId.split(',');
+    $scope.runNum = $scope.runIds.length;
+    $scope.nowRun = 0;
 
-    $scope.sync = 0;
-    $scope.z = 0;
-    $scope.startedTime = false;
-    $scope.time = 0;
-    $scope.startUnixTime = 0;
+    function setRunId(index){
+        $scope.runId = $scope.runIds[index];
+        runId = $scope.runIds[index];
+        $scope.nowRun = index;
+    
+        $scope.sync = 0;
+        $scope.z = 0;
+        $scope.startedTime = false;
+        $scope.time = 0;
+        $scope.startUnixTime = 0;
+        $scope.cells = {};
+        $scope.tiles = {};
+        loadNewRun();
+        $(window).scrollTop(0);
+    }
+    setRunId(0);
 
-    $scope.runId = runId;
+    if(movie){
+        $scope.movie = movie;
+        $scope.token = token;
+        $http.get("/api/document/files/" + teamId + '/' + token).then(function (response) {
+            $scope.uploaded = response.data;
+        })
+        
+        $scope.checkUploaded = function(name){
+            return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
+        }
+        
+        $scope.getVideoLink = function(path){
+            return("/api/document/files/" + teamId + "/" + token + "/" + path);
+        }
+        
+        $scope.getVideoList = function(name){
+            let res = $scope.uploaded.filter(function(value) {
+                return new RegExp(name+'\\.').test(value);
+            });
+            res.sort(function(first, second){
+                if ( first.match(/.mp4/)) {
+                    return -1;
+                }
+                if ( second.match(/.mp4/)) {
+                    return -1;
+                }
+            });
+            return res;
+        }
+    }
+    
+
     var date = new Date();
     var prevTime = 0;
 
@@ -119,54 +164,55 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     var db_cells;
 
-    $http.get("/api/runs/maze/" + runId +
+    function loadNewRun(){
+        $http.get("/api/runs/maze/" + runId +
         "?populate=true").then(function (response) {
+            $scope.exitBonus = response.data.exitBonus;
+            $scope.field = response.data.field.name;
+            $scope.round = response.data.round.name;
+            $scope.score = response.data.score;
+            $scope.team = response.data.team;
+            $scope.league = response.data.team.league;
+            $scope.competition = response.data.competition;
+            $scope.LoPs = response.data.LoPs;
+            $scope.MisIdent = response.data.misidentification;
 
-        console.log(response.data);
-        $scope.exitBonus = response.data.exitBonus;
-        $scope.field = response.data.field.name;
-        $scope.round = response.data.round.name;
-        $scope.score = response.data.score;
-        $scope.team = response.data.team;
-        $scope.league = response.data.team.league;
-        $scope.competition = response.data.competition;
-        $scope.LoPs = response.data.LoPs;
-        $scope.MisIdent = response.data.misidentification;
+            // Verified time by timekeeper
+            $scope.minutes = response.data.time.minutes;
+            $scope.seconds = response.data.time.seconds;
+            $scope.time = ($scope.minutes * 60 + $scope.seconds)*1000;
+            prevTime = $scope.time;
 
-        // Verified time by timekeeper
-        $scope.minutes = response.data.time.minutes;
-        $scope.seconds = response.data.time.seconds;
-        $scope.time = ($scope.minutes * 60 + $scope.seconds)*1000;
-        prevTime = $scope.time;
-
-        // Scoring elements of the tiles
-        for (let i = 0; i < response.data.tiles.length; i++) {
-            $scope.tiles[response.data.tiles[i].x + ',' +
-                response.data.tiles[i].y + ',' +
-                response.data.tiles[i].z] = response.data.tiles[i];
-        }
-
-
-        $scope.loadMap(response.data.map);
-
-        if (document.referrer.indexOf('sign') != -1 || document.referrer.indexOf('approval') != -1) {
-            $scope.checked = true;
-            if(document.referrer.indexOf('approval') != -1){
-              $scope.fromApproval = true;
+            // Scoring elements of the tiles
+            for (let i = 0; i < response.data.tiles.length; i++) {
+                $scope.tiles[response.data.tiles[i].x + ',' +
+                    response.data.tiles[i].y + ',' +
+                    response.data.tiles[i].z] = response.data.tiles[i];
             }
-            $timeout($scope.tile_size, 10);
-            $timeout($scope.tile_size, 200);
-        }else{
-        }
+
+
+            $scope.loadMap(response.data.map);
+
+            if (document.referrer.indexOf('sign') != -1 || document.referrer.indexOf('approval') != -1) {
+                $scope.checked = true;
+                if(document.referrer.indexOf('approval') != -1){
+                $scope.fromApproval = true;
+                }
+                $timeout($scope.tile_size, 10);
+                $timeout($scope.tile_size, 200);
+            }else{
+            }
 
 
 
-    }, function (response) {
-        console.log("Error: " + response.statusText);
-        if (response.status == 401) {
-            $scope.go('/home/access_denied');
-        }
-    });
+        }, function (response) {
+            console.log("Error: " + response.statusText);
+            if (response.status == 401) {
+                $scope.go('/home/access_denied');
+            }
+        });
+    }
+    
 
     $scope.randomDice = function(){
         playSound(sClick);
@@ -202,6 +248,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             $scope.width = response.data.width;
             $scope.length = response.data.length;
+            $scope.duration = response.data.duration || 480;
             if(response.data.parent){
                 if(!$scope.dice){
                     $http.get("/api/maps/maze/" + response.data.parent).then(function (response) {
@@ -366,12 +413,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.time = prevTime + (date.getTime() - $scope.startUnixTime);
             $scope.minutes = Math.floor($scope.time / 60000);
             $scope.seconds = Math.floor(($scope.time % 60000) / 1000);
-            if ($scope.time >= 480000) {
+            if ($scope.time >= $scope.duration*1000) {
                 playSound(sTimeup);
                 $scope.startedTime = !$scope.startedTime;
-                $scope.time = 480000;
+                $scope.time = $scope.duration*1000;
                 $scope.saveEverything();
-                swal(txt_timeup, txt_timeup_mes, "info");
+                swal(txt_timeup, '', "info");
             }
             $timeout(tick, 1000);
         }
@@ -664,6 +711,42 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         });
     };
 
+    $scope.nextRun = function (flag) {
+        playSound(sClick);
+        var run = {}
+        run.exitBonus = $scope.exitBonus;
+        run.LoPs = $scope.LoPs;
+        run.misidentification = $scope.MisIdent;
+
+        // Scoring elements of the tiles
+        run.tiles = $scope.tiles;
+
+        // Verified time by timekeeper
+        run.time = {};
+        run.time.minutes = $scope.minutes;;
+        run.time.seconds = $scope.seconds;
+        run.status = 3;
+
+        $http.put("/api/runs/maze/" + runId, run).then(function (response) {
+            $scope.score = response.data.score;
+            if(flag){
+                setRunId($scope.nowRun+1);
+                $(window).scrollTop(0);
+            }
+            else{
+            Swal.fire({
+                title: 'Complete!',
+                html: 'Scoring completed! Please close this tab.',
+                type: 'success'
+            }).then((result) => {
+                window.close();
+            })
+            }
+        }, function (response) {
+            console.log("Error: " + response.statusText);
+        });
+    };
+
       $scope.backApproval = function () {
         playSound(sClick);
         var run = {}
@@ -740,6 +823,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $('#wrapTile').css('width', (tilesize+10)*width+11);
             }else{
                 $('#wrapTile').css('width', (tilesize+10)*length+11);
+            }
+
+            if(movie){
+                $('#card_area').css('height', (window.innerHeight - 130 - $('#video_area').height()));
+            }else{
+                $('#card_area').css('height', (window.innerHeight - 130));
             }
         } catch (e) {
             $timeout($scope.tile_size, 500);

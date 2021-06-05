@@ -88,6 +88,9 @@ block content
                     .input-group-append
                         span.input-group-text {{"admin.mazeMapEditor.length" | translate}}
                     input.form-control(type='number', ng-model='length', min='1')
+                    .input-group-append
+                        span.input-group-text {{"admin.simMapEditor.timelimit" | translate}}:
+                    input.form-control(type='number', ng-model='duration', min = '1')
                 hr
                 if !pubService
                     div(ng-if='!parent')

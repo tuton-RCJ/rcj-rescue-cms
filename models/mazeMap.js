@@ -79,6 +79,7 @@ const mazeMapSchema = new Schema({
   height     : {type: Number, integer: true, required: true, min: 1},
   width      : {type: Number, integer: true, required: true, min: 1},
   length     : {type: Number, integer: true, required: true, min: 1},
+  duration   : {type: Number, integer: true, min: 0, default: 480},
   cells      : [{
     x       : {type: Number, integer: true, required: true, min: 0},
     y       : {type: Number, integer: true, required: true, min: 0},

@@ -91,6 +91,9 @@ block content
                     .input-group-append
                         span.input-group-text {{"admin.lineMapEditor.length" | translate}}
                     input.form-control(type='number', ng-model='length', min='1')
+                    .input-group-append
+                        span.input-group-text {{"admin.simMapEditor.timelimit" | translate}}:
+                    input.form-control(type='number', ng-model='duration', min = '1')
 
                 if !pubService
                     .input-group.mb-3
