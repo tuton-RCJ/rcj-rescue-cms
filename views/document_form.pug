@@ -173,7 +173,7 @@ block content
                                 if editable  
                                     .d-sm-flex.flex-row
                                         div
-                                            button.btn.btn-warning(type='file' ngf-select='uploadFiles(question, $file, $invalidFiles)' accept='video/*' ngf-max-size='500MB')
+                                            button.btn.btn-warning(type='file' ngf-select='uploadFiles(question, $file, $invalidFiles)' accept='video/mp4' ngf-max-size='500MB')
                                                 i.far.fa-folder-open
                                                 | {{"document.form.selectFile" | translate}}
                                         div(style="color:#e74c3c;margin-left:10px;", ng-if="question.errFile.$error")
