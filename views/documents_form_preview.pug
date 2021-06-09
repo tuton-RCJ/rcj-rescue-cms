@@ -101,6 +101,9 @@ block content
                     div(style="font-size:15px;")
                         p(ng-bind-html="langContent(question.i18n, 'description')")
                         p(ng-if="question.type=='picture'") {{"document.form.max5" | translate}}
+                        p(ng-if="question.type=='movie'", style="color:red;font-size:15px;")
+                            u
+                                b {{"document.form.mp4" | translate}}
                         p(ng-if="question.type=='movie'") {{"document.form.max500" | translate}}
                         p(ng-if="question.type=='pdf'") {{"document.form.pdfOnly" | translate}}{{"document.form.max20" | translate}}
                         p(ng-if="question.type=='zip'") {{"document.form.zipOnly" | translate}}{{"document.form.max50" | translate}}

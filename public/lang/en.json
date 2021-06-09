@@ -1001,10 +1001,11 @@
             "zipOnly": "Only ZIP format is accepted.",
             "hints": "@:document.editor.hints",
             "selectFile": "Select a file",
-            "overwrite": "A file has already been uploaded. When you upload a new file, it will overwrite the old one.",
+            "overwrite": "A file has already been uploaded. When you upload a new file, it will overwrite the old one. Please make sure that the uploaded file is not corrupted.",
             "uploaded": "Uploaded files",
             "cantplay": "If the video does not play properly, click here to download it.",
-            "uploading": "Uploading..."
+            "uploading": "Uploading...",
+            "mp4": "The format of the uploaded file should be mp4. If your file is in another format such as (.mov / .wmv / etc...), please convert it to mp4 format on your computer before uploading."
         },
         "review":{
             "reviewer": "Logged in reviewer: ",

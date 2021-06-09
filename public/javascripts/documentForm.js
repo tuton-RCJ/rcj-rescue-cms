@@ -279,13 +279,13 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
                     return;
                 }
             }else if(question.type == "movie"){
-                if(!file.type.startsWith("video/")){
+                if(file.type != "video/mp4"){
                     question.errFile = file;
-                    question.errFile.$error = "File type error. You should select video file.";
+                    question.errFile.$error = "File type error. You should select a mp4 video file.";
                     Toast.fire({
                         type: 'error',
                         title: "Error",
-                        html: "File type error. You should select video file."
+                        html: "File type error. You should select a mp4 video file."
                     })
                     return;
                 }
