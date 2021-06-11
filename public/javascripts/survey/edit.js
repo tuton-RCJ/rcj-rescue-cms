@@ -320,6 +320,9 @@ app.controller('SurveyEditorController', ['$scope', '$uibModal', '$log', '$http'
             reader.onload = function () {
                 var data = JSON.parse(reader.result);
                 $scope.surv = data;
+                for(let q of $scope.surv.questions){
+                    q.questionId = getUniqueStr();
+                }
                 $scope.surv.deadline = new Date($scope.surv.deadline);
                 $scope.surv.open = new Date($scope.surv.open);
                 $scope.$apply();
