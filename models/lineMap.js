@@ -1083,6 +1083,85 @@ const tileTypes = [
     "_id"          : "58cfd6549792e9313b1610de"
   },
   {
+    "image"        : "tile-78.png",
+    "gaps"         : 0,
+    "intersections": 0,
+    "seesaw"       : 0,
+    "paths"        : {
+      "top": "bottom",
+      "bottom" : "top"
+    },
+    "_id"          : "58cfd6549792e9313b1620e4"
+  },
+  {
+    "image"        : "tile-79.png",
+    "gaps"         : 0,
+    "intersections": 0,
+    "seesaw"       : 0,
+    "paths"        : {
+      "top": "bottom",
+      "bottom" : "top"
+    },
+    "_id"          : "58cfd6549792e9313b1620e5"
+  },
+  {
+    "image"        : "tile-80.png",
+    "gaps"         : 0,
+    "intersections": 0,
+    "seesaw"       : 0,
+    "paths"        : {
+      "right": "bottom",
+      "bottom" : "right"
+    },
+    "_id"          : "58cfd6549792e9313b1620e6"
+  },
+  {
+    "image"        : "tile-81-1.png",
+    "gaps"         : 0,
+    "intersections": 2,
+    "seesaw"       : 0,
+    "paths"        : {
+      "right": "bottom",
+      "bottom" : "right"
+    },
+    "_id"          : "58cfd6549792e9313b1620e7"
+  },
+  {
+    "image"        : "tile-81-2.png",
+    "gaps"         : 0,
+    "intersections": 2,
+    "seesaw"       : 0,
+    "paths"        : {
+      "right": "bottom",
+      "bottom" : "right"
+    },
+    "_id"          : "58cfd6549792e9313b1620e8"
+  },
+  {
+    "image"        : "tile-82.png",
+    "gaps"         : 0,
+    "intersections": 0,
+    "seesaw"       : 0,
+    "paths"        : {
+      "right": "bottom",
+      "bottom" : "right"
+    },
+    "_id"          : "58cfd6549792e9313b1620e9"
+  },
+  {
+    "image"        : "tile-83.png",
+    "gaps"         : 0,
+    "intersections": 0,
+    "seesaw"       : 0,
+    "paths"        : {
+      "right": "bottom",
+      "bottom" : "right",
+      "left": "top",
+      "top": "left"
+    },
+    "_id"          : "58cfd6549792e9313b1620ea"
+  },
+  {
     "image"        : "seesaw.png",
     "gaps"         : 0,
     "intersections": 0,
@@ -1176,7 +1255,7 @@ if(cluster.isMaster){
     )
   }
 
-  TileSet.findById('5c19d2439590f2d68b15b301', function (err, dbTileSet) {
+  TileSet.findById('5c19d2439590f2d68b15b302', function (err, dbTileSet) {
     if(dbTileSet){
       dbTileSet.tiles = defaultTileSet;
       dbTileSet.save(function (err) {
@@ -1186,8 +1265,8 @@ if(cluster.isMaster){
       })
     }else{
       let newTileSet = new TileSet({
-        '_id': '5c19d2439590f2d68b15b301',
-        'name': 'Default(2021)',
+        '_id': '5c19d2439590f2d68b15b302',
+        'name': 'Default(2021) Rev.2',
         'tiles': defaultTileSet
       });
       newTileSet.save(function (err) {
