@@ -241,7 +241,9 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
     $scope.scaleAnswer = function(b, q, a){
         if(!$scope.myComments[b]) $scope.myComments[b] = [];
-        $scope.myComments[b][q] = a;
+
+        if($scope.int($scope.myComments[b][q]) === a) $scope.myComments[b][q] = '';
+        else $scope.myComments[b][q] = a;
     }
 
     $scope.langContent = function(data, target){
