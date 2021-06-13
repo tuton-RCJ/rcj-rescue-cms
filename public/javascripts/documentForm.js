@@ -181,9 +181,9 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
         })
     })
 
-    
-
-    
+    $scope.int = function(n){
+        return parseInt(n);
+    }
 
     $scope.save = function () {
         $http.put("/api/document/answer/" + $scope.team._id + "/" + token, $scope.answers).then(function (response) {

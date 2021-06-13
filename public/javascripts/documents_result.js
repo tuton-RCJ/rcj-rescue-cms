@@ -100,7 +100,7 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                         if(!$scope.review[b].questions[q]) continue;
                         if($scope.review[b].questions[q].type != 'scale' || isNaN(c.comments[b][q]) ) continue;
                         if(c.comments[b][q] == ''){
-                            c.comments[b][q] = 0;
+                            continue;
                         }
                         let r = Number(c.comments[b][q]);
                         if(!$scope.rating[teamId][b]) $scope.rating[teamId][b] = [];

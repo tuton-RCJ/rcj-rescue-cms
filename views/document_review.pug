@@ -133,7 +133,7 @@ block content
                                     select.custom-select(ng-model='answers[blockIndex][questionIndex]', disabled , ng-options="option.value as option.text for option in langArray(question.i18n, 'options')")
                                 div(ng-if="question.type=='scale'")
                                     .btn-group
-                                        button.btn.btn-outline-primary(type='button', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: answers[blockIndex][questionIndex] == ans}')  {{ans}}
+                                        button.btn.btn-outline-primary(type='button', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: int(answers[blockIndex][questionIndex]) === ans}')  {{ans}}
                                 div(ng-if="question.type=='picture'")
                                     .row(ng-if="checkUploaded(question.fileName)", style="width:100%;")
                                         .col-12
@@ -201,7 +201,7 @@ block content
                                         select.custom-select(ng-model='myComments[blockIndex][questionIndex]', ng-change="save()", ng-options="option.value as option.text for option in langArray(question.i18n, 'options')")
                                     div(ng-if="question.type=='scale'")
                                         .btn-group
-                                            button.btn.btn-outline-primary(type='button', ng-click='scaleAnswer(blockIndex, questionIndex, ans);', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: myComments[blockIndex][questionIndex] == ans}')  {{ans}}
+                                            button.btn.btn-outline-primary(type='button', ng-click='scaleAnswer(blockIndex, questionIndex, ans);', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: int(myComments[blockIndex][questionIndex]) === ans}')  {{ans}}
                                     div(ng-if="question.type=='run'")
                                         button.btn.btn-primary(ng-click="openRun(question._id)")
                                             i.fas.fa-calculator &nbsp;
@@ -349,7 +349,7 @@ block content
                             select.custom-select(ng-model='answers[blockIndex][questionIndex]', disabled , ng-options="option.value as option.text for option in langArray(question.i18n, 'options')")
                         div(ng-if="question.type=='scale'")
                             .btn-group
-                                button.btn.btn-outline-primary(type='button', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: answers[blockIndex][questionIndex] == ans}')  {{ans}}
+                                button.btn.btn-outline-primary(type='button', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: int(answers[blockIndex][questionIndex]) === ans}')  {{ans}}
                         div(ng-if="question.type=='picture'")
                             .row(ng-if="checkUploaded(question.fileName)", style="width:100%;")
                                 .col-12
@@ -416,7 +416,19 @@ block content
                                 select.custom-select(ng-model='myComments[blockIndex][questionIndex]', ng-change="save()", ng-options="option.value as option.text for option in langArray(question.i18n, 'options')")
                             div(ng-if="question.type=='scale'")
                                 .btn-group
-                                    button.btn.btn-outline-primary(type='button', ng-click='scaleAnswer(blockIndex, questionIndex, ans);', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: myComments[blockIndex][questionIndex] == ans}')  {{ans}}
+                                    button.btn.btn-outline-primary(type='button', ng-click='scaleAnswer(blockIndex, questionIndex, ans);', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: int(myComments[blockIndex][questionIndex]) === ans}')  {{ans}}
+                            div(ng-if="question.type=='run'")
+                                button.btn.btn-primary(ng-click="openRun(question._id)")
+                                    i.fas.fa-calculator &nbsp;
+                                    | Do Scoring
+                                hr
+                                table.custom(style="overflow: scroll;")
+                                    thead 
+                                        tr 
+                                            th(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.round.name")
+                                    tbody
+                                        tr 
+                                            td(ng-repeat="run in runScore[question._id] track by $index", ng-bind="run.score")
                             div(ng-if="question.type=='picture'")
                                 .row(ng-if="checkUploadedReview(question.fileName)", style="width:100%;")
                                     .col-12

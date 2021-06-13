@@ -126,6 +126,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
             for(let r of $scope.review){
                 for(let q of r.questions){
+                    if(q.type != "run") continue;
                     $http.get(`/api/document/run/${teamId}/${q._id}`).then(function (response) {
                         $scope.runScore[q._id] = response.data;
                     });
@@ -183,7 +184,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                     for(let q in c.comments[b]){
                         if($scope.review[b].questions[q].type != 'scale') continue;
                         if(c.comments[b][q] == ''){
-                            c.comments[b][q] = 0;
+                            continue;
                         }
                         let r = Number(c.comments[b][q]);
                         if(!$scope.rating[b]) $scope.rating[b] = [];
