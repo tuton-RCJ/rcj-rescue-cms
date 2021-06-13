@@ -69,7 +69,9 @@ block navbar
         .col-sm-7.col-12(style="text-align:center;")
             span(style="font-size:20px;")
                 i.fas.fa-file-alt &nbsp;
-                | {{competition.name}}
+                | {{competition.name}} -&nbsp;
+            span(style="font-size:20px;" ng-bind="team.teamCode + ' '" ng-show="team.teamCode")
+            span(style="font-size:20px;" ng-bind="team.name")
         .col-sm-4.col-12(style="text-align:right;")
             button.btn.btn-primary(type='button', ng-click="changeLocale()", style="padding:2px 5px 0px 3px;margin-right:10px;")
                 i.fas.fa-language(style="font-size:30px;")
@@ -91,7 +93,8 @@ block content
                         div(style="margin-bottom:10px;")
                             strong {{"document.form.teamName" | translate}}
                         div(style="font-size:20px;")
-                            p(ng-bind="team.name")
+                            span(ng-bind="team.teamCode + ' '" ng-show="team.teamCode")
+                            span(ng-bind="team.name")
                         hr
                         div(style="margin-bottom:10px;")
                             strong {{"common.league" | translate}}

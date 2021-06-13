@@ -82,7 +82,8 @@ block content
                     div(style="margin-bottom:10px;")
                         strong {{"document.form.teamName" | translate}}
                     div(style="font-size:20px;")
-                        p {{team.teamCode}} {{team.name}}
+                        span(ng-bind="team.teamCode + ' '" ng-show="team.teamCode")
+                        span(ng-bind="team.name")
                     hr
                     div(style="margin-bottom:10px;")
                         strong {{"common.league" | translate}}
