@@ -1,8 +1,8 @@
 let maxScore = 0;
-let lastCheckpointIndex = 0;
+let lastCheckpointIndex = -1;
 function pathFinder (map) {
   maxScore = 0;
-  lastCheckpointIndex = 0;
+  lastCheckpointIndex = -1;
   let tiles = map.tiles;
   let startTile = tiles[map.startTile.x + ',' + map.startTile.y + ',' + map.startTile.z];
   if(!startTile) return map;
@@ -28,10 +28,8 @@ function traverse(curTile, entryDir, tiles, map, index, chpCount, restartFlag) {
   tiles[curTile.x + ',' + curTile.y + ',' + curTile.z].index.push(index);
   let nextTile = tiles[next_Coord];
 
+  console.log(curTile)
   //Max score calculation
-  if(curTile.start){
-    maxScore += 5;
-  }
   if(curTile.checkPoint){
     maxScore += 5 * (index - lastCheckpointIndex);
     lastCheckpointIndex = index;
@@ -42,7 +40,6 @@ function traverse(curTile, entryDir, tiles, map, index, chpCount, restartFlag) {
   maxScore += 10 * curTile.tileType.gaps;
   maxScore += 10 * curTile.tileType.intersections;
   maxScore += 15 * curTile.tileType.seesaw;
-
 
   if (curTile.tileType._id == '58cfd6549792e9313b1610e0') {
     map.indexCount = index + 1;
