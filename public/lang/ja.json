@@ -385,8 +385,8 @@
             "rescuedVictims": "@:line.view.rescuedVictims",
             "rescuedVictimsMes" : "救助済みの被災者を削除するには，ダブルクリック（PC）か左にスワイプ（モバイル）します．",
             "noShow": "チームが来なかった場合に時間計測を開始する",
-            "search": "レベル1",
-            "noSearch": "レベル2",
+            "search": "レベル2",
+            "noSearch": "レベル1",
             "js": {
                 "score_element": "チェックポイントマーカーは，得点項目のあるタイルには設置できません． (ルール 3.3.5)",
                 "cantvisit": "ロボットの通ることのできないタイルをチェックポイントに指定することはできません．",
