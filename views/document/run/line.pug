@@ -64,40 +64,43 @@ html(ng-app="ddApp")
               | {{'line.judge.ready' | translate}}
               br
               strong(style='font-size:20px;') {{'line.judge.push_start' | translate}}
-            .card(ng-if="league != 'LineNL'", ng-show='(!startedScoring || fromSign) && EvacuationAreaLoPIndex != -1')
-              h4.card-header
-                i.fas.fa-ambulance(aria-hidden='true')
-                |  {{'line.judge.select_elevel' | translate}}
-              .card-body
-                br
-                .row
-                  .col-6(style='position: relative;', ng-click='changeLevel(1)')
-                    img.img-thumbnail(src='/images/level1.png', width='100%', ng-style="{'background-color': evacuationLevel==1?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==1?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.low' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==1')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-                  .col-6(style='position: relative;', ng-click='changeLevel(2)')
-                    img.img-thumbnail(src='/images/level2.png', width='100%', ng-style="{'background-color': evacuationLevel==2?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==2?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.high' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==2')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-            .card(ng-if="league != 'LineNL'", ng-show='(!startedScoring || fromSign) && EvacuationAreaLoPIndex != -1' style="margin-top:10px;")
-              h4.card-header
-                i.fas.fa-medkit(aria-hidden='true')
-                |  {{'line.judge.select_klevel' | translate}}
-              .card-body
-                br
-                .row
-                  .col-6(style='position: relative;', ng-click='changeLevelK(1)')
-                    img.img-thumbnail(src='/images/line-kit-1.png', width='100%', ng-style="{'background-color': kitLevel==1?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==1?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.noSearch' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==1')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-                  .col-6(style='position: relative;', ng-click='changeLevelK(2)')
-                    img.img-thumbnail(src='/images/line-kit-2.png', width='100%', ng-style="{'background-color': kitLevel==2?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==2?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.search' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==2')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
+            .row(ng-if="league != 'LineNL'", ng-show='(!startedScoring || fromSign) && EvacuationAreaLoPIndex != -1')
+              .col-6 
+                .card
+                  h4.card-header
+                    i.fas.fa-ambulance(aria-hidden='true')
+                    |  {{'line.judge.select_elevel' | translate}}
+                  .card-body
+                    br
+                    .row
+                      .col-6(style='position: relative;', ng-click='changeLevel(1)')
+                        img.img-thumbnail(src='/images/level1.png', width='100%', ng-style="{'background-color': evacuationLevel==1?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==1?'1':'0.4' }")
+                        div(style='position:absolute; top:10px; left:30px;') {{'line.judge.low' | translate}}
+                        div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==1')
+                          i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
+                      .col-6(style='position: relative;', ng-click='changeLevel(2)')
+                        img.img-thumbnail(src='/images/level2.png', width='100%', ng-style="{'background-color': evacuationLevel==2?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==2?'1':'0.4' }")
+                        div(style='position:absolute; top:10px; left:30px;') {{'line.judge.high' | translate}}
+                        div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==2')
+                          i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
+              .col-6
+                .card
+                  h4.card-header
+                    i.fas.fa-medkit(aria-hidden='true')
+                    |  {{'line.judge.select_klevel' | translate}}
+                  .card-body
+                    br
+                    .row
+                      .col-6(style='position: relative;', ng-click='changeLevelK(1)')
+                        img.img-thumbnail(src='/images/line-kit-1.png', width='100%', ng-style="{'background-color': kitLevel==1?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==1?'1':'0.4' }")
+                        div(style='position:absolute; top:10px; left:30px;') {{'line.judge.noSearch' | translate}}
+                        div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==1')
+                          i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
+                      .col-6(style='position: relative;', ng-click='changeLevelK(2)')
+                        img.img-thumbnail(src='/images/line-kit-2.png', width='100%', ng-style="{'background-color': kitLevel==2?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==2?'1':'0.4' }")
+                        div(style='position:absolute; top:10px; left:30px;') {{'line.judge.search' | translate}}
+                        div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==2')
+                          i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
             br
             #card_area.scrool(style='overflow: scroll;', ng-show='startedScoring')
               #lops.card
@@ -130,7 +133,7 @@ html(ng-app="ddApp")
                           .input-group-append
                             button.btn.btn-success(type='button', ng-click='increment($index,$last)')
                               i.fas.fa-plus(aria-hidden='true')
-                    div(ng-if="$index == EvacuationAreaLoPIndex && league != 'LineNL'", style="border: solid 3px #e74c3c;border-radius:calc(0.5rem - 1px);")
+                    div(ng-if="$index == EvacuationAreaLoPIndex && league != 'LineNL'", style="border: solid 3px #e74c3c;border-radius:calc(0.5rem - 1px);max-width:300px;margin-left:calc(50% - 150px);")
                       h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;margin-left:-1px;")  {{'line.judge.rescue' | translate}}
                         span.badge.badge-danger {{evacuationLevel-1?'line.judge.high':'line.judge.low' | translate}}
                       .row
