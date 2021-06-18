@@ -421,7 +421,7 @@ publicRouter.get('/embed_video', function (req, res, next) {
   });
 });
 
-privateRouter.get('/public_files/:teamId/:token', function (req, res, next) {
+publicRouter.get('/public_files/:teamId/:token', function (req, res, next) {
   const { teamId } = req.params;
   const { token } = req.params;
 
