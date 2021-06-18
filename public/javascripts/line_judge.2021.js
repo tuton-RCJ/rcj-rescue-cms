@@ -282,11 +282,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         console.log(response.data);
 
       $scope.LoPs = response.data.LoPs;
-      $scope.evacuationLevel = response.data.evacuationLevel;
+      
       if($scope.nowRun == 0){
         $scope.kitLevel = response.data.kitLevel;
-        $scope.exitBonus = response.data.exitBonus;
+        $scope.evacuationLevel = response.data.evacuationLevel;
       }
+      $scope.exitBonus = response.data.exitBonus;
       $scope.field = response.data.field.name;
       $scope.score = response.data.score;
       $scope.showedUp = response.data.showedUp;
