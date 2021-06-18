@@ -446,7 +446,7 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
           });
           return;
         }
-        if (((dbTeam.competition.documents.enable && dbTeam.document.enabled) ||
+        if (((dbTeam.competition.documents.enable) ||
           auth.authCompetition(
             req.user,
             dbTeam.competition._id,
