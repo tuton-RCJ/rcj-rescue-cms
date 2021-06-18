@@ -95,6 +95,9 @@ block content
                         div(style="font-size:20px;")
                             span(ng-bind="team.teamCode + ' '" ng-show="team.teamCode")
                             span(ng-bind="team.name")
+                            button.btn.btn-secondary(type='button', ng-click="copyShareLink(0)", style="padding:2px 5px 0px 3px;margin-left:100px;")
+                                i.fas.fa-link &nbsp;
+                                | Shared link
                         hr
                         div(style="margin-bottom:10px;")
                             strong {{"common.league" | translate}}

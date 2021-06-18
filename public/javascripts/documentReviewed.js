@@ -200,10 +200,13 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     }
 
     $scope.copyShareLink = function(question){
-        console.log(question)
+        
 
         let link = `${location.protocol}//${location.host}`;
-        if(question.type == "pdf"){
+        if(question == 0){
+            link = `${link}/document/public_files/${$scope.team._id}/${publicToken}`
+        }
+        else if(question.type == "pdf"){
             link = `${link}/components/pdfjs/web/viewer.html?file=/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`
         }else if(question.type == "picture"){
             link = `${link}/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`

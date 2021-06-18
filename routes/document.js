@@ -421,6 +421,43 @@ publicRouter.get('/embed_video', function (req, res, next) {
   });
 });
 
+privateRouter.get('/public_files/:teamId/:token', function (req, res, next) {
+  const { teamId } = req.params;
+  const { token } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findById(teamId)
+    .populate({
+      path: "competition",
+      select: "publicToken documents"
+    })
+    //.select('competition.publicToken')
+    .exec(function (err, dbTeam) {
+      if (err || dbTeam == null) {
+        if (!err) err = { message: 'No team found' };
+        res.status(400).send({
+          msg: 'Could not get team',
+          err: err.message,
+        });
+      } else if (dbTeam) {
+        if(dbTeam.competition.publicToken === token){
+          res.render('document/public_files', {
+            competition: dbTeam.competition._id,
+            team: teamId,
+            token: token,
+            league: dbTeam.league
+          });
+        }else{
+          res.render('access_denied', { user: req.user });
+        }
+      }
+    });
+});
+
 publicRouter.all('*', function (req, res, next) {
   next();
 });
