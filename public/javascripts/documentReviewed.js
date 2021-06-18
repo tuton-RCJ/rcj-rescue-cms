@@ -85,6 +85,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     const currentLang = $translate.proposedLanguage() || $translate.use();
     const availableLangs =  $translate.getAvailableLanguageKeys();
 
+    let publicToken = "";
     $scope.token = token;
 
     $scope.currentLang = currentLang;
@@ -123,6 +124,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
             $scope.notifications = response.data.notifications;
             $scope.languages = response.data.languages;
             $scope.review = response.data.review;
+            publicToken = response.data.publicToken;
 
             for(let r of $scope.review){
                 for(let q of r.questions){
@@ -202,13 +204,13 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
         let link = `${location.protocol}//${location.host}`;
         if(question.type == "pdf"){
-            link = `${link}/components/pdfjs/web/viewer.html?file=/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+            link = `${link}/components/pdfjs/web/viewer.html?file=/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`
         }else if(question.type == "picture"){
-            link = `${link}/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+            link = `${link}/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`
         }else if(question.type == "zip"){
-            link = `${link}/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+            link = `${link}/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`
         }else if(question.type == "movie"){
-            link = `${link}/document/embed_video?video=/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+            link = `${link}/document/embed_video?video=/api/document/files/${$scope.team._id}/${publicToken}/${$scope.nameUploaded(question.fileName)}`
         }
         if(navigator.clipboard){
             navigator.clipboard.writeText(link);

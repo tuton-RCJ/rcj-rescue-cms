@@ -64,6 +64,9 @@ const competitionSchema = new Schema({
     'league': {type: String, enum: LEAGUES},
     'num': {type: Number, default: 20}
   }],
+  publicToken: {type: String, default: function(){
+    return crypto.randomBytes(16).reduce((p, i) => p + (i % 32).toString(32), '')
+  }, select: false},
   documents: {
     enable: {type: Boolean,  default: false},
     deadline: {type: Number, default: 0},

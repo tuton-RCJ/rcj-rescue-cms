@@ -421,32 +421,39 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
 
   competitiondb.team
     .findById(teamId)
-    .populate('competition')
-    .select('competition document.enabled document.token league')
-    .exec(function (err, dbTeam) {
-      let league = dbTeam.competition.documents.leagues.find(l => l.league == dbTeam.league);
-      let question = undefined;
-      for(b of league.blocks){
-        question = b.questions.find(q => q.fileName!="" && ~fileName.indexOf(q.fileName));
-        if(question) break;
-      }
+    .select('document.enabled document.token league')
+    .populate({
+      path: "competition",
+      select: "publicToken documents"
+    })
+    .exec(function (err, dbTeam) {     
+      console.log(dbTeam) 
       if (err || dbTeam == null) {
         if (!err) err = { message: 'No team found' };
         res.status(400).send({
           msg: 'Could not get team',
           err: err.message,
         });
-      }else if(!question){
-        res.status(400).send({
-          msg: 'Could not get question data'
-        });
       } else if (dbTeam) {
+        let league = dbTeam.competition.documents.leagues.find(l => l.league == dbTeam.league);
+        let question = undefined;
+        for(b of league.blocks){
+          question = b.questions.find(q => q.fileName!="" && ~fileName.indexOf(q.fileName));
+          if(question) break;
+        }
+        if(!question){
+          res.status(400).send({
+            msg: 'Could not get question data'
+          });
+          return;
+        }
+        console.log(question)
         if (((dbTeam.competition.documents.enable && dbTeam.document.enabled) ||
           auth.authCompetition(
             req.user,
             dbTeam.competition._id,
             ACCESSLEVELS.VIEW
-          )) && (dbTeam.document.token === token || dbTeam.document.public || question.public)) {
+          )) && (dbTeam.document.token === token || dbTeam.document.public || (question.public && token === dbTeam.competition.publicToken ))) {
           const path = `${__dirname}/../../documents/${dbTeam.competition._id}/${teamId}/${sanitize(fileName)}`;
           fs.stat(path, (err, stat) => {
             // Handle file not found

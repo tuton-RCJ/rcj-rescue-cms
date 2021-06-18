@@ -191,7 +191,13 @@ privateRouter.get(
           res.status(400).send({
             msg: 'Could not get competition',
           });
-        } else if (data[0]) res.status(200).send(data[0].documents.leagues);
+        } else if (data[0]) res.status(200).send({
+          blocks: data[0].documents.leagues.blocks,
+          notifications: data[0].documents.leagues.notifications,
+          languages: data[0].documents.leagues.languages,
+          review: data[0].documents.leagues.review,
+          publicToken: data[0].publicToken
+        });
         else res.status(200).send(data);
       });
   }
