@@ -197,6 +197,35 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
         })
     }
 
+    $scope.copyShareLink = function(question){
+        console.log(question)
+
+        let link = `${location.protocol}//${location.host}`;
+        if(question.type == "pdf"){
+            link = `${link}/components/pdfjs/web/viewer.html?file=/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+        }else if(question.type == "picture"){
+            link = `${link}/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+        }else if(question.type == "zip"){
+            link = `${link}/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+        }else if(question.type == "movie"){
+            link = `${link}/document/embed_video?video=/api/document/files/${$scope.team._id}/0/${$scope.nameUploaded(question.fileName)}`
+        }
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(link);
+            Toast.fire({
+                type: 'success',
+                title: "Copied!",
+                html: link
+            });
+        }else{
+            Toast.fire({
+                type: 'error',
+                title: "Not supported!"
+            });
+        }
+        
+    }
+
 
     $scope.trust = function(html){
         return($sce.trustAsHtml(html));

@@ -134,7 +134,10 @@ block content
                                             div(style="text-align:center;margin:10px 0px;")
                                                 a(style="max-width: 100%;height: auto; margin-bottom:20px;" ng-href="/api/document/files/{{team._id}}/{{token}}/{{nameUploaded(question.fileName)}}?v={{updateTime}}" data-lightbox="image")
                                                     img.img-thumbnail(style="max-height: 500px;max-width:100%;width: auto;margin-bottom:20px;" ng-src="/api/document/files/{{team._id}}/{{token}}/{{nameUploaded(question.fileName)}}?v={{updateTime}}")
-
+                                                div(ng-if="question.public")
+                                                    button.btn.btn-secondary(type='button', ng-click="copyShareLink(question)", style="padding:2px 5px 0px 3px;margin-top:10px;")
+                                                        i.fas.fa-link &nbsp;
+                                                        | Shared link
                                 div(ng-if="question.type=='movie'")
                                     .row(ng-if="checkUploaded(question.fileName) && !question.uploading", style="width:100%;")
                                         .col-12
@@ -143,13 +146,21 @@ block content
                                                     source(ng-src="{{getVideoLink(v)}}", ng-repeat="v in getVideoList(question.fileName)")
                                                 br
                                                 a(ng-href="{{getVideoLink(getVideoList(question.fileName)[0])}}" download) {{"document.form.cantplay" | translate}}
-
+                                                div(ng-if="question.public")
+                                                    button.btn.btn-secondary(type='button', ng-click="copyShareLink(question)", style="padding:2px 5px 0px 3px;margin-top:10px;")
+                                                        i.fas.fa-link &nbsp;
+                                                        | Shared link
+                                        
 
                                 div(ng-if="question.type=='pdf'")
                                     .row(ng-if="checkUploaded(question.fileName)", style="width:100%;")
                                         .col-12
                                             div(style="text-align:center;margin:10px 0px;")
                                                 iframe(ng-src="{{getPdfLink(question.fileName)}}" style="width:100%; height:500px;" )
+                                                div(ng-if="question.public")
+                                                    button.btn.btn-secondary(type='button', ng-click="copyShareLink(question)", style="padding:2px 5px 0px 3px;margin-top:10px;")
+                                                        i.fas.fa-link &nbsp;
+                                                        | Shared link
                 
                                 div(ng-if="question.type=='zip'")
                                     .row(ng-if="checkUploaded(question.fileName)", style="width:100%;")
@@ -158,6 +169,10 @@ block content
                                                 a.btn.btn-primary(type='file' ng-href="/api/document/files/{{team._id}}/{{token}}/{{nameUploaded(question.fileName)}}?v={{updateTime}}")
                                                     i.fas.fa-file-archive &nbsp;
                                                     | {{"document.form.uploaded" | translate}}
+                                                div(ng-if="question.public")
+                                                    button.btn.btn-secondary(type='button', ng-click="copyShareLink(question)", style="padding:2px 5px 0px 3px;margin-top:10px;")
+                                                        i.fas.fa-link &nbsp;
+                                                        | Shared link
 
                                 hr(ng-if="!$last")
             #COMMENTS(style="padding:5px 15px 0 0;margin-right: -15px;")

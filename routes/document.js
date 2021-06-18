@@ -415,6 +415,12 @@ publicRouter.get('/:competitionid/view/:teamid', function (req, res, next) {
   // else res.render('access_denied', {user: req.user})
 });
 
+publicRouter.get('/embed_video', function (req, res, next) {
+  res.render('document/embed_video', {
+    video: req.query.video
+  });
+});
+
 publicRouter.all('*', function (req, res, next) {
   next();
 });

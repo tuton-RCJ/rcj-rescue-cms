@@ -174,7 +174,7 @@ block content
                         div(ng-repeat="question in block.questions track by $index")
                             hr(ng-style="{borderTop: '3px solid #' + block.color}")
                             .row(style="margin:10px 0px;")
-                                .col-md-4
+                                .col-md-3
                                     .input-group(style="width:100%;margin 0 auto;")
                                         .input-group-prepend
                                             span.input-group-text {{"document.editor.questionType" | translate}}:
@@ -186,14 +186,21 @@ block content
                                             option(value='picture') {{"document.editor.picture" | translate}}
                                             option(value='movie') {{"document.editor.video" | translate}}
                                             option(value='zip') {{"document.editor.archive" | translate}}
-                                .col-md-4
+                                .col-md-3
                                     .input-group(style="width:100%;margin 0 auto;")
                                         .input-group-prepend
                                             span.input-group-text {{"document.editor.requiredOrNot" | translate}}
                                         select.custom-select(ng-model='question.required', ng-blur="save()")
                                             option(ng-value='true') {{"document.editor.required" | translate}}
                                             option(ng-value='false') {{"document.editor.optional" | translate}}
-                                .col-md-4
+                                .col-md-3
+                                    .input-group(style="width:100%;margin 0 auto;")
+                                        .input-group-prepend
+                                            span.input-group-text Make public
+                                        select.custom-select(ng-model='question.public', ng-blur="save()")
+                                            option(ng-value='false') {{"common.disable" | translate}}
+                                            option(ng-value='true') {{"common.enable" | translate}}
+                                .col-md-3
                                     button.btn.btn-danger(type='button', ng-click='removeQuestion($parent.$index,$index)', style="float:right;margin-left:5px;")
                                         i.fas.fa-trash-alt
                                     button.btn.btn-info(type='button', ng-click='moveQuestion($parent.$index,$index,$index+1)', ng-disabled="$last", style="float:right;margin-left:5px;")

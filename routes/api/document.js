@@ -420,28 +420,33 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
   }
 
   competitiondb.team
-    .findOne({
-      _id: ObjectId(teamId),
-      $or: [{ 'document.token': token }, { 'document.public': true }],
-    })
+    .findById(teamId)
     .populate('competition')
-    .select('competition document.enabled')
+    .select('competition document.enabled document.token league')
     .exec(function (err, dbTeam) {
+      let league = dbTeam.competition.documents.leagues.find(l => l.league == dbTeam.league);
+      let question = undefined;
+      for(b of league.blocks){
+        question = b.questions.find(q => q.fileName!="" && ~fileName.indexOf(q.fileName));
+        if(question) break;
+      }
       if (err || dbTeam == null) {
         if (!err) err = { message: 'No team found' };
         res.status(400).send({
           msg: 'Could not get team',
           err: err.message,
         });
+      }else if(!question){
+        res.status(400).send({
+          msg: 'Could not get question data'
+        });
       } else if (dbTeam) {
-        if (
-          (dbTeam.competition.documents.enable && dbTeam.document.enabled) ||
+        if (((dbTeam.competition.documents.enable && dbTeam.document.enabled) ||
           auth.authCompetition(
             req.user,
             dbTeam.competition._id,
             ACCESSLEVELS.VIEW
-          )
-        ) {
+          )) && (dbTeam.document.token === token || dbTeam.document.public || question.public)) {
           const path = `${__dirname}/../../documents/${dbTeam.competition._id}/${teamId}/${sanitize(fileName)}`;
           fs.stat(path, (err, stat) => {
             // Handle file not found

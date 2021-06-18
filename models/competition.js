@@ -101,6 +101,7 @@ const competitionSchema = new Schema({
           }],
           'type': {type: String, enum: QUESTION_TYPES},
           'required': {type: Boolean, default: true},
+          'public': {type: Boolean, default: false},
           'fileName': {type: String, default: ''},
           'scale': {
             'least': {type: Number, default: 1},
