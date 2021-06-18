@@ -427,7 +427,6 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
       select: "publicToken documents"
     })
     .exec(function (err, dbTeam) {     
-      console.log(dbTeam) 
       if (err || dbTeam == null) {
         if (!err) err = { message: 'No team found' };
         res.status(400).send({
@@ -447,7 +446,6 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
           });
           return;
         }
-        console.log(question)
         if (((dbTeam.competition.documents.enable && dbTeam.document.enabled) ||
           auth.authCompetition(
             req.user,
