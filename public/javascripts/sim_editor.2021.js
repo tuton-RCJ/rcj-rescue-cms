@@ -83,12 +83,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             $scope.cells[index].virtualWall = false;
             $scope.cells[index].reachable= false;
             $scope.cells[index].explored= false;
-            if ($scope.cells[index].tile && $scope.cells[index].tile.curve == undefined) {
-                $scope.cells[index].tile.halfWallIn = [0, 0, 0, 0];
-                $scope.cells[index].tile.curve = [0, 0, 0, 0]; //NW quadrant, NE, SW, SE
-                $scope.cells[index].tile.halfWallVic = [];
-                for (var i in $scope.range(16))
-                    $scope.cells[index].tile.halfWallVic.push('');
+            if ($scope.cells[index].tile) {
+                if($scope.cells[index].tile.curve == undefined)
+                    $scope.cells[index].tile.curve = [0, 0, 0, 0]; //NW quadrant, NE, SW, SE
+                if($scope.cells[index].tile.halfWallIn == undefined)
+                    $scope.cells[index].tile.halfWallIn = [0, 0, 0, 0];
+                if(!$scope.cells[index].tile.halfWallVic)
+                    $scope.cells[index].tile.halfWallVic = [];
             }
         }
         
@@ -1564,16 +1565,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if(walls[z][x][13]){
                     for (var i in $scope.range(16)) {
                         if (walls[z][x][13][i] != '') {
+                            let humanType = Number(walls[z][x][13][i]);
                             let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
                             let score = 30
                             let j = 0
                             if(walls[z][x][8]) score = 10
-                            if (walls[z][x][13][i] >= 0 && walls[z][x][13][i] <= 3) {
+                            if (humanType >= 0 && humanType <= 3) {
                                 score = score / 2;
                                 allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
                                 humanId = humanId + 1
                             }
-                            else if (walls[z][x][13][i] >= 5 && walls[z][x][13][i] <= 8) {
+                            else if (humanType>= 5 && humanType <= 8) {
                                 allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
                                 hazardId = hazardId + 1
                             }
@@ -1833,19 +1835,20 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(hazards.includes(cell.tile.victims[dir])){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     });
                 }
                 if(cell.tile.halfWallVic){
-                    for(let v of cell.tile.halfWallVic){
+                    for(let i of $scope.range(16)){
+                        let v = Number(cell.tile.halfWallVic[i]);
                         if(v == "") continue;
                         if(v >= 0 && v <= 3){
                             victimScore += (cell.isLinear ? 5 : 15) * areaMultiplier[checkRoomNumberKey(key)];
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(v >= 5 && v <= 8){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     }
                 }
