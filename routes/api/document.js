@@ -441,10 +441,9 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
           if(question) break;
         }
         if(!question){
-          res.status(400).send({
-            msg: 'Could not get question data'
-          });
-          return;
+          question= {
+            public: false
+          };
         }
         if (((dbTeam.competition.documents.enable) ||
           auth.authCompetition(
