@@ -271,9 +271,10 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                         for(let cc of c){
                             let question = $scope.review[rNo].questions[qNo];
                             if(question.type == "scale"){
-                                user.getRow(row).getCell(col).value = Number(cc);
+                                if(cc != "") user.getRow(row).getCell(col).value = Number(cc);
                                 col++;
                             }else if(question.type == "run"){
+                                let pCol = col;
                                 let runs = lineRuns.filter(r=> r.team._id == team._id && question.runReview.map.includes(r.map._id) && question.runReview.round.includes(r.round._id))
                                 for(let run of runs){
                                     user.getRow(row).getCell(col).value = Number(run.score);
@@ -284,6 +285,8 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                                     user.getRow(row).getCell(col).value = Number(run.score);
                                     col++;
                                 }
+                                col += question.runReview.round.length - (col-pCol);
+
                             }else if(question.type == "input"){
                                 let d = document.createElement('div');
                                 d.innerHTML = cc;
