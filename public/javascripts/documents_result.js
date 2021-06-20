@@ -70,6 +70,27 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
 
         $scope.scaleBlock = [];
         $scope.blockTitle = [];
+
+        let langConfirm = false;
+        //Check 1st lang
+        for(let l of $scope.languages){
+            if(l.language == $scope.displayLang && l.enable){
+                langConfirm = true;
+                break;
+            }
+        }
+
+        if(!langConfirm){
+            //Set alternative lang
+            for(let l of $scope.languages){
+                if(l.enable){
+                    $scope.displayLang = l.language;
+                    break;
+                }
+            }
+        }
+        
+
         for(let b in $scope.review){
             let blockFlag = false;
             for(let q of $scope.review[b].questions){
@@ -111,18 +132,7 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
             }
         })
 
-        //Check 1st lang
-        for(let l of $scope.languages){
-            if(l.language == $scope.displayLang && l.enable) return;
-        }
-
-        //Set alternative lang
-        for(let l of $scope.languages){
-            if(l.enable){
-                $scope.displayLang = l.language;
-                return;
-            }
-        }
+        
     })
 
     $scope.langContent = function(data, target){
@@ -210,5 +220,145 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
         return (~value.name.indexOf($scope.refineName)) && (~value.teamCode.indexOf($scope.refineCode)) && (~value.country.indexOf($scope.refineRegion))
     }
 
-  
+    function teamSort(item1, item2){
+        let team1 = $scope.teams.find(t=> t._id == item1.team._id);
+        let team2 = $scope.teams.find(t=> t._id == item2.team._id);
+        if(team1.teamCode > team2.teamCode) return 1;
+        if(team1.teamCode < team2.teamCode) return -1;
+        if(team1.name > team2.name) return 1;
+        if(team1.name < team2.name) return -1;
+    }
+
+    $scope.downloadExcel = function(){
+        $http.get("/api/competitions/" + competitionId +
+            "/line/runs?populate=true").then(function (response) {
+            let lineRuns = response.data;
+            $http.get("/api/competitions/" + competitionId +
+                "/maze/runs?populate=true").then(function (response) {
+                let mazeRuns = response.data;
+
+                let workbook = new ExcelJS.Workbook();
+                workbook.creator = 'RCJ CMS';
+                workbook.created = new Date();
+                workbook.modified = new Date();
+
+                let user = workbook.addWorksheet('Evaluation');
+
+                user.getRow(1).getCell(1).value = $scope.competition.name;
+
+                user.getColumn('B').width = 20;
+
+                user.getRow(3).getCell(1).value = "Code";
+                user.getRow(3).getCell(2).value = "Name";
+                user.getRow(3).getCell(3).value = "Region";
+                user.getRow(3).getCell(4).value = "User";
+                
+
+                $scope.reviewCommentsTeams.sort(teamSort)
+                let row = 4;
+                let col = 1;
+                for(let r of $scope.reviewCommentsTeams){
+                    let team = $scope.teams.find(t=>t._id == r.team._id);
+                    user.getRow(row).getCell(1).value = team.teamCode;
+                    user.getRow(row).getCell(2).value = team.name;
+                    user.getRow(row).getCell(3).value = team.country;
+                    user.getRow(row).getCell(4).value = r.reviewer?r.reviewer.username:r.name;
+                    col = 5;
+                    rNo = 0;
+                    qNo = 0;
+                    for(let c of r.comments){
+                        qNo = 0;
+                        for(let cc of c){
+                            let question = $scope.review[rNo].questions[qNo];
+                            if(question.type == "scale"){
+                                user.getRow(row).getCell(col).value = Number(cc);
+                                col++;
+                            }else if(question.type == "run"){
+                                let runs = lineRuns.filter(r=> r.team._id == team._id && question.runReview.map.includes(r.map._id) && question.runReview.round.includes(r.round._id))
+                                for(let run of runs){
+                                    user.getRow(row).getCell(col).value = Number(run.score);
+                                    col++;
+                                }
+                                runs = mazeRuns.filter(r=> r.team._id == team._id && question.runReview.map.includes(r.map._id) && question.runReview.round.includes(r.round._id))
+                                for(let run of runs){
+                                    user.getRow(row).getCell(col).value = Number(run.score);
+                                    col++;
+                                }
+                            }else if(question.type == "input"){
+                                let d = document.createElement('div');
+                                d.innerHTML = cc;
+                                user.getRow(row).getCell(col).value = d.innerText;
+                                col++;
+                            }else{
+                                user.getRow(row).getCell(col).value = cc;
+                                col++;
+                            }
+                            
+                            qNo ++;
+                        }
+                        rNo ++;
+                    }
+                    row++;
+                }
+
+
+                row = 2;
+                col = 5;
+                lastCol = 5;
+                for(let b of $scope.review){
+                    user.getRow(row).getCell(col).value = $sce.valueOf($scope.langContent(b.i18n, 'title'));
+                    user.getRow(row).getCell(col).fill = {
+                        type: 'pattern',
+                        pattern:'solid',
+                        fgColor: {argb: `${b.color}`}
+                    };
+                        
+                    for(let q of b.questions){
+                        user.getRow(row+1).getCell(col).value = $sce.valueOf($scope.langContent(q.i18n, 'question'));
+
+                        if(q.type == "run"){
+                            if(q.runReview.round.length > 1){
+                                user.mergeCells(row+1,col,row+1,col+q.runReview.round.length-1);
+                            }
+                            col += q.runReview.round.length;
+                            
+                        }else{
+                            col += 1;
+                        }
+                        
+                        
+                    }
+                    if(lastCol != col-1)
+                        user.mergeCells(row,lastCol,row,col-1);
+                    lastCol = col;
+                }
+
+                //return;
+                workbook.xlsx.writeBuffer( {
+                    base64: true
+                })
+                .then( function (xls64) {
+                    // build anchor tag and attach file (works in chrome)
+                    var a = document.createElement("a");
+                    var data = new Blob([xls64], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+                    var url = URL.createObjectURL(data);
+                    a.href = url;
+                    a.download = `${$scope.competition.name} - ${leagueId}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function() {
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                        },
+                        0);
+                })
+                .catch(function(error) {
+                    console.log(error.message);
+                });
+            })
+        })
+        
+    }
+    
 }]);

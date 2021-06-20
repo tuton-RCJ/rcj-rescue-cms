@@ -9,6 +9,7 @@ append scripts
     var competitionId = "#{id}"
     var leagueId = "#{lid}"
   script(src='/javascripts/documents_result.js')
+  script(src='/components/exceljs/index.js')
 
 append css
     style.
@@ -34,8 +35,15 @@ block content
       .refine
         .card.border-dark.mb-3(style='width:100%;')
           .card-header.bg-transparent.border-dark.fa-2x
-            i.fas.fa-search(aria-hidden='true') &nbsp;
-            | {{'common.refine' | translate}}
+            .row 
+              .col-md-6
+                i.fas.fa-search(aria-hidden='true') &nbsp;
+                | {{'common.refine' | translate}}
+              .col-md-6(style="text-align:right;")
+                button.btn.btn-sm.btn-success(ng-click="downloadExcel()")
+                  i.fas.fa-file-excel &nbsp;
+                  | Export
+
           .card-body.text-dark
             h6.card-title {{"common.teamCode" | translate}}
             .input-group
