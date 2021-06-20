@@ -270,6 +270,7 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                         qNo = 0;
                         for(let cc of c){
                             let question = $scope.review[rNo].questions[qNo];
+                            if(!question) continue;
                             if(question.type == "scale"){
                                 if(cc != "") user.getRow(row).getCell(col).value = Number(cc);
                                 col++;
