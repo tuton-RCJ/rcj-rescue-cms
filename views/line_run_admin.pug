@@ -132,6 +132,7 @@ block content
             th {{"common.round" | translate}}
             th {{"common.team" | translate}}
             th {{"common.field" | translate}}
+            th {{"common.map" | translate}}
             th {{"common.score" | translate}}
             th {{"common.time" | translate}}
             th {{"admin.lineRun.status" | translate}}
@@ -145,6 +146,7 @@ block content
             td(ng-bind='run.round.name' ng-style="{'background-color':statusColor(run.status)}" )
             td(ng-bind='run.team.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.field.name' ng-style="{'background-color':statusColor(run.status)}")
+            td(ng-bind='run.map.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.score' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind="run.time.minutes*60*1000+run.time.seconds*1000 | date:'mm:ss'" ng-style="{'background-color':statusColor(run.status)}")
             td(ng-style="{'background-color':statusColor(run.status)}")
