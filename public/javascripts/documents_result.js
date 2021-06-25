@@ -293,6 +293,11 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                                 d.innerHTML = cc;
                                 user.getRow(row).getCell(col).value = d.innerText;
                                 col++;
+                            }else if(question.type == "select"){
+                                let val = question.i18n.find(i=>i.language == $scope.displayLang).options.find(o=>o.value == cc).text;
+                                if(isNaN(Number(val))) user.getRow(row).getCell(col).value = val;
+                                else user.getRow(row).getCell(col).value = Number(val);
+                                col++;
                             }else{
                                 user.getRow(row).getCell(col).value = cc;
                                 col++;
