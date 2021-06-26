@@ -110,6 +110,8 @@ privateRouter.get('/review/run/:teamId/:questionId', function (req, res, next) {
             for(let b of review){
               let q = b.questions.filter(q=>q._id == questionId && q.type=="run");
               if(q.length > 0){
+                let simpleJudge = false;
+                if(q[0].runReview.round.length == 1 && q[0].runReview.movie == "") simpleJudge = true;
                 //Runs already exists?
                 if(GetleagueType(dbTeam.league) == "line"){
                   //LineRun
@@ -123,7 +125,8 @@ privateRouter.get('/review/run/:teamId/:questionId', function (req, res, next) {
                     if(!dbRun || dbRun.length == 0){
                       res.render('document/run/mapSelector', { user: req.user, team: dbTeam._id, competition: dbTeam.competition, league: dbTeam.league, token: dbTeam.document.token, map: q[0].runReview.map, movie: q[0].runReview.movie, round: q[0].runReview.round, questionId });
                     }else{
-                      res.render('document/run/line', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
+                      if(simpleJudge) res.redirect('/line/judge/' + dbRun[0]._id);
+                      else res.render('document/run/line', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
                     }
                   });
                 }else{
@@ -138,7 +141,8 @@ privateRouter.get('/review/run/:teamId/:questionId', function (req, res, next) {
                     if(!dbRun || dbRun.length == 0){
                       res.render('document/run/mapSelector', { user: req.user, team: dbTeam._id, competition: dbTeam.competition, league: dbTeam.league, token: dbTeam.document.token, map: q[0].runReview.map, movie: q[0].runReview.movie, round: q[0].runReview.round, questionId });
                     }else{
-                      res.render('document/run/maze', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
+                      if(simpleJudge) res.redirect('/maze/judge/' + dbRun[0]._id);
+                      else res.render('document/run/maze', { user: req.user, team: dbTeam._id, id: dbRun.map((obj)=>obj._id), rule: dbCompetition.rule, token: dbTeam.document.token, movie: q[0].runReview.movie});
                     }
                   });
                 }
