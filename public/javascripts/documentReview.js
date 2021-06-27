@@ -202,6 +202,9 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                     $scope.myComments = fil[0].comments;
                     for(let ri in $scope.review){
                         console.log(ri)
+                        if($scope.myComments[ri] == null){
+                            $scope.myComments[ri] = [];
+                        }
                         if(!$scope.myComments[ri]){
                             $scope.myComments.push([]);
                         }
@@ -211,7 +214,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                             else $scope.myComments[ri].push('');
                         }
                         for(let mc of $scope.myComments[ri]){
-                            if(!mc) mc = '';
+                            if(mc == null) mc = '';
                         }
                     }
                     console.log($scope.myComments)
