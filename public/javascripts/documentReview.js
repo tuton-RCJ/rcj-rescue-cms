@@ -200,6 +200,21 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                     }
                 }else{
                     $scope.myComments = fil[0].comments;
+                    for(let ri in $scope.review){
+                        console.log(ri)
+                        if(!$scope.myComments[ri]){
+                            $scope.myComments.push([]);
+                        }
+                        let count = $scope.review[ri].questions.length - $scope.myComments[ri].length;
+                        for(let i=0; i<count;i++){
+                            if($scope.review[ri].questions[$scope.myComments[ri].length].type == "select") $scope.myComments[ri].push('option0');
+                            else $scope.myComments[ri].push('');
+                        }
+                        for(let mc of $scope.myComments[ri]){
+                            if(!mc) mc = '';
+                        }
+                    }
+                    console.log($scope.myComments)
                 }
             })
             
