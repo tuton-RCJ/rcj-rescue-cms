@@ -94,7 +94,7 @@ function line_calc_score(run) {
         if(run.nl){
             score += 15 * run.nl.silverTape;
             score += 30 * run.nl.greenTape;
-            score -= 5 * run.nl.misidentification;
+            //score -= 5 * run.nl.misidentification; //Removed from 2022
         }
 
         final_score = Math.round(score * multiplier);
