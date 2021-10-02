@@ -8,8 +8,9 @@ env('process.env')
 
 var express = require('express');
 var RateLimit = require('express-rate-limit');
-const { createBullBoard } = require('bull-board')
-const { BullAdapter } = require('bull-board/bullAdapter')
+const { createBullBoard } = require('@bull-board/api')
+const { BullAdapter } = require('@bull-board/api/bullAdapter')
+const { ExpressAdapter } = require('@bull-board/express')
 const compression = require('compression')
 var path = require('path')
 var favicon = require('serve-favicon')
@@ -37,12 +38,18 @@ const limiter = new RateLimit({
     max: 200
 });
 
+const bullAdapter = new ExpressAdapter();
+
 const {mailQueue} = require("./queue/mailQueue")
 const {backupQueue} = require("./queue/backupQueue")
-const bullRouter = createBullBoard([
-    new BullAdapter(mailQueue),
-    new BullAdapter(backupQueue)
-]).router;
+
+const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
+    queues: [
+        new BullAdapter(mailQueue),
+        new BullAdapter(backupQueue)
+    ],
+    serverAdapter:bullAdapter
+})
 
 var app = express();
 async function bootstrap(){
@@ -206,7 +213,8 @@ async function bootstrap(){
     app.use('/maze', [mazeRoute.public, pass.ensureAuthenticated, mazeRoute.private, pass.ensureAdmin, mazeRoute.admin])
     app.use('/signage', [pass.ensureAuthenticated, signageRoute.private, pass.ensureAdmin, signageRoute.admin])
     app.use('/admin', pass.ensureAdmin, adminRoute)
-    app.use('/admin/queues', pass.ensureSuper, bullRouter)
+    bullAdapter.setBasePath('/admin/queues')
+    app.use('/admin/queues', pass.ensureSuper, bullAdapter.getRouter())
     app.use('/admin/mongo', pass.ensureSuper, await mongo_express(mongo_express_config))
     app.use('/document', [documentRoute.public, pass.ensureAuthenticated, documentRoute.private, pass.ensureAdmin, documentRoute.admin])
     app.use('/registration', [registrationRoute.public, pass.ensureAuthenticated, registrationRoute.private, pass.ensureAdmin, registrationRoute.admin])
