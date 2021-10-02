@@ -113,7 +113,11 @@ module.exports.calculateLineScore = function (run) {
     }
 
     if (run.exitBonus) {
-      score += Math.max(60 - 5 * total_lops, 0);
+      if (run.nl) {
+        score += 30; //From 2022(NL)
+      }else{
+        score += Math.max(60 - 5 * total_lops, 0);
+      }
     }
 
     // 5 points for placing robot on first droptile (start)

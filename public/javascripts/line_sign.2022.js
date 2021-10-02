@@ -205,6 +205,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             $scope.comment = response.data.comment;
 
+            $scope.nl = response.data.nl;
+
             // Scoring elements of the tiles
             $scope.stiles = response.data.tiles;
             for (let i = 0; i < response.data.tiles.length; i++) {
@@ -352,7 +354,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     };
 
     $scope.exitBonusPoints = function(){
-        return $scope.exitBonus * Math.max(0,60-5*$scope.sum($scope.LoPs));
+        if($scope.nl){
+            return $scope.exitBonus * 30;
+        }else{
+            return $scope.exitBonus * Math.max(0,60-5*$scope.sum($scope.LoPs));
+        } 
     };
 
 

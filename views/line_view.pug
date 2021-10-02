@@ -180,9 +180,9 @@ html(ng-app="ddApp")
                         i.fas.fa-child.fa-2x &nbsp;{{victimNL_G}}
                     span.badge.badge-success(style='margin-top:10px;')
                       span(style='font-size:25px;') {{30 * victimNL_G}} {{'common.point' | translate}}
-                .col-1
+                //.col-1
                   h1(style="text-align: center;line-height: 165px;") -
-                .col-4
+                //.col-4
                   .victim_btn(style='width:100%;position: relative; background-color: #E1FFFE;')
                     img.img-thumbnail(src='/images/misidentNL.png', style="height:90px;")
                     div(style="margin-top:10px;")
@@ -215,7 +215,7 @@ html(ng-app="ddApp")
               .col-1
               .col-4
                 p {{'line.sign.exitBonus' | translate}}
-            .row
+            .row(ng-if="league!='LineNL'")
               .col-3
                 h1 {{exitBonus?60:0}} {{'common.point' | translate}}
               .col-1
@@ -225,6 +225,9 @@ html(ng-app="ddApp")
               .col-1
                 h1 =
               .col-4
+                h1 {{exitBonusPoints()}} {{'common.point' | translate}}
+            .row(ng-if="league=='LineNL'")
+              .col-12
                 h1 {{exitBonusPoints()}} {{'common.point' | translate}}
       hr
       div(ng-if="league!='LineNL'")
