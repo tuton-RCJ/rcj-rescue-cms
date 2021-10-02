@@ -261,9 +261,7 @@ adminRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
   if (auth.authCompetition(req.user,competitionId,ACCESSLEVELS.ADMIN)){ // Admin check
     const destination = `${__dirname}/../../cabinet/${competitionId}/${folder}`;
     if (!fs.existsSync(destination)) {
-      mkdirp(destination, function (err) {
-        if (err) logger.error(err);
-      });
+      mkdirp.sync(destination);
     }
     const storage = multer.diskStorage({
       destination(req, file, callback) {

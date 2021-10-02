@@ -887,21 +887,15 @@ adminRouter.post('/', function (req, res) {
       const aLevel = ACCESSLEVELS.ADMIN;
 
       let path = `${__dirname}/../../documents/${competitionid}`;
-      mkdirp(path, function (err) {
-        if (err) logger.error(err);
-      });
+      mkdirp.sync(path);
 
       for(let l of LEAGUES){
         path = `${__dirname}/../../cabinet/${competitionid}/${l}`;
-        mkdirp(path, function (err) {
-          if (err) logger.error(err);
-        });
+        mkdirp.sync(path);
       }
 
       path = `${__dirname}/../../backup/${competitionid}`;
-      mkdirp(path, function (err) {
-        if (err) logger.error(err);
-      });
+      mkdirp.sync(path);
 
       userdb.user.findById(userid).exec(function (err, dbUser) {
         if (err) {
