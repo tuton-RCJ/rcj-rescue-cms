@@ -140,10 +140,10 @@ html(ng-app="RunAdmin")
                   img(src='/images/rescuekit-2.png', width='20px', ng-if="victim.type == 'K' && run.kitLevel==2")
               td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="showVictim && run.team.league=='LineNL'")
                 .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
-                  img(src='/images/silverVictim.png', style="height:20px;")
+                  img(src='/images/blackVictim.png', style="height:20px;")
                   span(style="font-size:20px;") {{run.nl.silverTape}}
                 .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
-                  img(src='/images/blackVictim.png', style="height:20px;")
+                  img(src='/images/greenVictim.png', style="height:20px;")
                   span(style="font-size:20px;") {{run.nl.greenTape}}
                 //.img-thumbnail(style="padding:0;display: inline-block;")
                   img(src='/images/misidentNL.png', style="height:20px;")
