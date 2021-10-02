@@ -11,10 +11,10 @@ const { ObjectId } = require('mongoose').Types;
 const multer = require('multer');
 const path = require('path');
 const auth = require('../../helper/authLevels');
-var fs = require('fs-extra');
+let fs = require('fs-extra');
 const gracefulFs = require('graceful-fs');
 
-var fs = gracefulFs.gracefulify(fs);
+fs = gracefulFs.gracefulify(fs);
 const mime = require('mime');
 const { ACCESSLEVELS } = require('../../models/user');
 const glob = require('glob');
