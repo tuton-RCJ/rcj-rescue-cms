@@ -237,13 +237,9 @@ publicRouter.post('/reg/:authId/:token/:lang', function (req, res, next) {
                 });
               } else {
                 let path = `${__dirname}/../../documents/${authInfo.competition._id}/${teamData._id}`;
-                mkdirp(path, function (err) {
-                  if (err) logger.error(err);
-                });
+                mkdirp.sync(path);
                 path = `${__dirname}/../../cabinet/${authInfo.competition._id}/${teamData._id}`;
-                mkdirp(path, function (err) {
-                  if (err) logger.error(err);
-                });
+                mkdirp.sync(path);
 
                 //Send mail
                 if(smtp == null){

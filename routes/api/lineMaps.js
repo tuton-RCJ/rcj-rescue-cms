@@ -277,10 +277,7 @@ adminRouter.post('/image/:map', function (req, res, next) {
   }
   const base64Data = req.body.img.replace(/^data:image\/png;base64,/, '');
   let path = `${__dirname}/../../tmp/course`;
-  mkdirp(path, function (err) {
-    if (err) logger.error(err);
-    else logger.info(path);
-  });
+  mkdirp.sync(path);
   path += `/${id}.png`;
   fs.writeFile(path, base64Data, 'base64', function (err) {
     res.send(path);

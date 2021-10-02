@@ -347,13 +347,9 @@ adminRouter.post('/', function (req, res) {
               id: data._id,
             });
             let path = `${__dirname}/../../documents/${dbComp._id}/${data._id}`;
-            mkdirp(path, function (err) {
-              if (err) logger.error(err);
-            });
+            mkdirp.sync(path);
             path = `${__dirname}/../../cabinet/${dbComp._id}/${data._id}`;
-            mkdirp(path, function (err) {
-              if (err) logger.error(err);
-            });
+            mkdirp.sync(path);
           }
         });
       }
@@ -401,9 +397,7 @@ adminRouter.post('/bulk', function (req, res) {
               }
             } else {
               const path = `${__dirname}/../../documents/${dbComp._id}/${data._id}`;
-              mkdirp(path, function (err) {
-                if (err) logger.error(err);
-              });
+              mkdirp.sync(path);
               count--;
               if (count <= 0) {
                 if (!responseSent) {
