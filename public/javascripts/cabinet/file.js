@@ -91,7 +91,7 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
     $scope.download = function(file){
         let  alink = document.createElement('a');
         alink.download = file.name;
-        alink.href = `/api/cabinet/${competitionId}/file/${teamId}/${token}/${file.folder}/${file.name}`;
+        alink.href = `/api/cabinet/${competitionId}/file/${teamId}/${token}/${encodeURIComponent(file.folder)}/${encodeURIComponent(file.name)}`;
         alink.click();
         return false;
     }
@@ -171,7 +171,7 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
             cancelButtonText: trans['delCancelButton']
             }).then((result) => {
             if (result.value) {
-                $http.delete(`/api/cabinet/${competitionId}/file/${file.folder}/${file.name}`).then(function (response) {
+                $http.delete(`/api/cabinet/${competitionId}/file/${encodeURIComponent(file.folder)}/${encodeURIComponent(file.name)}`).then(function (response) {
                     Swal.fire(
                         trans['delComplete'],
                         `${file.name} ${trans['delCompleteMes']}`,
@@ -187,8 +187,6 @@ app.controller("CabinetFileController", ['$scope', '$http', '$translate', 'Uploa
                     updateFiles();
                 });
             }
-        })
-
-        
+        })  
     }
 }])

@@ -200,7 +200,9 @@ publicRouter.get('/:competitionId/file/:teamId/:token/:folder/:file', function (
   const { teamId } = req.params;
   const { token } = req.params;
   let { folder } = req.params;
-  const { file } = req.params;
+  let { file } = req.params;
+  folder = decodeURIComponent(folder);
+  file = decodeURIComponent(file);
 
   if (!ObjectId.isValid(competitionId)) {
     return next();
@@ -291,8 +293,10 @@ adminRouter.post('/:competitionId/upload/:folder', function (req, res, next) {
 
 adminRouter.delete('/:competitionId/file/:folder/:file', function (req, res, next) {
   const { competitionId } = req.params;
-  const { folder } = req.params;
-  const { file } = req.params;
+  let { folder } = req.params;
+  let { file } = req.params;
+  folder = decodeURIComponent(folder);
+  file = decodeURIComponent(file);
 
   if (!ObjectId.isValid(competitionId)) {
     return next();
