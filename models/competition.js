@@ -29,7 +29,7 @@ if(cluster.isMaster){
 
 
 
-const SUPPORT_RULES = ["2021"];
+const SUPPORT_RULES = ["2022"];
 
 const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, OTHER_LEAGUES);
 

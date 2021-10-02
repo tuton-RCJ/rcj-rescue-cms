@@ -1266,7 +1266,7 @@ if(cluster.isMaster){
     }else{
       let newTileSet = new TileSet({
         '_id': '5c19d2439590f2d68b15b302',
-        'name': 'Default(2021) Rev.2',
+        'name': 'Default(2022)',
         'tiles': defaultTileSet
       });
       newTileSet.save(function (err) {
