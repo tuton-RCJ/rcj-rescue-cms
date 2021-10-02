@@ -6,9 +6,9 @@ This is a scoring system used in RoboCupJunior's rescue line & maze competition.
 * 2022 rules published by Japanese Regional Committee / [Nippon-League](https://drive.google.com/file/d/1bjoNF_jOcQ0M4QSeDRKg0GmDSSl9gxAO/view?usp=sharing)
 
 ## Demo
-The latest version is running. It is built using Docker image.
+The latest version is running. It is built using Docker image and working under OCI arm instance.
 
-[https://rcj.cloud](https://rcj.cloud)
+[https://osaka.rcj.cloud](https://osaka.rcj.cloud)
 
 ## List of competitions using this system
 ### 2016 rule
@@ -53,8 +53,14 @@ The latest version is running. It is built using Docker image.
 
 ## Usage
 ### Using Docker（Recomended）
-Use the  [Official docker image](https://hub.docker.com/r/ryorobo/rcj-rescue-scoring-japan) is strongly recommended.  
-For detail, please check [helper files (International version)](https://github.com/rrrobo/rcj-scoring-docker-International) to make up your environment.
+Use the  [Official docker image](https://hub.docker.com/repository/docker/ryorobo/rcj-cms) is strongly recommended.  
+This docker image supports following archtectures.  
+* linux/amd64
+* linux/arm/v6
+* linux/arm/v7
+* linux/arm64
+
+For detail, please check [helper files](https://github.com/rrrobo/rcj-cms-docker-helper) to set-up your environment.
 
 ### Without using docker
 #### Dependent software

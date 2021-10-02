@@ -1,4 +1,4 @@
-# ロボカップジュニア RoboCupJunior CMS
+# ロボカップジュニア RoboCupJunior CMS 2022
 ### Competition Management System
 #### (former Rescue Scoring System)
 This is a Competition Management System used in RoboCupJunior's rescue line & maze competitions in word wide.
@@ -36,9 +36,9 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 特別な理由がない限り，本リポジトリで提供しているバージョンを使用することをお勧めします．
 
 ## 動作デモ
-最新バージョンが稼働しています．Dockerイメージを利用して構築しています．
+最新バージョンが稼働しています．Dockerイメージを利用して，OCIのarmインスタンス上に構築しています．
 
-[https://rcj.cloud](https://rcj.cloud)
+[https://osaka.rcj.cloud](https://osaka.rcj.cloud)
 
 ## 更新情報
 * [2021/10/02] 2022ルールに暫定対応しました．
@@ -94,8 +94,14 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 
 ## 使用方法
 ### Dockerを利用（推奨）
-[公式Dockerイメージ](https://hub.docker.com/r/ryorobo/rcj-rescue-scoring-japan)を用意しています．本イメージからの利用を推奨します．
-また，環境構築用の[ヘルパーファイル](https://github.com/rrrobo/rcj-scoring-docker)も用意しています．
+[公式Dockerイメージ](https://hub.docker.com/repository/docker/ryorobo/rcj-cms)を用意しています．本イメージからの利用を推奨します．  
+公式Dockerイメージは次のアーキテクチャに対応します．  
+* linux/amd64
+* linux/arm/v6
+* linux/arm/v7
+* linux/arm64
+
+また，環境構築用の[ヘルパーファイル](https://github.com/rrrobo/rcj-cms-docker-helper)も用意しています．
 
 
 ### Dockerを利用しない構築
