@@ -83,6 +83,7 @@ const lineRunSchema = new Schema({
     greenTape: {type: Number, min:0, default:0},
     misidentification: {type: Number, min:0, default:0},
   },
+  isNL: {type: Boolean, default: false},
   manual  : {
     gap: {type: Number, default: 0},
     obstacle: {type: Number, default: 0},
@@ -211,6 +212,11 @@ lineRunSchema.pre('save', function (next) {
 
                       self.LoPs = new Array(results.map.numberOfDropTiles).fill(0)
                       self.tiles = new Array(results.map.indexCount).fill({})
+                      if(results.team.league == "LineNL"){
+                        self.isNL = true;
+                      }else{
+                        self.isNL = false;
+                      }
                       return next()
                     }
                   })

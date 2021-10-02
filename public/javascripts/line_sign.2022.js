@@ -203,9 +203,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.ref_sig = response.data.sign.referee;
             $scope.refas_sig = response.data.sign.referee_as;
 
-            $scope.comment = response.data.comment;
-
-            $scope.nl = response.data.nl;
+            $scope.comment = response.data.comment;            
 
             // Scoring elements of the tiles
             $scope.stiles = response.data.tiles;
@@ -354,7 +352,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     };
 
     $scope.exitBonusPoints = function(){
-        if($scope.nl){
+        if($scope.league == "LineNL"){
             return $scope.exitBonus * 30;
         }else{
             return $scope.exitBonus * Math.max(0,60-5*$scope.sum($scope.LoPs));

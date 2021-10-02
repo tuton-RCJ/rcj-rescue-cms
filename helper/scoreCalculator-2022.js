@@ -113,7 +113,7 @@ module.exports.calculateLineScore = function (run) {
     }
 
     if (run.exitBonus) {
-      if (run.nl) {
+      if (run.isNL) {
         score += 30; //From 2022(NL)
       }else{
         score += Math.max(60 - 5 * total_lops, 0);

@@ -182,7 +182,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         silverTape: $scope.victimNL_S,
         greenTape:  $scope.victimNL_G,
         misidentification: $scope.misidentNL_C
-      }
+      },
+      isNL: $scope.isNL
     };
     console.log(tmp);
     let calculated = line_calc_score(tmp);
@@ -302,7 +303,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       $scope.time = ($scope.minutes * 60 + $scope.seconds) * 1000;
       $scope.status = response.data.status;
 
-      if($scope.league == "LineNL") $scope.startedScoring = true;
+      $scope.isNL = response.data.isNL;
+      if($scope.isNL) $scope.startedScoring = true;
 
 
       prevTime = $scope.time;
