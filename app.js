@@ -227,7 +227,7 @@ async function bootstrap(){
     //Simple logout (noting more neeeded)
     app.get('/logout', function (req, res) {
         req.logout()
-        res.redirect('/')
+        res.redirect('/home')
     })
 
     /*
