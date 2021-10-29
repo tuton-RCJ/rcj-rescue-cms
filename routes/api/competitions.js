@@ -604,15 +604,6 @@ publicRouter.get('/:competition/line/runs', function (req, res, next) {
   return lineRunsApi.getLineRuns(req, res, next);
 });
 
-publicRouter.get('/:competition/line/latestrun', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  return lineRunsApi.getLatestLineRun(req, res, next);
-});
-
 publicRouter.get('/:competition/maze/runs', function (req, res, next) {
   const id = req.params.competition;
 
@@ -620,15 +611,6 @@ publicRouter.get('/:competition/maze/runs', function (req, res, next) {
     return next();
   }
   return mazeRunsApi.getMazeRuns(req, res, next);
-});
-
-publicRouter.get('/:competition/maze/latestrun', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  return mazeRunsApi.getLatestMazeRun(req, res, next);
 });
 
 privateRouter.get('/:competition/:league/maps', function (req, res, next) {

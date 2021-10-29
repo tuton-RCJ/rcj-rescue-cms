@@ -137,68 +137,6 @@ function getLineRuns(req, res) {
 
 module.exports.getLineRuns = getLineRuns;
 
-publicRouter.get('/latest', getLatestLineRun);
-
-function getLatestLineRun(req, res) {
-  const competition = req.query.competition || req.params.competition;
-  const field = req.query.field || req.params.field;
-  const { fields } = req.query;
-
-  const selection = {
-    competition,
-    field,
-  };
-  if (selection.competition == undefined) {
-    delete selection.competition;
-  }
-  if (selection.field == undefined) {
-    delete selection.field;
-  }
-
-  if (fields != null) {
-    selection.field = {
-      $in: fields,
-    };
-  }
-
-  const query = lineRun.findOne(selection).sort('-updatedAt');
-
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      'round',
-      { path: 'team', select: 'name league teamCode' },
-      'field',
-      'competition',
-      {
-        path: 'tiles',
-        populate: {
-          path: 'tileType',
-        },
-      },
-    ]);
-  }
-
-  query.lean().exec(function (err, dbRun) {
-    if (err) {
-      logger.error(err);
-      res.status(400).send({
-        msg: 'Could not get run',
-      });
-    } else if (dbRun) {
-      // Hide map and field from public
-      if (!auth.authViewRun(req.user, dbRun, ACCESSLEVELS.NONE + 1)) {
-        delete dbRun.map;
-        delete dbRun.field;
-        delete dbRun.comment;
-        delete dbRun.sign;
-      }
-      res.status(200).send(dbRun);
-    }
-  });
-}
-
-module.exports.getLatestLineRun = getLatestLineRun;
-
 privateRouter.get(
   '/find/team_status/:competitionid/:teamid/:status',
   function (req, res, next) {
