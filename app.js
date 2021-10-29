@@ -151,7 +151,7 @@ async function bootstrap(){
     // init passport and session
     app.use(session({
         store: MongoStore.create({ mongoUrl: process.env.DB_CONNECT_STR }),
-        secret: 'rcjscoring',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
