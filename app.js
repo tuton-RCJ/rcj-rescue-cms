@@ -150,7 +150,7 @@ async function bootstrap(){
     */
     // init passport and session
     app.use(session({
-        store: MongoStore.create({ mongoUrl: process.env.DB_CONNECT_STR }),
+        store: MongoStore.create({ mongoUrl: process.env.DB_CONNECT_STR, mongoOptions:{useUnifiedTopology: true}}),
         secret: process.env.SESSION_SECRET || 'rcjscoring',
         resave: false,
         saveUninitialized: false,
