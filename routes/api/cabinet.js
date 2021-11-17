@@ -75,6 +75,7 @@ function returnFiles(res, competition, folder){
       if (!dirent.isDirectory()) {
         d.push({
           name: escape(dirent.name),
+          encoded: encodeURIComponent(dirent.name),
           type: mime.getType(dirent.name)
         });
       }
