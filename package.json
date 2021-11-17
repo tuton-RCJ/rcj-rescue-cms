@@ -52,7 +52,7 @@
     "sessionstore": "^1.3.7",
     "socket.io": "4.2.0",
     "socket.io-redis": "6.1.1",
-    "validator": "13.6.0"
+    "validator": "13.7.0"
   },
   "main": "app.js",
   "devDependencies": {
