@@ -64,7 +64,7 @@ block content
             button(class='btn btn-outline-dark btn-lg btn-block' style="height:100%;border-radius: 4px 4px 0 0;" ng-click="download(file)")
               i.fas.fa-2x(ng-class="fileIcon(file.type)")
               br
-              span(style="overflow-wrap: break-word;" ng-bind-html="file.name")
+              span(style="overflow-wrap: break-word;") {{file.name}}
             button(class='btn btn-danger btn-sm btn-block', style="margin-top:0px;border-radius: 0 0 4px 4px;", ng-click="delete(file)")
               i.fas.fa-trash &nbsp;
               span {{'cabinet.delete' | translate}}
@@ -86,7 +86,7 @@ block content
             button(class='btn btn-outline-dark btn-lg btn-block' style="height:100%;" ng-click="download(file)")
               i.fas.fa-2x(ng-class="fileIcon(file.type)")
               br
-              span(ng-bind-html="file.name")
+              span {{file.name}}
   br
   br
   br
