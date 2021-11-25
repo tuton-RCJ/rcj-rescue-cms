@@ -141,7 +141,7 @@ async function drawRun(doc, config, scoringRun) {
   }
 
   // System version
-  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.npm_package_version}`, 6, 'black');
+  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.cms_version}`, 6, 'black');
 
   let x = 440;
   let y = 35;

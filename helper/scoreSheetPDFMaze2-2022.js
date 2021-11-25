@@ -174,7 +174,7 @@ function drawRun(doc, config, scoringRun) {
     );
 
   // System version
-  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.npm_package_version}`, 6, 'black');
+  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.cms_version}`, 6, 'black');
 
   const cells = [];
   for (const cell of scoringRun.map.cells) {

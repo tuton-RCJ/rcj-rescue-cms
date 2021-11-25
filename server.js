@@ -9,7 +9,14 @@ const fs = require("fs");
 const http = require('http');
 
 env('process.env');
- 
+//Load package json
+const packageJson = require('./package.json');
+process.env.cms_version = packageJson.version;
+process.env.cms_copyright = packageJson.copyright;
+logger.info(`#######################################`);
+logger.info(` Welcome to RoboCupJunior CMS v${process.env.cms_version}`);
+logger.info(`#######################################`);
+
  function isExistFile(file) {
    try {
      fs.statSync(file);
