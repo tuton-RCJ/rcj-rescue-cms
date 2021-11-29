@@ -651,7 +651,7 @@
             "status": "Status",
             "st0": "0.Before run",
             "st1": "1.Defined checkpoints",
-            "st2": "2.Timer start",
+            "st2": "2.During a run",
             "st3": "3.Record checking",
             "st4": "4.Finished",
             "st5": "5.Approval work in progress",

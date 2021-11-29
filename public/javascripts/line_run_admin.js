@@ -310,6 +310,10 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
         $scope.statusColor = function(status){
           switch(status){
+            case 2:
+                return "#81ecec";
+            case 3:
+              return "#fdcb6e";
             case 4:
               return "#ffadad";
             case 5:

@@ -164,7 +164,7 @@ block content
             td(ng-style="{'background-color':statusColor(run.status)}")
               button.btn.btn-light(uib-popover="{{run.comment}}" popover-trigger="'outsideClick'" type="button" ng-disabled="run.comment==''") {{"common.comment" | translate}}
             
-            td(ng-style="{'background-color':run.status==5?'#bdafdb':''}")
+            td(ng-style="{'background-color':statusColor(run.status)}")
               //a(href="" ng-click='removeRun(run._id)') {{"common.delete" | translate}}
               .dropdown
                   button#dropdownMenu.btn.btn-secondary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') {{"common.action" | translate}}
