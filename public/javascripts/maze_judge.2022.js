@@ -193,11 +193,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             $scope.loadMap(response.data.map);
 
-            if (document.referrer.indexOf('sign') != -1 || document.referrer.indexOf('approval') != -1) {
+            if (document.referrer.indexOf('sign') != -1) {
                 $scope.checked = true;
-                if(document.referrer.indexOf('approval') != -1){
-                $scope.fromApproval = true;
-                }
                 $timeout($scope.tile_size, 10);
                 $timeout($scope.tile_size, 200);
             }else{
@@ -746,30 +743,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             console.log("Error: " + response.statusText);
         });
     };
-
-      $scope.backApproval = function () {
-        playSound(sClick);
-        var run = {}
-        run.exitBonus = $scope.exitBonus;
-        run.LoPs = $scope.LoPs;
-        run.misidentification = $scope.MisIdent;
-
-        // Scoring elements of the tiles
-        run.tiles = $scope.tiles;
-
-        // Verified time by timekeeper
-        run.time = {};
-        run.time.minutes = $scope.minutes;;
-        run.time.seconds = $scope.seconds;
-        run.status = 5;
-
-        $http.put("/api/runs/maze/" + runId, run).then(function (response) {
-          $scope.score = response.data.score;
-          $scope.go('/maze/approval/' + runId + '?return=' + $scope.getParam('return'));
-        }, function (response) {
-          console.log("Error: " + response.statusText);
-        });
-      };
 
     $scope.getParam = function (key) {
         var str = location.search.split("?");

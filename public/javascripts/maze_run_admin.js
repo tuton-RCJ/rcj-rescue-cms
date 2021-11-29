@@ -307,38 +307,6 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             })
         }
 
-        $scope.go_approval = function (runid) {
-          if(runid){
-            swal({
-              title: "Go approval page?",
-              text: "Are you sure you want to go approval page?",
-              type: "warning",
-              showCancelButton: true,
-              confirmButtonText: "GO!",
-              confirmButtonColor: "#ec6c62"
-            }).then((result) => {
-              if (result.value) {
-                $scope.go('/maze/approval/' + runid + '/');
-              }
-            })
-          }else{
-            $http.get("/api/runs/maze/nextApproval/" + $scope.competitionId).then(function (response) {
-              console.log(response);
-              $scope.go("/maze/approval/"+response.data);
-            }, function () {
-              swal({
-                text: "There are no runs that requires approval anymore.",
-                type: 'info',
-                showCancelButton: false,
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-              }).then(() => {
-              })
-            });
-          }
-
-        }
-
         $scope.statusColor = function(status){
           switch(status){
             case 4:

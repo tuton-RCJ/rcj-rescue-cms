@@ -232,13 +232,10 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
   // Map (images etc.) for the tiles
   $scope.mtiles = [];
 
-  if (document.referrer.indexOf('sign') != -1 || document.referrer.indexOf('approval') != -1) {
+  if (document.referrer.indexOf('sign') != -1) {
     $scope.checked = true;
     $scope.startedScoring = true;
     $scope.fromSign = true;
-    if (document.referrer.indexOf('approval') != -1) {
-      $scope.fromApproval = true;
-    }
     $timeout($scope.tile_size, 10);
     $timeout($scope.tile_size, 200);
   } else {
@@ -1350,44 +1347,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       });
     }
   }
-
-  $scope.backApproval = function () {
-    if ((!$scope.showedUp || $scope.showedUp == null) && $scope.score > 0) {
-      playSound(sError);
-      swal("Oops!", txt_implicit, "error");
-    } else {
-      playSound(sClick);
-      var run = {};
-      run.LoPs = $scope.LoPs;
-      run.evacuationLevel = $scope.evacuationLevel;
-      run.kitLevel = $scope.kitLevel;
-      run.exitBonus = $scope.exitBonus;
-      run.rescueOrder = $scope.victim_list;
-      run.showedUp = $scope.showedUp;
-      run.started = $scope.started;
-      run.tiles = $scope.stiles;
-      run.time = {
-        minutes: $scope.minutes,
-        seconds: $scope.seconds
-      };
-      run.status = 5;
-
-
-      $scope.sync++;
-      $http.put("/api/runs/line/" + runId, run, http_config).then(function (response) {
-        if(response.statusCode == 202){
-          setTimeout($scope.backApproval, 100);
-          return;
-        }
-        $scope.score = response.data.score;
-        $scope.sync--;
-        $scope.go('/line/approval/' + runId + '?return=' + $scope.getParam('return'));
-      }, function (response) {
-        console.log("Error: " + response.statusText);
-        $scope.networkError = true;
-      });
-    }
-  };
 
   $scope.getParam = function (key) {
     var str = location.search.split("?");

@@ -151,52 +151,6 @@ function getMazeRuns(req, res) {
 }
 module.exports.getMazeRuns = getMazeRuns;
 
-adminRouter.get('/nextApproval/:competitionid', function (req, res, next) {
-  const id = req.params.competitionid;
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  const query = mazeRun.findOne({
-    competition: id,
-    status: 4,
-  });
-  query.exec(function (err, data) {
-    if (err) {
-      logger.error(err);
-      return res.status(400).send({
-        msg: 'Could not get runs',
-      });
-    }
-    if (data) {
-      data.status = 5;
-      data.save(function (err) {
-        if (err) {
-          logger.error(err);
-          return res.status(400).send({
-            err: err.message,
-            msg: 'Could not save run',
-          });
-        }
-        if (socketIo !== undefined) {
-          socketIo.sockets.in('runs/maze').emit('changed');
-          socketIo.sockets
-            .in(`competition/${data.competition}`)
-            .emit('changed');
-          socketIo.sockets.in(`runs/${data._id}`).emit('data', data);
-          socketIo.sockets.in(`fields/${data.field}`).emit('data', {
-            newRun: data._id,
-          });
-        }
-        return res.status(200).send(data._id);
-      });
-    } else {
-      return res.status(400).send({
-        msg: 'Could not get runs',
-      });
-    }
-  });
-});
-
 privateRouter.get(
   '/find/team_status/:competitionid/:teamid/:status',
   function (req, res, next) {

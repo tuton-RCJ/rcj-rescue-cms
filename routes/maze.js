@@ -156,19 +156,6 @@ privateRouter.get('/sign/:runid', async function (req, res) {
   });
 });
 
-adminRouter.get('/approval/:roundid', async function (req, res) {
-  const id = req.params.roundid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_approval', {
-    id,
-    rule,
-  });
-});
-
 publicRouter.all('*', function (req, res, next) {
   next();
 });

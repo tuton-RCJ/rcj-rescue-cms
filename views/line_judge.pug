@@ -360,10 +360,8 @@ html(ng-app="ddApp")
                       span.input-group-text {{'common.sec' | translate}}
                 .col-sm-5
                   div(style='text-align:right;')
-                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime', ng-hide='networkError || fromApproval')
+                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime', ng-hide='networkError')
                       i.fas.fa-arrow-right.fa-2x(aria-hidden='true')  {{'line.judge.toSign'| translate}}
-                    button.btn.btn-danger(type='button', ng-click='backApproval()', ng-disabled='startedTime', ng-show='fromApproval && !networkError')
-                      i.fas.fa-arrow-right.fa-2x(aria-hidden='true')  Go back to Approval
                     button.btn.btn-danger(type='button', ng-click='handover()', ng-disabled='startedTime', ng-show='networkError') {{'line.judge.handover' | translate}}
       .row(style='margin:20 0 0 0;')
         .col-md12
