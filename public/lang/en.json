@@ -658,7 +658,9 @@
             "st6": "6.Approved",
             "selectAll": "Select all runs",
             "delS": "Delete selected runs",
-            "statusReset": "Reset Status"
+            "statusReset": "Reset Status",
+            "printRuns": "Print all runs",
+            "printRanking": "Print ranking"
         },
         "lineRunBulk": {
             "title": "Line Run Bulk Registration",

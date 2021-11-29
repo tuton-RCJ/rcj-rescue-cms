@@ -53,7 +53,12 @@ html(ng-app="MazeScore")
         .refine.no_print
           .card.border-dark.mb-3(style='width:100%;')
             .card-header.bg-transparent.border-dark.fa-2x
-              i.fas.fa-cog(aria-hidden='true') Config
+              .row 
+                .col-md-6
+                  i.fas.fa-cog(aria-hidden='true') Config
+                .col-md-6(style="text-align:right;")
+                  button(onclick="window.print();" class='btn btn-info')
+                    i.fas.fa-print &nbsp;{{"common.print" | translate}}
             .card-body.text-dark
               h6.card-title Display items
                 br
@@ -77,12 +82,12 @@ html(ng-app="MazeScore")
             .col-md-12
               .row#rank
                 .col-md-12
-                  .row
+                  .row(style="margin-bottom:10px;")
                     .col-10
                       h3
                         i.fas.fa-award &nbsp;[Ranking] {{league.name}} - {{comment.top}}
                     .col-2(style="text-align:right;")
-                      img(ng-src="{{competition.logo}}" style="width:100%;max-height:40px;")
+                      img(ng-src="{{competition.logo}}" style="max-height:40px;")
                   table.custom(style="overflow: scroll;")
                     thead
                       tr
@@ -104,4 +109,5 @@ html(ng-app="MazeScore")
                         td.text-center(ng-bind='run.exit')
                         td.text-center(ng-bind='run.found')
                         td.text-center(ng-bind='run.lops')
-          h5(style="text-align:center;") [NOTE] {{comment.bottom}}
+        h6(style="text-align:center;margin-top:10px;", ng-if="comment.bottom")
+          i.fas.fa-info-circle &nbsp;{{comment.bottom}}

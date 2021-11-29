@@ -65,6 +65,10 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             }
         })
 
+        $http.get("/api/teams/leagues/maze/" + competitionId).then(function (response) {
+            $scope.leagues = response.data
+        })
+
         $scope.addRun = function () {
             if ($scope.run === undefined ||
                 $scope.run.round === undefined ||

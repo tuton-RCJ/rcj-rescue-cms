@@ -656,7 +656,9 @@
             "st6": "6.承認済み",
             "selectAll": "全選択",
             "delS": "選択した競技を削除",
-            "statusReset": "ステータス リセット"
+            "statusReset": "ステータス リセット",
+            "printRuns": "競技結果を印刷",
+            "printRanking": "ランキングを印刷"
         },
         "lineRunBulk": {
             "title": "Line 競技一括登録",

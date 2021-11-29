@@ -119,7 +119,9 @@ block content
         button(ng-click="removeSelectedRun()" class='btn btn-danger' style="margin: 5px 5px 5px 5px;") {{"admin.lineRun.delS" | translate}}
         button(ng-click="go('/signage/display/'+ competitionId +'/run')" class='btn btn-success' style="margin: 5px 5px 5px 5px; text-align:right;") {{"admin.lineRun.monitor" | translate}}
         button(ng-click="go('/admin/' + competitionId +'/line/runs/print')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
-          i.fas.fa-print &nbsp;{{"common.printPage" | translate}}
+          i.fas.fa-print &nbsp;{{"admin.lineRun.printRuns" | translate}}
+        button(ng-click="go('/admin/' + competition._id + '/line/runs/print/ranking/' + league.id)" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;" ng-repeat="league in leagues")
+          i.fas.fa-print(aria-hidden='true') &nbsp;[{{league.name}}]&nbsp;{{'admin.lineRun.printRanking' | translate}}
       center
         .loader
           img(src="/images/loader2.gif")

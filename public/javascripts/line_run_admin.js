@@ -65,6 +65,10 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             $scope.maps = response.data
         })
 
+        $http.get("/api/teams/leagues/line/" + competitionId).then(function (response) {
+            $scope.leagues = response.data
+        })
+
         $scope.addRun = function () {
             if ($scope.run === undefined ||
                 $scope.run.round === undefined ||
