@@ -199,9 +199,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.minutes = response.data.time.minutes;
             $scope.seconds = response.data.time.seconds;
 
-            $scope.cap_sig = response.data.sign.captain;
-            $scope.ref_sig = response.data.sign.referee;
-            $scope.refas_sig = response.data.sign.referee_as;
+            if(response.data.sign){
+                $scope.cap_sig = response.data.sign.captain;
+                $scope.ref_sig = response.data.sign.referee;
+                $scope.refas_sig = response.data.sign.referee_as;
+            }
+            
 
             $scope.comment = response.data.comment;            
 
