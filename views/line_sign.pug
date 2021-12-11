@@ -121,7 +121,7 @@ html(ng-app="ddApp")
       div(ng-if="league=='LineNL'")
         h2 {{'line.sign.rescue' | translate}} (NL)
         .row(style="display: flex;flex-wrap: wrap;")
-          .col-lg-8
+          .col-lg-6
             .alert.alert-info(style='margin-bottom:50px;text-align:center;', role='alert')
               .row
                 .col-5
@@ -144,18 +144,21 @@ html(ng-app="ddApp")
                       span(style='font-size:25px;') {{30 * victimNL_G}} {{'common.point' | translate}}
                 //.col-1
                   h1(style="text-align: center;line-height: 165px;") -
-                //.col-4
-                  .victim_btn(style='width:100%;position: relative; background-color: #E1FFFE;')
-                    img.img-thumbnail(src='/images/misidentNL.png', style="height:90px;")
-                    div(style="margin-top:10px;")
-                      span(style='font-size:1vw;color:#444;') 5 {{'common.point' | translate}} x 
-                        i.fas.fa-history.fa-2x &nbsp;{{misidentNL_C}}
-                    span.badge.badge-warning(style='margin-top:10px;')
-                      span(style='font-size:25px;') {{5 * misidentNL_C}} {{'common.point' | translate}}
-          .col-lg-4
-            .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')
-              h2 {{'line.sign.rescue' | translate}} {{'common.stotal' | translate}}
-              h1 {{nlPoints()}} {{'common.point' | translate}}
+                
+          .col-lg-6        
+                .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')
+                  .row 
+                    .col-6
+                      h2 {{'line.sign.rescue' | translate}} {{'common.stotal' | translate}}
+                      h1 {{nlPoints()}} {{'common.point' | translate}}
+                    .col-6 
+                      .victim_btn(style='width:100%;position: relative; background-color: #E1FFFE;')
+                        img.img-thumbnail(src='/images/misidentNL.png', style="height:90px;")
+                        div(style="margin-top:10px;")
+                          span(style='font-size:1vw;color:#444;')
+                            i.fas.fa-history.fa-2x &nbsp;{{misidentNL_C}}
+                        //span.badge.badge-warning(style='margin-top:10px;')
+                          span(style='font-size:25px;') {{5 * misidentNL_C}} {{'common.point' | translate}}
         hr
       h2 {{'line.sign.exitBonus' | translate}}
       .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')

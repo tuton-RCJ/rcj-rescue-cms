@@ -335,7 +335,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     };
 
     $scope.nlPoints = function(){
-        return 15 * $scope.victimNL_S + 30 * $scope.victimNL_G - 5 * $scope.misidentNL_C;
+        return 15 * $scope.victimNL_S + 30 * $scope.victimNL_G;
     }
 
 
