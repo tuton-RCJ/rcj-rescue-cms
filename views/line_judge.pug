@@ -200,7 +200,7 @@ html(ng-app="ddApp")
                           .input-group-append
                             button.btn.btn-success(type='button', ng-click='increment($index,$last)')
                               i.fas.fa-plus(aria-hidden='true')
-                      hr(ng-show="!$last")
+                    hr(ng-show='!$last')
                     div(ng-if="$index == EvacuationAreaLoPIndex && league != 'LineNL'", style="border: solid 3px #e74c3c;border-radius:calc(0.5rem - 1px);")
                       h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;margin-left:-1px;")  {{'line.judge.rescue' | translate}}
                         span.badge.badge-danger {{evacuationLevel-1?'line.judge.high':'line.judge.low' | translate}}
@@ -296,7 +296,7 @@ html(ng-app="ddApp")
                             .input-group-append
                               button.btn.btn-success(type='button', ng-click='misidentNL(1)')
                                 i.fas.fa-plus(aria-hidden='true')
-                    hr(ng-show='!$last')
+                  
                 h3.card-header
                   i.fas.fa-door-open(aria-hidden='true')
                   |  {{'line.judge.exit' | translate}}　
