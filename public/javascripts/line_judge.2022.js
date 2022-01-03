@@ -847,11 +847,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       $scope.seconds = Math.floor(($scope.time % 60000) / 1000)
     }
 
-    upload_run({
-      exitBonus: $scope.exitBonus
-    });
-
-
+    $scope.saveEverything();
   };
   $scope.changeLevel = function (n) {
     playSound(sClick);

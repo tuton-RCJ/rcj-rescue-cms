@@ -451,9 +451,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.changeExitBonus = function () {
         playSound(sClick);
         $scope.exitBonus = ! $scope.exitBonus
-        upload_run({
-          exitBonus: $scope.exitBonus
-        });
+        if ($scope.exitBonus && $scope.startedTime) {
+            $scope.startedTime = false;
+            date = new Date();
+            $scope.time = prevTime + (date.getTime() - $scope.startUnixTime);
+            prevTime = $scope.time;
+            $scope.minutes = Math.floor($scope.time / 60000);
+            $scope.seconds = Math.floor(($scope.time % 60000) / 1000)
+        }
+        $scope.saveEverything();
     }
 
     $scope.isUndefined = function (thing) {
