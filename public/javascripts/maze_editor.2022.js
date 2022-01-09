@@ -307,7 +307,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             }, function (response) {
                 console.log(response);
                 console.log("Error: " + response.statusText);
-                alert(response.data.msg);
+                alert(response.data.msg + ": " + response.data.err);
             });
         } else {
             $http.post("/api/maps/maze", map).then(function (response) {
@@ -315,7 +315,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             }, function (response) {
                 console.log(response);
                 console.log("Error: " + response.statusText);
-                alert(response.data.msg);
+                alert(response.data.msg + ": " + response.data.err);
             });
         }
 
