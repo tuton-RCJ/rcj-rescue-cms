@@ -213,13 +213,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.randomDice = function(){
         playSound(sClick);
-        var a = Math.floor( Math.random() * 6 ) ;
-        $scope.changeMap(a);
+        var a = Math.floor( Math.random() * 6 ) + 5;
+        $scope.diceSelect = 0;
+        //Animation
+        setTimeout(diceAnimation, 100, a)
+    }
+
+    function diceAnimation(num){
+        $scope.diceSelect += 1;
+        if($scope.diceSelect > 5) $scope.diceSelect -= 6;
+        $scope.$apply();
+        if(num > 0){
+            setTimeout(diceAnimation,100,num-1);
+        }else{
+            //Set selected map
+            $scope.changeMap($scope.diceSelect);
+        }
     }
 
     $scope.changeMap = function(n){
-        playSound(sClick);
-        $scope.diceSelect = n;
         $scope.sync++;
         $http.put("/api/runs/maze/map/" + runId, {
             map: $scope.dice[n]
