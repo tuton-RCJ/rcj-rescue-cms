@@ -34,8 +34,8 @@ var MongoStore = require('connect-mongo')
 var bodyParser = require('body-parser');
 
 const limiter = new RateLimit({
-    windowMs: 1*60*1000, // 1 minute
-    max: 200
+    windowMs: process.env.LIMITER_WINDOW_MS || 1000, // 1 sec
+    max: process.env.LIMITER_MAX || 200
 });
 
 const bullAdapter = new ExpressAdapter();
@@ -52,6 +52,7 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
 })
 
 var app = express();
+app.set('trust proxy', true);
 async function bootstrap(){
     //========================================================================
     //                          Routes require
