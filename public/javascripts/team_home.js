@@ -20,7 +20,6 @@ app.controller('TeamHomeController', ['$scope', '$uibModal', '$log', '$http', '$
     $scope.Rleagues = {};
     $http.get("/api/teams/leagues").then(function (response) {
         $scope.leagues = response.data;
-        
         for(let l of $scope.leagues){
             $scope.Rleagues[l] = false;
         }
@@ -101,4 +100,26 @@ app.controller('TeamHomeController', ['$scope', '$uibModal', '$log', '$http', '$
         }
         
     }
+
+    const lColor = [
+        '#81ecec',
+        '#74b9ff',
+        '#a29bfe',
+        '#ffeaa7',
+        '#fab1a0',
+        '#fd79a8',
+        '#b2bec3'
+    ]
+    $scope.leagueColor = function(league){
+        let lIndex = $scope.leagues.indexOf(league) % lColor.length;
+        return lColor[lIndex];
+    }
+
+    $scope.isSmartPhone = function() {
+        if (window.matchMedia && window.matchMedia('(max-device-width: 640px)').matches) {
+          return true;
+        } else {
+          return false;
+        }
+      }
 }]);

@@ -55,14 +55,14 @@ block content
               label.checkbox(for="checkL_{{key}}") {{key}}
             
       
-      table.custom(style="margin-bottom:20px;")
+      table.custom(style="margin-bottom:20px;" ng-if="!isSmartPhone()")
         thead
             tr
               th {{"common.teamCode" | translate}}
               th {{"common.team" | translate}}
               th {{"common.region" | translate}}
               th {{"common.league" | translate}}
-              th {{"common.checkin" | translate}}
+              //th {{"common.checkin" | translate}}
               th {{"common.inspected" | translate}}
               th {{'common.operation' | translate}}
         tbody
@@ -71,7 +71,7 @@ block content
               td(ng-bind='team.name')
               td(ng-bind='team.country')
               td(ng-bind='team.league')
-              td
+              //td
                 i(class="fa fa-2x fa-check" aria-hidden="true" style="color:#2ecc71;" ng-if="team.checkin")
                 i(class="fa fa-2x fa-times" aria-hidden="true" style="color:#e74c3c;" ng-if="!team.checkin")
               td
@@ -93,3 +93,33 @@ block content
                   button.btn.btn-sm.btn-success(type='button', ng-click="go('/document/reviewed/' + team._id + '?return=/home/' + team.competition + '/teams')", style="margin-right:5px;")
                     i.fas.fa-file-alt &nbsp;
                     | {{"team_home.result" | translate}} 
+
+      .card(style='width: 100%;margin-bottom:10px;' ng-repeat='team in teams | filter:list_filter | orderBy:"[teamCode, name]"'  ng-if="isSmartPhone()")
+        .card-body
+          h5.card-title {{team.teamCode}} {{team.name}}
+          h6.card-subtitle.mb-2.text-muted
+            span.badge(style="margin:0 5px 0 5px;color:#444;" ng-style="{backgroundColor: leagueColor(team.league)}") {{team.league}}
+            span.badge.badge-success(ng-if="team.inspected" style="margin:0 5px 0 5px;") {{"common.inspected" | translate}}&nbsp;
+              i(class="fa fa-check" aria-hidden="true" style="color:#fff;")
+            span.badge.badge-danger(ng-if="!team.inspected" style="margin:0 5px 0 5px;") {{"common.inspected" | translate}}&nbsp;
+              i(class="fa fa-times" aria-hidden="true" style="color:#fff;")
+            span(ng-show="team.country")
+              i.fas.fa-globe-asia &nbsp;
+              span {{team.country}}
+
+            
+          if judge
+            button.btn.btn-sm.btn-outline-warning(type='button', ng-click="go('/document/inspection/' + team._id)", style="margin:0 5px 5px 0;")
+              i.fas.fa-ruler-combined &nbsp;
+              | {{"common.inspection" | translate}}
+          button.btn.btn-sm.btn-outline-info(type='button', ng-click="go('/document/public/' + team._id)", style="margin:0 5px 5px 0;", ng-if="team.document.public")
+            i.fas.fa-file-alt &nbsp;
+            | {{"team_home.document" | translate}} 
+          if judge
+            button.btn.btn-sm.btn-outline-primary(type='button', ng-click="go('/document/review/' + team._id + '?return=/home/' + team.competition + '/teams')", style="margin:0 5px 5px 0;")
+              i.fas.fa-file-alt &nbsp;
+              | {{"team_home.review" | translate}} 
+          if view
+            button.btn.btn-sm.btn-outline-success(type='button', ng-click="go('/document/reviewed/' + team._id + '?return=/home/' + team.competition + '/teams')", style="margin:0 5px 5px 0;")
+              i.fas.fa-file-alt &nbsp;
+              | {{"team_home.result" | translate}} 
