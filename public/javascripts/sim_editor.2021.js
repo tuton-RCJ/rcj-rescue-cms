@@ -167,24 +167,24 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         //console.log(cell)
 
         //Upper
-        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
+        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) || (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
             reachable(x,y-2,z)
         }
 
         //console.log(((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))
         //console.log(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3]))))
         //Bottom
-        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
+        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) || (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
             reachable(x,y+2,z)
         }
 
         //Right
-        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
+        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) || (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
             reachable(x+2,y,z)
         }
 
         //Left
-        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
+        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) || (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
             reachable(x-2,y,z)
         }
     }
