@@ -1330,13 +1330,20 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         //Rotations of humans for each wall
         let humanRotation = [3.14, 1.57, 0, -1.57]
+        let humanRotationCurve = [2.355, 0.785, -0.785, -2.355];
         let halfWallVicPos = [[-0.075, -0.136], [-0.014, -0.075], [-0.075, -0.014], [-0.136, -0.075], 
                             [0.075, -0.136], [0.136, -0.075], [0.075, -0.014], [0.014, -0.074], 
                             [-0.075, 0.014], [-0.014, 0.075], [-0.075, 0.136], [-0.136, 0.075],
                             [0.075, 0.014], [0.136, 0.075], [0.075, 0.136], [0.014, 0.075]];
+        //***let curveWallVicPos = [[-0.042, -0.042], [0.042, -0.042], [0.042, 0.042], [-0.042, 0.042]];
+        let curveWallVicPos = [[-0.022, -0.039], [-0.022, -0.022], [-0.039, -0.023], [-0.038, -0.038],
+                            [0.038, -0.039], [0.038, -0.022], [0.021, -0.023], [0.022, -0.038],
+                            [-0.022, 0.021], [-0.022, 0.038], [-0.039, 0.037], [-0.038, 0.022],
+                            [0.038, 0.021], [0.038, 0.038], [0.021, 0.037], [0.022, 0.022]];
         //Offsets for visual and thermal humans
         let humanOffset = [[0, -0.1375 * tileScale[2]], [0.1375 * tileScale[0], 0], [0, 0.1375 * tileScale[2]], [-0.1375 * tileScale[0], 0]]
         let humanOffsetThermal = [[0, -0.136 * tileScale[2]], [0.136 * tileScale[0], 0], [0, 0.136 * tileScale[2]], [-0.136 * tileScale[0], 0]]
+        let humanOffsetCurve = [[-0.008, 0.008], [-0.008, -0.008], [0.008, -0.008], [0.008, 0.008]];
         //Names of types of visual human
         let humanTypesVisual = ["harmed", "unharmed", "stable"]
         //Names of types of hazards
@@ -1561,23 +1568,60 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         humanId = humanId + 1
                     }
                 }
-                //Half Wall Humans
                 if(walls[z][x][13]){
                     for (var i in $scope.range(16)) {
-                        if (walls[z][x][13][i] != '') {
+                        if (walls[z][x][13][i]) {
                             let humanType = Number(walls[z][x][13][i]);
                             let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
                             let score = 30
                             let j = 0
                             if(walls[z][x][8]) score = 10
-                            if (humanType >= 0 && humanType <= 3) {
-                                score = score / 2;
-                                allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
-                                humanId = humanId + 1
+                            //Curved Wall Humans
+                            // ****===============================================linear vs floating curved walls
+                            let curveWallArr = JSON.parse(walls[z][x][12]);
+                            if (curveWallArr[parseInt(i / 4)]) {
+                                let curveDir = curveWallArr[parseInt(i / 4)] - 1;
+                                let inside = 0;
+                                let ind = parseInt(i / 4) * 4 + curveDir;
+                                // if victim is on inside or outside of curve
+                                if (!(curveDir == (parseInt(i) + 2) % 4 || curveDir == (parseInt(i) + 1) % 4)) {
+                                    console.log("outside");
+                                    inside = 1;
+                                    curveDir = (curveDir + 2) % 4;
+                                }
+                                else {
+                                    console.log("inside");
+                                }
+                                if (humanType >= 0 && humanType <= 3) {
+                                    console.log("HP: " + humanPos);
+                                    console.log("Curve Offset: " + curveWallVicPos[ind] + " " + ind + " " + i);
+                                    console.log("Curvedir: " + curveDir);
+                                    console.log("Inside: " + inside);
+                                    console.log("In/Out X: " + humanOffsetCurve[curveDir][0] * inside);
+                                    console.log("In/Out Z: " + humanOffsetCurve[curveDir][1] * inside);
+                                    console.log("X: " + humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside);
+                                    console.log("Z: " + humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside);
+                                    score = score / 2;
+                                    //allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    allHumans = allHumans + visualHumanPart({x: humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside, z: humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside, rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    humanId = humanId + 1
+                                }
+                                else if (humanType>= 5 && humanType <= 8) {
+                                    allHazards = allHazards + hazardPart({x: humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside, z: humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside, rot: humanRotationCurve[curveDir], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
+                                    hazardId = hazardId + 1
+                                }
                             }
-                            else if (humanType>= 5 && humanType <= 8) {
-                                allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
-                                hazardId = hazardId + 1
+                            //Half Wall Humans
+                            else {
+                                if (humanType >= 0 && humanType <= 3) {
+                                    score = score / 2;
+                                    allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    humanId = humanId + 1
+                                }
+                                else if (humanType>= 5 && humanType <= 8) {
+                                    allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
+                                    hazardId = hazardId + 1
+                                }
                             }
                         }
                     }
