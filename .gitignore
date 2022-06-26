@@ -10,7 +10,7 @@ cabinet/*
 tmp/*
 backup/*
 public/sw.js*
-piblic/workbox-*
+public/workbox-*
 
 .idea/
 
