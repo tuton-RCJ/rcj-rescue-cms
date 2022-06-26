@@ -9,6 +9,8 @@ documents/*
 cabinet/*
 tmp/*
 backup/*
+public/sw.js*
+piblic/workbox*.js*
 
 .idea/
 
