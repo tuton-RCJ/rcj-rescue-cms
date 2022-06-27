@@ -143,125 +143,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         reachable($scope.startTile.x, $scope.startTile.y, $scope.startTile.z);
     }
 
-    let visited = [];
-    const UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
-
-    function inBounds(x, y) {
-        if (x<0 || x>$scope.width*2 || y<0 || y>$scope.length*2)
-            return false;
-        return true;
-    }
-
-    function halfRecurs(i, j, x, y, z, reached) {
-        //Check if blocked by half wall *****************************************
-        // $scope.cells[x+','+y+','+z].tile.halfTile
-        // $scope.cells[x+','+y+','+z].halfWall
-        // $scope.cells[x+','+y+','+z].tile.halfWallIn[]
-        // $scope.cells[x+','+y+','+z].tile.curve[]
-        if (visited[i+','+j+','+x+','+y+','+z] || !inBounds(x, y)) return;
-        visited[i+','+j+','+x+','+y+','+z] = 1;
-        if (i == 0) reached[LEFT] = 1;
-        if (i == 2) reached[RIGHT] = 1;
-        if (j == 0) reached[UP] = 1;
-        if (j == 2) reached[DOWN] = 1;
-        if (i == 0 && j == 0) {
-            if ($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].halfWall == 1) halfRecurs(i + 1, j, x, y, z, reached);
-            if ($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].halfWall == 2) halfRecurs(i, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[0] && $scope.cells[x+','+y+','+z].tile.curve[0] % 2 == 1) halfRecurs(i + 1, j + 1, x, y, z, reached);
-        }
-        else if (i == 0 && j == 1) {
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[LEFT]) halfRecurs(i + 1, j, x, y, z, reached)
-            if ($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].halfWall == 2) halfRecurs(i, j - 1, x, y, z, reached);
-            if ($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].halfWall == 1) halfRecurs(i, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[0] && $scope.cells[x+','+y+','+z].tile.curve[0] % 2 == 0) halfRecurs(i + 1, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[2] && $scope.cells[x+','+y+','+z].tile.curve[2] % 2 == 1) halfRecurs(i + 1, j + 1, x, y, z, reached);
-            if ($scope.cells[(x-2)+','+y+','+z] && $scope.cells[(x-2)+','+y+','+z].tile.halfWallIn[RIGHT]) {
-                let tmpReached = [0, 0, 0, 0];
-                halfRecurs(2, 1, x-2, y, z, tmpReached);
-                if (tmpReached[UP]) reached[UP] = 1;
-                if (tmpReached[DOWN]) reached[DOWN] = 1;
-            }
-        }
-        else if (i == 0 && j == 2) {
-            if ($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].halfWall == 1) halfRecurs(i, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].halfWall == 1) halfRecurs(i + 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[2] && $scope.cells[x+','+y+','+z].tile.curve[2] % 2 == 0) halfRecurs(i + 1, j - 1, x, y, z, reached);
-        }
-        else if (i == 1 && j == 0) {
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[UP]) halfRecurs(i, j + 1, x, y, z, reached)
-            if ($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].halfWall == 2) halfRecurs(i + 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].halfWall == 1) halfRecurs(i - 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[1] && $scope.cells[x+','+y+','+z].tile.curve[1] % 2 == 1) halfRecurs(i + 1, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[0] && $scope.cells[x+','+y+','+z].tile.curve[0] % 2 == 0) halfRecurs(i - 1, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+(y-2)+','+z] && $scope.cells[x+','+(y-2)+','+z].tile.halfWallIn[DOWN]) {
-                let tmpReached = [0, 0, 0, 0];
-                halfRecurs(1, 2, x, y-2, z, tmpReached);
-                if (tmpReached[LEFT]) reached[LEFT] = 1;
-                if (tmpReached[RIGHT]) reached[RIGHT]= 1;
-            }
-        }
-        else if (i == 1 && j == 1) {
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[UP]) halfRecurs(i, j - 1, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[RIGHT]) halfRecurs(i + 1, j, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[DOWN]) halfRecurs(i, j + 1, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[LEFT]) halfRecurs(i - 1, j, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.curve[0] && $scope.cells[x+','+y+','+z].tile.curve[0] % 2 == 1) halfRecurs(i - 1, j - 1, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.curve[1] && $scope.cells[x+','+y+','+z].tile.curve[1] % 2 == 0) halfRecurs(i + 1, j - 1, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.curve[2] && $scope.cells[x+','+y+','+z].tile.curve[2] % 2 == 0) halfRecurs(i - 1, j + 1, x, y, z, reached)
-            if ($scope.cells[x+','+y+','+z].tile.curve[3] && $scope.cells[x+','+y+','+z].tile.curve[3] % 2 == 1) halfRecurs(i + 1, j + 1, x, y, z, reached)
-        }
-        else if (i == 1 && j == 2) {
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[DOWN]) halfRecurs(i, j - 1, x, y, z, reached)
-            if ($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].halfWall == 2) halfRecurs(i + 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].halfWall == 1) halfRecurs(i - 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[3] && $scope.cells[x+','+y+','+z].tile.curve[3] % 2 == 0) halfRecurs(i + 1, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[2] && $scope.cells[x+','+y+','+z].tile.curve[2] % 2 == 1) halfRecurs(i - 1, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+(y+2)+','+z] && $scope.cells[x+','+(y+2)+','+z].tile.halfWallIn[UP]) {
-                let tmpReached = [0, 0, 0, 0];
-                halfRecurs(1, 0, x, y+2, z, tmpReached);
-                if (tmpReached[LEFT]) reached[LEFT] = 1;
-                if (tmpReached[RIGHT]) reached[RIGHT] = 1;
-            }
-        }
-        else if (i == 2 && j == 0) {
-            if ($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].halfWall == 2) halfRecurs(i, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].halfWall == 2) halfRecurs(i - 1, j, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[1] && $scope.cells[x+','+y+','+z].tile.curve[1] % 2 == 0) halfRecurs(i - 1, j + 1, x, y, z, reached);
-        }
-        else if (i == 2 && j == 1) {
-            if ($scope.cells[x+','+y+','+z].tile.halfWallIn[RIGHT]) halfRecurs(i - 1, j, x, y, z, reached)
-            if ($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].halfWall == 2) halfRecurs(i, j - 1, x, y, z, reached);
-            if ($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].halfWall == 1) halfRecurs(i, j + 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[1] && $scope.cells[x+','+y+','+z].tile.curve[1] % 2 == 1) halfRecurs(i - 1, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[3] && $scope.cells[x+','+y+','+z].tile.curve[3] % 2 == 0) halfRecurs(i - 1, j + 1, x, y, z, reached);
-            if ($scope.cells[(x+2)+','+y+','+z] && $scope.cells[(x+2)+','+y+','+z].tile.halfWallIn[LEFT]) {
-                let tmpReached = [0, 0, 0, 0];
-                halfRecurs(0, 1, x+2, y, z, tmpReached);
-                if (tmpReached[UP]) reached[UP] = 1;
-                if (tmpReached[DOWN]) reached[DOWN] = 1;
-            }
-        }
-        else if (i == 2 && j == 2) {
-            if ($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].halfWall == 2) halfRecurs(i - 1, j, x, y, z, reached);
-            if ($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].halfWall == 1) halfRecurs(i, j - 1, x, y, z, reached);
-            if ($scope.cells[x+','+y+','+z].tile.curve[3] && $scope.cells[x+','+y+','+z].tile.curve[3] % 2 == 1) halfRecurs(i - 1, j - 1, x, y, z, reached);
-        }
-    }
-
-    function restrictHalf(i, j, x, y, z, restricted) {
-        let reached = [0, 0, 0, 0]; // up, right, down, left
-        visited = [];
-        halfRecurs(i, j, x, y, z, reached);
-        if (reached[UP] && reached[DOWN]) {
-            restricted[LEFT] = 1;
-            restricted[RIGHT] = 1;
-        }
-        if (reached[LEFT] && reached[RIGHT]) {
-            restricted[UP] = 1;
-            restricted[DOWN] = 1;
-        }
-    }
-
     function reachable(x,y,z){
         
         if(x<0 || x>$scope.width*2 || y<0 || y>$scope.length*2) return;
@@ -285,35 +166,25 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         //console.log(`${x},${y},${z}`)
         //console.log(cell)
 
-        let restricted = [0, 0, 0, 0]; // up, right, down, left
-        // check for half wall blocking reachable
-        if ($scope.cells[x+','+y+','+z].tile.halfTile) {
-           restrictHalf(1, 1, x, y, z, restricted);
-           restrictHalf(1, 0, x, y, z, restricted);
-           restrictHalf(0, 1, x, y, z, restricted);
-           restrictHalf(2, 1, x, y, z, restricted);
-           restrictHalf(1, 2, x, y, z, restricted);
-        }
-
         //Upper
-        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall || restricted[UP]))) {
+        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) || (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
             reachable(x,y-2,z)
         }
 
         //console.log(((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))
         //console.log(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3]))))
         //Bottom
-        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall || restricted[DOWN]))) {
+        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) || (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
             reachable(x,y+2,z)
         }
 
         //Right
-        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall || restricted[RIGHT]))) {
+        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) || (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
             reachable(x+2,y,z)
         }
 
         //Left
-        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall || restricted[LEFT]))) {
+        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) || (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
             reachable(x-2,y,z)
         }
     }
