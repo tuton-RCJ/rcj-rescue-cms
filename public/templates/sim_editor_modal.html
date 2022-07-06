@@ -1,6 +1,13 @@
 <!--
   http://localhost:3000/service/editor/simulation/2020
 -->
+<style>
+  .innerTileImg {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
 <div class="modal-header">
   <h3 class="modal-title">{{"admin.simMapEditor.item" | translate}}</h3>
 </div>
@@ -100,43 +107,43 @@
     <h4>{{"admin.simMapEditor.innerTile" | translate}}</h4>
     <table style="float: left; margin: 10px;">
       <tr ng-repeat="r in range(5)">
-        <td ng-repeat="c in range(5)" ng-click="innerTileClick(r, c)" ng-class="{'inner-tile': (r % 2 == 1 && c % 2 == 1), 'wall': isHalfWall(r, c)}">
-            <img ng-src='/images/curvedWall/curved_NE.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 1">
-            <img ng-src='/images/curvedWall/curved_SE.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 2">
-            <img ng-src='/images/curvedWall/curved_SW.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 3">
-            <img ng-src='/images/curvedWall/curved_NW.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 4">
-            <img ng-src='/images/h_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 1">
-            <img ng-src='/images/h_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 1">
-            <img ng-src='/images/h_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 1">
-            <img ng-src='/images/h_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 1">
-            <img ng-src='/images/u_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 2">
-            <img ng-src='/images/u_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 2">
-            <img ng-src='/images/u_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 2">
-            <img ng-src='/images/u_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 2">
-            <img ng-src='/images/s_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 3">
-            <img ng-src='/images/s_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 3">
-            <img ng-src='/images/s_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 3">
-            <img ng-src='/images/s_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 3">
-            <img ng-src='/images/heated_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 4">
-            <img ng-src='/images/heated_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 4">
-            <img ng-src='/images/heated_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 4">
-            <img ng-src='/images/heated_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 4">
-            <img ng-src='/images/f_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 5">
-            <img ng-src='/images/f_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 5">
-            <img ng-src='/images/f_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 5">
-            <img ng-src='/images/f_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 5">
-            <img ng-src='/images/p_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 6">
-            <img ng-src='/images/p_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 6">
-            <img ng-src='/images/p_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 6">
-            <img ng-src='/images/p_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 6">
-            <img ng-src='/images/c_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 7">
-            <img ng-src='/images/c_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 7">
-            <img ng-src='/images/c_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 7">
-            <img ng-src='/images/c_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 7">
-            <img ng-src='/images/o_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 8">
-            <img ng-src='/images/o_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 8">
-            <img ng-src='/images/o_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 8">
-            <img ng-src='/images/o_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 8">
+        <td ng-repeat="c in range(5)" ng-click="innerTileClick(r, c)" ng-class="{'inner-tile': (r % 2 == 1 && c % 2 == 1), 'wall': isHalfWall(r, c)}" style="position: relative;">
+            <img ng-src='/images/curvedWall/curved_NE.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 1" class="innerTileImg">
+            <img ng-src='/images/curvedWall/curved_SE.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 2" class="innerTileImg">
+            <img ng-src='/images/curvedWall/curved_SW.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 3" class="innerTileImg">
+            <img ng-src='/images/curvedWall/curved_NW.png' width="35" height="35" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.curve[(r - 1) + (c - 1) / 2] == 4" class="innerTileImg">
+            <img ng-src='/images/h_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 1" class="innerTileImg">
+            <img ng-src='/images/h_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 1" class="innerTileImg">
+            <img ng-src='/images/h_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 1" class="innerTileImg">
+            <img ng-src='/images/h_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 1" class="innerTileImg">
+            <img ng-src='/images/u_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 2" class="innerTileImg">
+            <img ng-src='/images/u_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 2" class="innerTileImg">
+            <img ng-src='/images/u_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 2" class="innerTileImg">
+            <img ng-src='/images/u_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 2" class="innerTileImg">
+            <img ng-src='/images/s_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 3" class="innerTileImg">
+            <img ng-src='/images/s_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 3" class="innerTileImg">
+            <img ng-src='/images/s_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 3" class="innerTileImg">
+            <img ng-src='/images/s_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 3" class="innerTileImg">
+            <img ng-src='/images/heated_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 4" class="innerTileImg">
+            <img ng-src='/images/heated_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 4" class="innerTileImg">
+            <img ng-src='/images/heated_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 4" class="innerTileImg">
+            <img ng-src='/images/heated_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 4" class="innerTileImg">
+            <img ng-src='/images/f_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 5" class="innerTileImg">
+            <img ng-src='/images/f_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 5" class="innerTileImg">
+            <img ng-src='/images/f_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 5" class="innerTileImg">
+            <img ng-src='/images/f_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 5" class="innerTileImg">
+            <img ng-src='/images/p_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 6" class="innerTileImg">
+            <img ng-src='/images/p_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 6" class="innerTileImg">
+            <img ng-src='/images/p_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 6" class="innerTileImg">
+            <img ng-src='/images/p_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 6" class="innerTileImg">
+            <img ng-src='/images/c_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 7" class="innerTileImg">
+            <img ng-src='/images/c_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 7" class="innerTileImg">
+            <img ng-src='/images/c_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 7" class="innerTileImg">
+            <img ng-src='/images/c_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 7" class="innerTileImg">
+            <img ng-src='/images/o_top.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 0] == 8" class="innerTileImg">
+            <img ng-src='/images/o_right.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 1] == 8" class="innerTileImg">
+            <img ng-src='/images/o_bottom.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 2] == 8" class="innerTileImg">
+            <img ng-src='/images/o_left.png' width="100%" ng-show="r % 2 == 1 && c % 2 == 1 && cell.tile.halfWallVic[((r - 1) + (c - 1) / 2) * 4 + 3] == 8" class="innerTileImg">
         </td>
     </tr>
     </table>
