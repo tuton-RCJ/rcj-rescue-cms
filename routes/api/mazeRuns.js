@@ -622,7 +622,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
       });
     } else if (dbRuns) {
       for (let i = 0; i < dbRuns.length; i++) {
-        if (dbRuns[i].tiles.length === 0 && !dbRuns[i].diceNumber) {
+        if (dbRuns[i].tiles.length === 0 && !dbRuns[i].diceNumber && dbRuns[i].map.dice.length > 0) {
           const randomMapIndex = Math.floor(
             Math.random() * dbRuns[i].map.dice.length
           );
