@@ -306,7 +306,10 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 }
             })
         }
-        
+
+        $scope.go_input = function (runid) {
+            $scope.go('/line/input/' + runid + '/');
+        }
 
         $scope.statusColor = function(status){
           switch(status){
