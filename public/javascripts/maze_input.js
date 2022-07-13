@@ -144,6 +144,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             for(let j=1,l=map.length*2+1;j<l;j+=2) {
                 for (let i = 1, m = map.width * 2 + 1; i < m; i += 2) {
+                    if (!cells[`${i},${j},0`]) continue
                     let victimLF =  cells[i+','+j+',0'].isLinear?"linear":"floating";
                     let victims = cells[i+','+j+',0'].tile.victims;
                     let tile = cells[i+','+j+',0'].tile;

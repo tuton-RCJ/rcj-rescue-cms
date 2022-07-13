@@ -233,6 +233,7 @@ adminRouter.put('/:map', function (req, res, next) {
     // logger.debug(map)
     dbMap.cells = [];
     err = copyProperties(map, dbMap);
+    if (map.dice != undefined) dbMap.dice = map.dice
 
     if (err) {
       logger.error(err);
