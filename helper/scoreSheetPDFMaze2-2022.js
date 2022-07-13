@@ -219,6 +219,7 @@ function drawRun(doc, config, scoringRun) {
   };
   for (let j = 1, l = scoringRun.map.length * 2 + 1; j < l; j += 2) {
     for (let i = 1, m = scoringRun.map.width * 2 + 1; i < m; i += 2) {
+      if (!cells[`${i},${j},0`]) continue
       const victimLF = cells[`${i},${j},0`].isLinear ? 'linear' : 'floating';
       const { victims } = cells[`${i},${j},0`].tile;
       const { tile } = cells[`${i},${j},0`];
