@@ -307,6 +307,10 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             })
         }
 
+        $scope.go_input = function (runid) {
+            $scope.go('/maze/input/' + runid + '/');
+        }
+
         $scope.statusColor = function(status){
           switch(status){
             case 2:

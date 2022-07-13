@@ -74,7 +74,10 @@ const mazeMapSchema = new Schema({
   name       : {type: String, required: true},
   parent     : {type: ObjectId},
   dice       : [
-      {type: ObjectId}
+      {
+        type : ObjectId,
+        ref  : 'MazeMap'
+      }
   ],
   height     : {type: Number, integer: true, required: true, min: 1},
   width      : {type: Number, integer: true, required: true, min: 1},
