@@ -140,16 +140,64 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         recurs($scope.startTile.x+2, $scope.startTile.y + 1, $scope.startTile.z);
 
         //Search reachable tiles
+        quarterReachable = [];
         reachable($scope.startTile.x, $scope.startTile.y, $scope.startTile.z);
     }
 
-    function reachable(x,y,z){
-        
+    const UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
+    let quarterReachable;
+
+    function curveBlock(toDir, fromDir, curve) {
+        // if continuing straight, any curve wall will block
+        // if curve has orientation 2 or 4, the following are blocked:
+        //      UP <-> RIGHT, DOWN <-> LEFT 
+        //      aka toDir + fromDir == 1 || toDir + fromDir == 5
+        // if curve has orientation 1 or 3, the following are blocked:
+        //      UP <-> LEFT, DOWN <-> RIGHT
+        //      aka toDir + 1 and fromDir + 1 satisfies prev condition 
+        const tmpToDir = (toDir + 1) % 4, tmpFromDir = (fromDir + 1) % 4;
+        return curve != 0 && ((toDir == (fromDir + 2) % 4) || 
+                (curve % 2 == 0 && (toDir + fromDir == 1 || toDir + fromDir == 5)) || 
+                (curve % 2 == 1 && (tmpToDir + tmpFromDir == 1 || tmpToDir + tmpFromDir == 5)));
+    }
+
+    function getHalfWall(x, y, z) {
+        if (!$scope.cells[x+','+y+','+z]) return 0;
+        return $scope.cells[x+','+y+','+z].halfWall;
+    }
+
+    function getWall(x, y, z) {
+        if (!$scope.cells[x+','+y+','+z]) return 0;
+        return $scope.cells[x+','+y+','+z].isWall;
+    }
+
+    function blocked(x, y, z, halfWallSide) {
+        return getWall(x,y,z) || getHalfWall(x,y,z) == halfWallSide;
+    }
+
+    function reachable(x,y,z,i=-1,dir=-1){
+        if (i == 0 && x == 7 && y == 3)
+            console.log('hello');
+
         if(x<0 || x>$scope.width*2 || y<0 || y>$scope.length*2) return;
         let cell = $scope.cells[x+','+y+','+z];
+        if (!cell.tile.halfTile) i = -1; // if going from quarter tile to full tile
         if(cell){
-            if($scope.cells[x+','+y+','+z].reachable) return;
-            $scope.cells[x+','+y+','+z].reachable = true;
+            if (i == -1) { // if coming from full tile
+                if($scope.cells[x+','+y+','+z].reachable) return;
+                $scope.cells[x+','+y+','+z].reachable = true;
+            }
+            else {
+                const qr = quarterReachable[i+','+x+','+y+','+z];
+                if ((cell.tile.curve[i] == 0 && qr != undefined) ||
+                    (cell.tile.curve[i] != 0 && qr != undefined && qr.find((i) => {return i == dir}) != undefined)) return;
+
+                if (qr == undefined)
+                    quarterReachable[i+','+x+','+y+','+z] = [dir];
+                else
+                    quarterReachable[i+','+x+','+y+','+z].push(dir);
+                $scope.cells[x+','+y+','+z].reachable = true;
+            }
         }else{
             $scope.cells[x+','+y+','+z] = {
                 isTile: true,
@@ -166,26 +214,122 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         //console.log(`${x},${y},${z}`)
         //console.log(cell)
 
-        //Upper
-        if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
-            reachable(x,y-2,z)
-        }
+        if (cell.tile.halfTile && i == -1) {
+            // check if going from non quarter title to quarter tile
 
-        //console.log(((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))
-        //console.log(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3]))))
-        //Bottom
-        if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))){
-            reachable(x,y+2,z)
+            if ((dir == UP && !blocked(x,y-1,z,1)) || dir == -1)
+                reachable(x,y,z,0,UP);
+            if ((dir == UP && !blocked(x,y-1,z,2)) || dir == -1)
+                reachable(x,y,z,1,UP);
+            if ((dir == RIGHT && !blocked(x+1,y,z,2)) || dir == -1)
+                reachable(x,y,z,1,RIGHT);
+            if ((dir == RIGHT && !blocked(x+1,y,z,1)) || dir == -1)
+                reachable(x,y,z,3,RIGHT);
+            if ((dir == DOWN && !blocked(x,y+1,z,2)) || dir == -1)
+                reachable(x,y,z,3,DOWN);
+            if ((dir == DOWN && !blocked(x,y+1,z,1)) || dir == -1)
+                reachable(x,y,z,2,DOWN);
+            if ((dir == LEFT && !blocked(x-1,y,z,1)) || dir == -1)
+                reachable(x,y,z,2,LEFT);
+            if ((dir == LEFT && !blocked(x-1,y,z,2)) || dir == -1)
+                reachable(x,y,z,0,LEFT);
         }
+        else if (i == -1) {
+            // full tile navigation
 
-        //Right
-        if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
-            reachable(x+2,y,z)
+            //Upper
+            if(!(($scope.cells[x+','+(y-1)+','+z] && $scope.cells[x+','+(y-1)+','+z].isWall))) {
+                reachable(x,y-2,z,-1,DOWN)
+            }
+
+            //console.log(((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3])))
+            //console.log(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall) || ((cell.tile.halfWallIn[3] || cell.tile.curve[0] || cell.tile.curve[2]) && (cell.tile.halfWallIn[1] || cell.tile.curve[1] || cell.tile.curve[3]))))
+            //Bottom
+            if(!(($scope.cells[x+','+(y+1)+','+z] && $scope.cells[x+','+(y+1)+','+z].isWall))) {
+                reachable(x,y+2,z,-1,UP)
+            }
+
+            //Right
+            if(!(($scope.cells[(x+1)+','+y+','+z] && $scope.cells[(x+1)+','+y+','+z].isWall))) {
+                reachable(x+2,y,z,-1,LEFT)
+            }
+
+            //Left
+            if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall))) {
+                reachable(x-2,y,z,-1,RIGHT)
+            }
         }
+        else {
+            //quarter tile navigation
+            // +-+-+
+            // |a|b|
+            // +-+-+    (1 tile)
+            // |c|d|
+            // +-+-+
+            // a: i = 0
+            // b: i = 1
+            // c: i = 2
+            // d: i = 3
 
-        //Left
-        if(!(($scope.cells[(x-1)+','+y+','+z] && $scope.cells[(x-1)+','+y+','+z].isWall)  || ((cell.tile.halfWallIn[0] || cell.tile.curve[0] || cell.tile.curve[1]) && (cell.tile.halfWallIn[2] || cell.tile.curve[2] || cell.tile.curve[3])))){
-            reachable(x-2,y,z)
+            // dir represents direction of entry into quarter tile
+            // relevant for calculating traversable curved walls
+
+            if (i == 0) {
+                if (!(blocked(x,y-1,z,1) || 
+                    curveBlock(UP, dir, cell.tile.curve[i])))
+                    reachable(x, y-2, z, 2, DOWN);           // up
+                if (!(cell.tile.halfWallIn[UP] ||
+                    curveBlock(RIGHT, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 1, LEFT);             // right
+                if (!(cell.tile.halfWallIn[LEFT] ||
+                    curveBlock(DOWN, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 2, UP);               // down
+                if (!(blocked(x-1,y,z,2) || 
+                    curveBlock(LEFT, dir, cell.tile.curve[i])))
+                    reachable(x-2, y, z, 1, RIGHT);          // left
+            }
+            else if (i == 1) {
+                if (!(blocked(x,y-1,z,2) || 
+                    curveBlock(UP, dir, cell.tile.curve[i])))
+                    reachable(x, y-2, z, 3, DOWN);
+                if (!(blocked(x+1,y,z,2) || 
+                    curveBlock(RIGHT, dir, cell.tile.curve[i])))
+                    reachable(x+2, y, z, 0, LEFT);
+                if (!(cell.tile.halfWallIn[RIGHT] ||
+                    curveBlock(DOWN, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 3, UP);
+                if (!(cell.tile.halfWallIn[UP] ||
+                    curveBlock(LEFT, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 0, RIGHT);
+            }
+            else if (i == 2) {
+                if (!(cell.tile.halfWallIn[LEFT] ||
+                    curveBlock(UP, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 0, DOWN);
+                if (!(cell.tile.halfWallIn[DOWN] ||
+                    curveBlock(RIGHT, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 3, LEFT);
+                if (!(blocked(x,y+1,z,1) || 
+                    curveBlock(DOWN, dir, cell.tile.curve[i])))
+                    reachable(x, y+2, z, 0, UP);
+                if (!(blocked(x-1,y,z,1) || 
+                    curveBlock(LEFT, dir, cell.tile.curve[i])))
+                    reachable(x-2, y, z, 3, RIGHT);
+            }
+            else if (i == 3) {
+                if (!(cell.tile.halfWallIn[RIGHT] ||
+                    curveBlock(UP, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 1, DOWN);
+                if (!(blocked(x+1,y,z,1) || 
+                    curveBlock(RIGHT, dir, cell.tile.curve[i])))
+                    reachable(x+2, y, z, 2, LEFT);
+                if (!(blocked(x,y+1,z,2) || 
+                    curveBlock(DOWN, dir, cell.tile.curve[i])))
+                    reachable(x, y+2, z, 1, UP);
+                if (!(cell.tile.halfWallIn[DOWN] ||
+                    curveBlock(LEFT, dir, cell.tile.curve[i])))
+                    reachable(x, y, z, 2, RIGHT);
+            }
         }
     }
 
@@ -1330,13 +1474,20 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         //Rotations of humans for each wall
         let humanRotation = [3.14, 1.57, 0, -1.57]
+        let humanRotationCurve = [2.355, 0.785, -0.785, -2.355];
         let halfWallVicPos = [[-0.075, -0.136], [-0.014, -0.075], [-0.075, -0.014], [-0.136, -0.075], 
                             [0.075, -0.136], [0.136, -0.075], [0.075, -0.014], [0.014, -0.074], 
                             [-0.075, 0.014], [-0.014, 0.075], [-0.075, 0.136], [-0.136, 0.075],
                             [0.075, 0.014], [0.136, 0.075], [0.075, 0.136], [0.014, 0.075]];
+        //***let curveWallVicPos = [[-0.042, -0.042], [0.042, -0.042], [0.042, 0.042], [-0.042, 0.042]];
+        let curveWallVicPos = [[-0.022, -0.039], [-0.022, -0.022], [-0.039, -0.023], [-0.038, -0.038],
+                            [0.038, -0.039], [0.038, -0.022], [0.021, -0.023], [0.022, -0.038],
+                            [-0.022, 0.021], [-0.022, 0.038], [-0.039, 0.037], [-0.038, 0.022],
+                            [0.038, 0.021], [0.038, 0.038], [0.021, 0.037], [0.022, 0.022]];
         //Offsets for visual and thermal humans
         let humanOffset = [[0, -0.1375 * tileScale[2]], [0.1375 * tileScale[0], 0], [0, 0.1375 * tileScale[2]], [-0.1375 * tileScale[0], 0]]
         let humanOffsetThermal = [[0, -0.136 * tileScale[2]], [0.136 * tileScale[0], 0], [0, 0.136 * tileScale[2]], [-0.136 * tileScale[0], 0]]
+        let humanOffsetCurve = [[-0.008, 0.008], [-0.008, -0.008], [0.008, -0.008], [0.008, 0.008]];
         //Names of types of visual human
         let humanTypesVisual = ["harmed", "unharmed", "stable"]
         //Names of types of hazards
@@ -1561,23 +1712,60 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         humanId = humanId + 1
                     }
                 }
-                //Half Wall Humans
                 if(walls[z][x][13]){
                     for (var i in $scope.range(16)) {
-                        if (walls[z][x][13][i] != '') {
+                        if (walls[z][x][13][i]) {
                             let humanType = Number(walls[z][x][13][i]);
                             let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
                             let score = 30
                             let j = 0
                             if(walls[z][x][8]) score = 10
-                            if (humanType >= 0 && humanType <= 3) {
-                                score = score / 2;
-                                allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
-                                humanId = humanId + 1
+                            //Curved Wall Humans
+                            // ****===============================================linear vs floating curved walls
+                            let curveWallArr = JSON.parse(walls[z][x][12]);
+                            if (curveWallArr[parseInt(i / 4)]) {
+                                let curveDir = curveWallArr[parseInt(i / 4)] - 1;
+                                let inside = 0;
+                                let ind = parseInt(i / 4) * 4 + curveDir;
+                                // if victim is on inside or outside of curve
+                                if (!(curveDir == (parseInt(i) + 2) % 4 || curveDir == (parseInt(i) + 1) % 4)) {
+                                    console.log("outside");
+                                    inside = 1;
+                                    curveDir = (curveDir + 2) % 4;
+                                }
+                                else {
+                                    console.log("inside");
+                                }
+                                if (humanType >= 0 && humanType <= 3) {
+                                    console.log("HP: " + humanPos);
+                                    console.log("Curve Offset: " + curveWallVicPos[ind] + " " + ind + " " + i);
+                                    console.log("Curvedir: " + curveDir);
+                                    console.log("Inside: " + inside);
+                                    console.log("In/Out X: " + humanOffsetCurve[curveDir][0] * inside);
+                                    console.log("In/Out Z: " + humanOffsetCurve[curveDir][1] * inside);
+                                    console.log("X: " + humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside);
+                                    console.log("Z: " + humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside);
+                                    score = score / 2;
+                                    //allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    allHumans = allHumans + visualHumanPart({x: humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside, z: humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside, rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    humanId = humanId + 1
+                                }
+                                else if (humanType>= 5 && humanType <= 8) {
+                                    allHazards = allHazards + hazardPart({x: humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside, z: humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside, rot: humanRotationCurve[curveDir], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
+                                    hazardId = hazardId + 1
+                                }
                             }
-                            else if (humanType>= 5 && humanType <= 8) {
-                                allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
-                                hazardId = hazardId + 1
+                            //Half Wall Humans
+                            else {
+                                if (humanType >= 0 && humanType <= 3) {
+                                    score = score / 2;
+                                    allHumans = allHumans + visualHumanPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
+                                    humanId = humanId + 1
+                                }
+                                else if (humanType>= 5 && humanType <= 8) {
+                                    allHazards = allHazards + hazardPart({x: humanPos[0] + halfWallVicPos[i][0] * tileScale[0], z: humanPos[1] + halfWallVicPos[i][1] * tileScale[2], rot: humanRotation[i % 4], id: hazardId, type: hazardTypes[walls[z][x][13][i] - 5], score: score})
+                                    hazardId = hazardId + 1
+                                }
                             }
                         }
                     }
