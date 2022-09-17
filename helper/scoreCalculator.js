@@ -1,38 +1,38 @@
 const logger = require('../config/logger').mainLogger;
-const rule2022 = require('./scoreCalculator-2022');
+const rule2023 = require('./scoreCalculator-2023');
 
 module.exports.calculateLineScore = function (run) {
   const { rule } = run.competition;
   switch (rule) {
-    case '2022':
+    case '2023':
     default:
-      return rule2022.calculateLineScore(run);
+      return rule2023.calculateLineScore(run);
   }
 };
 
 module.exports.calculateLineScoreManual = function (run) {
   const { rule } = run.competition;
   switch (rule) {
-    case '2022':
+    case '2023':
     default:
-      return rule2022.calculateLineScoreManual(run);
+      return rule2023.calculateLineScoreManual(run);
   }
 };
 
 module.exports.calculateMazeScore = function (run) {
   const { rule } = run.competition;
   switch (rule) {
-    case '2022':
+    case '2023':
     default:
-      return rule2022.calculateMazeScore(run);
+      return rule2023.calculateMazeScore(run);
   }
 };
 
 module.exports.calculateMazeScoreManual = function (run) {
   const { rule } = run.competition;
   switch (rule) {
-    case '2022':
+    case '2023':
     default:
-      return rule2022.calculateMazeScoreManual(run);
+      return rule2023.calculateMazeScoreManual(run);
   }
 };

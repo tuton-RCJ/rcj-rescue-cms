@@ -1,5 +1,5 @@
 const logger = require('../config/logger').mainLogger;
-const rule2022 = require('./scoreSheetPDFMaze2-2022');
+const rule2023 = require('./scoreSheetPDFMaze2-2023');
 
 module.exports.generateScoreSheet = function (res, runs) {
   let rule;
@@ -7,8 +7,8 @@ module.exports.generateScoreSheet = function (res, runs) {
     rule = runs[0].competition.rule;
   }
   switch (rule) {
-    case '2022':
+    case '2023':
     default:
-      return rule2022.generateScoreSheet(res, runs);
+      return rule2023.generateScoreSheet(res, runs);
   }
 };

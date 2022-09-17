@@ -258,34 +258,38 @@ html(ng-app="ddApp")
 
                     div(ng-if="$index == EvacuationAreaLoPIndex && league == 'LineNL'", style="border: solid 4px #e74c3c;border-radius:calc(0.5rem - 1px);margin-top:15px;")
                       h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;")  {{'line.judge.rescue' | translate}} (NL)
-                      .row(style="margin-top:20px;")
-                        div(style='width:40%;font-size:10px;', align='center')
-                          img(src='/images/blackVictim.png', height='40px')
-                        div(style='width:60%;position: relative;')
-                          .input-group.mb-3(style='width:100%; height:40px;position:absolute;margin: auto;top: calc(50% - 20px);')
-                            .input-group-prepend
-                              button.btn.btn-danger(type='button', ng-click='victimNL("S",-1)')
-                                i.fas.fa-minus(aria-hidden='true')
-                            div(style='background-color: #F2F2F2; width:40%; text-align: center;')
-                              span.count {{victimNL_S}}
-                            .input-group-append
-                              button.btn.btn-success(type='button', ng-click='victimNL("S",1)')
-                                i.fas.fa-plus(aria-hidden='true')
-                      .row(style="margin-top:20px;margin-bottom:20px;")
-                        div(style='width:40%;font-size:10px;', align='center')
-                          img(src='/images/greenVictim.png', height='40px')
-                        div(style='width:60%;position: relative;')
-                          .input-group.mb-3(style='width:100%; height:40px;position:absolute;margin: auto;top: calc(50% - 20px);')
-                            .input-group-prepend
-                              button.btn.btn-danger(type='button', ng-click='victimNL("G",-1)')
-                                i.fas.fa-minus(aria-hidden='true')
-                            div(style='background-color: #F2F2F2; width:40%; text-align: center;')
-                              span.count {{victimNL_G}}
-                            .input-group-append
-                              button.btn.btn-success(type='button', ng-click='victimNL("G",1)')
-                                i.fas.fa-plus(aria-hidden='true')
+                      div(ng-repeat="i in range(maxLiveVictims)")
+                        .row(style="padding-right:5px;margin:10px 0 10px 0;")
+                          div(style='width:20%;font-size:10px;', align='center')
+                            img(src='/images/greenVictim.png', height='30px')
+                            span(style="font-size:30px;") {{i+1}}
+                          div(style='width:80%;position: relative;')
+                            .btn-group.mb-3(style='width:100%; top: calc(50% - 20px);')
+                                button.btn(style="padding-left: 0; padding-right: 0;", type='button', ng-click='victimNL("L", i, false, false)', ng-class="victimNLActivate('L', i, false, false) ? 'btn-secondary':'btn-outline-secondary'")
+                                  i.fas.fa-times
+                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("L", i, true, false)', ng-class="victimNLActivate('L', i, true, false) ? 'btn-info':'btn-outline-info'")
+                                  i.fas.fa-check &nbsp;
+                                  span 発見
+                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("L", i, true, true)', ng-class="victimNLActivate('L', i, true, true) ? 'btn-success':'btn-outline-success'")
+                                  i.fas.fa-check-double &nbsp;
+                                  span 識別
+                      div(ng-repeat="i in range(maxDeadVictims)")
+                        .row(style="padding-right:5px;margin:10px 0 10px 0;")
+                          div(style='width:20%;font-size:10px;', align='center')
+                            img(src='/images/blackVictim.png', height='30px')
+                            span(style="font-size:30px;") {{i+1}}
+                          div(style='width:80%;position: relative;')
+                            .btn-group.mb-3(style='width:100%; top: calc(50% - 20px);')
+                                button.btn(style="padding-left: 0; padding-right: 0;", type='button', ng-click='victimNL("D", i, false, false)', ng-class="victimNLActivate('D', i, false, false) ? 'btn-secondary':'btn-outline-secondary'")
+                                  i.fas.fa-times
+                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("D", i, true, false)', ng-class="victimNLActivate('D', i, true, false) ? 'btn-info':'btn-outline-info'")
+                                  i.fas.fa-check &nbsp;
+                                  span 発見
+                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("D", i, true, true)', ng-class="victimNLActivate('D', i, true, true) ? 'btn-danger':'btn-outline-danger'")
+                                  i.fas.fa-check-double &nbsp;
+                                  span 識別
                       //hr
-                      .row(style="margin-top:10px;padding-bottom:20px;")
+                      //.row(style="margin-top:10px;padding-bottom:20px;")
                         div(style='width:40%;font-size:10px;', align='center')
                           img(src='/images/misidentNL.png', height='40px')
                         div(style='width:60%;position: relative;')

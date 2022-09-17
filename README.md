@@ -1,4 +1,4 @@
-# ロボカップジュニア RoboCupJunior CMS 2022
+# ロボカップジュニア RoboCupJunior CMS 2023
 ### Competition Management System
 #### (former Rescue Scoring System)
 This is a Competition Management System used in RoboCupJunior's rescue line & maze competitions in word wide.
@@ -11,8 +11,8 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 これは，ロボカップジュニアレスキュー競技で用いられる大会管理システムです．  
 
 #### 対応ルール
-* International RoboCupJunior Rescue Technical Committee により発行された2021最終ルール / [Line](https://cdn.robocup.org/junior/wp/2021/06/2021_RescueLine_Rules_final02.pdf) / [Maze](https://cdn.robocup.org/junior/wp/2021/06/2021_RescueMaze_Rules_final02.pdf)
-* 日本のレスキュー技術委員会により発行された日本リーグ2022ルール / [Nippon-League](https://drive.google.com/file/d/1bjoNF_jOcQ0M4QSeDRKg0GmDSSl9gxAO/view?usp=sharing)
+* International RoboCupJunior Rescue Technical Committee により発行された2022最終ルール / [Line](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueLine_Rules_final01.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueMaze_Rules_final01.pdf)
+* 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2023ルール / [レスキュー・ライン・エントリー](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view)
 
 --
 
@@ -25,13 +25,14 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 * ユーザー管理機能を強化
 * マップの回転機能を追加
 * インタビュー機能を追加
-* 2022ルールに対応
+* 国際2022ルールに対応
 * ラインのタイルセットの在庫管理に対応
 * 大会データーのバックアップ/リストアに対応
 * トラブル発生時のハンドオーバーに対応
 * 紙のスコアシートの出力に対応
 * ドキュメント提出/レビューシステムを統合
 * システムからのメール配信が可能
+* レスキュー・ライン・エントリー2023ルールに対応
 
 特別な理由がない限り，本リポジトリで提供しているバージョンを使用することをお勧めします．
 
@@ -41,6 +42,7 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 [https://osaka.rcj.cloud](https://osaka.rcj.cloud)
 
 ## 更新情報
+* [2022/09/17] レスキュー・ライン・エントリー 2023ルールに対応しました
 * [2021/10/02] 2022ルールに暫定対応しました．
 * [2021/03/07] 2021ルールに正式に対応しました．
 * [2020/11/28] ドキュメント系システムを本システムに統合しました．また，システムからのチームへのメール配信も可能になりました．
@@ -91,6 +93,9 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 * ロボカップジュニア2021 東海ブロック大会
 * ロボカップジュニア 日本大会2021 オンライン
 * RoboCup2021 WORLDWIDE
+
+### 2022年ルール対応版
+* RoboCup 2022 Bangkok Thailand
 
 ## 使用方法
 ### Dockerを利用（推奨）

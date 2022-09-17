@@ -127,9 +127,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.LoPs_total = 0;
                 $scope.status = data.status;
                 $scope.victim_list = data.rescueOrder;
-                $scope.victimNL_G = data.nl.greenTape;
-                $scope.victimNL_S = data.nl.silverTape;
-                $scope.misidentNL_C = data.nl.misidentification;
+                
+                if(data.nl){
+                    $scope.victimNL_Dead = data.nl.deadVictim;
+                    $scope.victimNL_Live = data.nl.liveVictim;
+                }
+
                 for (let i = 0; i < $scope.LoPs.length; i++) {
                     $scope.LoPs_total += $scope.LoPs[i];
                 }
@@ -183,9 +186,10 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             }
 
             $scope.victim_list = response.data.rescueOrder;
-            $scope.victimNL_G = response.data.nl.greenTape;
-            $scope.victimNL_S = response.data.nl.silverTape;
-            $scope.misidentNL_C = response.data.nl.misidentification;
+            if(response.data.nl){
+                $scope.victimNL_Dead = response.data.nl.deadVictim;
+                $scope.victimNL_Live = response.data.nl.liveVictim;
+            }
 
 
             // Get the map
@@ -236,6 +240,38 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return count;
     }
 
+    $scope.nlVictimCount = function() {
+        let unknown = 0;
+        let live = 0;
+        let dead = 0;
+
+        for (let victim of $scope.victimNL_Live) {
+            if (victim.identified) live++;
+            else if(victim.found) unknown++;
+        }
+        
+        for (let victim of $scope.victimNL_Dead) {
+            if (victim.identified) dead++;
+            else if(victim.found) unknown++;
+        }
+
+        return {
+            unknown,
+            live,
+            dead
+        }
+    }
+
+    $scope.nlVictimPoints = function(){
+        let point = 0;
+        for (let victim of $scope.victimNL_Live) {
+            point += 10 * victim.found + 20 * victim.identified;
+        }
+        for (let victim of $scope.victimNL_Dead) {
+            point += 10 * victim.found + 5 * victim.identified;
+        }
+        return point;
+    }
 
     $scope.range = function (n) {
         arr = [];
