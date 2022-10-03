@@ -56,15 +56,15 @@ block content
               td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}") {{("00"+run.time.minutes).slice(-2)}}:{{("00"+run.time.seconds).slice(-2)}}
               td.text-center(ng-bind='run.rescuedVictims' ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league!='LineNL'")
               td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league=='LineNL'")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
-                  img(src='/images/blackVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.rescuedNLS}}
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Unknown > 0")
+                  img(src='/images/unknownVictim.png', style="height:20px;")
+                  span(style="font-size:20px;") ×{{run.rescuedNL_Unknown}}
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Live > 0")
                   img(src='/images/greenVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.rescuedNLG}}
-                //.img-thumbnail(style="padding:0;display: inline-block;")
-                  img(src='/images/misidentNL.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.rescueNLMis}}
+                  span(style="font-size:20px;") ×{{run.rescuedNL_Live}}
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Dead > 0")
+                  img(src='/images/blackVictim.png', style="height:20px;")
+                  span(style="font-size:20px;") ×{{run.rescuedNL_Dead}}
               td.text-center(ng-bind='run.LoPsNum' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
     .row
       hr
@@ -102,15 +102,15 @@ block content
                   img(src='/images/rescuekit-2.png', width='20px', ng-if="victim.type == 'K' && run.kitLevel==2")
                 span &nbsp;×{{run.multiplier}}
               td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league=='LineNL'")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
-                  img(src='/images/blackVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.nl.silverTape}}
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlUnknownVictimCount)")
+                  img(src='/images/unknownVictim.png', style="height:20px;")
+                  span(style="font-size:20px;")
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlLiveVictimCount)")
                   img(src='/images/greenVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.nl.greenTape}}
-                //.img-thumbnail(style="padding:0;display: inline-block;")
-                  img(src='/images/misidentNL.png', style="height:20px;")
-                  span(style="font-size:20px;") {{run.nl.misidentification}}                
+                  span(style="font-size:20px;")
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlDeadVictimCount)")
+                  img(src='/images/blackVictim.png', style="height:20px;")
+                  span(style="font-size:20px;")            
               td.text-center(ng-bind='run.LoPsNum'  ng-style="run.isplaying && {'background-color': '#ffffa8'}")
     br
     br

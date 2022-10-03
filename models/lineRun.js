@@ -79,20 +79,16 @@ const lineRunSchema = new Schema({
   startTime         : {type: Number, default: 0},
   test: {type: Boolean, default: false},
   nl  : {
-    silverTape: {type: Number, min:0, default:0},
-    greenTape: {type: Number, min:0, default:0},
-    misidentification: {type: Number, min:0, default:0},
+    liveVictim: [{
+      found: {type: Boolean, default: false},
+      identified: {type: Boolean, default: false}
+    }],
+    deadVictim: [{
+      found: {type: Boolean, default: false},
+      identified: {type: Boolean, default: false}
+    }]
   },
-  isNL: {type: Boolean, default: false},
-  manual  : {
-    gap: {type: Number, default: 0},
-    obstacle: {type: Number, default: 0},
-    speedbump: {type: Number, default: 0},
-    intersection: {type: Number, default: 0},
-    deadend: {type: Number, default: 0},
-    rampUP: {type: Number, default: 0},
-    rampDOWN: {type: Number, default: 0},
-  }
+  isNL: {type: Boolean, default: false}
 });
 
 lineRunSchema.pre('save', function (next) {

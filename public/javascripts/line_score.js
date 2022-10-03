@@ -7,7 +7,7 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
 
     $scope.showTeam = true;
 
-    $scope.sortOrder = ['-score','time.minutes*60+time.seconds','-rescueOrder.length', 'nl.silverTape+nl.greenTape','LoPsNum'];
+    $scope.sortOrder = ['-score','time.minutes*60+time.seconds','-rescueOrder.length', 'LoPsNum'];
     $scope.go = function (path) {
         window.location = path
     }
@@ -89,6 +89,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
                     run.teamCode = run.team.teamCode;
                     run.teamName = run.team.name;
 
+                    run.nlLiveVictimCount = run.nl.liveVictim.filter(victim => victim.identified).length;
+                    run.nlDeadVictimCount = run.nl.deadVictim.filter(victim => victim.identified).length;
+                    run.nlUnknownVictimCount = run.nl.liveVictim.filter(victim => victim.found && !victim.identified).length + run.nl.deadVictim.filter(victim => victim.found && !victim.identified).length;
                 }
                 catch(e){
 
@@ -139,9 +142,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
                         TeamRuns[run.team._id].sumScore = sum.score
                         TeamRuns[run.team._id].sumTime = sum.time
                         TeamRuns[run.team._id].sumRescue = sum.rescued
-                        TeamRuns[run.team._id].sumRescueNLS = sum.rescuedNLS
-                        TeamRuns[run.team._id].sumRescueNLG = sum.rescuedNLG
-                        TeamRuns[run.team._id].sumRescueNLMis = sum.rescueNLMis
+                        TeamRuns[run.team._id].sumRescueNL_Live = sum.rescuedNL_Live
+                        TeamRuns[run.team._id].sumRescueNL_Dead = sum.rescuedNL_Dead
+                        TeamRuns[run.team._id].sumRescueNL_Unknown = sum.rescuedNL_Unknown
                         TeamRuns[run.team._id].sumLoPs = sum.lops
                         TeamRuns[run.team._id].retired = sum.retired
                         if (run.status == 2 || run.status == 3) {
@@ -163,9 +166,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
                     score: teamRun.sumScore,
                     time: teamRun.sumTime,
                     rescuedVictims: teamRun.sumRescue,
-                    rescuedNLS: teamRun.sumRescueNLS,
-                    rescuedNLG: teamRun.sumRescueNLG,
-                    rescueNLMis: teamRun.sumRescueNLMis,
+                    rescuedNL_Live: teamRun.sumRescueNL_Live,
+                    rescuedNL_Dead: teamRun.sumRescueNL_Dead,
+                    rescuedNL_Unknown: teamRun.sumRescueNL_Unknown,
                     LoPsNum: teamRun.sumLoPs,
                     retired: teamRun.retired,
                     isplaying: teamRun.isplaying,
@@ -227,9 +230,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
                 time: runs[0].time,
                 rescued: (runs[0].rescueOrder.length - areKit(runs[0].rescueOrder)),
                 lops: runs[0].LoPsNum,
-                rescuedNLS: runs[0].nl.silverTape,
-                rescuedNLG: runs[0].nl.greenTape,
-                rescueNLMis: runs[0].nl.misidentification
+                rescuedNL_Live: runs[0].nlLiveVictimCount,
+                rescuedNL_Dead: runs[0].nlDeadVictimCount,
+                rescuedNL_Unknown: runs[0].nlUnknownVictimCount
             }
         }
 
@@ -242,9 +245,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
                 seconds: 0
             },
             rescued: 0,
-            rescuedNLS: 0,
-            rescuedNLG: 0,
-            rescueNLMis: 0,
+            rescuedNL_Live: 0,
+            rescuedNL_Dead: 0,
+            rescuedNL_Unknown: 0,
             lops: 0
         }
 
@@ -253,9 +256,9 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
             sum.time.minutes += runs[i].time.minutes
             sum.time.seconds += runs[i].time.seconds
             sum.rescued += (runs[i].rescueOrder.length - areKit(runs[i].rescueOrder));
-            sum.rescuedNLS += runs[i].nl.silverTape;
-            sum.rescuedNLG += runs[i].nl.greenTape;
-            sum.rescueNLMis += runs[i].nl.misidentification;
+            sum.rescuedNL_Live += runs[i].nlLiveVictimCount;
+            sum.rescuedNL_Dead += runs[i].nlDeadVictimCount;
+            sum.rescuedNL_Unknown += runs[i].nlUnknownVictimCount;
             sum.lops += runs[i].LoPsNum
         }
         sum.time.minutes += Math.floor(sum.time.seconds/60);
@@ -287,6 +290,14 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
 
     $scope.detail = function (row) {
         //console.log(row);
+    }
+
+    $scope.range = function (n) {
+        arr = [];
+        for (var i = 0; i < n; i++) {
+            arr.push(i);
+        }
+        return arr;
     }
 }]);
 

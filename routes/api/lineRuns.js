@@ -411,11 +411,13 @@ privateRouter.put('/:runid', function (req, res, next) {
         }
 
         if (run.nl != null) {
-          if (run.nl.silverTape != null)
-            dbRun.nl.silverTape = run.nl.silverTape;
-          if (run.nl.greenTape != null) dbRun.nl.greenTape = run.nl.greenTape;
-          if (run.nl.misidentification != null)
-            dbRun.nl.misidentification = run.nl.misidentification;
+          if (run.nl.liveVictim != null) {
+            dbRun.nl.liveVictim = run.nl.liveVictim ;
+          }
+
+          if (run.nl.deadVictim != null) {
+            dbRun.nl.deadVictim = run.nl.deadVictim ;
+          }
         }
 
         if (run.status) {

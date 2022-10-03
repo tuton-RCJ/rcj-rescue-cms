@@ -93,9 +93,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.victim_list = [];
     $scope.LoPs = [];
-    $scope.victimNL_G = 0;
-    $scope.vittimNL_S = 0;
-    $scope.misidentNL_C = 0;
 
     $scope.enableSign = [false,false,false];
     $scope.signData = [null,null,null];
@@ -139,9 +136,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.victim_list = data.rescueOrder;
 
                 if(data.nl){
-                    $scope.victimNL_G = data.nl.greenTape;
-                    $scope.victimNL_S = data.nl.silverTape;
-                    $scope.misidentNL_C = data.nl.misidentification;
+                    $scope.victimNL_Dead = data.nl.deadVictim;
+                    $scope.victimNL_Live = data.nl.liveVictim;
                 }
                 
 
@@ -221,9 +217,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.victim_list = response.data.rescueOrder;
 
             if(response.data.nl){
-                $scope.victimNL_G = response.data.nl.greenTape;
-                $scope.victimNL_S = response.data.nl.silverTape;
-                $scope.misidentNL_C = response.data.nl.misidentification;
+                $scope.victimNL_Dead = response.data.nl.deadVictim;
+                $scope.victimNL_Live = response.data.nl.liveVictim;
             }
             
 
@@ -335,7 +330,14 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     };
 
     $scope.nlPoints = function(){
-        return 15 * $scope.victimNL_S + 30 * $scope.victimNL_G;
+        let point = 0;
+        for (let victim of $scope.victimNL_Live) {
+            point += 10 * victim.found + 20 * victim.identified;
+        }
+        for (let victim of $scope.victimNL_Dead) {
+            point += 10 * victim.found + 5 * victim.identified;
+        }
+        return point;
     }
 
 

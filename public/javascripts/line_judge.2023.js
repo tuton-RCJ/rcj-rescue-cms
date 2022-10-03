@@ -1,7 +1,6 @@
 /*********************************************************************************/
-// This file is a RoboCup Junior Rescue 2020 rule correspondence version. //
+// This file is a RoboCup Junior Rescue 2023 rule correspondence version. //
 /*********************************************************************************/
-
 // register the directive with your app module
 
 var app = angular.module('ddApp', ['ngTouch', 'ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
@@ -128,9 +127,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.victim_list = [];
     $scope.victim_tmp = [];
     $scope.LoPs = [];
-    $scope.victimNL_G = 0;
-    $scope.vittimNL_S = 0;
-    $scope.misidentNL_C = 0;
+    $scope.victimNL_Dead = [];
+    $scope.victimNL_Live = [];
 
     $scope.checkTeam = $scope.checkRound = $scope.checkMember = $scope.checkMachine = false;
     loadNewRun();
@@ -179,9 +177,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       showedUp: $scope.showedUp,
       EvacuationAreaLoPIndex: $scope.EvacuationAreaLoPIndex,
       nl: {
-        silverTape: $scope.victimNL_S,
-        greenTape:  $scope.victimNL_G,
-        misidentification: $scope.misidentNL_C
+        deadVictim: $scope.victimNL_Dead,
+        liveVictim:  $scope.victimNL_Live
       },
       isNL: $scope.isNL
     };
@@ -310,9 +307,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
       $scope.victim_list = response.data.rescueOrder;
 
-      $scope.victimNL_G = response.data.nl.greenTape;
-      $scope.victimNL_S = response.data.nl.silverTape;
-      $scope.misidentNL_C = response.data.nl.misidentification;
+      $scope.victimNL_Dead = response.data.nl.deadVictim;
+      $scope.victimNL_Live = response.data.nl.liveVictim;
 
 
       // Scoring elements of the tiles
@@ -345,6 +341,21 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         // Get max victim count
         $scope.maxLiveVictims = response.data.victims.live;
         $scope.maxDeadVictims = response.data.victims.dead;
+
+        if ($scope.isNL) {
+          for (let _ in $scope.range($scope.maxDeadVictims - $scope.victimNL_Dead.length)) {
+            $scope.victimNL_Dead.push({
+              "found": false,
+              "identified": false
+            })
+          }
+          for (let _ in $scope.range($scope.maxLiveVictims - $scope.victimNL_Live.length)) {
+            $scope.victimNL_Live.push({
+              "found": false,
+              "identified": false
+            })
+          }
+        }
 
         $scope.mapIndexCount = response.data.indexCount;
         if($scope.maxLiveVictims == 0 && $scope.maxDeadVictims == 0){
@@ -608,22 +619,34 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   };
 
-  $scope.victimNL = function (type, num) {
+  $scope.victimNL = function (type, number, found, identified) {
     playSound(sClick);
-    if(type == "S"){
-      $scope.victimNL_S += num;
-      if($scope.victimNL_S < 0) $scope.victimNL_S = 0;
-    }else{
-      $scope.victimNL_G += num;
-      if($scope.victimNL_G < 0) $scope.victimNL_G = 0;
+    if(type == "D"){ // dead
+      if ($scope.victimNL_Dead.length <= number) return;
+      $scope.victimNL_Dead[number].found = found;
+      $scope.victimNL_Dead[number].identified = identified;
+    }else{ // live
+      if ($scope.victimNL_Live.length <= number) return;
+      $scope.victimNL_Live[number].found = found;
+      $scope.victimNL_Live[number].identified = identified;
     }
     upload_run({
       nl:{
-        silverTape: $scope.victimNL_S,
-        greenTape: $scope.victimNL_G
+        liveVictim: $scope.victimNL_Live,
+        deadVictim: $scope.victimNL_Dead
       }
     });
   };
+
+  $scope.victimNLActivate = function (type, number, found, identified) {
+    if(type == "D"){ // dead
+      if ($scope.victimNL_Dead.length <= number) return false;
+      return $scope.victimNL_Dead[number].found == found && $scope.victimNL_Dead[number].identified == identified; 
+    }else{ // live
+      if ($scope.victimNL_Live.length <= number) return false;
+      return $scope.victimNL_Live[number].found == found && $scope.victimNL_Live[number].identified == identified;
+    }
+  }
 
   $scope.misidentNL = function (num) {
     playSound(sClick);

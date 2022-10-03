@@ -1,6 +1,6 @@
 {
   "name": "rcj-scoring",
-  "version": "22.0.15",
+  "version": "23.0.0",
   "copyright": "2016-2022 RCJ-CMS Development Team",
   "private": true,
   "scripts": {

@@ -48,7 +48,16 @@ block content
                       li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#0abde3")
                         i.fas.fa-stopwatch.fa-fw &nbsp;&nbsp;&nbsp;{{("00"+run.time.minutes).slice(-2)}}:{{("00"+run.time.seconds).slice(-2)}}
                       li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#ee5253")
-                        i.fas.fa-ambulance.fa-fw &nbsp;&nbsp;{{run.rescuedNLS + run.rescuedNLG}}&nbsp;体
+                        i.fas.fa-ambulance.fa-fw(style="margin-right:15px;")
+                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Unknown > 0")
+                          img(src='/images/unknownVictim.png', style="height:30px;")
+                          span(style="font-size:30px; color:#000;") ×{{run.rescuedNL_Unknown}}
+                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Live > 0")
+                          img(src='/images/greenVictim.png', style="height:30px;")
+                          span(style="font-size:30px; color:#000;") ×{{run.rescuedNL_Live}}
+                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Dead > 0")
+                          img(src='/images/blackVictim.png', style="height:30px;")
+                          span(style="font-size:30px; color:#000;") ×{{run.rescuedNL_Dead}}
                       li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                         i.fas.fa-step-forward.fa-fw &nbsp;&nbsp;&nbsp;{{run.LoPsNum}}&nbsp;回
             hr(color="#636e72" style="margin-top:1vh;margin-bottom:1vh;")
@@ -68,7 +77,16 @@ block content
                             .col-6
                                 ul.list-group(style="height:100%;font-size:4vh;")
                                     li.list-group-item(style="border:3px solid #636e72;padding:1vh;color:#ee5253")
-                                        i.fas.fa-ambulance.fa-fw &nbsp;&nbsp;{{RunsTop[nowR+(2*i)-1].rescuedNLS + RunsTop[nowR+(2*i)-1].rescuedNLG}}&nbsp;体
+                                        i.fas.fa-ambulance.fa-fw(style="margin-right:15px;")
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)-1].rescuedNL_Unknown > 0")
+                                          img(src='/images/unknownVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)-1].rescuedNL_Unknown}}
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)-1].rescuedNL_Live > 0")
+                                          img(src='/images/greenVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)-1].rescuedNL_Live}}
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)-1].rescuedNL_Dead > 0")
+                                          img(src='/images/blackVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)-1].rescuedNL_Dead}}
                                     li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                                         i.fas.fa-step-forward.fa-fw &nbsp;&nbsp;&nbsp;{{RunsTop[nowR+(2*i)-1].LoPsNum}}&nbsp;回
                     .col-6(ng-show="RunsTop[nowR+(2*i)]")
@@ -84,8 +102,17 @@ block content
                                         i.fas.fa-stopwatch.fa-fw &nbsp;&nbsp;&nbsp;{{("00"+RunsTop[nowR+(2*i)].time.minutes).slice(-2)}}:{{("00"+RunsTop[nowR+(2*i)].time.seconds).slice(-2)}}
                             .col-6
                                 ul.list-group(style="height:100%;font-size:4vh;")
-                                    li.list-group-item(style="border:3px solid #636e72;padding:1vh;color:#ee5253")
-                                        i.fas.fa-ambulance.fa-fw &nbsp;&nbsp;{{RunsTop[nowR+(2*i)].rescuedNLS + RunsTop[nowR+(2*i)].rescuedNLG}}&nbsp;体
+                                    i.fas.fa-ambulance.fa-fw(style="margin-right:15px;")
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)].rescuedNL_Unknown > 0")
+                                          img(src='/images/unknownVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)].rescuedNL_Unknown}}
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)].rescuedNL_Live > 0")
+                                          img(src='/images/greenVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)].rescuedNL_Live}}
+                                        .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="RunsTop[nowR+(2*i)].rescuedNL_Dead > 0")
+                                          img(src='/images/blackVictim.png', style="height:30px;")
+                                          span(style="font-size:30px; color:#000;") ×{{RunsTop[nowR+(2*i)].rescuedNL_Dead}}
+                                    li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                                     li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                                         i.fas.fa-step-forward.fa-fw &nbsp;&nbsp;&nbsp;{{RunsTop[nowR+(2*i)].LoPsNum}}&nbsp;回
                     
