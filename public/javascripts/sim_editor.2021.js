@@ -176,13 +176,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function reachable(x,y,z,i=-1,dir=-1){
-        if (i == 0 && x == 7 && y == 3)
-            console.log('hello');
-
         if(x<0 || x>$scope.width*2 || y<0 || y>$scope.length*2) return;
         let cell = $scope.cells[x+','+y+','+z];
-        if (!cell.tile.halfTile) i = -1; // if going from quarter tile to full tile
         if(cell){
+            if (!cell.tile.halfTile) i = -1; // if going from quarter tile to full tile
             if (i == -1) { // if coming from full tile
                 if($scope.cells[x+','+y+','+z].reachable) return;
                 $scope.cells[x+','+y+','+z].reachable = true;
