@@ -1,5 +1,6 @@
 // register the directive with your app module
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
+let maxKit={};
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http','$translate', '$cookies',function ($scope, $uibModal, $log, $timeout, $http, $translate, $cookies) {
@@ -33,6 +34,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         $scope.startUnixTime = 0;
         $scope.cells = {};
         $scope.tiles = {};
+        $scope.leagueType = null;
         loadNewRun();
         $(window).scrollTop(0);
     }
@@ -95,15 +97,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return ($scope.checkTeam & $scope.checkRound & $scope.checkMember & $scope.checkMachine)
     }
 
-    let maxKit={
-        'Heated': 1,
-        'H': 3,
-        'S': 2,
-        'U': 0,
-        'Red': 1,
-        'Yellow': 1,
-        'Green': 0
-    }
+    
 
 
     const http_config = {
@@ -121,7 +115,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             exitBonus: $scope.exitBonus,
             misidentification: $scope.MisIdent
         };
-        $scope.score = maze_calc_score(tmp);
+        if ($scope.leagueType == "entry") {
+            $scope.score = maze_calc_score_entry(tmp);
+        } else {
+            $scope.score = maze_calc_score(tmp);
+        }
       }
         if ($scope.networkError) {
             $scope.saveEverything();
@@ -258,6 +256,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.width = response.data.width;
             $scope.length = response.data.length;
             $scope.duration = response.data.duration || 480;
+            $scope.leagueType = response.data.leagueType;
+            if (response.data.leagueType == "entry") {
+                // Identification bonus
+                maxKit={
+                    'Red': 1,
+                    'Green': 1
+                };
+            } else {
+                maxKit={
+                    'Heated': 1,
+                    'H': 3,
+                    'S': 2,
+                    'U': 0,
+                    'Red': 1,
+                    'Yellow': 1,
+                    'Green': 0
+                };
+            }
+
             if(response.data.parent){
                 if(!$scope.dice){
                     $http.get("/api/maps/maze/" + response.data.parent).then(function (response) {
@@ -497,13 +514,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -564,6 +583,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible += maxKit[cell.tile.victims.bottom];
             current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
         }
+        if(cell.tile.victims.floor != "None"){
+            possible++;
+            current += tile.scoredItems.victims.floor;
+            console.log(current)
+            possible += maxKit[cell.tile.victims.floor];
+            current += Math.min(tile.scoredItems.rescueKits.floor,maxKit[cell.tile.victims.floor]);
+        }
 
 
 
@@ -599,13 +625,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -615,9 +643,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var hasVictims = (cell.tile.victims.top != "None") ||
             (cell.tile.victims.right != "None") ||
             (cell.tile.victims.bottom != "None") ||
-            (cell.tile.victims.left != "None");
+            (cell.tile.victims.left != "None") ||
+            (cell.tile.victims.floor != "None");
 
-        console.log(cell.tile);
         // Total number of scorable things on this tile
         var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + !!cell.tile.ramp + hasVictims;
         console.log("totalt antal saker", total);
@@ -664,6 +692,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 },
                 sRotate: function (){
                     return $scope.sRotate;
+                },
+                leagueType: function () {
+                    return $scope.leagueType;
                 }
             }
         }).closed.then(function (result) {
@@ -870,13 +901,15 @@ $(window).on('load resize', function () {
 // Please note that $uibModalInstance represents a modal window (instance) dependency.
 // It is not the same as the $uibModal service used above.
 
-app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate','leagueType',function ($scope, $uibModalInstance, cell, tile, sRotate, leagueType) {
     $scope.cell = cell;
     $scope.tile = tile;
+    $scope.leagueType = leagueType;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
         (cell.tile.victims.right != "None") ||
         (cell.tile.victims.bottom != "None") ||
-        (cell.tile.victims.left != "None");
+        (cell.tile.victims.left != "None") ||
+        (cell.tile.victims.floor != "None");
     $scope.clickSound = function(){
         playSound(sClick);
     };
@@ -921,23 +954,7 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     };
 
     $scope.kitStatus = function(light, kit, type){
-        switch(type){
-            case 'H':
-                if(kit >= 3) return true;
-                break;
-            case 'S':
-                if(kit >= 2) return true;
-                break;
-            case 'Red':
-            case 'Heated':
-            case 'Yellow':
-                if(kit >= 1) return true;
-                break;
-            case 'U':
-            case 'Green':
-                return true;
-        }
-        return false;
+        return (maxKit[type] <= kit);
     };
 
     $scope.modalRotate = function(dir){

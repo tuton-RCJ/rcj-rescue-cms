@@ -1,6 +1,8 @@
 // register the directive with your app module
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 var socket;
+
+let maxKit = {};
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $cookies) {
 
@@ -8,16 +10,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.dRunId = -1;
 
     $scope.countWords = ["Bottom", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Ninth"];
-
-    let maxKit={
-        'Heated': 1,
-        'H': 3,
-        'S': 2,
-        'U': 0,
-        'Red': 1,
-        'Yellow': 1,
-        'Green': 0
-    }
 
     var tick = function () {
         if ($scope.status == 2 && $scope.minutes < 8) {
@@ -185,6 +177,24 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.width = response.data.width;
             $scope.length = response.data.length;
 
+            $scope.leagueType = response.data.leagueType;
+            if ($scope.leagueType == "entry") {
+                maxKit={
+                    'Red': 1,
+                    'Green': 1
+                }
+            } else {
+                maxKit={
+                    'Heated': 1,
+                    'H': 3,
+                    'S': 2,
+                    'U': 0,
+                    'Red': 1,
+                    'Yellow': 1,
+                    'Green': 0
+                }
+            }
+
             for (let i = 0; i < response.data.cells.length; i++) {
                 $scope.cells[response.data.cells[i].x + ',' +
                     response.data.cells[i].y + ',' +
@@ -195,8 +205,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             length = response.data.length;
             height = response.data.height;
             if (height > 2) height = 2;
-            console.log("h" + height);
-
         }, function (response) {
             console.log("Error: " + response.statusText);
         });
@@ -235,13 +243,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -302,6 +312,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible += maxKit[cell.tile.victims.bottom];
             current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
         }
+        if(cell.tile.victims.floor != "None"){
+            possible++;
+            current += tile.scoredItems.victims.floor;
+            possible += maxKit[cell.tile.victims.floor];
+            current += Math.min(tile.scoredItems.rescueKits.floor,maxKit[cell.tile.victims.floor]);
+        }
 
 
 
@@ -327,7 +343,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var hasVictims = (cell.tile.victims.top != "None") ||
           (cell.tile.victims.right != "None") ||
           (cell.tile.victims.bottom != "None") ||
-          (cell.tile.victims.left != "None");
+          (cell.tile.victims.left != "None") ||
+          (cell.tile.victims.floor != "None");
         // Total number of scorable things on this tile
         var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + cell.tile.ramp + hasVictims;
 
@@ -358,13 +375,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -487,7 +506,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 current += victimPoint * tile.scoredItems.victims.left / 2;
                 break;
         }
-
+        switch (cell.tile.victims.floor) {
+            case 'Red':
+            case 'Green':
+                current += (cell.isLinear ? 15:30) * tile.scoredItems.victims.floor;
+                current += 10 * Math.min(tile.scoredItems.rescueKits.floor , 1);
+                break;
+        }
 
         return current;
     };
@@ -507,6 +532,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 },
                 sRotate: function () {
                     return $scope.sRotate;
+                },
+                leagueType: function () {
+                    return $scope.leagueType;
                 }
             }
         }).closed.then(function (result) {
@@ -595,7 +623,7 @@ function tile_size() {
             //console.log('window：' + window.innerHeight);
             var tilesize_w = (b.width() - (10*(height-1)) -10*(width+1 * height) ) /
                 ((width * height) + (width+1 * height)/4);
-            var tilesize_h = (window.innerHeight - (180 + 12 * (length + 1))) /
+            var tilesize_h = (window.innerHeight - (200 + 12 * (length + 1))) /
                 length;
             console.log(width + 'tilesize_w:' + tilesize_w);
             console.log('tilesize_h:' + tilesize_h);
@@ -622,13 +650,15 @@ function tile_size() {
 }
 
 
-app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','leagueType',function ($scope, $uibModalInstance, cell, tile, leagueType) {
     $scope.cell = cell;
     $scope.tile = tile;
+    $scope.leagueType = leagueType;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
         (cell.tile.victims.right != "None") ||
         (cell.tile.victims.bottom != "None") ||
-        (cell.tile.victims.left != "None");
+        (cell.tile.victims.left != "None") ||
+        (cell.tile.victims.floor != "None");
 
     $scope.lightStatus = function(light, kit){
         if(light) return true;
@@ -636,23 +666,7 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     };
 
     $scope.kitStatus = function(light, kit, type){
-        switch(type){
-            case 'H':
-                if(kit >= 3) return true;
-                break;
-            case 'S':
-                if(kit >= 2) return true;
-                break;
-            case 'Red':
-            case 'Heated':
-            case 'Yellow':
-                if(kit >= 1) return true;
-                break;
-            case 'U':
-            case 'Green':
-                return true;
-        }
-        return false;
+        return (maxKit[type] <= kit);
     };
 
     $scope.modalRotate = function (dir) {
@@ -697,7 +711,7 @@ $(window).on('load resize', function () {
     }
     currentWidth = window.innerWidth;
     tile_size();
-
+    setInterval(tile_size, 10000);
 });
 
 let lastTouch = 0;

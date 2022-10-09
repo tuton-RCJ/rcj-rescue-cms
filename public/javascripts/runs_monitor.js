@@ -18,6 +18,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.vet = 1;
 
+    $http.get("/api/competitions/leagues").then(function (response) {
+        $scope.leagues = response.data
+    })
+
+    function getLeagueType(leagueId) {
+        return $scope.leagues.find(l => l.id == leagueId).type;
+    }
 
     $http.get("/api/competitions/" + competitionId +
         "/line/fields").then(function (response) {
@@ -30,9 +37,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     })
 
     $scope.getIframeSrc = function (field) {
-        if (field.league === "Maze") return '/maze/view/field/' + competitionId + '/' + field._id;
-        return '/line/view/field/' + competitionId + '/' + field._id;
+        return `/${getLeagueType(field.league)}/view/field/${competitionId}/${field._id}`;
     };
+
     $scope.range = function (n) {
         arr = [];
         for (var i = 0; i < n; i++) {
@@ -41,23 +48,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return arr;
     }
 
-
-
-
-
     $scope.go = function (path) {
         window.open(path)
     }
 
-
     function getFieldOpen(field, level = 2) {
-        if (field.league === "Maze") {
-            var league = "maze";
-        } else {
-            var league = "line";
-        }
-        $http.get("/api/runs/" + league + "/find/" + competitionId + "/" +
-            field._id + "/" + level).then(function (response) {
+        $http.get(`/api/runs/${getLeagueType(field.league)}/find/${competitionId}/${field._id}/${level}`).then(function (response) {
             if (response.data.length != 1) {
                 if (level == 2) {
                     getFieldOpen(field, 3);
