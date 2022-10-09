@@ -207,3 +207,46 @@ function maze_calc_score(run) {
 
     return score
 }
+
+function maze_calc_score_entry(run) {
+    let score = 0;
+
+    let mapTiles = [];
+    for (let i = 0; i < run.map.cells.length; i++) {
+        let cell = run.map.cells[i];
+        if (cell.isTile) {
+            mapTiles[cell.x + ',' + cell.y + ',' + cell.z] = cell
+        }
+    }
+
+    let victims = 0;
+
+    for (let coord of Object.keys(run.tiles)) {
+        let tile = run.tiles[coord];
+
+        if (tile.scoredItems.speedbump && mapTiles[coord].tile.speedbump) {
+            score += 5
+        }
+        if (tile.scoredItems.checkpoint && mapTiles[coord].tile.checkpoint) {
+            score += 10
+        }
+
+        if (mapTiles[coord].tile.victims.floor != "None") {
+            if (tile.scoredItems.victims.floor) {
+                victims++;
+                if(mapTiles[coord].tile.victims.floor == "Red" || mapTiles[coord].tile.victims.floor == "Green")  score += mapTiles[coord].isLinear ? 15 : 30;
+            }
+            score += Math.min(tile.scoredItems.rescueKits.floor, 1) * 10
+        }
+    }
+
+    score += Math.max((victims * 10) - (run.LoPs * 5), 0);
+
+    if (run.exitBonus) {
+        score += victims * 10;
+    }
+
+    score -= Math.min(run.misidentification*5,score);
+
+    return score
+}

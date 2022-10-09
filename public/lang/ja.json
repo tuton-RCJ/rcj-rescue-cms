@@ -489,6 +489,7 @@
             "m_ramp": "傾斜路",
             "m_steps": "ステップ",
             "m_flash": "被災者から15cm以内でランプを点滅",
+            "m_identified": "被災者のタイプの識別に成功",
             "m_kit": "レスキューキットを配布",
             "misidentification": "誤発見"
         },
@@ -516,6 +517,7 @@
             "m_ramp": "@:maze.view.m_ramp",
             "m_steps": "@:maze.view.m_steps",
             "m_flash": "@:maze.view.m_flash",
+            "m_identified": "@:maze.view.m_identified",
             "m_kit": "@:maze.view.m_kit",
             "pat": "@:admin.mazeMapEditor.pattern",
             "random": "ランダム抽選（乱数）",
@@ -752,6 +754,7 @@
             "right": "@:admin.lineMapEditor.right",
             "left": "@:admin.lineMapEditor.left",
             "bottom": "@:admin.lineMapEditor.bottom",
+            "floor": "床",
             "noStart": "@:admin.lineMapEditor.noStart",
             "start": "@:admin.lineMapEditor.start",
             "placement" : "被災者の配置:",
@@ -765,7 +768,10 @@
             "patSave" : "パターンを設定するためには，マップを一度，保存してください．",
             "create": "新規作成",
             "edit": "編集",
-            "patYet": "サイコロパターン設定が行われていないため，迷路作成を完了できません."
+            "patYet": "サイコロパターン設定が行われていないため，迷路作成を完了できません.",
+            "entryLeague": "エントリー",
+            "standardLeague": "国際標準",
+            "leagueType": "リーグタイプ"
         },
         "mazeRun": {
             "title": "Maze 競技管理",

@@ -149,97 +149,6 @@ module.exports.calculateLineScore = function (run) {
   }
 };
 
-module.exports.calculateLineScoreManual = function (run) {
-  try {
-    // console.log(run);
-    let score = 0;
-
-    const mapTiles = [];
-    for (let i = 0; i < run.map.tiles.length; i++) {
-      const tile = run.map.tiles[i];
-
-      for (let j = 0; j < tile.index.length; j++) {
-        const index = tile.index[j];
-
-        mapTiles[index] = tile;
-      }
-    }
-
-    let lastDropTile = 0;
-    let dropTileCount = 0;
-
-    // console.log(mapTiles);
-    for (let i = 0; i < run.tiles.length; i++) {
-      const tile = run.tiles[i];
-      // console.log(tile.scoredItems)
-      for (let j = 0; j < tile.scoredItems.length; j++) {
-        switch (tile.scoredItems[j].item) {
-          case 'checkpoint':
-            const tileCount = i - lastDropTile;
-            score +=
-              Math.max(tileCount * (5 - 2 * run.LoPs[dropTileCount]), 0) *
-              tile.scoredItems[j].scored;
-            // console.log(Math.max(tileCount * (5 - 2 * run.LoPs[dropTileCount]), 0) * tile.scoredItems[j].scored)
-            break;
-          default:
-            break;
-        }
-      }
-
-      if (tile.isDropTile) {
-        lastDropTile = i;
-        dropTileCount++;
-      }
-    }
-
-    if (run.rescueOrder) {
-      if (run.evacuationLevel == 1) {
-        for (const victim of run.rescueOrder) {
-          if (victim.effective) {
-            if (victim.type == 'L') {
-              score += Math.max(30 - run.LoPs[dropTileCount] * 5, 0);
-            } else {
-              score += Math.max(20 - run.LoPs[dropTileCount] * 5, 0);
-            }
-          } else {
-            score += Math.max(5 - run.LoPs[dropTileCount] * 5, 0);
-          }
-        }
-      } else if (run.evacuationLevel == 2) {
-        for (const victim of run.rescueOrder) {
-          if (victim.effective) {
-            if (victim.type == 'L') {
-              score += Math.max(40 - run.LoPs[dropTileCount] * 5, 0);
-            } else {
-              score += Math.max(30 - run.LoPs[dropTileCount] * 5, 0);
-            }
-          } else {
-            score += Math.max(5 - run.LoPs[dropTileCount] * 5, 0);
-          }
-        }
-      }
-    }
-
-    score += run.manual.gap * 10;
-    score += run.manual.obstacle * 10;
-    score += run.manual.speedbump * 5;
-    score += (run.manual.intersection + run.manual.deadend) * 15;
-    score += (run.manual.rampUP + run.manual.rampDOWN) * 5;
-
-    if (run.exitBonus) {
-      score += 20;
-    }
-
-    // 5 points for placing robot on first droptile (start)
-    // Implicit showedUp if anything else is scored
-    if (run.showedUp || score > 0) {
-      score += 5;
-    }
-    if (isNaN(score)) return 0;
-    return score;
-  } catch (e) {}
-};
-
 /**
  *
  * @param run Must be populated with map!
@@ -365,48 +274,54 @@ module.exports.calculateMazeScore = function (run) {
   return `${score},${victims},${Math.min(rescueKits, 12)}`;
 };
 
-module.exports.calculateMazeScoreManual = function (run) {
+module.exports.calculateMazeScoreEntry = function (run) {
   let score = 0;
 
+  const mapTiles = [];
+  for (let i = 0; i < run.map.cells.length; i++) {
+    const cell = run.map.cells[i];
+    if (cell.isTile) {
+      mapTiles[`${cell.x},${cell.y},${cell.z}`] = cell;
+    }
+  }
+
   let victims = 0;
-  let rescueKits = 0;
+  let identified = 0;
 
-  score += run.manual.speedbumps * 5;
-  score += run.manual.checkpoints * 10;
-  score += run.manual.rampDOWN * 10;
-  score += run.manual.rampUP * 20;
+  for (let i = 0; i < run.tiles.length; i++) {
+    const tile = run.tiles[i];
+    const coord = `${tile.x},${tile.y},${tile.z}`;
 
-  let victimsL = 0;
-  victimsL += run.manual.victims.linear.u.identify;
-  victimsL += run.manual.victims.linear.s.identify;
-  victimsL += run.manual.victims.linear.h.identify;
-  victimsL += run.manual.victims.linear.heated.identify;
-  rescueKits += run.manual.victims.linear.s.kit;
-  rescueKits += run.manual.victims.linear.h.kit;
-  rescueKits += run.manual.victims.linear.heated.kit;
-  score += victimsL * 10;
+    if (tile.scoredItems.speedbump && mapTiles[coord].tile.speedbump) {
+      score += 5;
+    }
+    if (tile.scoredItems.checkpoint && mapTiles[coord].tile.checkpoint) {
+      score += 10;
+    }
 
-  let victimsF = 0;
-  victimsF += run.manual.victims.floating.u.identify;
-  victimsF += run.manual.victims.floating.s.identify;
-  victimsF += run.manual.victims.floating.h.identify;
-  victimsF += run.manual.victims.floating.heated.identify;
-  rescueKits += run.manual.victims.floating.s.kit;
-  rescueKits += run.manual.victims.floating.h.kit;
-  rescueKits += run.manual.victims.floating.heated.kit;
-  score += victimsF * 25;
+    if (mapTiles[coord].tile.victims.floor != 'None') {
+      if (tile.scoredItems.victims.floor) {
+        victims++;
+        if (
+          mapTiles[coord].tile.victims.floor == 'Red' ||
+          mapTiles[coord].tile.victims.floor == 'Green'
+        )
+          score += mapTiles[coord].isLinear ? 15 : 30;
+      }
+      if (tile.scoredItems.rescueKits.floor > 0) {
+        score += 10;
+        identified ++;
+      }
+    }
+  }
 
-  victims = victimsL + victimsF;
-
-  score += Math.min(rescueKits, 12) * 10;
-
-  score += Math.max((victims + Math.min(rescueKits, 12) - run.LoPs) * 10, 0);
+  score += Math.max((victims * 10)  - (run.LoPs * 5), 0);
 
   if (run.exitBonus) {
     score += victims * 10;
   }
 
-  score -= Math.min(run.misidentification * 5, score);
+  score -= Math.min(run.misidentification*5,score);
 
-  return `${score},${victims},${Math.min(rescueKits, 12)}`;
+  return `${score},${victims},${identified}`;
 };
