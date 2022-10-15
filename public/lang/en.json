@@ -491,6 +491,7 @@
             "m_ramp": "Ramp",
             "m_steps": "Steps",
             "m_flash": "Flash within 15cm from victim:",
+            "m_identified": "Successfully identified victim type",
             "m_kit": "Delivered rescue kits:",
             "misidentification": "Misidentification"
         },
@@ -518,6 +519,7 @@
             "m_ramp": "@:maze.view.m_ramp",
             "m_steps": "@:maze.view.m_steps",
             "m_flash": "@:maze.view.m_flash",
+            "m_identified": "@:maze.view.m_identified",
             "m_kit": "@:maze.view.m_kit",
             "pat": "@:admin.mazeMapEditor.pattern",
             "random": "Random drawing",
@@ -754,6 +756,7 @@
             "right": "@:admin.lineMapEditor.right",
             "left": "@:admin.lineMapEditor.left",
             "bottom": "@:admin.lineMapEditor.bottom",
+            "floor": "Floor",
             "noStart": "@:admin.lineMapEditor.noStart",
             "start": "@:admin.lineMapEditor.start",
             "placement" : "Placement of victims:",
@@ -767,7 +770,10 @@
             "patSave": "To set the pattern, save the map before once.",
             "create": "Create New",
             "edit" : "Edit",
-            "patYet": "The map creation can not be completed because the dice pattern setting has not been done."
+            "patYet": "The map creation can not be completed because the dice pattern setting has not been done.",
+            "entryLeague": "Entry(JP)",
+            "standardLeague": "Normal",
+            "leagueType": "League type"
         },
         "mazeRun": {
             "title": "Maze Runs",

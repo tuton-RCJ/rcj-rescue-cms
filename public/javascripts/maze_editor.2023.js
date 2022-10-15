@@ -42,6 +42,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
     $scope.dice = [];
     $scope.saveasname ="";
     $scope.finished = true;
+    $scope.leagueType = "standard";
 
     if(!pubService){
         $http.get("/api/competitions/" +
@@ -64,6 +65,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             $scope.name = response.data.name;
             $scope.finished = response.data.finished;
             $scope.competitionId = response.data.competition;
+            $scope.leagueType = response.data.leagueType;
 
 
             try {
@@ -391,6 +393,11 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
                             if(linear) return big[count-1];
                             else return small[count-1];
                         }
+                        if(victims.floor == type) count++;
+                        if(x == j && y == i && place == 'floor'){
+                            if(linear) return big[count-1];
+                            else return small[count-1];
+                        }
                     }
                 }
             }
@@ -415,6 +422,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             if($scope.cells[x + ',' + y + ',' + z].tile.victims.top == type) return true;
             if($scope.cells[x + ',' + y + ',' + z].tile.victims.right == type) return true;
             if($scope.cells[x + ',' + y + ',' + z].tile.victims.left == type) return true;
+            if($scope.cells[x + ',' + y + ',' + z].tile.victims.floor == type) return true;
         }
         return false;
     };
@@ -556,9 +564,6 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             alert("You must define a starting tile by clicking a tile");
             return;
         }
-        console.log($scope.se_competition);
-        console.log(competitionId);
-
         if (name == $scope.name && $scope.se_competition == competitionId) {
             alert("You must have a new name when saving as!");
             return;
@@ -572,11 +577,11 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             height: $scope.height,
             duration: $scope.duration,
             width: $scope.width,
+            leagueType: $scope.leagueType,
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells
         };
-        console.log(map);
         $http.post("/api/maps/maze", map).then(function (response) {
             alert("Created map!");
             console.log(response.data);
@@ -601,6 +606,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             height: $scope.height,
             duration: $scope.duration,
             width: $scope.width,
+            leagueType: $scope.leagueType,
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells
@@ -650,14 +656,23 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             if(cell.isTile){
                 if(cell.tile.victims){
                     Object.keys(cell.tile.victims).map(function(dir){
-                        if(coloredVictims.includes(cell.tile.victims[dir])){
-                            maxScore += cell.isLinear ? 5 : 15;
-                            victimCount++;
-                        }else if(cell.tile.victims[dir] != "None"){
-                            maxScore += cell.isLinear ? 10 : 30;
-                            victimCount++;
+                        if ($scope.leagueType == 'entry') {
+                            if(coloredVictims.includes(cell.tile.victims[dir])) {
+                                maxScore += cell.isLinear ? 15 : 30;
+                                kitCount ++;
+                                victimCount ++;
+                            }
+                        } else {
+                            if(coloredVictims.includes(cell.tile.victims[dir])){
+                                maxScore += cell.isLinear ? 5 : 15;
+                                victimCount++;
+                            }else if(cell.tile.victims[dir] != "None"){
+                                maxScore += cell.isLinear ? 10 : 30;
+                                victimCount++;
+                            }
+                            kitCount += maxKits[cell.tile.victims[dir]];
                         }
-                        kitCount += maxKits[cell.tile.victims[dir]];
+                        
                     });
                 }
                 if(cell.tile.speedbump) maxScore += 5;
@@ -667,9 +682,15 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             }
         });
 
-        maxScore += Math.min(kitCount, 12) * 10;
-        maxScore += (victimCount + Math.min(kitCount, 12)) * 10;
-        maxScore += victimCount * 10;
+        if ($scope.leagueType == 'entry') {
+            maxScore += kitCount * 10;
+            maxScore += victimCount * 20;
+        } else {
+            maxScore += Math.min(kitCount, 12) * 10;
+            maxScore += (victimCount + Math.min(kitCount, 12)) * 10;
+            maxScore += victimCount * 10;
+        }
+        
 
         let html = `
         <div class='text-center'>
@@ -691,6 +712,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             length: $scope.length,
             height: $scope.height,
             width: $scope.width,
+            leagueType: $scope.leagueType,
             duration: $scope.duration,
             finished: $scope.finished,
             startTile: $scope.startTile,
@@ -810,6 +832,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
 
 app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'x', 'y', 'z', function ($scope, $uibModalInstance, x, y, z) {
     $scope.cell = $scope.$parent.cells[x + ',' + y + ',' + z];
+    $scope.leagueType = $scope.$parent.leagueType;
     $scope.isStart = $scope.$parent.startTile.x == x &&
         $scope.$parent.startTile.y == y &&
         $scope.$parent.startTile.z == z;

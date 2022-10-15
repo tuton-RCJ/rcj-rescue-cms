@@ -15,6 +15,7 @@ const { ACCESSLEVELS } = require('../../models/user');
 const logger = require('../../config/logger').mainLogger;
 const competitiondb = require('../../models/competition');
 const auth = require('../../helper/authLevels');
+const { type } = require('os');
 
 const { LEAGUES_JSON } = competitiondb;
 
@@ -358,6 +359,10 @@ adminRouter.post('/', function (req, res) {
 
 adminRouter.post('/bulk', function (req, res) {
   const teams = req.body;
+  if (typeof(teams) != "object") {
+    res.status(400).send("Bad request");
+    return;
+  }
 
   competitiondb.competition
     .findOne({

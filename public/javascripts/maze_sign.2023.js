@@ -2,6 +2,7 @@
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 var marker = {};
 var socket;
+let maxKit = {};
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$translate', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $translate, $cookies) {
@@ -47,16 +48,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.cells = {};
     $scope.tiles = {};
-
-    let maxKit={
-        'Heated': 1,
-        'H': 3,
-        'S': 2,
-        'U': 0,
-        'Red': 1,
-        'Yellow': 1,
-        'Green': 0
-    }
 
     //$cookies.remove('sRotate')
     if($cookies.get('sRotate')){
@@ -149,6 +140,24 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.width = response.data.width;
                 $scope.length = response.data.length;
 
+                $scope.leagueType = response.data.leagueType;
+                if ($scope.leagueType == "entry") {
+                    maxKit={
+                        'Red': 1,
+                        'Green': 1
+                    }
+                } else {
+                    maxKit={
+                        'Heated': 1,
+                        'H': 3,
+                        'S': 2,
+                        'U': 0,
+                        'Red': 1,
+                        'Yellow': 1,
+                        'Green': 0
+                    }
+                }
+
                 for (let i = 0; i < response.data.cells.length; i++) {
                     $scope.cells[response.data.cells[i].x + ',' +
                         response.data.cells[i].y + ',' +
@@ -171,11 +180,19 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     }
 
     $scope.reliability = function(){
-        return Math.max(($scope.foundVictims + $scope.distKits - $scope.LoPs)*10,0);
+        if ($scope.leagueType == "entry") {
+            return Math.max(($scope.foundVictims * 10) - ($scope.LoPs * 5),0);
+        } else {
+            return Math.max(($scope.foundVictims + $scope.distKits - $scope.LoPs)*10,0);
+        }
     }
 
     $scope.reliabilityLoPs = function(){
-        return Math.min(($scope.foundVictims + $scope.distKits)*10, $scope.LoPs*10);
+        if ($scope.leagueType == "entry") {
+            return Math.min($scope.foundVictims * 10, $scope.LoPs * 5);
+        } else {
+            return Math.min(($scope.foundVictims + $scope.distKits)*10, $scope.LoPs*10);
+        }
     }
 
     $scope.changeFloor = function (z){
@@ -230,13 +247,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -298,6 +317,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible += maxKit[cell.tile.victims.bottom];
             current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
         }
+        if(cell.tile.victims.floor != "None"){
+            possible++;
+            current += tile.scoredItems.victims.floor;
+            possible += maxKit[cell.tile.victims.floor];
+            current += Math.min(tile.scoredItems.rescueKits.floor,maxKit[cell.tile.victims.floor]);
+        }
 
         if (tile.processing)
             return "processing";
@@ -325,7 +350,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var hasVictims = (cell.tile.victims.top != "None") ||
           (cell.tile.victims.right != "None") ||
           (cell.tile.victims.bottom != "None") ||
-          (cell.tile.victims.left != "None");
+          (cell.tile.victims.left != "None") ||
+          (cell.tile.victims.floor != "None");
         // Total number of scorable things on this tile
         var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + cell.tile.ramp + hasVictims;
 
@@ -356,13 +382,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -485,7 +513,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 current += victimPoint * tile.scoredItems.victims.left / 2;
                 break;
         }
-
+        switch (cell.tile.victims.floor) {
+            case 'Red':
+            case 'Green':
+                current += (cell.isLinear ? 15:30) * tile.scoredItems.victims.floor;
+                current += 10 * Math.min(tile.scoredItems.rescueKits.floor , 1);
+                break;
+        }
 
         return current;
     };
@@ -506,6 +540,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 },
                 sRotate: function (){
                     return $scope.sRotate;
+                },
+                leagueType: function () {
+                    return $scope.leagueType;
                 }
             }
         }).closed.then(function (result) {
@@ -765,13 +802,15 @@ $(window).on('load resize', function () {
     }]);
 
 
-app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate',function ($scope, $uibModalInstance, cell, tile, sRotate) {
+app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile','sRotate','leagueType',function ($scope, $uibModalInstance, cell, tile, sRotate, leagueType) {
     $scope.cell = cell;
     $scope.tile = tile;
+    $scope.leagueType = leagueType;
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
         (cell.tile.victims.right != "None") ||
         (cell.tile.victims.bottom != "None") ||
-        (cell.tile.victims.left != "None");
+        (cell.tile.victims.left != "None") ||
+        (cell.tile.victims.floor != "None");
 
     $scope.lightStatus = function(light, kit){
         if(light) return true;
@@ -779,23 +818,7 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     };
 
     $scope.kitStatus = function(light, kit, type){
-        switch(type){
-            case 'H':
-                if(kit >= 3) return true;
-                break;
-            case 'S':
-                if(kit >= 2) return true;
-                break;
-            case 'Red':
-            case 'Heated':
-            case 'Yellow':
-                if(kit >= 1) return true;
-                break;
-            case 'U':
-            case 'Green':
-                return true;
-        }
-        return false;
+        return (maxKit[type] <= kit);
     };
 
     $scope.modalRotate = function(dir){

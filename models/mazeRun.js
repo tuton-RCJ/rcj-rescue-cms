@@ -48,13 +48,15 @@ const mazeRunSchema = new Schema({
         top   : {type: Boolean, default: false},
         right : {type: Boolean, default: false},
         bottom: {type: Boolean, default: false},
-        left  : {type: Boolean, default: false}
+        left  : {type: Boolean, default: false},
+        floor : {type: Boolean, default: false}
       },
       rescueKits: {
         top   : {type: Number, integer: true, min: 0, default: 0},
         right : {type: Number, integer: true, min: 0, default: 0},
         bottom: {type: Number, integer: true, min: 0, default: 0},
-        left  : {type: Number, integer: true, min: 0, default: 0}
+        left  : {type: Number, integer: true, min: 0, default: 0},
+        floor : {type: Number, integer: true, min: 0, default: 0}
       }
     }
   }],
@@ -77,75 +79,7 @@ const mazeRunSchema = new Schema({
   started  : {type: Boolean, default: false, index: true},
   comment  : {type: String, default: ""},
   acceptResult : {type: Boolean, default: true}, // The team agreed to accept the result
-  startTime: {type: Number, default: 0},
-  manual  : {
-    victims  : {
-      linear  : {
-        u : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        s : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        h : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        heated : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        red : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        yellow : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        green : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        }
-      },
-      floating  : {
-        u : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        s : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        h : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        heated : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        red : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        yellow : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        },
-        green : {
-          identify: {type: Number, default: 0},
-          kit     : {type: Number, default: 0}
-        }
-      }
-    },
-    checkpoints: {type: Number, default: 0},
-    speedbumps: {type: Number, default: 0},
-    ramps: {type: Number, default: 0},
-    steps: {type: Number, default: 0}
-  }
+  startTime: {type: Number, default: 0}
 })
 
 mazeRunSchema.pre('save', function (next) {

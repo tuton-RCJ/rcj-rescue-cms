@@ -39,6 +39,7 @@ const tileSchema = new Schema({
   black        : {type: Boolean, default: false},
   ramp         : {type: Boolean, default: false},
   steps        : {type: Boolean, default: false},
+  blueTile     : {type: Boolean, default: false},
   victims      : {
     top   : {
       type   : String,
@@ -56,6 +57,11 @@ const tileSchema = new Schema({
       default: "None"
     },
     left  : {
+      type   : String,
+      enum   : VICTIMS,
+      default: "None"
+    },
+    floor : {
       type   : String,
       enum   : VICTIMS,
       default: "None"
@@ -83,6 +89,7 @@ const mazeMapSchema = new Schema({
   width      : {type: Number, integer: true, required: true, min: 1},
   length     : {type: Number, integer: true, required: true, min: 1},
   duration   : {type: Number, integer: true, min: 0, default: 480},
+  leagueType : {type: String, default: "standard"},
   cells      : [{
     x       : {type: Number, integer: true, required: true, min: 0},
     y       : {type: Number, integer: true, required: true, min: 0},
@@ -146,20 +153,6 @@ mazeMapSchema.pre('save', function (next) {
                                 cell.y + ", z: " + cell.z + "!");
           return next(err);
         }
-        
-        if (cell.tile.rampBottom) {
-          const err = new Error("Tile can't be both black and ramp bottom at x: " +
-                                cell.x + ", y: " +
-                                cell.y + ", z: " + cell.z + "!");
-          return next(err);
-        }
-        
-        if (cell.tile.rampTop) {
-          const err = new Error("Tile can't be both black and ramp top at x: " +
-                                cell.x + ", y: " +
-                                cell.y + ", z: " + cell.z + "!");
-          return next(err);
-        }
 
         if (cell.tile.steps) {
           const err = new Error("Tile can't be both black and steps at x: " +
@@ -167,7 +160,9 @@ mazeMapSchema.pre('save', function (next) {
                                 cell.y + ", z: " + cell.z + "!");
           return next(err);
         }
-        
+      }
+
+      if (cell.tile.black || cell.tile.checkpoint || cell.tile.steps || cell.tile.speedbump || cell.tile.ramp || cell.tile.blueTile) {
         if ((cell.tile.victims.top != null &&
              cell.tile.victims.top != "None") ||
         
@@ -180,10 +175,18 @@ mazeMapSchema.pre('save', function (next) {
             (cell.tile.victims.left != null &&
              cell.tile.victims.left != "None")) {
           
-          const err = new Error("Can't have victims on black tile at x: " +
+          const err = new Error("Can't have victims on black/silver/blue tile & with stair, ramp, obstacle at x: " +
                                 cell.x + ", y: " +
                                 cell.y + ", z: " + cell.z + "!")
           return next(err)
+        }
+      }
+
+      if (self.leagueType == "entry") { // Validation for Rescue Maze Entry League
+        if (cell.tile.steps || cell.tile.ramp || cell.tile.blueTile) {
+          cell.tile.steps = false;
+          cell.tile.ramp = false;
+          cell.tile.blueTile = false;
         }
       }
       
@@ -203,8 +206,6 @@ mazeMapSchema.pre('save', function (next) {
   
   if (self.finished) {
     mazeFill.floodFill(self)
-    //mazeFill.linearFill(self)
-    //logger.debug(JSON.stringify(self))
   }
   
   if (self.isNew || self.isModified("name")) {
@@ -254,57 +255,3 @@ const MazeMap = mongoose.model('MazeMap', mazeMapSchema)
 
 /** Mongoose model {@link http://mongoosejs.com/docs/models.html} */
 module.exports.mazeMap = MazeMap
-
-
-/*new MazeMap({
- competition: "58a9c7e48cd7f372358f139b",
- name       : "testmap7",
- height     : 2,
- width      : 2,
- length     : 2,
- cells      : [{
- x     : 1,
- y     : 0,
- z     : 0,
- isWall: true
- }, {
- x     : 0,
- y     : 1,
- z     : 0,
- isWall: true
- }, {
- x     : 1,
- y     : 1,
- z     : 0,
- isTile: true
- }, {
- x     : 1,
- y     : 3,
- z     : 0,
- isTile: true,
- tile  : {
- black: true
- }
- }, {
- x     : 3,
- y     : 1,
- z     : 0,
- isTile: true,
- tile  : {
- checkpoint: true
- }
- }],
- startTile  : {
- x: 1,
- y: 1,
- z: 0
- }
- }).save(function (err) {
- if (err) {
- logger.error(err)
- }
- else {
- logger.info("saved mazemap")
- }
- }
- )*/
