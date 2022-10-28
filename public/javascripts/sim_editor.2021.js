@@ -180,7 +180,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let cell = $scope.cells[x+','+y+','+z];
         if(cell){
             if (!cell.tile.halfTile) i = -1; // if going from quarter tile to full tile
-            if (i == -1) { // if coming from full tile
+            if (i == -1 && !cell.tile.halfTile) { // if going from full tile to full tile
                 if($scope.cells[x+','+y+','+z].reachable) return;
                 $scope.cells[x+','+y+','+z].reachable = true;
             }
