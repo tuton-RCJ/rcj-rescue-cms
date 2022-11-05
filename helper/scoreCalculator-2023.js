@@ -7,7 +7,6 @@ const logger = require('../config/logger').mainLogger;
  */
 module.exports.calculateLineScore = function (run) {
   try {
-    // console.log(run);
     let score = 0;
     let final_score;
     let multiplier = 1.0;
@@ -52,7 +51,6 @@ module.exports.calculateLineScore = function (run) {
             break;
         }
       }
-      console.log(score)
     }
     
 
