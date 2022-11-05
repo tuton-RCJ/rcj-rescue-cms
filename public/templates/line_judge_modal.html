@@ -6,7 +6,7 @@
       <table class="custom" style="padding: 0px;max-width:300px;background-color:#585858;border-collapse:separate;border-spacing:0.1px;" align="center">
           <tr style="height:100px;">
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;">
-                  <img ng-src="/images/tiles/{{nineTile[0].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[0].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[0]) || isStart(nineTile[0])}">
+                  <img ng-src="/images/tiles/{{nineTile[0].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[0].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[0]) || isStart(nineTile[0])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[0])}}" ng-if="nineTile[0].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[0])}}" ng-if="nineTile[0].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[0].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -16,7 +16,7 @@
                   <i class="fa fa-angle-double-down  fa-fw fa-4x" ng-class="rotateRamp(nineTile[0].levelDown)" ng-show="nineTile[0].levelDown" style="padding-top:4px; color:#ff8095; opacity:0.4;"></i>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;" ng-click="toggle_scored(next.top)">
-                  <img ng-src="/images/tiles/{{nineTile[1].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[1].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[1]) || isStart(nineTile[1])}">
+                  <img ng-src="/images/tiles/{{nineTile[1].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[1].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[1]) || isStart(nineTile[1])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[1])}}" ng-if="nineTile[1].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[1])}}" ng-if="nineTile[1].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[1].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -40,7 +40,7 @@
                   </div>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;">
-                  <img ng-src="/images/tiles/{{nineTile[2].tileType.image}}" style="position:absolute;left: 0px; top: 0px;"  width="100%" height="auto" class="rot{{tilerotate(nineTile[2].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[2]) || isStart(nineTile[2])}">
+                  <img ng-src="/images/tiles/{{nineTile[2].tileType.image}}" style="position:absolute;left: 0px; top: 0px;"  width="100%" height="auto" class="rot{{tilerotate(nineTile[2].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[2]) || isStart(nineTile[2])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[2])}}" ng-if="nineTile[2].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[2])}}" ng-if="nineTile[2].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[2].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -52,7 +52,7 @@
           </tr>
           <tr style="height:100px;">
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;" ng-click="toggle_scored(next.left)">
-                  <img ng-src="/images/tiles/{{nineTile[3].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[3].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[3]) || isStart(nineTile[3])}">
+                  <img ng-src="/images/tiles/{{nineTile[3].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[3].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[3]) || isStart(nineTile[3])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[3])}}" ng-if="nineTile[3].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[3])}}" ng-if="nineTile[3].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[3].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -76,7 +76,7 @@
                   </div>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;">
-                  <img ng-src="/images/tiles/{{nineTile[4].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[4].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[4]) || isStart(nineTile[4])}">
+                  <img ng-src="/images/tiles/{{nineTile[4].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[4].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[4]) || isStart(nineTile[4])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[4])}}" ng-if="nineTile[4].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[4])}}" ng-if="nineTile[4].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[4].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -86,7 +86,7 @@
                   <i class="fa fa-angle-double-down  fa-fw fa-4x" ng-class="rotateRamp(nineTile[4].levelDown)" ng-show="nineTile[4].levelDown" style="padding-top:4px; color:#ff8095; opacity:0.4;"></i>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;" ng-click="toggle_scored(next.right)">
-                  <img ng-src="/images/tiles/{{nineTile[5].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[5].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[5]) || isStart(nineTile[5])}">
+                  <img ng-src="/images/tiles/{{nineTile[5].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[5].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[5]) || isStart(nineTile[5])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[5])}}" ng-if="nineTile[5].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[5])}}" ng-if="nineTile[5].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[5].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -112,7 +112,7 @@
           </tr>
           <tr style="height:100px;">
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;">
-                  <img ng-src="/images/tiles/{{nineTile[6].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[6].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[6]) || isStart(nineTile[6])}">
+                  <img ng-src="/images/tiles/{{nineTile[6].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[6].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[6]) || isStart(nineTile[6])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[6])}}" ng-if="nineTile[6].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[6])}}" ng-if="nineTile[6].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[6].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -122,7 +122,7 @@
                   <i class="fa fa-angle-double-down  fa-fw fa-4x" ng-class="rotateRamp(nineTile[6].levelDown)" ng-show="nineTile[6].levelDown" style="padding-top:4px; color:#ff8095; opacity:0.4;"></i>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;" ng-click="toggle_scored(next.bottom)">
-                  <img ng-src="/images/tiles/{{nineTile[7].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[7].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[7]) || isStart(nineTile[7])}">
+                  <img ng-src="/images/tiles/{{nineTile[7].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[7].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[7]) || isStart(nineTile[7])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[7])}}" ng-if="nineTile[7].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[7])}}" ng-if="nineTile[7].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[7].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>
@@ -146,7 +146,7 @@
                   </div>
               </td>
               <td width="100px" style="padding: 0px;position: relative;background-color: #e6e6e6;">
-                  <img ng-src="/images/tiles/{{nineTile[8].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[8].rot)}}" ng-class="{'drop-tile': isDropTile(nineTile[8]) || isStart(nineTile[8])}">
+                  <img ng-src="/images/tiles/{{nineTile[8].tileType.image}}" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto" class="rot{{tilerotate(nineTile[8].rot)}}" ng-class="{'drop-tile': isCheckPointTile(nineTile[8]) || isStart(nineTile[8])}">
                   <img ng-src="/images/tiles/ev-entrance.png"  class="rot{{evacTapeRot(nineTile[8])}}" ng-if="nineTile[8].evacEntrance>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <img ng-src="/images/tiles/ev-exit.png"  class="rot{{evacTapeRot(nineTile[8])}}" ng-if="nineTile[8].evacExit>=0" style="position:absolute;left: 0px; top: 0px;" width="100%" height="auto">
                   <i class="fa fa-cube fa-fw fa-2x" ng-show="nineTile[8].items.obstacles>0" style="text-align:right; padding:1px 2px; color:#6e2c00; opacity:0.9; position:absolute;top:0px;"></i>

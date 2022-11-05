@@ -7,7 +7,7 @@
           i.fas.fa-step-forward(aria-hidden='true')
           |  {{'common.lops' | translate}}
         .card-body
-          div(ng-repeat='dropTile in range(actualUsedDropTiles+1) track by $index')
+          div(ng-repeat='cp in range(LoPs.length) track by $index')
             .card-text(style='display:flex;' ng-style="{'background-color': $index == EvacuationAreaLoPIndex?'#ffcccc':''}")
               div(style='width:40%;font-size:10px;', align='center')
                 | {{$index==0?'line.judge.start':'line.judge.checkpoint'|translate}}

@@ -12,8 +12,8 @@ module.exports.calculateLineScore = function (run) {
     let final_score;
     let multiplier = 1.0;
 
-    let lastDropTile = 0;
-    let dropTileCount = 0;
+    let lastCheckPointTile = 0;
+    let checkPointCount = 0;
 
     let total_lops = 0;
     for (let i = 0; i < run.LoPs.length; i++) {
@@ -22,48 +22,42 @@ module.exports.calculateLineScore = function (run) {
 
     for (let i = 0; i < run.tiles.length; i++) {
       const tile = run.tiles[i];
-
       for (let j = 0; j < tile.scoredItems.length; j++) {
         switch (tile.scoredItems[j].item) {
           case 'checkpoint':
-            const tileCount = i - lastDropTile;
-            if (typeof run.LoPs[dropTileCount] === 'undefined')
-              run.LoPs.push(0);
+            const tileCount = i - lastCheckPointTile;
             score +=
-              Math.max(tileCount * (5 - 2 * run.LoPs[dropTileCount]), 0) *
+              Math.max(tileCount * (5 - 2 * run.LoPs[checkPointCount]), 0) *
               tile.scoredItems[j].scored;
+            lastCheckPointTile = i;
+            checkPointCount++;
             break;
           case 'gap':
-            score += 10 * tile.scoredItems[j].scored;
+            score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'intersection':
-            score +=
-              10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
+            score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'obstacle':
-            score += 15 * tile.scoredItems[j].scored;
+            score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'speedbump':
-            score += 5 * tile.scoredItems[j].scored;
+            score += 5 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'ramp':
-            score += 10 * tile.scoredItems[j].scored;
+            score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'seesaw':
-            score += 15 * tile.scoredItems[j].scored;
+            score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
         }
       }
-
-      if (tile.isDropTile) {
-        lastDropTile = i;
-        dropTileCount++;
-      }
+      console.log(score)
     }
+    
 
     let error = 1;
     if (run.rescueOrder) {
-      if (typeof run.LoPs[dropTileCount] === 'undefined') run.LoPs.push(0);
       if (run.evacuationLevel == 1) {
         for (const victim of run.rescueOrder) {
           if (victim.type == 'K') {
