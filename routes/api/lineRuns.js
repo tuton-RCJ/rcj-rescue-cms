@@ -299,7 +299,7 @@ publicRouter.get('/:runid', function (req, res, next) {
         dbRun,
         ACCESSLEVELS.NONE + 1
       );
-      if (authResult == 0) return res.status(403);
+      if (authResult == 0) return res.status(403).send();
 
       // Init run data
       let initDbRun = await initRunData.initLine(dbRun);
@@ -500,11 +500,13 @@ privateRouter.put('/:runid', function (req, res, next) {
           if (dbRun.score > 0) {
             dbRun.started = true;
           } else {
-            scoredCheck : for (let tile of run.tiles) {
-              for (let item of tile.scoredItems) {
-                if (item.scored) {
-                  dbRun.started = true;
-                  break scoredCheck;
+            if (run.tiles) {
+              scoredCheck : for (let tile of run.tiles) {
+                for (let item of tile.scoredItems) {
+                  if (item.scored) {
+                    dbRun.started = true;
+                    break scoredCheck;
+                  }
                 }
               }
             }
