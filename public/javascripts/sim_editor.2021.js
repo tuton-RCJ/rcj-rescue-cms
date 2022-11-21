@@ -818,7 +818,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }else{
                 css['background-color'] = '#b4ffd5';
             }
-            if(cell.tile.color) css['background-color'] = cell.tile.color;
+            if(cell.tile.color) {
+                if (cell.tile.color == "14") {
+                    $scope.connect14 = [x, y];
+                    cell.tile.color = '#08D508';
+                }
+                else if (cell.tile.color == "34") {
+                    $scope.connect34 = [x, y]
+                    cell.tile.color = '#e61a1a';
+                }
+                css['background-color'] = cell.tile.color;
+            }
             if(cell.tile.swamp) css['background-color'] = '#CD853F';
             if(cell.tile.black) css['background-color'] = '#000000';
             if(cell.tile.checkpoint) css['background-image'] = 'linear-gradient(to top left, #A5A5A5, #BABAC2, #E8E8E8, #A5A5A5, #BABAC2)';
@@ -1391,6 +1401,22 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           }
         `;
 
+        /* *** */
+        const area4Part = ({x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
+        Area4 {
+            X ${x}
+            Y ${y}
+            DIR ${rot}
+            width ${width}
+            height ${height}
+            xScale ${xScale}
+            zScale ${zScale}
+            yScale ${yScale}
+            area4Width ${area4Width}
+            area4Height ${area4Height}
+        }
+        `;
+
         const visualHumanPart = ({x, z, rot, id, type, score}) => `
         Victim {
             translation ${x} 0 ${z}
@@ -1807,6 +1833,46 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
             }
         }
+        // area 4 positioning
+        /*
+        TODO:
+        - area 4 victims
+        - get rid of map answer error (erebus side)
+        - save area 1-4 and 3-4 tile property to json file
+        - make adaptable to multiple different area4 rooms
+        */
+        /* *** */
+        area4X = ($scope.connect14[0] - 1) / 2
+        area4Y = ($scope.connect14[1] - 1) / 2
+
+        // [0, 1, 2, 3] = [N, E, S, W]
+        area4Width = 0
+        area4Height = 0
+        if ($scope.connect34[0] > $scope.connect14[0]) {
+            area4Rot = 0
+            area4Width = 7
+            area4Height = 5
+            area4Y += 1
+        }
+        else if ($scope.connect34[1] > $scope.connect14[1]) {
+            area4Rot = 1
+            area4Width = 5
+            area4Height = 7
+            area4X -= 1
+        }
+        else if ($scope.connect34[0] < $scope.connect14[0]) {
+            area4Rot = 2
+            area4Width = 7
+            area4Height = 5
+            area4Y -= 1
+        }
+        else if ($scope.connect34[0] < $scope.connect14[0]) {
+            area4Rot = 3
+            area4Width = 5
+            area4Height = 7
+            area4X += 1
+        }
+        allTiles = allTiles + area4Part({x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: area4Width, area4Height: area4Height})
 
         //Add the data pieces to the file data
         fileData = fileData + groupPart({data: allTiles, name: "WALLTILES"})
