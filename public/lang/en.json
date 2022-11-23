@@ -902,6 +902,7 @@
             "timelimit": "Time Limit (sec)",
             "select2": "Select Room 2 Tiles (Half-Walls)",
             "select3": "Select Room 3 Tiles (Curved Walls)",
+            "select4": "Select Room 4 Configuration (Anything)",
             "innerTile": "Inner Tile Walls",
             "js":{
                 "startTileError": "Please set the start tile."
