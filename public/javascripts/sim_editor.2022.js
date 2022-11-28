@@ -1293,8 +1293,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         //
         const fileHeader = ({y, z}) => `#VRML_SIM R2022b utf8
-        EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/50c3f419b5da49a2af606297049ee91e8adbc92e/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-        EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/50c3f419b5da49a2af606297049ee91e8adbc92e/projects/objects/backgrounds/protos/TexturedBackground.proto"
+        EXTERNPROTO "../protos/TexturedBackgroundLight.proto"
+        EXTERNPROTO "../protos/TexturedBackground.proto"
         EXTERNPROTO "../protos/curvedWall.proto"
         EXTERNPROTO "../protos/halfTile.proto"
         EXTERNPROTO "../protos/HazardMap.proto"
