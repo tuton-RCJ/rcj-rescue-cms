@@ -1292,7 +1292,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let allObstacles = "";
 
         //
-        const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
+        const fileHeader = ({y, z}) => `#VRML_SIM R2022b utf8
+        EXTERNPROTO "../protos/TexturedBackgroundLight.proto"
+        EXTERNPROTO "../protos/TexturedBackground.proto"
+        EXTERNPROTO "../protos/curvedWall.proto"
+        EXTERNPROTO "../protos/halfTile.proto"
+        EXTERNPROTO "../protos/HazardMap.proto"
+        EXTERNPROTO "../protos/obstacle.proto"
+        EXTERNPROTO "../protos/Victim.proto"
+        EXTERNPROTO "../protos/worldTile.proto"
+        IMPORTABLE EXTERNPROTO "../protos/custom_robot.proto"
+
         WorldInfo {
           basicTimeStep 16
           coordinateSystem "NUE"
@@ -1309,7 +1319,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           ]
         }
         DEF Viewpoint Viewpoint {
-          orientation -1 0 0 0.85
+          orientation -0.683263 0.683263 0.257493 2.63756
           position -0.08 ${y} ${z}
         }
         TexturedBackground {
@@ -1457,7 +1467,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             controller "MainSupervisor"
             customData "${time}"
             window "MainSupervisorWindow"
-            showWindow TRUE
           }
         `;
 
