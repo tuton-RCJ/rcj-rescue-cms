@@ -39,11 +39,39 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.saveasname ="";
     $scope.finished = true;
     $scope.selectRoom = -1;
-    $scope.roomTiles = [[], []];
+    $scope.roomTiles = [[], [], []];
     $scope.roomColors = ["red", "green", "blue"]
-    $scope.area4RoomsList = [
+    $scope.area4Room = 0
+    $scope.area4 = [
         {value: "None", type: 0},
-        {value: "Room 1 (7x5)", type: 1},
+        {
+            value: "Room 1 (7x5)", 
+            type: 1,
+            width: 7,
+            height: 5,
+            room1Tile: [0, -1],
+            room3Tile: [6, -1],
+            humans: [
+                {
+                    x: 0.01,
+                    z: 0.238,
+                    rot: 1.5708,
+                    id: 1, // *** should be added to # victims in rooms 1-3
+                    type: "harmed",
+                    score: 33.75,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.548,
+                    z: 0.193396,
+                    rot: 1.05,
+                    id: 1, // *** should be added to # hazards in rooms 1-3
+                    type: "P",
+                    score: 67.5,
+                }
+            ],
+        },
         {value: "Room 2 (7x5)", type: 2},
     ]
 
@@ -834,6 +862,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }else if(roomNumber === 3){
                 css['border-color'] = '#ed9aef';
                 css['border-width'] = '3px';
+            }else if(roomNumber === 4){
+                css['border-color'] = '#7500FF';
+                css['border-width'] = '3px';
             }
             if(!cell.reachable) css['background-color'] = '#636e72';
             return css;
@@ -843,7 +874,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     };
 
     function checkRoomNumber(x,y,z){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === `${x},${y},${z}`)){
                 return i + 2;
             }
@@ -1268,7 +1299,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     floorColor = '';
                     if (thisCell.tile.color == '#08D508') // area 1 <-> 4
                         $scope.connect14 = [x, y];
-                    else if (thisCell.tile.color == '#e61a1a') // area 3 <-> 4
+                    else if (thisCell.tile.color == '#e71a1a') // area 3 <-> 4
                         $scope.connect34 = [x, y]
                     for (i = 1; i < 7; i += 2)
                         floorColor += String(parseInt('0x' + thisCell.tile.color.substring(i, i + 2)) / 255.0) + ' ';
@@ -1283,6 +1314,18 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     walls[(y-1)/2][(x-1)/2] = [u2f(thisCell.reachable), arWall, u2f(thisCell.tile.checkpoint), u2f(thisCell.tile.black), x == $scope.startTile.x && y == $scope.startTile.y, u2f(thisCell.tile.swamp), humanType, humanPlace, u2f(thisCell.isLinear), u2f(thisCell.tile.obstacle), halfWallOutVar, halfWallInVar, curveWallVar, thisCell.tile.halfWallVic, floorColor, halfWallOutInfo, roomNum];
                 }
             }
+        }
+
+        function vectorRotate(vector, dir) {
+            if (dir == 0) // N
+                return [vector[0], vector[1]]
+            else if (dir == 1) // E
+                return [-1 * vector[1], vector[0]]
+            else if (dir == 2) // S
+                return [-1 * vector[0], -1 * vector[1]]
+            else if (dir == 3) // W
+                return [vector[1], -1 * vector[0]]
+
         }
 
 
@@ -1401,9 +1444,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           }
         `;
 
-        /* *** */
-        const area4Part = ({x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
-        Area4 {
+        const area4Part = ({roomNum, x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
+        Area4_${roomNum} {
             X ${x}
             Y ${y}
             DIR ${rot}
@@ -1743,7 +1785,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             let j = 0
                             if(walls[z][x][8]) score = 10
                             //Curved Wall Humans
-                            // ****===============================================linear vs floating curved walls
                             let curveWallArr = JSON.parse(walls[z][x][12]);
                             if (curveWallArr[parseInt(i / 4)]) {
                                 let curveDir = curveWallArr[parseInt(i / 4)] - 1;
@@ -1833,9 +1874,83 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
         // area 4 positioning
+        /* TODO:
+            - produce correct webots config for area 4
 
-        if ($scope.connect14) {
-            if ($scope.area4Room == 1) {
+            - test map answer
+            - add pictures showing area4 protos (also mark 1-4 and 3-4 connection tile numbers)
+        */
+
+        N = 0
+        E = 1
+        S = 2
+        W = 3
+        room4 = $scope.area4[$scope.area4Room.type]
+        if ($scope.area4Room.type != 0 && $scope.connect14 && $scope.connect34) {
+            connect14 = [($scope.connect14[0] - 1) / 2, ($scope.connect14[1] - 1) / 2]
+            connect34 = [($scope.connect34[0] - 1) / 2, ($scope.connect34[1] - 1) / 2]
+            area4X = 0
+            area4Y = 0
+            area4Rot = 0
+
+            area4X = connect14[0]
+            area4Y = connect14[1]
+            if (connect34[0] - connect14[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                connect34[1] - connect14[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                area4Rot = N
+            else if (connect14[0] - connect34[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                connect34[1] - connect14[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                area4Rot = E
+            else if (connect14[0] - connect34[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                connect14[1] - connect34[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                area4Rot = S
+            else if (connect34[0] - connect14[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                connect14[1] - connect34[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                area4Rot = W
+            startTrans = vectorRotate(room4.room1Tile, area4Rot)
+            area4X -= startTrans[0]
+            area4Y -= startTrans[1]
+            allTiles = allTiles + area4Part({roomNum: $scope.area4Room.type, x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: room4.width, area4Height: room4.height})
+
+            area4Width = room4.width
+            area4Height = room4.height
+            if (area4Rot == E || area4Rot == W) {
+                area4Width = room4.height
+                area4Height = room4.width
+            }
+            xOffset = -(width * 0.3 * tileScale[0] / 2.0) + area4X * 0.3 * tileScale[0]
+            zOffset = -(height * 0.3 * tileScale[1] / 2.0) + area4Y * 0.3 * tileScale[1]
+            area4Humans = room4.humans
+            for (i = 0; i < area4Humans.length; i++) {
+                vicPosTrans = vectorRotate([area4Humans[i].x, area4Humans[i].z], area4Rot)
+                thisHuman = {
+                    x: vicPosTrans[0] + xOffset,
+                    z: vicPosTrans[1] + zOffset,
+                    rot: area4Humans[i].rot + area4Rot * -1.57,
+                    id: area4Humans[i].id,
+                    type: area4Humans[i].type,
+                    score: area4Humans[i].score,
+                }
+                allHumans += visualHumanPart(thisHuman)
+            }
+            area4Hazards = room4.hazards
+            for (i = 0; i < area4Hazards.length; i++) {
+                hazPosTrans = vectorRotate([area4Hazards[i].x, area4Hazards[i].z], area4Rot)
+                thisHazard = {
+                    x: hazPosTrans[0] + xOffset,
+                    z: hazPosTrans[1] + zOffset,
+                    rot: area4Hazards[i].rot + area4Rot * -1.57,
+                    id: area4Hazards[i].id,
+                    type: area4Hazards[i].type,
+                    score: area4Hazards[i].score,
+                }
+                allHazards += hazardPart(thisHazard)
+            }
+        }
+
+
+        /*if ($scope.connect14) {
+            if ($scope.area4Room.type == 1) {
                 area4X = ($scope.connect14[0] - 1) / 2
                 area4Y = ($scope.connect14[1] - 1) / 2
 
@@ -1865,10 +1980,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     area4Rot = 3
                     area4Width = 5 //===
                     area4Height = 7
-                    area4X += 1
+                    area4X += /victimP1
                 }
                 allTiles = allTiles + area4Part({x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: area4Width, area4Height: area4Height})
-                /* *** */
+                 *** 
                 xOffset = -(width * 0.3 * tileScale[0] / 2.0) + Math.floor(area4Width / 2.0) * 0.3 * tileScale[0] + area4X * 0.3 * tileScale[0]
                 zOffset = -(height * 0.3 * tileScale[1] / 2.0) + Math.floor(area4Height / 2.0) * 0.3 * tileScale[1] + area4Y * 0.3 * tileScale[1]
 
@@ -1884,15 +1999,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 `;
                 allHazards += `
                 HazardMap {
-                    translation ${0.19 + xOffset} 0 ${-0.043 + zOffset}
-                    rotation 0 1 0 ${2.09 + area4Rot * -1.57}
+                    translation ${0.188 + xOffset} 0 ${-0.046604 + zOffset}
+                    rotation 0 1 0 ${1.05 + area4Rot * -1.57}
                     name "Hazard Map1"
                     type "P"
                     scoreWorth 67.5
                 }
                 `;
             }
-        }
+        }*/
         //}
 
         //Add the data pieces to the file data
@@ -1939,7 +2054,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.finished = data.finished;
                     $scope.roomTiles = data.roomTiles;
                     $scope.area4Room = data.area4Room;
-                    console.log($scope.roomTiles)
 
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
 
@@ -1963,6 +2077,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.selectRoom3 = function() {
         if ($scope.selectRoom != 1) {
             $scope.selectRoom = 1;
+        }
+        else {
+            $scope.selectRoom = -1;
+        }
+    }
+
+    $scope.selectRoom4 = function() {
+        if ($scope.selectRoom != 2) {
+            $scope.selectRoom = 2;
         }
         else {
             $scope.selectRoom = -1;
@@ -2035,11 +2158,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     }
                 };
             }
-            console.log(cell)
             if ($scope.selectRoom != -1 && cell) {
                 let undo = false
-                console.log($scope.roomTiles)
-                for (a = 0; a < 2; a++) {
+                for (a = 0; a < $scope.roomTiles.length; a++) {
                     if ($scope.roomTiles[a]) {
                         for (b = 0; b < $scope.roomTiles[a].length; b++) {
                             if ($scope.roomTiles[a][b] == x+','+y+','+z) {
@@ -2056,13 +2177,22 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if (!undo) {
                     $scope.roomTiles[$scope.selectRoom].push(x+','+y+','+z);
                     var i = (parseInt(y - 1) / 2 * $scope.width + (parseInt(x - 1) / 2));
-                    if ($scope.selectRoom == 0)
+                    console.log($scope.selectRoom == 2)
+                    if ($scope.selectRoom == 0) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#359ef4");
-                    else
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('a')
+                    }
+                    else if ($scope.selectRoom == 1) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#ed9aef");
-                    $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('b')
+                    }
+                    else if ($scope.selectRoom == 2)
+                        $(".tile").get(i).style.setProperty("--tileColor", "#7500FF");
                 }
             }
+            console.log($scope.roomTiles)
             $scope.open(x, y, z);
         }
         $scope.recalculateLinear();

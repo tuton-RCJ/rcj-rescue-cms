@@ -70,8 +70,12 @@ block content
                         i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
                         i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
                         | {{"admin.simMapEditor.select3" | translate}}
-                    span.input-group-text {{"admin.simMapEditor.select4" | translate}}: &nbsp;
-                        select(ng-model='area4Room', ng-options="room as room.value for room in area4RoomsList", ng-init="area4Room=area4RoomsList[0]")
+                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom4()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==2? '#7500FF':''}")
+                        i.far.fa-square(ng-hide='selectRoom == 2') &nbsp;
+                        i.far.fa-check-square(ng-show='selectRoom == 2') &nbsp;
+                        | {{"admin.simMapEditor.select4" | translate}}
+                    span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
+                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]")
 
         .row
             .col-11
