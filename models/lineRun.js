@@ -25,13 +25,9 @@ const lineRunSchema = new Schema({
   field      : {type: ObjectId, ref: 'Field', required: true, index: true},
   map        : {type: ObjectId, ref: 'LineMap', required: true, index: true},
   group     : {type: Number, min: 0},
-  manualFlag: {type: Boolean, default: false},
-
-  judges: [{type: ObjectId, ref: 'User'}],
 
   tiles             : [{
     type: new Schema({
-      isDropTile: {type: Boolean, default: false},
       scoredItems: [
         {
             item: {type: String, default: ""},
@@ -67,8 +63,6 @@ const lineRunSchema = new Schema({
     seconds: {type: Number, min: 0, max: 59, default: 0},
   },
   status            : {type: Number, min: -1, default: 0},
-  retired           : {type: Boolean, default: false},
-  acceptResult : {type: Boolean, default: true},
   sign              : {
     captain   : {type: String, default: ""},
     referee   : {type: String, default: ""},
@@ -77,7 +71,6 @@ const lineRunSchema = new Schema({
   started           : {type: Boolean, default: false, index: true},
   comment           : {type: String, default: ""},
   startTime         : {type: Number, default: 0},
-  test: {type: Boolean, default: false},
   nl  : {
     liveVictim: [{
       found: {type: Boolean, default: false},
@@ -101,7 +94,6 @@ lineRunSchema.pre('save', function (next) {
       err = new Error('Map "' + populatedRun.map.name + '" is not finished!')
       return next(err)
     } else {
-
       if (self.isNew) {
           if(self.team){
             LineRun.findOne({
@@ -206,8 +198,6 @@ lineRunSchema.pre('save', function (next) {
                         return next(new Error("Map does not match competition!"))
                       }
 
-                      self.LoPs = new Array(results.map.numberOfDropTiles).fill(0)
-                      self.tiles = new Array(results.map.indexCount).fill({})
                       if(results.team.league == "LineNL"){
                         self.isNL = true;
                       }else{
@@ -220,81 +210,79 @@ lineRunSchema.pre('save', function (next) {
             })
         }
         else{
-                async.parallel({
-                    competition: function (callback) {
-                      competitiondb.competition.findById(self.competition, function (err, dbCompetition) {
-                        if (err) {
-                          return callback(err)
-                        } else if (!dbCompetition) {
-                          return callback(new Error("No competition with that id!"))
-                        } else {
-                          return callback(null, dbCompetition)
-                        }
-                      })
-                    },
-                    round      : function (callback) {
-                      competitiondb.round.findById(self.round, function (err, dbRound) {
-                        if (err) {
-                          return callback(err)
-                        } else if (!dbRound) {
-                          return callback(new Error("No round with that id!"))
-                        } else {
-                          return callback(null, dbRound)
-                        }
-                      })
-                    },
-                    field      : function (callback) {
-                      competitiondb.field.findById(self.field, function (err, dbField) {
-                        if (err) {
-                          return callback(err)
-                        } else if (!dbField) {
-                          return callback(new Error("No field with that id!"))
-                        } else {
-                          return callback(null, dbField)
-                        }
-                      })
-                    },
-                    map        : function (callback) {
-                      lineMapdb.lineMap.findById(self.map, function (err, dbMap) {
-                        if (err) {
-                          return callback(err)
-                        } else if (!dbMap) {
-                          return callback(new Error("No map with that id!"))
-                        } else {
-                          return callback(null, dbMap)
-                        }
-                      })
-                    }
-                  },
-                  function (err, results) {
-                    if (err) {
-                      return next(err)
-                    } else {
-                      const competitionId = results.competition.id
+          async.parallel({
+              competition: function (callback) {
+                competitiondb.competition.findById(self.competition, function (err, dbCompetition) {
+                  if (err) {
+                    return callback(err)
+                  } else if (!dbCompetition) {
+                    return callback(new Error("No competition with that id!"))
+                  } else {
+                    return callback(null, dbCompetition)
+                  }
+                })
+              },
+              round      : function (callback) {
+                competitiondb.round.findById(self.round, function (err, dbRound) {
+                  if (err) {
+                    return callback(err)
+                  } else if (!dbRound) {
+                    return callback(new Error("No round with that id!"))
+                  } else {
+                    return callback(null, dbRound)
+                  }
+                })
+              },
+              field      : function (callback) {
+                competitiondb.field.findById(self.field, function (err, dbField) {
+                  if (err) {
+                    return callback(err)
+                  } else if (!dbField) {
+                    return callback(new Error("No field with that id!"))
+                  } else {
+                    return callback(null, dbField)
+                  }
+                })
+              },
+              map        : function (callback) {
+                lineMapdb.lineMap.findById(self.map, function (err, dbMap) {
+                  if (err) {
+                    return callback(err)
+                  } else if (!dbMap) {
+                    return callback(new Error("No map with that id!"))
+                  } else {
+                    return callback(null, dbMap)
+                  }
+                })
+              }
+            },
+            function (err, results) {
+              if (err) {
+                return next(err)
+              } else {
+                const competitionId = results.competition.id
 
-                      if (results.round.competition != competitionId) {
-                        return next(new Error("Round does not match competition!"))
-                      }
-                      if (LINE_LEAGUES.indexOf(results.round.league) == -1) {
-                        return next(new Error("Round does not match league!"))
-                      }
+                if (results.round.competition != competitionId) {
+                  return next(new Error("Round does not match competition!"))
+                }
+                if (LINE_LEAGUES.indexOf(results.round.league) == -1) {
+                  return next(new Error("Round does not match league!"))
+                }
 
-                      if (results.field.competition != competitionId) {
-                        return next(new Error("Field does not match competition!"))
-                      }
-                      if (LINE_LEAGUES.indexOf(results.field.league) == -1) {
-                        return next(new Error("Field does not match league!"))
-                      }
+                if (results.field.competition != competitionId) {
+                  return next(new Error("Field does not match competition!"))
+                }
+                if (LINE_LEAGUES.indexOf(results.field.league) == -1) {
+                  return next(new Error("Field does not match league!"))
+                }
 
-                      if (results.map.competition != competitionId) {
-                        return next(new Error("Map does not match competition!"))
-                      }
+                if (results.map.competition != competitionId) {
+                  return next(new Error("Map does not match competition!"))
+                }
 
-                      self.LoPs = new Array(results.map.numberOfDropTiles).fill(0)
-                      self.tiles = new Array(results.map.indexCount).fill({})
-                      return next()
-                    }
-                  })
+                return next()
+              }
+            })
         }
       } else {
         return next()

@@ -1,7 +1,7 @@
 [
-  {"type": "line", "id": "LineWL", "name": "ワールドリーグ レスキューLine"},
-  {"type": "line", "id": "LineNL", "name": "日本リーグ レスキュー"},
-  {"type": "line", "id": "Line", "name": "Rescue Line (International)"},
-  {"type": "maze", "id": "Maze",   "name": "ワールドリーグ レスキューMaze"},
+  {"type": "line", "id": "Line", "name": "Rescue Line"},
+  {"type": "line", "id": "LineNL", "name": "Rescue Line Entry"},
+  {"type": "maze", "id": "Maze",   "name": "Rescue Maze"},
+  {"type": "maze", "id": "MazeNL",   "name": "Rescue Maze Entry"},
   {"type": "other", "id": "Erebus",   "name": "Erebus"}
 ]

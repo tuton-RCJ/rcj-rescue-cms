@@ -35,12 +35,9 @@ function authViewRun(user, run, level) {
     return 1;
   }
 
-  if (run.competition != undefined && run.competition.constructor == String) {
+  if (run.competition != undefined && typeof(run.competition) == "string") {
     competitionId = run.competition;
-  } else if (
-    run.competition != undefined &&
-    run.competition.constructor == Object
-  ) {
+  } else if (run.competition != undefined && typeof(run.competition) == "object") {
     competitionId = run.competition._id;
   }
   if (authCompetition(user, competitionId, level)) {

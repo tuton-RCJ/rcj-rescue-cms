@@ -45,8 +45,10 @@ module.exports.getMazeMaps = getMazeMaps;
 
 adminRouter.post('/', function (req, res) {
   const map = req.body;
-
-  // logger.debug(map)
+  if (typeof(map) != "object") {
+    res.status(400).send("Bad request");
+    return;
+  }
 
   const cells = [];
   for (const i in map.cells) {
@@ -77,6 +79,7 @@ adminRouter.post('/', function (req, res) {
             right: cell.tile.victims.right,
             bottom: cell.tile.victims.bottom,
             left: cell.tile.victims.left,
+            floor: cell.tile.victims.floor
           };
         }
       }
@@ -103,6 +106,7 @@ adminRouter.post('/', function (req, res) {
     height: map.height,
     width: map.width,
     length: map.length,
+    leagueType: map.leagueType,
     cells,
     startTile: {
       x: map.startTile.x,

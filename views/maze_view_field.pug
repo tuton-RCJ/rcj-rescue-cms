@@ -20,8 +20,8 @@ html(ng-app="ddApp")
       // Navbar content
       .col-md-6.col-sm4.col-12
         li.navbar-brand(href='#')
-          i.fas.fa-spinner.fa-spin.fa-fw &nbsp;
-          |  {{team}}
+          i.fas.fa-spinner.fa-spin.fa-fw
+          | &nbsp;{{team}}
       .col-md-3.col-sm4.col-7
         i.fas.fa-calculator.fa-2x(aria-hidden='true') &nbsp;
         li.navbar-brand(href='#')  {{score}} points
@@ -37,7 +37,6 @@ html(ng-app="ddApp")
                 td.cell(ng-repeat='c in range(2*width + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z,0)")
                   .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
                     img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
-                    img.tile-image(ng-src='/images/elevator.png', ng-show="!isUndefined(cells[c+','+r+','+z].tile.changeFloorTo) && cells[c+','+r+','+z].tile.changeFloorTo != z")
                     img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
                     img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")
                     img.tile-image(ng-src='/images/steps.png', ng-show="cells[c+','+r+','+z].tile.steps")
@@ -70,13 +69,15 @@ html(ng-app="ddApp")
                     img.tile-image(ng-src='/images/green_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Green'")
                     img.tile-image(ng-src='/images/green_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Green'")
                     img.tile-image(ng-src='/images/green_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Green'")
+                    img.tile-image(ng-src='/images/red_floor.png', ng-show="cells[c+','+r+','+z].tile.victims.floor == 'Red'")
+                    img.tile-image(ng-src='/images/green_floor.png', ng-show="cells[c+','+r+','+z].tile.victims.floor == 'Green'")
                     i.fas.fa-check.fa-fw.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'done'", style='padding-top:4px; color:#27ae60; opacity:0.9;')
                     i.fas.fa-play.fa-fw.fa-rotate-270.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'halfdone'", style='padding-top:4px; color:#f4d03f; opacity:0.9;')
                     i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')
       .col-md-12(ng-show='!exist')
         .alert.alert-dark(role='alert')
           h2 現在，このフィールドでは競技が行われていません
-          h4 We have no games running at this competition field right now.
+          h4 No games are currently being happened on this field.
     br
     .alert.alert-info(role='alert', ng-show='exist')
       .row
@@ -86,7 +87,7 @@ html(ng-app="ddApp")
           i.fas Misidentification : {{MisIdent}} times
         .col-4
           i.fas.fa-home(aria-hidden='true')
-            | : Returned:
+            | : Exit Bonus:
             b {{exitBonus}}
 
 

@@ -1,10 +1,9 @@
-# RoboCupJunior CMS 2022
+# RoboCupJunior CMS 2023
 This is a scoring system used in RoboCupJunior's rescue line & maze competition.
 
-## Support rule set
-* 2021 final rules published by International RoboCupJunior Rescue Technical Committee / [Line](https://cdn.robocup.org/junior/wp/2021/06/2021_RescueLine_Rules_final02.pdf) / [Maze](https://cdn.robocup.org/junior/wp/2021/06/2021_RescueMaze_Rules_final02.pdf)
-* 2022 rules published by Japanese Regional Committee / [Nippon-League](https://drive.google.com/file/d/1bjoNF_jOcQ0M4QSeDRKg0GmDSSl9gxAO/view?usp=sharing)
-
+## Supported rules
+* 2022 final rules published by International RoboCupJunior Rescue Technical Committee / [Line](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueLine_Rules_final01.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueMaze_Rules_final01.pdf)
+* 2023 rules published by Japanese Regional Committee for entry leagues / [Line-Entry](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view) / [Maze-Entry](https://drive.google.com/file/d/1uMUyGcmFgs-j8imhE3vgOHX1gyz4r_J8/view?usp=sharing)
 ## Demo
 The latest version is running. It is built using Docker image and working under OCI arm instance.
 

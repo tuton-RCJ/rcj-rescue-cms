@@ -48,8 +48,10 @@ module.exports.getLineMaps = getLineMaps;
 
 adminRouter.post('/', function (req, res) {
   const map = req.body;
-
-  // logger.debug(map)
+  if (typeof(map) != "object") {
+    res.status(400).send("Bad request");
+    return;
+  }
 
   const tiles = [];
   for (const i in map.tiles) {

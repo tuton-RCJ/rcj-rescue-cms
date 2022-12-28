@@ -5,8 +5,8 @@ function line_calc_score(run) {
         let final_score;
         let multiplier = 1.0;
 
-        let lastDropTile = 0;
-        let dropTileCount = 0;
+        let lastCheckPointTile = 0;
+        let checkPointCount = 0;
 
         let total_lops = 0;
         for(let i=0;i<run.LoPs.length;i++){
@@ -19,41 +19,36 @@ function line_calc_score(run) {
             for (let j=0; j<tile.scoredItems.length;j++){
                 switch (tile.scoredItems[j].item){
                     case "checkpoint":
-                        let tileCount = i - lastDropTile;
-                        if(typeof run.LoPs[dropTileCount] === "undefined")run.LoPs.push(0);
-                        score += Math.max(tileCount * (5 - 2 * run.LoPs[dropTileCount]), 0) * tile.scoredItems[j].scored;
+                        let tileCount = i - lastCheckPointTile;
+                        score += Math.max(tileCount * (5 - 2 * run.LoPs[checkPointCount]), 0) * tile.scoredItems[j].scored;
+                        lastCheckPointTile = i;
+                        checkPointCount++;
                         break;
                     case "gap":
-                        score += 10 * tile.scoredItems[j].scored;
+                        score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                     case "intersection":
                         score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                     case "obstacle":
-                        score += 15 * tile.scoredItems[j].scored;
+                        score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                     case "speedbump":
-                        score += 5 * tile.scoredItems[j].scored;
+                        score += 5 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                     case "ramp":
-                        score += 10 * tile.scoredItems[j].scored;
+                        score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                     case "seesaw":
-                        score += 15 * tile.scoredItems[j].scored;
+                        score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
                         break;
                 }
 
-            }
-
-            if (tile.isDropTile) {
-                lastDropTile = i
-                dropTileCount++
             }
         }
 
         let error = 1;
         if (run.rescueOrder) {
-            if(typeof run.LoPs[dropTileCount] === "undefined")run.LoPs.push(0);
             if (run.evacuationLevel == 1) {
                 for (let victim of run.rescueOrder) {
                     if(victim.type == "K"){
@@ -202,6 +197,49 @@ function maze_calc_score(run) {
     }
 
 
+
+    score -= Math.min(run.misidentification*5,score);
+
+    return score
+}
+
+function maze_calc_score_entry(run) {
+    let score = 0;
+
+    let mapTiles = [];
+    for (let i = 0; i < run.map.cells.length; i++) {
+        let cell = run.map.cells[i];
+        if (cell.isTile) {
+            mapTiles[cell.x + ',' + cell.y + ',' + cell.z] = cell
+        }
+    }
+
+    let victims = 0;
+
+    for (let coord of Object.keys(run.tiles)) {
+        let tile = run.tiles[coord];
+
+        if (tile.scoredItems.speedbump && mapTiles[coord].tile.speedbump) {
+            score += 5
+        }
+        if (tile.scoredItems.checkpoint && mapTiles[coord].tile.checkpoint) {
+            score += 10
+        }
+
+        if (mapTiles[coord].tile.victims.floor != "None") {
+            if (tile.scoredItems.victims.floor) {
+                victims++;
+                if(mapTiles[coord].tile.victims.floor == "Red" || mapTiles[coord].tile.victims.floor == "Green")  score += mapTiles[coord].isLinear ? 15 : 30;
+            }
+            score += Math.min(tile.scoredItems.rescueKits.floor, 1) * 10
+        }
+    }
+
+    score += Math.max((victims * 10) - (run.LoPs * 5), 0);
+
+    if (run.exitBonus) {
+        score += victims * 10;
+    }
 
     score -= Math.min(run.misidentification*5,score);
 

@@ -12,6 +12,7 @@ const auth = require('../../helper/authLevels');
 const scoreSheetLinePDF2 = require('../../helper/scoreSheetPDFLine2');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
+const initRunData = require('../../helper/initRunData')
 
 let socketIo;
 
@@ -283,7 +284,7 @@ publicRouter.get('/:runid', function (req, res, next) {
     ]);
   }
 
-  query.lean().exec(function (err, dbRun) {
+  query.exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
       return res.status(400).send({
@@ -298,7 +299,25 @@ publicRouter.get('/:runid', function (req, res, next) {
         dbRun,
         ACCESSLEVELS.NONE + 1
       );
-      if (authResult == 0) return res.status(403);
+      if (authResult == 0) return res.status(403).send();
+
+      // Init run data
+      let initDbRun = await initRunData.initLine(dbRun);
+      if (initDbRun != null) {
+        dbRun.tiles = initDbRun.tiles;
+        dbRun.LoPs = initDbRun.LoPs;
+        dbRun.nl = initDbRun.nl;
+        await dbRun.save(function (err) {
+          if (err) {
+            logger.error(err);
+            return res.status(400).send({
+              err: err.message,
+              msg: 'Could not get run',
+            });
+          }
+        });
+      }
+      
       if (authResult == 2) {
         delete dbRun.comment;
         delete dbRun.sign;
@@ -477,17 +496,23 @@ privateRouter.put('/:runid', function (req, res, next) {
         dbRun.raw_score = cal.raw_score;
         dbRun.multiplier = cal.multiplier;
 
-        if (
-          dbRun.score > 0 ||
-          dbRun.time.minutes != 0 ||
-          dbRun.time.seconds != 0 ||
-          dbRun.status >= 2
-        ) {
-          dbRun.started = true;
-        } else {
-          dbRun.started = false;
+        if (!dbRun.started) {
+          if (dbRun.score > 0) {
+            dbRun.started = true;
+          } else {
+            if (run.tiles) {
+              scoredCheck : for (let tile of run.tiles) {
+                for (let item of tile.scoredItems) {
+                  if (item.scored) {
+                    dbRun.started = true;
+                    break scoredCheck;
+                  }
+                }
+              }
+            }
+          }
         }
-
+        
         dbRun.save(function (err) {
           if (err) {
             logger.error(err);

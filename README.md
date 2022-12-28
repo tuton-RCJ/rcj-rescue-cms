@@ -12,8 +12,8 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 
 #### 対応ルール
 * International RoboCupJunior Rescue Technical Committee により発行された2022最終ルール / [Line](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueLine_Rules_final01.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueMaze_Rules_final01.pdf)
-* 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2023ルール / [レスキュー・ライン・エントリー](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view)
-
+* 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2023ルール / [レスキュー・ライン・エントリー](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view) / [レスキュー・メイズ・エントリー](https://drive.google.com/file/d/1uMUyGcmFgs-j8imhE3vgOHX1gyz4r_J8/view?usp=sharing)
+* *国際2023ルール(Draft)には、2022年12月末を目処に対応いたします。*
 --
 
 
@@ -32,7 +32,7 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 * 紙のスコアシートの出力に対応
 * ドキュメント提出/レビューシステムを統合
 * システムからのメール配信が可能
-* レスキュー・ライン・エントリー2023ルールに対応
+* レスキュー・ライン・エントリー / レスキュー・メイズ・エントリー2023ルールに対応
 
 特別な理由がない限り，本リポジトリで提供しているバージョンを使用することをお勧めします．
 
@@ -42,6 +42,7 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 [https://osaka.rcj.cloud](https://osaka.rcj.cloud)
 
 ## 更新情報
+* [2022/10/09] レスキュー・メイズ・エントリー 2023ルールに対応しました
 * [2022/09/17] レスキュー・ライン・エントリー 2023ルールに対応しました
 * [2021/10/02] 2022ルールに暫定対応しました．
 * [2021/03/07] 2021ルールに正式に対応しました．
