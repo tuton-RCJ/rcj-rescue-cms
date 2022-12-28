@@ -641,7 +641,7 @@ app.directive('tile', function () {
                     attrs.z == scope.$parent.startTile.z;
             };
 
-            scope.isDropTile = function(tile){
+            scope.isCheckPointTile = function(tile){
                 if(tile) return tile.checkPoint;
                 return false;
             };
@@ -824,7 +824,7 @@ app.directive('tile4image', function () {
                   attrs.z == scope.$parent.startTile.z;
             };
 
-            scope.isDropTile = function(tile){
+            scope.isCheckPointTile = function(tile){
                 if(tile) return tile.checkPoint;
                 return false;
             };
