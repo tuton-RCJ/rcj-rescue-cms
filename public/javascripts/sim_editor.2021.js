@@ -56,9 +56,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     x: 0.01,
                     z: 0.238,
                     rot: 1.5708,
-                    id: 1, // *** should be added to # victims in rooms 1-3
                     type: "harmed",
-                    score: 33.75,
+                    score: 15,
                 }
             ],
             hazards: [
@@ -66,13 +65,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     x: 0.548,
                     z: 0.193396,
                     rot: 1.05,
-                    id: 1, // *** should be added to # hazards in rooms 1-3
                     type: "P",
-                    score: 67.5,
+                    score: 30,
                 }
             ],
         },
-        {value: "Room 2 (7x5)", type: 2},
     ]
 
     $scope.range = function (n) {
@@ -883,7 +880,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function checkRoomNumberKey(key){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === key)){
                 return i + 2;
             }
@@ -1459,23 +1456,25 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
         `;
 
-        const visualHumanPart = ({x, z, rot, id, type, score}) => `
+        const visualHumanPart = ({x, z, rot, id, type, score, room4}) => `
         Victim {
             translation ${x} 0 ${z}
             rotation 0 1 0 ${rot}
             name "Victim${id}"
             type "${type}"
             scoreWorth ${score}
+            room4 ${room4}
         }
         `;
 
-        const hazardPart = ({x, z, rot, id, type, score}) => `
+        const hazardPart = ({x, z, rot, id, type, score, room4}) => `
         HazardMap {
             translation ${x} 0 ${z}
             rotation 0 1 0 ${rot}
             name "Hazard${id}"
             type "${type}"
             scoreWorth ${score}
+            room4 ${room4}
         }
         `;
 
@@ -1772,7 +1771,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         humanPos[1] = humanPos[1] + humanOffset[walls[z][x][7]][1] + randomOffset[1]
                         let score = 15
                         if(walls[z][x][8]) score = 5
-                        allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRot, id: humanId, type: humanTypesVisual[walls[z][x][6] - 1], score: score})
+                        allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRot, id: humanId, type: humanTypesVisual[walls[z][x][6] - 1], score: score, room4: "FALSE"})
                         humanId = humanId + 1
                     }
                 }
@@ -1874,12 +1873,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
         // area 4 positioning
-        /* TODO:
+        /*** TODO:
             - produce correct webots config for area 4
 
             - test map answer
             - add pictures showing area4 protos (also mark 1-4 and 3-4 connection tile numbers)
-        */
+        ***/
 
         N = 0
         E = 1
@@ -1927,11 +1926,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     x: vicPosTrans[0] + xOffset,
                     z: vicPosTrans[1] + zOffset,
                     rot: area4Humans[i].rot + area4Rot * -1.57,
-                    id: area4Humans[i].id,
+                    id: humanId,
                     type: area4Humans[i].type,
                     score: area4Humans[i].score,
+                    room4: "TRUE",
                 }
                 allHumans += visualHumanPart(thisHuman)
+                humanId += 1
             }
             area4Hazards = room4.hazards
             for (i = 0; i < area4Hazards.length; i++) {
@@ -1940,11 +1941,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     x: hazPosTrans[0] + xOffset,
                     z: hazPosTrans[1] + zOffset,
                     rot: area4Hazards[i].rot + area4Rot * -1.57,
-                    id: area4Hazards[i].id,
+                    id: hazardId,
                     type: area4Hazards[i].type,
                     score: area4Hazards[i].score,
+                    room4: "TRUE",
                 }
                 allHazards += hazardPart(thisHazard)
+                hazardId += 1
             }
         }
 
@@ -2177,7 +2180,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if (!undo) {
                     $scope.roomTiles[$scope.selectRoom].push(x+','+y+','+z);
                     var i = (parseInt(y - 1) / 2 * $scope.width + (parseInt(x - 1) / 2));
-                    console.log($scope.selectRoom == 2)
                     if ($scope.selectRoom == 0) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#359ef4");
                         $scope.cells[x+','+y+','+z].tile.halfTile = 1;
