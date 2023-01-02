@@ -70,6 +70,46 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
             ],
         },
+        {
+            value: "Room 2 (6x6)", 
+            type: 2,
+            width: 6,
+            height: 6,
+            room1Tile: [-1, 0],
+            room3Tile: [2, 6],
+            humans: [
+                {
+                    x: 0.33,
+                    z: 0.3,
+                    rot: 0,
+                    type: "unharmed",
+                    score: 15,
+                },
+                {
+                    x: 0.4991,
+                    z: 0.27366,
+                    rot: 2.0944,
+                    type: "harmed",
+                    score: 15,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.14,
+                    z: 0.299,
+                    rot: 0,
+                    type: "C",
+                    score: 30,
+                },
+                {
+                    x: 0.564142,
+                    z: 0.474142,
+                    rot: 0.785398,
+                    type: "P",
+                    score: 30,
+                }
+            ],
+        },
     ]
 
     $scope.range = function (n) {
@@ -1456,25 +1496,23 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
         `;
 
-        const visualHumanPart = ({x, z, rot, id, type, score, room4}) => `
+        const visualHumanPart = ({x, z, rot, id, type, score}) => `
         Victim {
             translation ${x} 0 ${z}
             rotation 0 1 0 ${rot}
             name "Victim${id}"
             type "${type}"
             scoreWorth ${score}
-            room4 ${room4}
         }
         `;
 
-        const hazardPart = ({x, z, rot, id, type, score, room4}) => `
+        const hazardPart = ({x, z, rot, id, type, score}) => `
         HazardMap {
             translation ${x} 0 ${z}
             rotation 0 1 0 ${rot}
             name "Hazard${id}"
             type "${type}"
             scoreWorth ${score}
-            room4 ${room4}
         }
         `;
 
@@ -1771,7 +1809,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         humanPos[1] = humanPos[1] + humanOffset[walls[z][x][7]][1] + randomOffset[1]
                         let score = 15
                         if(walls[z][x][8]) score = 5
-                        allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRot, id: humanId, type: humanTypesVisual[walls[z][x][6] - 1], score: score, room4: "FALSE"})
+                        allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRot, id: humanId, type: humanTypesVisual[walls[z][x][6] - 1], score: score})
                         humanId = humanId + 1
                     }
                 }
@@ -1872,14 +1910,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
             }
         }
+
         // area 4 positioning
-        /*** TODO:
-            - produce correct webots config for area 4
-
-            - test map answer
-            - add pictures showing area4 protos (also mark 1-4 and 3-4 connection tile numbers)
-        ***/
-
         N = 0
         E = 1
         S = 2
@@ -1929,7 +1961,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     id: humanId,
                     type: area4Humans[i].type,
                     score: area4Humans[i].score,
-                    room4: "TRUE",
                 }
                 allHumans += visualHumanPart(thisHuman)
                 humanId += 1
@@ -1944,74 +1975,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     id: hazardId,
                     type: area4Hazards[i].type,
                     score: area4Hazards[i].score,
-                    room4: "TRUE",
                 }
                 allHazards += hazardPart(thisHazard)
                 hazardId += 1
             }
         }
-
-
-        /*if ($scope.connect14) {
-            if ($scope.area4Room.type == 1) {
-                area4X = ($scope.connect14[0] - 1) / 2
-                area4Y = ($scope.connect14[1] - 1) / 2
-
-                // [0, 1, 2, 3] = [N, E, S, W]
-                area4Width = 0
-                area4Height = 0
-                if ($scope.connect34[0] > $scope.connect14[0]) {
-                    area4Rot = 0
-                    area4Width = 7 //===
-                    area4Height = 5
-                    area4Y += 1
-                }
-                else if ($scope.connect34[1] > $scope.connect14[1]) {
-                    area4Rot = 1
-                    area4Width = 5 //===
-                    area4Height = 7
-                    area4X -= 1
-                    zOffset += area4Y * 0.3 * tileScale[1]
-                }
-                else if ($scope.connect34[0] < $scope.connect14[0]) {
-                    area4Rot = 2
-                    area4Width = 7 //===
-                    area4Height = 5
-                    area4Y -= 1
-                }
-                else if ($scope.connect34[0] < $scope.connect14[0]) {
-                    area4Rot = 3
-                    area4Width = 5 //===
-                    area4Height = 7
-                    area4X += /victimP1
-                }
-                allTiles = allTiles + area4Part({x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: area4Width, area4Height: area4Height})
-                 *** 
-                xOffset = -(width * 0.3 * tileScale[0] / 2.0) + Math.floor(area4Width / 2.0) * 0.3 * tileScale[0] + area4X * 0.3 * tileScale[0]
-                zOffset = -(height * 0.3 * tileScale[1] / 2.0) + Math.floor(area4Height / 2.0) * 0.3 * tileScale[1] + area4Y * 0.3 * tileScale[1]
-
-                //===
-                allHumans += `
-                Victim {
-                translation ${-0.35 + xOffset} 0 ${0 + zOffset}
-                rotation 0 1 0 ${1.5708 + area4Rot * -1.57}
-                name "Victim1"
-                type "harmed"
-                scoreWorth 33.75
-                }
-                `;
-                allHazards += `
-                HazardMap {
-                    translation ${0.188 + xOffset} 0 ${-0.046604 + zOffset}
-                    rotation 0 1 0 ${1.05 + area4Rot * -1.57}
-                    name "Hazard Map1"
-                    type "P"
-                    scoreWorth 67.5
-                }
-                `;
-            }
-        }*/
-        //}
 
         //Add the data pieces to the file data
         fileData = fileData + groupPart({data: allTiles, name: "WALLTILES"})
