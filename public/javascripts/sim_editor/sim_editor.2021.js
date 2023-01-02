@@ -1292,17 +1292,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let allObstacles = "";
 
         //
-        const fileHeader = ({y, z}) => `#VRML_SIM R2022b utf8
-        EXTERNPROTO "../protos/TexturedBackgroundLight.proto"
-        EXTERNPROTO "../protos/TexturedBackground.proto"
-        EXTERNPROTO "../protos/curvedWall.proto"
-        EXTERNPROTO "../protos/halfTile.proto"
-        EXTERNPROTO "../protos/HazardMap.proto"
-        EXTERNPROTO "../protos/obstacle.proto"
-        EXTERNPROTO "../protos/Victim.proto"
-        EXTERNPROTO "../protos/worldTile.proto"
-        IMPORTABLE EXTERNPROTO "../protos/custom_robot.proto"
-
+        const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
         WorldInfo {
           basicTimeStep 16
           coordinateSystem "NUE"
@@ -1319,7 +1309,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           ]
         }
         DEF Viewpoint Viewpoint {
-          orientation -0.683263 0.683263 0.257493 2.63756
+          orientation -1 0 0 0.85
           position -0.08 ${y} ${z}
         }
         TexturedBackground {
@@ -1467,6 +1457,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             controller "MainSupervisor"
             customData "${time}"
             window "MainSupervisorWindow"
+            showWindow TRUE
           }
         `;
 
@@ -1993,7 +1984,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         if ($scope.selectRoom == -1) {
             var modalInstance = $uibModal.open({
                 animation: true,
-                templateUrl: '/templates/sim_editor_modal.html',
+                templateUrl: '/templates/sim_editor/sim_editor_modal.2021.html',
                 controller: 'ModalInstanceCtrl',
                 size: 'lg',
                 scope: $scope,
