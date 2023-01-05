@@ -11,7 +11,7 @@ append scripts
     var pubService = "#{pubService}"
 
   script(src="/javascripts/lvl-uuid.js")
-  script(src="/javascripts/sim_editor/sim_editor.2023.js")
+  script(src="/javascripts/sim_editor/sim_editor.2021.js")
   script(src="/components/bootstrap-fileinput/js/fileinput.min.js")
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
@@ -27,7 +27,7 @@ block location
     span.breadcrumb-item.active Simulation world editor
 
 block content
-    h1 {{"admin.simMapEditor.title" | translate}} 2023
+    h1 {{"admin.simMapEditor.title" | translate}} 2021
     p {{"admin.simMapEditor.desc" | translate}}
     div(style='margin-top:50px;')
         .row
@@ -60,15 +60,22 @@ block content
                         span.input-group-text {{"admin.simMapEditor.timelimit" | translate}}:
                     input.form-control(type='number', ng-model='time', min = '1')
                 
-                button.btn.btn-outline-dark(type='button', ng-click='selectRoom2()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==0? 'rgb(53, 158, 244)':'', color: selectRoom==0? '#fff':''}")
-                    i.far.fa-square(ng-hide='selectRoom == 0') &nbsp;
-                    i.far.fa-check-square(ng-show='selectRoom == 0') &nbsp;
-                    | {{"admin.simMapEditor.select2" | translate}}
-                button.btn.btn-outline-dark(type='button', ng-click='selectRoom3()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==1? '#ed9aef':''}")
-                    i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
-                    i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
-                    | {{"admin.simMapEditor.select3" | translate}}
-                
+                // translate? ***
+                .input-group.mb-3
+                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom2()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==0? 'rgb(53, 158, 244)':'', color: selectRoom==0? '#fff':''}")
+                        i.far.fa-square(ng-hide='selectRoom == 0') &nbsp;
+                        i.far.fa-check-square(ng-show='selectRoom == 0') &nbsp;
+                        | {{"admin.simMapEditor.select2" | translate}}
+                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom3()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==1? '#ed9aef':''}")
+                        i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
+                        i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
+                        | {{"admin.simMapEditor.select3" | translate}}
+                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom4()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==2? '#7500FF':''}")
+                        i.far.fa-square(ng-hide='selectRoom == 2') &nbsp;
+                        i.far.fa-check-square(ng-show='selectRoom == 2') &nbsp;
+                        | {{"admin.simMapEditor.select4" | translate}}
+                    span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
+                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]")
 
         .row
             .col-11

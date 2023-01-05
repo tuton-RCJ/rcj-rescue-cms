@@ -39,8 +39,78 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.saveasname ="";
     $scope.finished = true;
     $scope.selectRoom = -1;
-    $scope.roomTiles = [[], []];
+    $scope.roomTiles = [[], [], []];
     $scope.roomColors = ["red", "green", "blue"]
+    $scope.area4Room = 0
+    $scope.area4 = [
+        {value: "None", type: 0},
+        {
+            value: "Room 1 (7x5)", 
+            type: 1,
+            width: 7,
+            height: 5,
+            room1Tile: [0, -1],
+            room3Tile: [6, -1],
+            humans: [
+                {
+                    x: 0.01,
+                    z: 0.238,
+                    rot: 1.5708,
+                    type: "harmed",
+                    score: 15,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.548,
+                    z: 0.193396,
+                    rot: 1.05,
+                    type: "P",
+                    score: 30,
+                }
+            ],
+        },
+        {
+            value: "Room 2 (6x6)", 
+            type: 2,
+            width: 6,
+            height: 6,
+            room1Tile: [-1, 0],
+            room3Tile: [2, 6],
+            humans: [
+                {
+                    x: 0.33,
+                    z: 0.3,
+                    rot: 0,
+                    type: "unharmed",
+                    score: 15,
+                },
+                {
+                    x: 0.4991,
+                    z: 0.27366,
+                    rot: 2.0944,
+                    type: "harmed",
+                    score: 15,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.14,
+                    z: 0.299,
+                    rot: 0,
+                    type: "C",
+                    score: 30,
+                },
+                {
+                    x: 0.564142,
+                    z: 0.474142,
+                    rot: 0.785398,
+                    type: "P",
+                    score: 30,
+                }
+            ],
+        },
+    ]
 
     $scope.range = function (n) {
         arr = [];
@@ -829,6 +899,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }else if(roomNumber === 3){
                 css['border-color'] = '#ed9aef';
                 css['border-width'] = '3px';
+            }else if(roomNumber === 4){
+                css['border-color'] = '#7500FF';
+                css['border-width'] = '3px';
             }
             if(!cell.reachable) css['background-color'] = '#636e72';
             return css;
@@ -838,7 +911,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     };
 
     function checkRoomNumber(x,y,z){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === `${x},${y},${z}`)){
                 return i + 2;
             }
@@ -847,7 +920,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function checkRoomNumberKey(key){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === key)){
                 return i + 2;
             }
@@ -867,7 +940,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             startTile: $scope.startTile,
             cells: $scope.cells,
             roomTiles: $scope.roomTiles,
-            time: $scope.time
+            time: $scope.time,
+            area4Room: $scope.area4Room
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -1260,6 +1334,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
                 if (thisCell.tile && thisCell.tile.color) {
                     floorColor = '';
+                    if (thisCell.tile.color == '#08D508') // area 1 <-> 4
+                        $scope.connect14 = [x, y];
+                    else if (thisCell.tile.color == '#e71a1a') // area 3 <-> 4
+                        $scope.connect34 = [x, y]
                     for (i = 1; i < 7; i += 2)
                         floorColor += String(parseInt('0x' + thisCell.tile.color.substring(i, i + 2)) / 255.0) + ' ';
                 }
@@ -1273,6 +1351,18 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     walls[(y-1)/2][(x-1)/2] = [u2f(thisCell.reachable), arWall, u2f(thisCell.tile.checkpoint), u2f(thisCell.tile.black), x == $scope.startTile.x && y == $scope.startTile.y, u2f(thisCell.tile.swamp), humanType, humanPlace, u2f(thisCell.isLinear), u2f(thisCell.tile.obstacle), halfWallOutVar, halfWallInVar, curveWallVar, thisCell.tile.halfWallVic, floorColor, halfWallOutInfo, roomNum];
                 }
             }
+        }
+
+        function vectorRotate(vector, dir) {
+            if (dir == 0) // N
+                return [vector[0], vector[1]]
+            else if (dir == 1) // E
+                return [-1 * vector[1], vector[0]]
+            else if (dir == 2) // S
+                return [-1 * vector[0], -1 * vector[1]]
+            else if (dir == 3) // W
+                return [vector[1], -1 * vector[0]]
+
         }
 
 
@@ -1292,17 +1382,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let allObstacles = "";
 
         //
-        const fileHeader = ({y, z}) => `#VRML_SIM R2022b utf8
-        EXTERNPROTO "../protos/TexturedBackgroundLight.proto"
-        EXTERNPROTO "../protos/TexturedBackground.proto"
-        EXTERNPROTO "../protos/curvedWall.proto"
-        EXTERNPROTO "../protos/halfTile.proto"
-        EXTERNPROTO "../protos/HazardMap.proto"
-        EXTERNPROTO "../protos/obstacle.proto"
-        EXTERNPROTO "../protos/Victim.proto"
-        EXTERNPROTO "../protos/worldTile.proto"
-        IMPORTABLE EXTERNPROTO "../protos/custom_robot.proto"
-
+        const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
         WorldInfo {
           basicTimeStep 16
           coordinateSystem "NUE"
@@ -1319,7 +1399,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           ]
         }
         DEF Viewpoint Viewpoint {
-          orientation -0.683263 0.683263 0.257493 2.63756
+          orientation -1 0 0 0.85
           position -0.08 ${y} ${z}
         }
         TexturedBackground {
@@ -1401,6 +1481,21 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           }
         `;
 
+        const area4Part = ({roomNum, x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
+        Area4_${roomNum} {
+            X ${x}
+            Y ${y}
+            DIR ${rot}
+            width ${width}
+            height ${height}
+            xScale ${xScale}
+            zScale ${zScale}
+            yScale ${yScale}
+            area4Width ${area4Width}
+            area4Height ${area4Height}
+        }
+        `;
+
         const visualHumanPart = ({x, z, rot, id, type, score}) => `
         Victim {
             translation ${x} 0 ${z}
@@ -1467,6 +1562,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             controller "MainSupervisor"
             customData "${time}"
             window "MainSupervisorWindow"
+            showWindow TRUE
           }
         `;
 
@@ -1485,7 +1581,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             [0.075, -0.136], [0.136, -0.075], [0.075, -0.014], [0.014, -0.074], 
                             [-0.075, 0.014], [-0.014, 0.075], [-0.075, 0.136], [-0.136, 0.075],
                             [0.075, 0.014], [0.136, 0.075], [0.075, 0.136], [0.014, 0.075]];
-        //***let curveWallVicPos = [[-0.042, -0.042], [0.042, -0.042], [0.042, 0.042], [-0.042, 0.042]];
         let curveWallVicPos = [[-0.022, -0.039], [-0.022, -0.022], [-0.039, -0.023], [-0.038, -0.038],
                             [0.038, -0.039], [0.038, -0.022], [0.021, -0.023], [0.022, -0.038],
                             [-0.022, 0.021], [-0.022, 0.038], [-0.039, 0.037], [-0.038, 0.022],
@@ -1727,7 +1822,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             let j = 0
                             if(walls[z][x][8]) score = 10
                             //Curved Wall Humans
-                            // ****===============================================linear vs floating curved walls
                             let curveWallArr = JSON.parse(walls[z][x][12]);
                             if (curveWallArr[parseInt(i / 4)]) {
                                 let curveDir = curveWallArr[parseInt(i / 4)] - 1;
@@ -1817,6 +1911,76 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
 
+        // area 4 positioning
+        N = 0
+        E = 1
+        S = 2
+        W = 3
+        room4 = $scope.area4[$scope.area4Room.type]
+        if ($scope.area4Room.type != 0 && $scope.connect14 && $scope.connect34) {
+            connect14 = [($scope.connect14[0] - 1) / 2, ($scope.connect14[1] - 1) / 2]
+            connect34 = [($scope.connect34[0] - 1) / 2, ($scope.connect34[1] - 1) / 2]
+            area4X = 0
+            area4Y = 0
+            area4Rot = 0
+
+            area4X = connect14[0]
+            area4Y = connect14[1]
+            if (connect34[0] - connect14[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                connect34[1] - connect14[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                area4Rot = N
+            else if (connect14[0] - connect34[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                connect34[1] - connect14[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                area4Rot = E
+            else if (connect14[0] - connect34[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                connect14[1] - connect34[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                area4Rot = S
+            else if (connect34[0] - connect14[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                connect14[1] - connect34[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                area4Rot = W
+            startTrans = vectorRotate(room4.room1Tile, area4Rot)
+            area4X -= startTrans[0]
+            area4Y -= startTrans[1]
+            allTiles = allTiles + area4Part({roomNum: $scope.area4Room.type, x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: room4.width, area4Height: room4.height})
+
+            area4Width = room4.width
+            area4Height = room4.height
+            if (area4Rot == E || area4Rot == W) {
+                area4Width = room4.height
+                area4Height = room4.width
+            }
+            xOffset = -(width * 0.3 * tileScale[0] / 2.0) + area4X * 0.3 * tileScale[0]
+            zOffset = -(height * 0.3 * tileScale[1] / 2.0) + area4Y * 0.3 * tileScale[1]
+            area4Humans = room4.humans
+            for (i = 0; i < area4Humans.length; i++) {
+                vicPosTrans = vectorRotate([area4Humans[i].x, area4Humans[i].z], area4Rot)
+                thisHuman = {
+                    x: vicPosTrans[0] + xOffset,
+                    z: vicPosTrans[1] + zOffset,
+                    rot: area4Humans[i].rot + area4Rot * -1.57,
+                    id: humanId,
+                    type: area4Humans[i].type,
+                    score: area4Humans[i].score,
+                }
+                allHumans += visualHumanPart(thisHuman)
+                humanId += 1
+            }
+            area4Hazards = room4.hazards
+            for (i = 0; i < area4Hazards.length; i++) {
+                hazPosTrans = vectorRotate([area4Hazards[i].x, area4Hazards[i].z], area4Rot)
+                thisHazard = {
+                    x: hazPosTrans[0] + xOffset,
+                    z: hazPosTrans[1] + zOffset,
+                    rot: area4Hazards[i].rot + area4Rot * -1.57,
+                    id: hazardId,
+                    type: area4Hazards[i].type,
+                    score: area4Hazards[i].score,
+                }
+                allHazards += hazardPart(thisHazard)
+                hazardId += 1
+            }
+        }
+
         //Add the data pieces to the file data
         fileData = fileData + groupPart({data: allTiles, name: "WALLTILES"})
         fileData = fileData + groupPart({data: allCheckpointBounds, name: "CHECKPOINTBOUNDS"})
@@ -1860,7 +2024,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.time = data.time;
                     $scope.finished = data.finished;
                     $scope.roomTiles = data.roomTiles;
-                    console.log($scope.roomTiles)
+                    $scope.area4Room = data.area4Room;
 
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
 
@@ -1884,6 +2048,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.selectRoom3 = function() {
         if ($scope.selectRoom != 1) {
             $scope.selectRoom = 1;
+        }
+        else {
+            $scope.selectRoom = -1;
+        }
+    }
+
+    $scope.selectRoom4 = function() {
+        if ($scope.selectRoom != 2) {
+            $scope.selectRoom = 2;
         }
         else {
             $scope.selectRoom = -1;
@@ -1956,11 +2129,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     }
                 };
             }
-            console.log(cell)
             if ($scope.selectRoom != -1 && cell) {
                 let undo = false
-                console.log($scope.roomTiles)
-                for (a = 0; a < 2; a++) {
+                for (a = 0; a < $scope.roomTiles.length; a++) {
                     if ($scope.roomTiles[a]) {
                         for (b = 0; b < $scope.roomTiles[a].length; b++) {
                             if ($scope.roomTiles[a][b] == x+','+y+','+z) {
@@ -1977,13 +2148,21 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if (!undo) {
                     $scope.roomTiles[$scope.selectRoom].push(x+','+y+','+z);
                     var i = (parseInt(y - 1) / 2 * $scope.width + (parseInt(x - 1) / 2));
-                    if ($scope.selectRoom == 0)
+                    if ($scope.selectRoom == 0) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#359ef4");
-                    else
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('a')
+                    }
+                    else if ($scope.selectRoom == 1) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#ed9aef");
-                    $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('b')
+                    }
+                    else if ($scope.selectRoom == 2)
+                        $(".tile").get(i).style.setProperty("--tileColor", "#7500FF");
                 }
             }
+            console.log($scope.roomTiles)
             $scope.open(x, y, z);
         }
         $scope.recalculateLinear();
@@ -1993,7 +2172,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         if ($scope.selectRoom == -1) {
             var modalInstance = $uibModal.open({
                 animation: true,
-                templateUrl: '/templates/sim_editor/sim_editor_modal.2023.html',
+                templateUrl: '/templates/sim_editor/sim_editor_modal.2021.html',
                 controller: 'ModalInstanceCtrl',
                 size: 'lg',
                 scope: $scope,
