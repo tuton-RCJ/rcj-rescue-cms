@@ -69,12 +69,8 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 if(run.status < 4){
                     if(!$scope.runs[run.field._id]) $scope.runs[run.field._id]=[];
                     try{
-                         var teamname = run.team.name.split(' ');
-                        run.teamCode = teamname[0];
-                        run.teamName = teamname[1];
-                        for(let i = 2; i < teamname.length;i++){
-                            run.teamName = run.teamName + " " + teamname[i];
-                        }
+                        run.teamCode = run.team.teamCode;
+                        run.teamName = run.team.name;
                         $scope.runs[run.field._id].push(run);
                     }
                     catch(e){
@@ -87,12 +83,8 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 if(run.status < 4){
                     if(!$scope.runs[run.field._id]) $scope.runs[run.field._id]=[];
                     try{
-                        var teamname = run.team.name.split(' ');
-                        run.teamCode = teamname[0];
-                        run.teamName = teamname[1];
-                        for(let i = 2; i < teamname.length;i++){
-                            run.teamName = run.teamName + " " + teamname[i];
-                        }
+                        run.teamCode = run.team.teamCode;
+                        run.teamName = run.team.name;
                         $scope.runs[run.field._id].push(run);
                     }
                     catch(e){
@@ -116,12 +108,8 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 if(run.status < 4){
                     if(!$scope.runs[run.field._id]) $scope.runs[run.field._id]=[];
                     try{
-                        var teamname = run.team.name.split(' ');
-                        run.teamCode = teamname[0];
-                        run.teamName = teamname[1];
-                        for(let i = 2; i < teamname.length;i++){
-                            run.teamName = run.teamName + " " + teamname[i];
-                        }
+                        run.teamCode = run.team.teamCode;
+                        run.teamName = run.team.name;
                         $scope.runs[run.field._id].push(run);
                     }
                     catch(e){
@@ -134,12 +122,8 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
                 if(run.status < 4){
                     if(!$scope.runs[run.field._id]) $scope.runs[run.field._id]=[];
                     try{
-                         var teamname = run.team.name.split(' ');
-                        run.teamCode = teamname[0];
-                        run.teamName = teamname[1];
-                        for(let i = 2; i < teamname.length;i++){
-                            run.teamName = run.teamName + " " + teamname[i];
-                        }
+                        run.teamCode = run.team.teamCode;
+                        run.teamName = run.team.name;
                         $scope.runs[run.field._id].push(run);
                     }
                     catch(e){
