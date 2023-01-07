@@ -160,15 +160,38 @@ app.controller('SignEditorController', ['$scope', '$uibModal', '$log', '$http', 
         }
     }
 
-    $scope.addRanking = function (number,league){
+    $scope.addRanking = async function (number,league){
+        let competitionSelect = {};
+        for(let c of $scope.competitions){
+            competitionSelect[c._id] = c.name;
+        }
+        const { value: competition } = await Swal.fire({
+            title: 'Select a competition',
+            input: 'select',
+            inputOptions: competitionSelect,
+            inputPlaceholder: 'Select a competition',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                return new Promise((resolve) => {
+                    if (value) {
+                        resolve()
+                    } else {
+                        resolve('You need to select a competition')
+                    }
+                })
+            }
+        })
+        if(!competition) return;
+
         var content = {
             duration : -1,
             type : "iframe",
-            url : "/signage/display/:competition/score/"+league,
+            url : `/signage/display/${competition}/score/${league}`,
             group: "0",
             disable: false
         }
         $scope.contents.splice(number,0,content);
+        $scope.$apply();
     }
 
     $scope.addTimeTable = async function (number){
