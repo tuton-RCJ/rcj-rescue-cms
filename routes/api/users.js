@@ -24,13 +24,6 @@ adminRouter.get('/', function (req, res) {
           err: err.message,
         });
       } else {
-        if (!req.user.superDuperAdmin) {
-          for (let i = 0; i < data.length; i++) {
-            delete data[i].admin;
-            delete data[i].superDuperAdmin;
-          }
-        }
-
         res.status(200).send(data);
       }
     });
