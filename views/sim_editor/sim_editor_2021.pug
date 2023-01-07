@@ -60,22 +60,15 @@ block content
                         span.input-group-text {{"admin.simMapEditor.timelimit" | translate}}:
                     input.form-control(type='number', ng-model='time', min = '1')
                 
-                // translate? ***
-                .input-group.mb-3
-                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom2()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==0? 'rgb(53, 158, 244)':'', color: selectRoom==0? '#fff':''}")
-                        i.far.fa-square(ng-hide='selectRoom == 0') &nbsp;
-                        i.far.fa-check-square(ng-show='selectRoom == 0') &nbsp;
-                        | {{"admin.simMapEditor.select2" | translate}}
-                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom3()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==1? '#ed9aef':''}")
-                        i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
-                        i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
-                        | {{"admin.simMapEditor.select3" | translate}}
-                    button.btn.btn-outline-dark(type='button', ng-click='selectRoom4()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==2? '#7500FF':''}")
-                        i.far.fa-square(ng-hide='selectRoom == 2') &nbsp;
-                        i.far.fa-check-square(ng-show='selectRoom == 2') &nbsp;
-                        | {{"admin.simMapEditor.select4" | translate}}
-                    span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
-                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]")
+                button.btn.btn-outline-dark(type='button', ng-click='selectRoom2()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==0? 'rgb(53, 158, 244)':'', color: selectRoom==0? '#fff':''}")
+                    i.far.fa-square(ng-hide='selectRoom == 0') &nbsp;
+                    i.far.fa-check-square(ng-show='selectRoom == 0') &nbsp;
+                    | {{"admin.simMapEditor.select2" | translate}}
+                button.btn.btn-outline-dark(type='button', ng-click='selectRoom3()', style="margin:10px;", ng-style="{backgroundColor: selectRoom==1? '#ed9aef':''}")
+                    i.far.fa-square(ng-hide='selectRoom == 1') &nbsp;
+                    i.far.fa-check-square(ng-show='selectRoom == 1') &nbsp;
+                    | {{"admin.simMapEditor.select3" | translate}}
+                
 
         .row
             .col-11
@@ -83,7 +76,7 @@ block content
                     .input-group-prepend
                         span.input-group-text
                             i.fas.fa-arrows-alt-v(aria-hidden='true')
-                    button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
+                    button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
@@ -319,5 +312,4 @@ block content
                                         img.tile-image(ng-src='/images/green_bottom.png')
                                         div.maru.size_normal.pink1(style="left:5px;bottom:-10px;position: absolute;z-index:3;")
                                             div.letter3(ng-bind="victimNumber('Green',c,r,z,'bottom')")
-
 
