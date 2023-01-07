@@ -203,8 +203,10 @@ async function bootstrap(){
 
     app.use('/login', pass.ensureNotAuthenticated, loginRoute)
     app.use('/logout', pass.ensureAuthenticated, function (req, res, next) {
-        req.logout()
-        res.redirect('/home')
+        req.logout(req.user, err => {
+            if(err) return next(err);
+            res.redirect("/home");
+        });
     })
     app.use('/home', [homeRoute.public, pass.ensureAuthenticated, homeRoute.private, pass.ensureAdmin, homeRoute.admin])
     app.use('/locales', localesRoute)
@@ -225,13 +227,6 @@ async function bootstrap(){
     //========================================================================
     //                          Custom routes
     //========================================================================
-
-    //Simple logout (noting more neeeded)
-    app.get('/logout', function (req, res) {
-        req.logout()
-        res.redirect('/home')
-    })
-
     /*
     * This is called last in the routing config, therefor it'll take care of 404s
     */
