@@ -69,6 +69,14 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             $scope.leagues = response.data
         })
 
+        $scope.range = function (n) {
+            arr = [];
+            for (var i = 0; i < n; i++) {
+                arr.push(i);
+            }
+            return arr;
+        }
+
         $scope.addRun = function () {
             if ($scope.run === undefined ||
                 $scope.run.round === undefined ||
@@ -262,8 +270,9 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                         } catch (e) {
 
                         }
-
-
+                        $scope.runs[i].nlLiveVictimCount = $scope.runs[i].nl.liveVictim.filter(victim => victim.identified).length;
+                        $scope.runs[i].nlDeadVictimCount = $scope.runs[i].nl.deadVictim.filter(victim => victim.identified).length;
+                        $scope.runs[i].nlUnknownVictimCount = $scope.runs[i].nl.liveVictim.filter(victim => victim.found && !victim.identified).length + $scope.runs[i].nl.deadVictim.filter(victim => victim.found && !victim.identified).length;
                     }
 
                     $scope.Rrounds = objectSort(rounds)

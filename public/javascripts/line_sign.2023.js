@@ -1037,7 +1037,7 @@ app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'mt
         return ro;
     }
 
-     $scope.isCheckPointTile = function (tile) {
+    $scope.isCheckPointTile = function (tile) {
         if (!tile || tile.index.length == 0)
             return;
         return $scope.isCheckPoint($scope.stiles[tile.index[0]]);
