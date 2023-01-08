@@ -643,9 +643,9 @@ app.directive('tile', function () {
                     tile.items.speedbumps == 0 &&
                     !tile.items.rampPoints &&
                     tile.tileType.gaps == 0 &&
-                    tile.tileType.intersections == 0 &&
                     tile.tileType.seesaw == 0 &&
-                    !$scope.$parent.stiles[tile.index[0]].isDropTile && !isStart(tile)
+                    tile.tileType.intersections == 0 &&
+                    !$scope.isCheckPointTile(tile) && !isStart(tile)
                 ) {
                     return;
                 }
@@ -656,11 +656,8 @@ app.directive('tile', function () {
                 var possible = 0;
 
                 for(let i=0;i<tile.index.length;i++){
-                    possible += $scope.$parent.stiles[tile.index[i]].scoredItems.length;
-                }
-
-                for (var i = 0; i < tile.index.length; i++) {
-                    for(let j = 0; j < $scope.$parent.stiles[tile.index[i]].scoredItems.length;j++){
+                    for(let j=0;j<$scope.$parent.stiles[tile.index[i]].scoredItems.length;j++){
+                        possible++;
                         if($scope.$parent.stiles[tile.index[i]].scoredItems[j].scored){
                             successfully++;
                         }
