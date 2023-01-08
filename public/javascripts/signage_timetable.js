@@ -97,13 +97,8 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
 
             for(let run of runs){
                 try{
-                    var teamname = run.team.name.split(' ');
-                    run.teamCode = teamname[0];
-                    run.teamName = teamname[1];
-                    for(let i = 2; i < teamname.length;i++){
-                        run.teamName = run.teamName + " " + teamname[i];
-                    }
-
+                    run.teamCode = run.team.teamCode;
+                    run.teamName = run.team.name;
                 }
                 catch(e){
 
