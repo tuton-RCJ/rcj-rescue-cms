@@ -18,10 +18,6 @@ router.get('/editor/simulation/2021', async function (req, res, next) {
   res.render('sim_editor/sim_editor_2021', { user: req.user, pubService: true });
 });
 
-router.get('/editor/simulation/2022', async function (req, res, next) {
-  res.render('sim_editor/sim_editor_2022', { user: req.user, pubService: true });
-});
-
 router.get('/editor/simulation/2023', async function (req, res, next) {
   res.render('sim_editor/sim_editor_2023', { user: req.user, pubService: true });
 });
