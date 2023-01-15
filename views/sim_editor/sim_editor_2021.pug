@@ -1,5 +1,5 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../includes/layout
 
 block vars
   - var ngAppDef = 'SimEditor'
@@ -11,7 +11,7 @@ append scripts
     var pubService = "#{pubService}"
 
   script(src="/javascripts/lvl-uuid.js")
-  script(src="/javascripts/sim_editor."+rule+".js")
+  script(src="/javascripts/sim_editor/sim_editor.2021.js")
   script(src="/components/bootstrap-fileinput/js/fileinput.min.js")
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
@@ -27,7 +27,7 @@ block location
     span.breadcrumb-item.active Simulation world editor
 
 block content
-    h1 {{"admin.simMapEditor.title" | translate}} #{rule}
+    h1 {{"admin.simMapEditor.title" | translate}} 2021
     p {{"admin.simMapEditor.desc" | translate}}
     div(style='margin-top:50px;')
         .row
@@ -76,7 +76,7 @@ block content
                     .input-group-prepend
                         span.input-group-text
                             i.fas.fa-arrows-alt-v(aria-hidden='true')
-                    button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
+                    button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
@@ -312,5 +312,4 @@ block content
                                         img.tile-image(ng-src='/images/green_bottom.png')
                                         div.maru.size_normal.pink1(style="left:5px;bottom:-10px;position: absolute;z-index:3;")
                                             div.letter3(ng-bind="victimNumber('Green',c,r,z,'bottom')")
-
 
