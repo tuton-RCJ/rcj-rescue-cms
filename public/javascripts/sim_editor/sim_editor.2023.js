@@ -44,9 +44,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.area4Room = 0
     $scope.area4 = [
         {value: "None", type: 0},
+        {value: "Custom Room", type: 1},
         {
-            value: "Room 1 (7x5)", 
-            type: 1,
+            value: "Option 1 (7x5)", 
+            type: 2,
             width: 7,
             height: 5,
             room1Tile: [0, -1],
@@ -71,8 +72,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             ],
         },
         {
-            value: "Room 2 (6x6)", 
-            type: 2,
+            value: "Option 2 (6x6)", 
+            type: 3,
             width: 6,
             height: 6,
             room1Tile: [-1, 0],
@@ -111,6 +112,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             ],
         },
     ]
+
+    // Custom room 4 setup
+    let imgElement = document.getElementById("inputImg");
+    let inputElement = document.getElementById("selectImg");
+    inputElement.addEventListener("change", (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+    }, false);
 
     $scope.range = function (n) {
         arr = [];
@@ -958,6 +966,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 type: 'error',
                 title: 'Oops...',
                 text: trans['startTileError'],
+            });
+            return;
+        }
+        if($scope.area4Room.value == "Custom Room" && !room4CorrectSize()) {
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'For input image for custom room 4: width:height ratio of image does not match width:height ratio of room 4 in maze'
             });
             return;
         }
@@ -1923,72 +1939,76 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
 
         // area 4 positioning
-        N = 0
-        E = 1
-        S = 2
-        W = 3
-        room4 = $scope.area4[$scope.area4Room.type]
-        if ($scope.area4Room.type != 0 && $scope.connect14 && $scope.connect34) {
-            connect14 = [($scope.connect14[0] - 1) / 2, ($scope.connect14[1] - 1) / 2]
-            connect34 = [($scope.connect34[0] - 1) / 2, ($scope.connect34[1] - 1) / 2]
-            area4X = 0
-            area4Y = 0
-            area4Rot = 0
+        if ($scope.area4Room.value == "Custom Room")
+            allTiles = allTiles + createArea4Solid();
+        else {
+            N = 0
+            E = 1
+            S = 2
+            W = 3
+            room4 = $scope.area4[$scope.area4Room.type]
+            if ($scope.area4Room.type != 0 && $scope.connect14 && $scope.connect34) {
+                connect14 = [($scope.connect14[0] - 1) / 2, ($scope.connect14[1] - 1) / 2]
+                connect34 = [($scope.connect34[0] - 1) / 2, ($scope.connect34[1] - 1) / 2]
+                area4X = 0
+                area4Y = 0
+                area4Rot = 0
 
-            area4X = connect14[0]
-            area4Y = connect14[1]
-            if (connect34[0] - connect14[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
-                connect34[1] - connect14[1] == room4.room3Tile[1] - room4.room1Tile[1])
-                area4Rot = N
-            else if (connect14[0] - connect34[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
-                connect34[1] - connect14[1] == room4.room3Tile[0] - room4.room1Tile[0])
-                area4Rot = E
-            else if (connect14[0] - connect34[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
-                connect14[1] - connect34[1] == room4.room3Tile[1] - room4.room1Tile[1])
-                area4Rot = S
-            else if (connect34[0] - connect14[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
-                connect14[1] - connect34[1] == room4.room3Tile[0] - room4.room1Tile[0])
-                area4Rot = W
-            startTrans = vectorRotate(room4.room1Tile, area4Rot)
-            area4X -= startTrans[0]
-            area4Y -= startTrans[1]
-            allTiles = allTiles + area4Part({roomNum: $scope.area4Room.type, x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: room4.width, area4Height: room4.height})
+                area4X = connect14[0]
+                area4Y = connect14[1]
+                if (connect34[0] - connect14[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                    connect34[1] - connect14[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                    area4Rot = N
+                else if (connect14[0] - connect34[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                    connect34[1] - connect14[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                    area4Rot = E
+                else if (connect14[0] - connect34[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                    connect14[1] - connect34[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                    area4Rot = S
+                else if (connect34[0] - connect14[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                    connect14[1] - connect34[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                    area4Rot = W
+                startTrans = vectorRotate(room4.room1Tile, area4Rot)
+                area4X -= startTrans[0]
+                area4Y -= startTrans[1]
+                allTiles = allTiles + area4Part({roomNum: $scope.area4Room.type, x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: room4.width, area4Height: room4.height})
 
-            area4Width = room4.width
-            area4Height = room4.height
-            if (area4Rot == E || area4Rot == W) {
-                area4Width = room4.height
-                area4Height = room4.width
-            }
-            xOffset = -(width * 0.3 * tileScale[0] / 2.0) + area4X * 0.3 * tileScale[0]
-            zOffset = -(height * 0.3 * tileScale[1] / 2.0) + area4Y * 0.3 * tileScale[1]
-            area4Humans = room4.humans
-            for (i = 0; i < area4Humans.length; i++) {
-                vicPosTrans = vectorRotate([area4Humans[i].x, area4Humans[i].z], area4Rot)
-                thisHuman = {
-                    x: vicPosTrans[0] + xOffset,
-                    z: vicPosTrans[1] + zOffset,
-                    rot: area4Humans[i].rot + area4Rot * -1.57,
-                    id: humanId,
-                    type: area4Humans[i].type,
-                    score: area4Humans[i].score,
+                area4Width = room4.width
+                area4Height = room4.height
+                if (area4Rot == E || area4Rot == W) {
+                    area4Width = room4.height
+                    area4Height = room4.width
                 }
-                allHumans += visualHumanPart(thisHuman)
-                humanId += 1
-            }
-            area4Hazards = room4.hazards
-            for (i = 0; i < area4Hazards.length; i++) {
-                hazPosTrans = vectorRotate([area4Hazards[i].x, area4Hazards[i].z], area4Rot)
-                thisHazard = {
-                    x: hazPosTrans[0] + xOffset,
-                    z: hazPosTrans[1] + zOffset,
-                    rot: area4Hazards[i].rot + area4Rot * -1.57,
-                    id: hazardId,
-                    type: area4Hazards[i].type,
-                    score: area4Hazards[i].score,
+                xOffset = -(width * 0.3 * tileScale[0] / 2.0) + area4X * 0.3 * tileScale[0]
+                zOffset = -(height * 0.3 * tileScale[1] / 2.0) + area4Y * 0.3 * tileScale[1]
+                area4Humans = room4.humans
+                for (i = 0; i < area4Humans.length; i++) {
+                    vicPosTrans = vectorRotate([area4Humans[i].x, area4Humans[i].z], area4Rot)
+                    thisHuman = {
+                        x: vicPosTrans[0] + xOffset,
+                        z: vicPosTrans[1] + zOffset,
+                        rot: area4Humans[i].rot + area4Rot * -1.57,
+                        id: humanId,
+                        type: area4Humans[i].type,
+                        score: area4Humans[i].score,
+                    }
+                    allHumans += visualHumanPart(thisHuman)
+                    humanId += 1
                 }
-                allHazards += hazardPart(thisHazard)
-                hazardId += 1
+                area4Hazards = room4.hazards
+                for (i = 0; i < area4Hazards.length; i++) {
+                    hazPosTrans = vectorRotate([area4Hazards[i].x, area4Hazards[i].z], area4Rot)
+                    thisHazard = {
+                        x: hazPosTrans[0] + xOffset,
+                        z: hazPosTrans[1] + zOffset,
+                        rot: area4Hazards[i].rot + area4Rot * -1.57,
+                        id: hazardId,
+                        type: area4Hazards[i].type,
+                        score: area4Hazards[i].score,
+                    }
+                    allHazards += hazardPart(thisHazard)
+                    hazardId += 1
+                }
             }
         }
 
@@ -2037,6 +2057,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.roomTiles = data.roomTiles;
                     $scope.area4Room = data.area4Room;
 
+                    $scope.updateRoom4Pick();
+
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
 
                     $scope.$apply();
@@ -2072,6 +2094,180 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         else {
             $scope.selectRoom = -1;
         }
+    }
+
+    $scope.updateRoom4Pick = function() {
+        if ($scope.area4Room.value == "Custom Room")
+            inputElement.style.display = "inline";
+        else
+            inputElement.style.display = "none";
+    }
+
+    function room4CorrectSize() {
+        let img = cv.imread(imgElement);
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        let width = 0;
+        let height = 0;
+        
+        for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+            let tileStr = $scope.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+
+        width = (maxX - minX) / 2 + 1;
+        height = (maxY - minY) / 2 + 1;
+        if (width / height != img.size().width / img.size().height)
+            return false;
+        return true;
+    }
+
+    function has(contPoints, x, y) {
+        for (let i = 0; i < contPoints.length; i++) {
+        let compX = contPoints[i][0];
+        let compY = contPoints[i][1];
+
+        // Complete equality
+        /* if (compX == x && compY == y)
+            return true; */
+
+        // proximity
+        let dist = 0.002;
+        if (Math.pow(compX - x, 2) + Math.pow(compY - y, 2) < Math.pow(dist, 2))
+            return true;
+
+        // single-axis proximity
+        /* let dist = 0.0005;
+        if (Math.abs(compX - x) < dist || Math.abs(compY - y) < dist)
+            return true; */
+        }
+        return false;
+    }
+
+    function createArea4Solid() {
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        let room4Width = 0;
+        let room4Height = 0;
+        
+        for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+            let tileStr = $scope.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+        let x = (minX - 1) / 2;
+        let y = (minY - 1) / 2;
+        room4Width = (maxX - minX) / 2 + 1;
+        room4Height = (maxY - minY) / 2 + 1;
+        console.log(x, y, room4Width, room4Height);
+
+        let src = cv.imread(imgElement);
+        let im = new cv.Mat();
+        cv.cvtColor(src, im, cv.COLOR_RGBA2GRAY, 0);
+        cv.threshold(im, im, 127, 255, cv.THRESH_BINARY_INV);
+        let contours = new cv.MatVector();
+        let hierarchy = new cv.Mat();
+        cv.findContours(
+            im,
+            contours,
+            hierarchy,
+            cv.RETR_TREE,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+
+        let mazeWidthScale = 0.4;
+        let mazeHeightScale = 0.4;
+        let imgWidth = src.size().width;
+        let imgHeight = src.size().height;
+        let wallHeight = 0.06;
+        let roundDigits = 5;
+        let outputStr = "";
+        room4Width *= 0.3 * mazeWidthScale;
+        room4Height *= 0.3 * mazeHeightScale;
+
+        let xStart = -(($scope.width / 2.0) + 0.5) * (0.3 * mazeWidthScale);
+        let zStart = -(($scope.length / 2.0) + 0.5) * (0.3 * mazeHeightScale);
+        let xRelPos = x * 0.3 * mazeWidthScale;
+        let zRelPos = y * 0.3 * mazeHeightScale;
+        let xCoord = xRelPos + xStart;
+        let zCoord = zRelPos + zStart;
+        zCoord -= 0.005;
+        console.log(zStart, zRelPos, zCoord, $scope.width, $scope.height);
+        outputStr += `Solid {\n
+                translation ` + xCoord.toString() + ' -0.03 ' + zCoord.toString() + `\n
+                rotation 0 1 0 0\n
+                name "Area4"\n
+                children [\n
+            `;
+
+        let fullContPoints = [];
+        for (let i = 0; i < contours.size(); i++) {
+        outputStr +=
+            "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
+        let contour = contours.get(i);
+        let points = contour.data32S;
+        let contPoints = [];
+        fullContPoints.push([]);
+
+        for (let j = 0; j < points.length; j += 2) {
+            let row = points[j + 1];
+            let col = points[j];
+            let x = ((col / imgWidth) * room4Width).toFixed(roundDigits);
+            let y = ((row / imgHeight) * room4Height).toFixed(roundDigits);
+
+            if (!has(contPoints, x, y)) {
+                outputStr += x.toString() + " " + "0" + " " + y.toString() + ",";
+                outputStr +=
+                    x.toString() + " " + wallHeight + " " + y.toString() + ",";
+                contPoints.push([x, y]);
+                fullContPoints[i].push([row, col]);
+            }
+        }
+
+        outputStr += "\n]\n}\ncoordIndex [\n";
+        for (let j = 0; j < contPoints.length - 1; j++) {
+            outputStr +=
+            (j * 2).toString() + "," +
+            ((j + 1) * 2).toString() + "," +
+            ((j + 1) * 2 + 1).toString() + "," +
+            (j * 2 + 1).toString() + "," +
+            "-1,";
+        }
+        let tmp = contPoints.length - 1;
+        outputStr +=
+            (tmp * 2).toString() + "," +
+            "0" + "," +
+            "1" + "," +
+            (tmp * 2 + 1).toString() + "," +
+            "-1,";
+        for (let j = 0; j < contPoints.length; j++)
+            outputStr += (j * 2 + 1).toString() + ",";
+        outputStr += "-1,\n]\n}\n}";
+        }
+        outputStr += '\n]\n}\n';
+
+        return outputStr;
     }
 
     $scope.cellClick = function (x, y, z, isWall, isTile) {
@@ -2173,7 +2369,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         $(".tile").get(i).style.setProperty("--tileColor", "#7500FF");
                 }
             }
-            console.log($scope.roomTiles)
             $scope.open(x, y, z);
         }
         $scope.recalculateLinear();

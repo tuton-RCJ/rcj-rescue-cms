@@ -16,6 +16,7 @@ append scripts
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
   script(src="/components/html2canvas/index.js")
+  script(src="/javascripts/opencv.js")
 
 append css
   link(href="/stylesheets/maze_edit.css" rel="stylesheet")
@@ -35,6 +36,7 @@ block content
                 button.btn.btn-dark(type='button', ng-click='export()') {{"admin.simMapEditor.export" | translate}}
             .col-md-4
                 input#select(type='file', name='select')
+
         br
         .row
             .col-md-12
@@ -75,7 +77,9 @@ block content
                         i.far.fa-check-square(ng-show='selectRoom == 2') &nbsp;
                         | {{"admin.simMapEditor.select4" | translate}}
                     span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
-                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]")
+                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]", ng-change="updateRoom4Pick()", style="margin-right:10px;")
+                        input#selectImg(type='file', style="display:none;")
+                        img#inputImg(src="/images/barcode.png", style="display:none;")
 
         .row
             .col-11
