@@ -1365,6 +1365,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         }
 
+        function inBounds(z, x) {
+            return (z >= 0) && (z < $scope.length) && (x >= 0) && (x < $scope.width);
+        }
+
 
         let arr = [];
         //General scale for tiles - adjusts position and size of pieces and obstacles
@@ -1800,12 +1804,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     let humanRot = humanRotation[walls[z][x][7]]
                     //Randomly move human left and right on wall
                     let randomOffset = [0, 0]
-                    if(walls[z][x][7] == 0 || walls[z][x][7] == 2){
-                        //X offset for top and bottom
-                        randomOffset = [orgRound(getRandomArbitrary(-0.1 * tileScale[0], 0.1 * tileScale[0]), 0.001), 0]
-                    }else{
-                        //Z offset for left and right
-                        randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
+                    if ((inBounds(z-1, x) && walls[z-1][x][6] == 0) &&  // ensure no adjacent tile victims (random offset can place too close)
+                        (inBounds(z+1, x) && walls[z+1][x][6] == 0) && 
+                        (inBounds(z, x-1) && walls[z][x-1][6] == 0) && 
+                        (inBounds(z, x+1) && walls[z][x+1][6] == 0)) {
+                        if(walls[z][x][7] == 0 || walls[z][x][7] == 2){
+                            //X offset for top and bottom
+                            randomOffset = [orgRound(getRandomArbitrary(-0.1 * tileScale[0], 0.1 * tileScale[0]), 0.001), 0]
+                        }else{
+                            //Z offset for left and right
+                            randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
+                        }
                     }
 
                     if (walls[z][x][6] >= 5 && walls[z][x][6] <= 8){ //hazards
