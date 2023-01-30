@@ -1939,8 +1939,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
 
         // area 4 positioning
-        if ($scope.area4Room.value == "Custom Room")
+        if ($scope.area4Room.value == "Custom Room") {
             allTiles = allTiles + createArea4Solid();
+            let scoringElements = createArea4Victims(humanId, hazardId);
+            allHumans += scoringElements[0];
+            allHazards += scoringElements[1];
+        }
         else {
             N = 0
             E = 1
@@ -2155,13 +2159,20 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         return false;
     }
 
+    let room4xOffset = 0;
+    let room4zOffset = 0;
+    let fullContPoints = [];
+    let imgWidth = 0;
+    let imgHeight = 0;
+    let room4Width = 0;
+    let room4Height = 0;
+    let roundDigits = 5;
+
     function createArea4Solid() {
         let minX = -1;
         let maxX = 0;
         let minY = -1;
         let maxY = 0;
-        let room4Width = 0;
-        let room4Height = 0;
         
         for (let i = 0; i < $scope.roomTiles[2].length; i++) {
             let tileStr = $scope.roomTiles[2][i];
@@ -2180,12 +2191,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let y = (minY - 1) / 2;
         room4Width = (maxX - minX) / 2 + 1;
         room4Height = (maxY - minY) / 2 + 1;
-        console.log(x, y, room4Width, room4Height);
 
         let src = cv.imread(imgElement);
         let im = new cv.Mat();
-        cv.cvtColor(src, im, cv.COLOR_RGBA2GRAY, 0);
-        cv.threshold(im, im, 127, 255, cv.THRESH_BINARY_INV);
+
+        let blackLow = new cv.Mat(src.rows, src.cols, src.type(), [0, 0, 0, 0]);
+        let blackHigh = new cv.Mat(src.rows, src.cols, src.type(), [50, 50, 50, 255]);
+        cv.inRange(src, blackLow, blackHigh, im);
+
         let contours = new cv.MatVector();
         let hierarchy = new cv.Mat();
         cv.findContours(
@@ -2198,11 +2211,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         let mazeWidthScale = 0.4;
         let mazeHeightScale = 0.4;
-        let imgWidth = src.size().width;
-        let imgHeight = src.size().height;
         let wallHeight = 0.06;
-        let roundDigits = 5;
         let outputStr = "";
+        imgWidth = src.size().width;
+        imgHeight = src.size().height;
         room4Width *= 0.3 * mazeWidthScale;
         room4Height *= 0.3 * mazeHeightScale;
 
@@ -2213,7 +2225,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let xCoord = xRelPos + xStart;
         let zCoord = zRelPos + zStart;
         zCoord -= 0.005;
-        console.log(zStart, zRelPos, zCoord, $scope.width, $scope.height);
+
+        room4xOffset = xCoord;
+        room4zOffset = zCoord;
         outputStr += `Solid {\n
                 translation ` + xCoord.toString() + ' -0.03 ' + zCoord.toString() + `\n
                 rotation 0 1 0 0\n
@@ -2221,53 +2235,197 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 children [\n
             `;
 
-        let fullContPoints = [];
+        fullContPoints = [];
         for (let i = 0; i < contours.size(); i++) {
-        outputStr +=
-            "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
-        let contour = contours.get(i);
-        let points = contour.data32S;
-        let contPoints = [];
-        fullContPoints.push([]);
-
-        for (let j = 0; j < points.length; j += 2) {
-            let row = points[j + 1];
-            let col = points[j];
-            let x = ((col / imgWidth) * room4Width).toFixed(roundDigits);
-            let y = ((row / imgHeight) * room4Height).toFixed(roundDigits);
-
-            if (!has(contPoints, x, y)) {
-                outputStr += x.toString() + " " + "0" + " " + y.toString() + ",";
-                outputStr +=
-                    x.toString() + " " + wallHeight + " " + y.toString() + ",";
-                contPoints.push([x, y]);
-                fullContPoints[i].push([row, col]);
-            }
-        }
-
-        outputStr += "\n]\n}\ncoordIndex [\n";
-        for (let j = 0; j < contPoints.length - 1; j++) {
             outputStr +=
-            (j * 2).toString() + "," +
-            ((j + 1) * 2).toString() + "," +
-            ((j + 1) * 2 + 1).toString() + "," +
-            (j * 2 + 1).toString() + "," +
-            "-1,";
-        }
-        let tmp = contPoints.length - 1;
-        outputStr +=
-            (tmp * 2).toString() + "," +
-            "0" + "," +
-            "1" + "," +
-            (tmp * 2 + 1).toString() + "," +
-            "-1,";
-        for (let j = 0; j < contPoints.length; j++)
-            outputStr += (j * 2 + 1).toString() + ",";
-        outputStr += "-1,\n]\n}\n}";
+                "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
+            let contour = contours.get(i);
+            let points = contour.data32S;
+            let contPoints = [];
+            fullContPoints.push([]);
+
+            for (let j = 0; j < points.length; j += 2) {
+                let row = points[j + 1];
+                let col = points[j];
+                let x = ((col / imgWidth) * room4Width).toFixed(roundDigits);
+                let y = ((row / imgHeight) * room4Height).toFixed(roundDigits);
+
+                if (!has(contPoints, x, y)) {
+                    outputStr += x.toString() + " " + "0" + " " + y.toString() + ",";
+                    outputStr +=
+                        x.toString() + " " + wallHeight + " " + y.toString() + ",";
+                    contPoints.push([x, y]);
+                    fullContPoints[i].push([row, col]);
+                }
+            }
+
+            outputStr += "\n]\n}\ncoordIndex [\n";
+            for (let j = 0; j < contPoints.length - 1; j++) {
+                outputStr +=
+                (j * 2).toString() + "," +
+                ((j + 1) * 2).toString() + "," +
+                ((j + 1) * 2 + 1).toString() + "," +
+                (j * 2 + 1).toString() + "," +
+                "-1,";
+            }
+            let tmp = contPoints.length - 1;
+            outputStr +=
+                (tmp * 2).toString() + "," +
+                "0" + "," +
+                "1" + "," +
+                (tmp * 2 + 1).toString() + "," +
+                "-1,";
+            for (let j = 0; j < contPoints.length; j++)
+                outputStr += (j * 2 + 1).toString() + ",";
+            outputStr += "-1,\n]\n}\n}";
         }
         outputStr += '\n]\n}\n';
 
         return outputStr;
+    }
+
+    function dist(point1, point2) {
+        return Math.sqrt(Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2));
+    }
+
+    function createArea4Victims(startHumanId, startHazardId) {
+
+        // TODO:
+        //   - incremental victim names (e.g. "victim1, victim2, ...")
+
+        let outputStrVic = "";
+        let outputStrHaz = "";
+        const scoringElem = ["harmed", "stable", "unharmed", "P", "O", "F", "C"];
+        
+        let src = cv.imread(imgElement);
+        let vicIm = new cv.Mat();
+        let low = new cv.Mat(src.rows, src.cols, src.type(), [100, 0, 0, 0]);
+        let high = new cv.Mat(src.rows, src.cols, src.type(), [255, 50, 50, 255]);
+        cv.inRange(src, low, high, vicIm);
+
+        let vicContours = new cv.MatVector();
+        let vicHierarchy = new cv.Mat();
+        cv.findContours(
+            vicIm,
+            vicContours,
+            vicHierarchy,
+            cv.RETR_TREE,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+
+        for (let x = 0; x < vicContours.size(); x++) {
+            let M = cv.moments(vicContours.get(x), false);
+            let cx = M.m10/M.m00;
+            let cy = M.m01/M.m00;
+            let point = [cy, cx];
+
+            let closePoint = [0, 0];
+            let closeDist = -1;
+            let closeIndex = [0, 0];
+
+            for (let i = 0; i < fullContPoints.length; i++) {
+                for (let j = 0; j < fullContPoints[i].length; j++) {
+                    let curDist = dist(fullContPoints[i][j], point);
+                    if (curDist < closeDist || closeDist == -1) {
+                        closePoint = fullContPoints[i][j];
+                        closeDist = curDist;
+                        closeIndex = [i, j];
+                    }
+                }
+            }
+
+            let vicWidth = 0.016;
+            let angle = 0;
+            let nextPoint = 0;
+            let prevPoint = 0;
+
+            let npInd = [closeIndex[0], closeIndex[1]];
+            let ppInd = [closeIndex[0], closeIndex[1]];
+            vicWidth = vicWidth * imgWidth / room4Width;
+            while (dist(fullContPoints[npInd[0]][npInd[1]], fullContPoints[ppInd[0]][ppInd[1]]) < vicWidth) {
+                if (ppInd[1] == 0) {
+                    ppInd[1] = fullContPoints[ppInd[0]].length - 1;
+                    npInd[1] += 1;
+                }
+                else if (npInd[1] == fullContPoints[npInd[0]].length - 1) {
+                    ppInd[1] -= 1;
+                    npInd[1] = 0;
+                }
+                else {
+                    ppInd[1] -= 1;
+                    npInd[1] += 1;
+                }
+            }
+            
+            let midPoint = [(fullContPoints[ppInd[0]][ppInd[1]][0] + fullContPoints[npInd[0]][npInd[1]][0]) / 2,
+                            (fullContPoints[ppInd[0]][ppInd[1]][1] + fullContPoints[npInd[0]][npInd[1]][1]) / 2]
+            if (dist(midPoint, point) > dist(closePoint, point)) { // convex wall
+                if (closeIndex[1] == 0) {
+                    nextPoint = fullContPoints[closeIndex[0]][closeIndex[1]+1];
+                    prevPoint = fullContPoints[closeIndex[0]][fullContPoints[closeIndex[0]].length-1];
+                }
+                else if (closeIndex[1] == fullContPoints[closeIndex[0]].length-1) {
+                    nextPoint = fullContPoints[closeIndex[0]][0];
+                    prevPoint = fullContPoints[closeIndex[0]][closeIndex[1]-1];
+                }
+                else {
+                    nextPoint = fullContPoints[closeIndex[0]][closeIndex[1]+1];
+                    prevPoint = fullContPoints[closeIndex[0]][closeIndex[1]-1];
+                }
+            }
+            else { // concave wall
+                nextPoint = fullContPoints[npInd[0]][npInd[1]] // (y, x), i.e. (row, col)
+                prevPoint = fullContPoints[ppInd[0]][ppInd[1]]
+                closePoint = midPoint;
+            }
+
+            angle = Math.atan((nextPoint[0] - prevPoint[0]) / (nextPoint[1] - prevPoint[1])) * -1; // times -1 because axis different
+            /* console.log(nextPoint, prevPoint);
+            console.log(angle * 180 / 3.14); */
+
+            let vicX = parseFloat(((closePoint[1] / imgWidth) * room4Width).toFixed(roundDigits)) + room4xOffset;
+            let vicY = parseFloat(((closePoint[0] / imgHeight) * room4Height).toFixed(roundDigits)) + room4zOffset;
+
+            let rand = parseInt(Math.random() * scoringElem.length);
+            console.log(rand, scoringElem[rand]);
+            if (rand <= 2) { // victim
+                outputStrVic += `
+                    Victim {
+                        translation `;
+                    outputStrVic += vicX.toString() + ' 0 ' + vicY.toString();
+                    outputStrVic += `
+                        rotation 0 1 0 `;
+                    outputStrVic += angle.toString() + `
+                        name "Victim` + startHumanId.toString() + `"
+                        type "` + scoringElem[rand] + `"
+                        scoreWorth 15
+                    }
+                    `;
+                startHumanId += 1;
+            }
+            else { // hazard
+                outputStrHaz += `
+                    HazardMap {
+                        translation `;
+                    outputStrHaz += vicX.toString() + ' 0 ' + vicY.toString();
+                    outputStrHaz += `
+                        rotation 0 1 0 `;
+                    outputStrHaz += angle.toString() + `
+                        name "Hazard` + startHazardId.toString() + `"
+                        type "` + scoringElem[rand] + `"
+                        scoreWorth 30
+                    }
+                    `;
+                startHazardId += 1;
+            }
+
+            /*cv.circle(src, new cv.Point(cx, cy), 3, new cv.Scalar(0, 255, 0, 255), 5);
+            cv.circle(src, new cv.Point(nextPoint[1], nextPoint[0]), 5, new cv.Scalar(0, 255, 255, 255), 5);
+            cv.circle(src, new cv.Point(prevPoint[1], prevPoint[0]), 5, new cv.Scalar(0, 255, 255, 255), 5);
+            //cv.circle(src, new cv.Point(closePoint[1], closePoint[0]), 5, new cv.Scalar(0, 0, 255, 255), 5);
+            showImg(src);*/
+        }
+        return [outputStrVic, outputStrHaz];
     }
 
     $scope.cellClick = function (x, y, z, isWall, isTile) {
