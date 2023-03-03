@@ -38,6 +38,10 @@ block content
                 input#select(type='file', name='select')
 
         br
+        //.row
+            canvas#room4canvas(width='300', height='300' drawing)
+        //row
+            canvas#outputCanvas(width='300', height='300')
         .row
             .col-md-12
                 .input-group.mb-3
@@ -80,6 +84,8 @@ block content
                         select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]", ng-change="updateRoom4Pick()", style="margin-right:10px;")
                         input#selectImg(type='file', style="display:none;")
                         img#inputImg(src="/images/barcode.png", style="display:none;")
+                        button.btn.btn-outline-dark#showRoom4Canvas(type='button', ng-click='openCustomRoom4()', style="margin:5px;")
+                            p Create Custom Room 4
 
         .row
             .col-11

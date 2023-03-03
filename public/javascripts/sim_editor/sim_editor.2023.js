@@ -1,6 +1,11 @@
 // register the directive with your app module
 var app = angular.module('SimEditor', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 
+/*** */
+let canvasWidth = 500;
+let canvasHeight = 500;
+let canvasColor = '#000000';
+
 // function referenced by the drop target
 app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$translate', function ($scope, $uibModal, $log, $http, $translate) {
 
@@ -938,6 +943,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
 
     $scope.export = function(){
+        /*let canvas = document.getElementById('room4canvas');
+        let ctx = canvas.getContext('2d');
+        let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let src = cv.matFromImageData(imgData);
+        cv.imshow('outputCanvas', src);*/
+
         $scope.recalculateLinear();
         var map = {
             name: $scope.name,
@@ -2239,7 +2250,12 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         for (let i = 0; i < contours.size(); i++) {
             outputStr +=
                 "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
-            let contour = contours.get(i);
+
+            let approx = new cv.Mat();
+            let epsilon = 0.001*cv.arcLength(contours.get(i),true);
+            cv.approxPolyDP(contours.get(i), approx, epsilon, true);
+
+            let contour = approx;
             let points = contour.data32S;
             let contPoints = [];
             fullContPoints.push([]);
@@ -2555,6 +2571,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
     };
 
+
     $scope.openMaxScore = function(){
         let victimScore = 0;
         let checkpointScore = 0;
@@ -2598,7 +2615,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
         if(victimScore > 0) exitBonus += (victimScore + checkpointScore) * 0.1
 
-
         let html = `
             <div class='text-center'>
                 <i class='fas fa-calculator fa-3x'></i>
@@ -2626,6 +2642,52 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         })
 
     }
+
+    $scope.openCustomRoom4 = function() {
+        if ($scope.selectRoom == -1) {
+            let minX = -1;
+            let maxX = 0;
+            let minY = -1;
+            let maxY = 0;
+            
+            for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+                let tileStr = $scope.roomTiles[2][i];
+                let x = tileStr.slice(0, tileStr.indexOf(","));
+                let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+                if (x < minX || minX == -1)
+                    minX = x;
+                if (x > maxX)
+                    maxX = x;
+                if (y < minY || minY == -1)
+                    minY = y;
+                if (y > maxY)
+                    maxY = y;
+            }
+            let x = (minX - 1) / 2;
+            let y = (minY - 1) / 2;
+            room4Width = (maxX - minX) / 2 + 1;
+            room4Height = (maxY - minY) / 2 + 1;
+            canvasWidth = 600;
+            canvasHeight = canvasWidth / room4Width * room4Height;
+
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: '/templates/sim_editor/custom_room_4_modal.html',
+                controller: 'CustomRoom4ModalCtrl',
+                size: 'lg',
+                scope: $scope,
+                resolve: {
+                    x: function() {
+                        return 3;
+                    }
+                }
+            }).result.then(function (data) {
+                console.log(data);
+            }, function() {
+                console.log(data);
+            });
+        }
+    };
 }]);
 
 
@@ -2697,4 +2759,149 @@ app.controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', 'x', 'y', 'z'
         $scope.$parent.recalculateLinear();
         $uibModalInstance.close();
     };
+
 }]);
+
+app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function ($scope, $uibModalInstance){
+
+    let canvas;
+    $scope.importImg = null;
+
+    $scope.downloadCanvas = function downloadCanvas() {
+        if (!canvas)
+            canvas = document.getElementById('room4Canvas');
+
+        let imgData = canvas.toDataURL();
+        var link = document.createElement("a");
+        link.download = 'custom_room_4_pic.png';
+        link.href = imgData;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        delete link;
+    }
+
+    function loadCanvas() {
+        console.log(importImg);
+    }
+
+    $scope.click = function() {
+        //console.log($scope.img);
+        let canvas = document.getElementById('room4Canvas');
+        let imgElem = document.getElementById('img');
+        let context = canvas.getContext('2d');
+        context.drawImage(imgElem, 0, 0);
+
+        var select = document.getElementById('select');
+
+        select.addEventListener('change', function (e) {
+            var fileData = e.target.files[0];
+            imgElem.src = URL.createObjectURL(fileData);
+            $scope.click();
+        });
+        console.log($scope.img);
+    }
+}]);
+
+app.directive("drawing", function(){
+    return {
+        restrict: "A",
+        link: function(scope, element){
+        var ctx = element[0].getContext('2d');
+        
+        // variable that decides if something should be drawn on mousemove
+        var drawing = false;
+        
+        // the last coordinates before the current move
+        var lastX;
+        var lastY;
+        
+        // modal initialization
+        let room4Canvas = document.getElementById("room4Canvas");
+        let context = room4Canvas.getContext('2d');
+        room4Canvas.width = canvasWidth;
+        room4Canvas.height = canvasHeight;
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        let black = '#000000';
+        let red = '#FF0000';
+        let wallCheckbox = document.getElementById("drawWall");
+        let vicCheckbox = document.getElementById("drawVic");
+        wallCheckbox.addEventListener('change', function (e) {
+            let checked = e.target.checked;
+            vicCheckbox.checked = !checked;
+            canvasColor = black;
+        });
+        vicCheckbox.addEventListener('change', function (e) {
+            let checked = e.target.checked;
+            wallCheckbox.checked = !checked;
+            canvasColor = red;
+        });
+
+        let inputFile = document.getElementById("importCanvas");
+        let img = new Image;
+        img.onload = function() {
+            context.drawImage(img, 0, 0);
+        }
+        inputFile.addEventListener('change', function (e) {
+            img.src = URL.createObjectURL(e.target.files[0]);
+        });
+
+        element.bind('mousedown', function(event){
+            if(event.offsetX!==undefined){
+            lastX = event.offsetX;
+            lastY = event.offsetY;
+            } else {
+            /*lastX = event.layerX - event.currentTarget.offsetLeft;
+            lastY = event.layerY - event.currentTarget.offsetTop;*/
+            }
+            
+            // begins new line
+            ctx.beginPath();
+            
+            drawing = true;
+        });
+        element.bind('mousemove', function(event){
+            if(drawing){
+            // get current mouse position
+            if(event.offsetX!==undefined){
+                currentX = event.offsetX;
+                currentY = event.offsetY;
+            } else {
+                /*currentX = event.layerX - event.currentTarget.offsetLeft;
+                currentY = event.layerY - event.currentTarget.offsetTop;*/
+            }
+            
+            draw(lastX, lastY, currentX, currentY);
+            
+            // set current coordinates to last one
+            lastX = currentX;
+            lastY = currentY;
+            }
+            
+        });
+        element.bind('mouseup', function(event){
+            // stop drawing
+            drawing = false;
+        });
+            
+        // canvas reset
+        function reset(){
+        element[0].width = element[0].width; 
+        }
+        
+        function draw(lX, lY, cX, cY){
+            // line from
+            ctx.moveTo(lX,lY);
+            // to
+            ctx.lineTo(cX,cY);
+            // color
+            ctx.strokeStyle = canvasColor;
+            // draw it
+            ctx.stroke();
+        }
+        }
+    };
+});
+

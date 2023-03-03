@@ -1,0 +1,44 @@
+<div style="display: flex; flex-direction: column; align-items: center">
+  <div id="test"></div>
+  <h1 style="margin: 10px">Custom Room 4 Creator</h1>
+  <canvas
+    id="room4Canvas"
+    style="
+      border-color: black;
+      border-style: solid;
+      border-width: 1px;
+      margin: 10px;
+    "
+    drawing
+  >
+  </canvas>
+  <!--input type="checkbox" ng-model="img" id="isCheckpoint"><label class="checkbox" for="isCheckpoint">{{"admin.simMapEditor.cp" | translate}}</label>
+  <input type="file" id="select" ng-model="img"></input>
+  <button ng-click="click()">click</button>
+  <img id="img" src="/images/ramp.png" style="width: 500px; height: 500px;"></img-->
+  <div style="display: flex; flex-direction: row">
+    <input type="checkbox" id="drawWall" checked /><label
+      class="checkbox"
+      for="drawWall"
+      >Draw Walls (Black)</label
+    >
+    <input type="checkbox" id="drawVic" /><label class="checkbox" for="drawVic"
+      >Draw Victims (Red)</label
+    >
+  </div>
+  <input
+    type="file"
+    id="importCanvas"
+    style="
+      border-color: black;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 3%;
+      padding: 5px;
+    "
+    accept="image/png, image/jpeg"
+  />
+  <button style="margin: 10px" ng-click="downloadCanvas()">
+    Download Custom Room 4
+  </button>
+</div>
