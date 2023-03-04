@@ -2400,7 +2400,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             let vicY = parseFloat(((closePoint[0] / imgHeight) * room4Height).toFixed(roundDigits)) + room4zOffset;
 
             let rand = parseInt(Math.random() * scoringElem.length);
-            console.log(rand, scoringElem[rand]);
             if (rand <= 2) { // victim
                 outputStrVic += `
                     Victim {
