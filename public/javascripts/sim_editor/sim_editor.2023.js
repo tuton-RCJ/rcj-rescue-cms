@@ -119,6 +119,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     ]
 
     // Custom room 4 setup
+    let useCustomRoom4 = document.getElementById("showRoom4Canvas");
     let imgElement = document.getElementById("inputImg");
     let inputElement = document.getElementById("selectImg");
     inputElement.addEventListener("change", (e) => {
@@ -2112,10 +2113,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     $scope.updateRoom4Pick = function() {
-        if ($scope.area4Room.value == "Custom Room")
+        if ($scope.area4Room.value == "Custom Room") {
             inputElement.style.display = "inline";
-        else
+            useCustomRoom4.style.display = "inline";
+        }
+        else {
             inputElement.style.display = "none";
+            useCustomRoom4.style.display = "inline";
+        }
     }
 
     function room4CorrectSize() {
@@ -2216,7 +2221,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             im,
             contours,
             hierarchy,
-            cv.RETR_TREE,
+            cv.RETR_EXTERNAL,
             cv.CHAIN_APPROX_SIMPLE
         );
 
@@ -2251,11 +2256,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             outputStr +=
                 "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
 
-            let approx = new cv.Mat();
-            let epsilon = 0.001*cv.arcLength(contours.get(i),true);
-            cv.approxPolyDP(contours.get(i), approx, epsilon, true);
-
-            let contour = approx;
+            let contour = contours.get(i);
             let points = contour.data32S;
             let contPoints = [];
             fullContPoints.push([]);
@@ -2305,10 +2306,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function createArea4Victims(startHumanId, startHazardId) {
-
-        // TODO:
-        //   - incremental victim names (e.g. "victim1, victim2, ...")
-
         let outputStrVic = "";
         let outputStrHaz = "";
         const scoringElem = ["harmed", "stable", "unharmed", "P", "O", "F", "C"];
@@ -2395,9 +2392,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 closePoint = midPoint;
             }
 
-            angle = Math.atan((nextPoint[0] - prevPoint[0]) / (nextPoint[1] - prevPoint[1])) * -1; // times -1 because axis different
-            /* console.log(nextPoint, prevPoint);
-            console.log(angle * 180 / 3.14); */
+            angle = Math.atan(-1*(prevPoint[0] - nextPoint[0]) / (prevPoint[1] - nextPoint[1])); // times -1 because axis different
+            if (prevPoint[1] - nextPoint[1] < 0)
+                angle = 3.14 + angle
 
             let vicX = parseFloat(((closePoint[1] / imgWidth) * room4Width).toFixed(roundDigits)) + room4xOffset;
             let vicY = parseFloat(((closePoint[0] / imgHeight) * room4Height).toFixed(roundDigits)) + room4zOffset;
