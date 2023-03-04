@@ -2824,6 +2824,9 @@ app.directive("drawing", function(){
         let red = '#FF0000';
         let wallCheckbox = document.getElementById("drawWall");
         let vicCheckbox = document.getElementById("drawVic");
+        wallCheckbox.checked = 1;
+        vicCheckbox.checked = 0;
+        canvasColor = black;
         wallCheckbox.addEventListener('change', function (e) {
             let checked = e.target.checked;
             vicCheckbox.checked = !checked;
