@@ -332,19 +332,19 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     }
 
     $scope.checkUploaded = function(name){
-        return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
+        return($scope.uploaded.some((n) => new RegExp('^' + name + '\\.*').test(n)));
     }
 
     $scope.checkUploadedReview = function(name){
-        return($scope.uploadedReview.some((n) => new RegExp(userName + '/' + name+'\\.').test(n)));
+        return($scope.uploadedReview.some((n) => new RegExp(userName + '/' + '^' + name + '\\.*').test(n)));
     }
 
     $scope.nameUploaded = function(name){
-        return($scope.uploaded[$scope.uploaded.findIndex((n) => new RegExp(name+'\\.').test(n))]);
+        return($scope.uploaded[$scope.uploaded.findIndex((n) => new RegExp('^' + name + '\\.*').test(n))]);
     }
 
     $scope.nameUploadedReview = function(name){
-        return($scope.uploadedReview[$scope.uploadedReview.findIndex((n) => new RegExp(userName + '/' + name+'\\.').test(n))]);
+        return($scope.uploadedReview[$scope.uploadedReview.findIndex((n) => new RegExp(userName + '/' + '^' + name + '\\.*').test(n))]);
     }
 
     $scope.getPdfLink = function(name){
@@ -357,14 +357,14 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
     $scope.getVideoList = function(name){
         let res = $scope.uploaded.filter(function(value) {
-            return new RegExp(name+'\\.').test(value);
+            return new RegExp('^' + name + '\\.*').test(value);
         });
         return res;
     }
 
     $scope.getVideoListReview = function(name){
         let res = $scope.uploadedReview.filter(function(value) {
-            return new RegExp(userName + '/' + name+'\\.').test(value);
+            return new RegExp(userName + '/' + '^' + name + '\\.*').test(value);
         });
         return res;
     }
