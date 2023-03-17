@@ -1,11 +1,6 @@
 // register the directive with your app module
 var app = angular.module('SimEditor', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 
-/*** */
-let canvasWidth = 500;
-let canvasHeight = 500;
-let canvasColor = '#000000';
-
 // function referenced by the drop target
 app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$translate', function ($scope, $uibModal, $log, $http, $translate) {
 
@@ -120,11 +115,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
     // Custom room 4 setup
     let useCustomRoom4 = document.getElementById("showRoom4Canvas");
-    let imgElement = document.getElementById("inputImg");
+    /*let imgElement = document.getElementById("inputImg");
     let inputElement = document.getElementById("selectImg");
     inputElement.addEventListener("change", (e) => {
         imgElement.src = URL.createObjectURL(e.target.files[0]);
-    }, false);
+    }, false);*/
 
     $scope.range = function (n) {
         arr = [];
@@ -961,7 +956,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             cells: $scope.cells,
             roomTiles: $scope.roomTiles,
             time: $scope.time,
-            area4Room: $scope.area4Room
+            area4Room: $scope.area4Room,
+            room4CanvasSave: $scope.room4CanvasSave
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -2072,6 +2068,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.finished = data.finished;
                     $scope.roomTiles = data.roomTiles;
                     $scope.area4Room = data.area4Room;
+                    $scope.room4CanvasSave = data.room4CanvasSave;
 
                     $scope.updateRoom4Pick();
 
@@ -2114,17 +2111,23 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
     $scope.updateRoom4Pick = function() {
         if ($scope.area4Room.value == "Custom Room") {
-            inputElement.style.display = "inline";
+            //inputElement.style.display = "inline";
             useCustomRoom4.style.display = "inline";
         }
         else {
-            inputElement.style.display = "none";
-            useCustomRoom4.style.display = "inline";
+            //inputElement.style.display = "none";
+            useCustomRoom4.style.display = "none";
         }
     }
 
     function room4CorrectSize() {
-        let img = cv.imread(imgElement);
+        return true;
+        //let img = cv.imread(imgElement);
+
+        let context = room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, canvasWidth, canvasHeight);
+        let img = cv.matFromImageData(imgData); 
+
         let minX = -1;
         let maxX = 0;
         let minY = -1;
@@ -2208,7 +2211,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         room4Width = (maxX - minX) / 2 + 1;
         room4Height = (maxY - minY) / 2 + 1;
 
-        let src = cv.imread(imgElement);
+        //let src = cv.imread(imgElement);
+        let context = $scope.room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+        let src = cv.matFromImageData(imgData); 
+
         let im = new cv.Mat();
 
         let blackLow = new cv.Mat(src.rows, src.cols, src.type(), [0, 0, 0, 0]);
@@ -2310,7 +2317,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let outputStrHaz = "";
         const scoringElem = ["harmed", "stable", "unharmed", "P", "O", "F", "C"];
         
-        let src = cv.imread(imgElement);
+        // let src = cv.imread(imgElement);
+        let context = $scope.room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+        let src = cv.matFromImageData(imgData); 
+
         let vicIm = new cv.Mat();
         let low = new cv.Mat(src.rows, src.cols, src.type(), [100, 0, 0, 0]);
         let high = new cv.Mat(src.rows, src.cols, src.type(), [255, 50, 50, 255]);
@@ -2441,7 +2452,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     $scope.cellClick = function (x, y, z, isWall, isTile) {
-
         var cell = $scope.cells[x + ',' + y + ',' + z];
         var halfWallTile;
         var intx = parseInt(x), inty = parseInt(y);
@@ -2663,8 +2673,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             let y = (minY - 1) / 2;
             room4Width = (maxX - minX) / 2 + 1;
             room4Height = (maxY - minY) / 2 + 1;
-            canvasWidth = 600;
-            canvasHeight = canvasWidth / room4Width * room4Height;
+            $scope.canvasWidth = 600;
+            $scope.canvasHeight = $scope.canvasWidth / room4Width * room4Height;
 
             var modalInstance = $uibModal.open({
                 animation: true,
@@ -2777,12 +2787,16 @@ app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function (
         delete link;
     }
 
-    function loadCanvas() {
-        console.log(importImg);
+    $scope.clearCanvas = function() {
+        if (!canvas)
+            canvas = document.getElementById('room4Canvas');
+        let context = canvas.getContext('2d');
+        
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     $scope.click = function() {
-        //console.log($scope.img);
         let canvas = document.getElementById('room4Canvas');
         let imgElem = document.getElementById('img');
         let context = canvas.getContext('2d');
@@ -2795,14 +2809,17 @@ app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function (
             imgElem.src = URL.createObjectURL(fileData);
             $scope.click();
         });
-        console.log($scope.img);
+    }
+
+    $scope.closeRoom4 = function() {
+        $uibModalInstance.close();
     }
 }]);
 
 app.directive("drawing", function(){
     return {
         restrict: "A",
-        link: function(scope, element){
+        link: function($scope, element){
         var ctx = element[0].getContext('2d');
         
         // variable that decides if something should be drawn on mousemove
@@ -2815,33 +2832,64 @@ app.directive("drawing", function(){
         // modal initialization
         let room4Canvas = document.getElementById("room4Canvas");
         let context = room4Canvas.getContext('2d');
-        room4Canvas.width = canvasWidth;
-        room4Canvas.height = canvasHeight;
+        if ($scope.$parent.room4CanvasSave != null) {
+            canvasImg = new Image;
+            canvasImg.onload = function() {
+                context.drawImage(canvasImg, 0, 0);
+            };
+            canvasImg.src = $scope.$parent.room4CanvasSave;
+        }
+        room4Canvas.width = $scope.$parent.canvasWidth;
+        room4Canvas.height = $scope.$parent.canvasHeight;
         context.fillStyle = "white";
-        context.fillRect(0, 0, canvasWidth, canvasHeight);
+        context.fillRect(0, 0, room4Canvas.width, room4Canvas.height);
 
         let black = '#000000';
         let red = '#FF0000';
+        let white = '#FFFFFF';
+        let canvasColor = black;
         let wallCheckbox = document.getElementById("drawWall");
         let vicCheckbox = document.getElementById("drawVic");
+        let eraseCheckbox = document.getElementById("erase");
         wallCheckbox.checked = 1;
         vicCheckbox.checked = 0;
-        canvasColor = black;
+        eraseCheckbox.checked = 0;
         wallCheckbox.addEventListener('change', function (e) {
-            let checked = e.target.checked;
-            vicCheckbox.checked = !checked;
-            canvasColor = black;
+            let checked = !e.target.checked;
+            if (!checked) {
+                vicCheckbox.checked = false;
+                eraseCheckbox.checked = false;
+                canvasColor = black;
+            }
+            else
+                e.target.checked = true;
         });
         vicCheckbox.addEventListener('change', function (e) {
-            let checked = e.target.checked;
-            wallCheckbox.checked = !checked;
-            canvasColor = red;
+            let checked = !e.target.checked;
+            if (!checked) {
+                wallCheckbox.checked = false;
+                eraseCheckbox.checked = false;
+                canvasColor = red;
+            }
+            else
+                e.target.checked = true;
+        });
+        eraseCheckbox.addEventListener('change', function (e) {
+            let checked = !e.target.checked;
+            if (!checked) {
+                wallCheckbox.checked = false;
+                vicCheckbox.checked = false;
+                canvasColor = white;
+            }
+            else
+                e.target.checked = true;
         });
 
         let inputFile = document.getElementById("importCanvas");
         let img = new Image;
         img.onload = function() {
-            context.drawImage(img, 0, 0);
+            context.drawImage(img, 0, 0, room4Canvas.width, room4Canvas.height);
+            $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
         }
         inputFile.addEventListener('change', function (e) {
             img.src = URL.createObjectURL(e.target.files[0]);
@@ -2883,6 +2931,7 @@ app.directive("drawing", function(){
         element.bind('mouseup', function(event){
             // stop drawing
             drawing = false;
+            $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
         });
             
         // canvas reset
@@ -2897,6 +2946,11 @@ app.directive("drawing", function(){
             ctx.lineTo(cX,cY);
             // color
             ctx.strokeStyle = canvasColor;
+            // width
+            if (canvasColor == white)
+                ctx.lineWidth = 20;
+            else
+                ctx.lineWidth = 2;
             // draw it
             ctx.stroke();
         }

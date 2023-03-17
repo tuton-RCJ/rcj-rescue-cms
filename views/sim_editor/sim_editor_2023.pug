@@ -82,8 +82,8 @@ block content
                         | {{"admin.simMapEditor.select4" | translate}}
                     span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
                         select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]", ng-change="updateRoom4Pick()", style="margin-right:10px;")
-                        input#selectImg(type='file', style="border-style:solid; border-color:black; border-width:1px;border-radius:3%; padding:5px; display:none;")
-                        img#inputImg(src="/images/barcode.png", style="display:none;")
+                        //input#selectImg(type='file', style="border-style:solid; border-color:black; border-width:1px;border-radius:3%; padding:5px; display:none;")
+                        //img#inputImg(src="/images/barcode.png", style="display:none;")
                         button.btn.btn-outline-dark#showRoom4Canvas(type='button', ng-click='openCustomRoom4()', style="margin:5px;display:none;")
                             p Create Custom Room 4
 

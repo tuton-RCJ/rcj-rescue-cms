@@ -12,10 +12,7 @@
     drawing
   >
   </canvas>
-  <!--input type="checkbox" ng-model="img" id="isCheckpoint"><label class="checkbox" for="isCheckpoint">{{"admin.simMapEditor.cp" | translate}}</label>
-  <input type="file" id="select" ng-model="img"></input>
-  <button ng-click="click()">click</button>
-  <img id="img" src="/images/ramp.png" style="width: 500px; height: 500px;"></img-->
+  <button style="margin: 7px" ng-click="clearCanvas()">Clear Canvas</button>
   <div style="display: flex; flex-direction: row">
     <input type="checkbox" id="drawWall" checked /><label
       class="checkbox"
@@ -25,28 +22,61 @@
     <input type="checkbox" id="drawVic" /><label class="checkbox" for="drawVic"
       >Draw Victims (Red)</label
     >
+    <input type="checkbox" id="erase" /><label class="checkbox" for="erase"
+      >Erase</label
+    >
   </div>
   <div
     style="
       display: flex;
       flex-direction: row;
-      align-items: center;
+      width: 100%;
+      justify-content: center;
       border-color: black;
       border-style: solid;
       border-width: 1px;
-      border-radius: 3%;
-      padding: 5px;
     "
   >
-    Import Room 4 Picture to Canvas:
+    <div style="margin-top: 7px; margin-bottom: 7px">Import Room 4 Picture to Canvas:</div>
     <input
       type="file"
       id="importCanvas"
       accept="image/png, image/jpeg"
-      style="margin-left: 10px"
+      style="margin-left: 10px; margin-top: 7px; margin-bottom: 7px"
+      onclick="this.value=null;"
     />
   </div>
-  <button style="margin: 10px" ng-click="downloadCanvas()">
-    Download Custom Room 4
+  <div
+    style="
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      justify-content: center;
+      border-color: black;
+      border-style: solid;
+      border-width: 1px;
+    "
+  >
+    <button style="margin: 7px" ng-click="downloadCanvas()">
+      Download Custom Room 4
+    </button>
+  </div>
+  <button
+    style="
+      margin: 5px;
+      padding-right: 15px;
+      padding-left: 15px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background-color: blue;
+      color: white;
+      border-color: white;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 20%;
+    "
+    ng-click="closeRoom4()"
+  >
+    OK
   </button>
 </div>
