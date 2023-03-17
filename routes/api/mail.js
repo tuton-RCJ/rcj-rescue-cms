@@ -117,9 +117,12 @@ adminRouter.get('/templates/:fileName', function (req, res, next) {
           res.statusCode = 500
           res.end('Cloud not make stream')
       })
-      res.writeHead(200, {
-        'Content-Type': mime.getType(path),
-      });
+      let mimeType = mime.getType(path);
+      let head = {}
+      if(mimeType != null) {
+        head['Content-Type'] = mimeType;
+      }
+      res.writeHead(200, head);
       stream.pipe(res);
   });
 });
