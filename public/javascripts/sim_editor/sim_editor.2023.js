@@ -115,6 +115,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
     // Custom room 4 setup
     let useCustomRoom4 = document.getElementById("showRoom4Canvas");
+    $scope.room4Img = new Image;
     /*let imgElement = document.getElementById("inputImg");
     let inputElement = document.getElementById("selectImg");
     inputElement.addEventListener("change", (e) => {
@@ -957,7 +958,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             roomTiles: $scope.roomTiles,
             time: $scope.time,
             area4Room: $scope.area4Room,
-            room4CanvasSave: $scope.room4CanvasSave
+            room4CanvasSave: $scope.room4CanvasSave,
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -2069,6 +2070,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.roomTiles = data.roomTiles;
                     $scope.area4Room = data.area4Room;
                     $scope.room4CanvasSave = data.room4CanvasSave;
+                    $scope.room4Img.src = $scope.room4CanvasSave;
 
                     $scope.updateRoom4Pick();
 
@@ -2212,9 +2214,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         room4Height = (maxY - minY) / 2 + 1;
 
         //let src = cv.imread(imgElement);
-        let context = $scope.room4CanvasSave.getContext('2d');
+        /*let context = $scope.room4CanvasSave.getContext('2d');
         let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
-        let src = cv.matFromImageData(imgData); 
+        let src = cv.matFromImageData(imgData);*/
+        let src = cv.imread($scope.room4Img);
 
         let im = new cv.Mat();
 
@@ -2318,9 +2321,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         const scoringElem = ["harmed", "stable", "unharmed", "P", "O", "F", "C"];
         
         // let src = cv.imread(imgElement);
-        let context = $scope.room4CanvasSave.getContext('2d');
+        /*let context = $scope.room4CanvasSave.getContext('2d');
         let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
-        let src = cv.matFromImageData(imgData); 
+        let src = cv.matFromImageData(imgData);*/
+        let src = cv.imread($scope.room4Img);
 
         let vicIm = new cv.Mat();
         let low = new cv.Mat(src.rows, src.cols, src.type(), [100, 0, 0, 0]);
@@ -2333,7 +2337,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             vicIm,
             vicContours,
             vicHierarchy,
-            cv.RETR_TREE,
+            cv.RETR_EXTERNAL,
             cv.CHAIN_APPROX_SIMPLE
         );
 
@@ -2687,10 +2691,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                         return 3;
                     }
                 }
-            }).result.then(function (data) {
-                console.log(data);
-            }, function() {
-                console.log(data);
             });
         }
     };
@@ -2794,6 +2794,9 @@ app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function (
         
         context.fillStyle = "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
+        //$scope.$parent.room4CanvasSave = canvas.toDataURL("image/png");
+        $scope.$parent.room4CanvasSave = null;
+        $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
     }
 
     $scope.click = function() {
@@ -2830,8 +2833,8 @@ app.directive("drawing", function(){
         var lastY;
         
         // modal initialization
-        let room4Canvas = document.getElementById("room4Canvas");
-        let context = room4Canvas.getContext('2d');
+        let room4Canvas = element[0];
+        let context = ctx;
         if ($scope.$parent.room4CanvasSave != null) {
             canvasImg = new Image;
             canvasImg.onload = function() {
@@ -2847,6 +2850,7 @@ app.directive("drawing", function(){
         let black = '#000000';
         let red = '#FF0000';
         let white = '#FFFFFF';
+        let blue = '#0000FF';
         let canvasColor = black;
         let wallCheckbox = document.getElementById("drawWall");
         let vicCheckbox = document.getElementById("drawVic");
@@ -2890,10 +2894,54 @@ app.directive("drawing", function(){
         img.onload = function() {
             context.drawImage(img, 0, 0, room4Canvas.width, room4Canvas.height);
             $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
+            $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
         }
         inputFile.addEventListener('change', function (e) {
             img.src = URL.createObjectURL(e.target.files[0]);
         });
+
+        // cover tiles in canvas that are not actually room 4
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        
+        for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+            let tileStr = $scope.$parent.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+        room4Width = (maxX - minX) / 2 + 1;
+        room4Height = (maxY - minY) / 2 + 1;
+
+        let blockWidth = room4Canvas.width / room4Width;
+        for (let x = minX; x <= maxX; x = parseInt(x) + 2) {
+            for (let y = minY; y <= maxY; y = parseInt(y) + 2) {
+                let found = false;
+                for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+                    if ($scope.$parent.roomTiles[2][i] == x+','+y+',0') {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    let startX = (x - minX) / 2 * blockWidth;
+                    let startY = (y - minY) / 2 * blockWidth;
+                    context.fillStyle = blue;
+                    context.fillRect(startX, startY, blockWidth, blockWidth);
+                    context.fillStyle = white;
+                }
+            }
+        }
+
 
         element.bind('mousedown', function(event){
             if(event.offsetX!==undefined){
@@ -2932,6 +2980,7 @@ app.directive("drawing", function(){
             // stop drawing
             drawing = false;
             $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
+            $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
         });
             
         // canvas reset
@@ -2940,19 +2989,34 @@ app.directive("drawing", function(){
         }
         
         function draw(lX, lY, cX, cY){
-            // line from
-            ctx.moveTo(lX,lY);
-            // to
-            ctx.lineTo(cX,cY);
-            // color
-            ctx.strokeStyle = canvasColor;
-            // width
-            if (canvasColor == white)
-                ctx.lineWidth = 20;
-            else
-                ctx.lineWidth = 2;
-            // draw it
-            ctx.stroke();
+            // make sure drawing in a room4 tile
+            let gridX1 = (parseInt(cX / blockWidth) * 2) + parseInt(minX);
+            let gridY1 = (parseInt(cY / blockWidth) * 2) + parseInt(minY);
+            let gridX2 = (parseInt(lX / blockWidth) * 2) + parseInt(minX);
+            let gridY2 = (parseInt(lY / blockWidth) * 2) + parseInt(minY);
+            let found = false;
+            for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+                if ($scope.$parent.roomTiles[2][i] == gridX1+','+gridY1+',0' ||
+                    $scope.$parent.roomTiles[2][i] == gridX2+','+gridY2+',0') {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                // line from
+                ctx.moveTo(lX,lY);
+                // to
+                ctx.lineTo(cX,cY);
+                // color
+                ctx.strokeStyle = canvasColor;
+                // width
+                if (canvasColor == white)
+                    ctx.lineWidth = 20;
+                else
+                    ctx.lineWidth = 2;
+                // draw it
+                ctx.stroke();
+            }
         }
         }
     };
