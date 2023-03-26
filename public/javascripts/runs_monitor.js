@@ -5,9 +5,8 @@ var allFieldOpen = 0;
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $cookies) {
 
-    $scope.sigGroup = '0';
     $scope.signageSrc = function(){
-        return "/signage/display/" + sigId + "/" + $scope.sigGroup + "/" + competitionId;
+        return "/signage/display/" + sigId + "/" + grpId + "/" + competitionId;
     }
     $scope.selectfield = [];
     if(sigId){

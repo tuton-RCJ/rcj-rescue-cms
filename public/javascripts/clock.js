@@ -55,6 +55,11 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
             $http.get("/api/competitions/" + competitionId +
                 "/Maze/fields").then(function (response) {
                 $scope.fields = $scope.fields.concat(response.data)
+                $http.get("/api/competitions/" + competitionId +
+                "/MazeNL/fields").then(function (response) {
+                $scope.fields = $scope.fields.concat(response.data)
+                
+            })
             })
         })
     })

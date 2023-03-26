@@ -141,7 +141,7 @@ block content
                             .dropdown-divide
                             h6.dropdown-header {{"signage.editor.score" | translate}}
                             li(ng-repeat="league in leagues")
-                                a.dropdown-item(href='#',ng-click="addRanking($index+1,league)") {{league}}
+                                a.dropdown-item(href='#',ng-click="addRanking($parent.$index+1,league)") {{league}}
             br
             br
             br

@@ -308,7 +308,7 @@ html(ng-app="ddApp")
           hr
           .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')
             h2(style='text-align:center;')
-              | {{'common.stotal' | translate}} : {{score - foundVictims * 10 * exitBonus - reliability() + MisIdent*5}} {{'common.point' |translate}}
+              | {{'common.stotal' | translate}} : {{allItemScore()}} {{'common.point' |translate}}
       hr
       h2 {{'maze.sign.reliability' | translate}}
       .alert.alert-info(style='margin-bottom:30px;text-align:center;', role='alert', ng-if="leagueType=='standard'")
@@ -370,7 +370,7 @@ html(ng-app="ddApp")
           .col-md-2
             p(style='height:30px;') {{'maze.sign.item' | translate}}
             h1
-              | {{score - foundVictims * 10 * exitBonus - reliability() + MisIdent*5}} {{'common.point' | translate}}
+              | {{allItemScore()}} {{'common.point' | translate}}
           .col-md-1
             p(style='height:30px;')
             h1 +
