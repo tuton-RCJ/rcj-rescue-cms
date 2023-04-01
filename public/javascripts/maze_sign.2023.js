@@ -417,9 +417,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var cell = $scope.cells[x + ',' + y + ',' + z];
 
         if (!cell)
-            return;
+            return 0;
         if (!isTile)
-            return;
+            return 0;
 
         if (!$scope.tiles[x + ',' + y + ',' + z]) {
             $scope.tiles[x + ',' + y + ',' + z] = {

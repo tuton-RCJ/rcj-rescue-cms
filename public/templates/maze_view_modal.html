@@ -59,7 +59,7 @@
         <div>
         <div ng-show="hasVictims"  ng-if="leagueType=='standard'">
             <i class="fas fa-2x fa-medkit" aria-hidden="true" style="color:#c53d43;">&nbsp;</i>{{"maze.view.m_kit" | translate}}
-            <div ng-repeat="(direction, type) in cell.tile.victims" ng-show="type != 'None'" style="margin-left:50px;">
+            <div ng-repeat="(direction, type) in cell.tile.victims" ng-if="type != 'None'" style="margin-left:50px;">
                 <div class="input-group mb-3" style="width:100%;" >
                     <div class="input-group-prepend">
                         <span class="input-group-text" ng-style="{backgroundColor: kitStatus(tile.scoredItems.victims[direction],tile.scoredItems.rescueKits[direction],type) ? '#d3f5d3': '#f5d3d4'}">
@@ -90,7 +90,7 @@
         </div>
         <div ng-show="hasVictims" ng-if="leagueType=='entry'">
             <i class="far fa-2x fa-lightbulb" aria-hidden="true" style="color:#2980b9;">&nbsp;</i>{{"maze.judge.m_identified" | translate}}
-                <div ng-repeat="(direction, type) in cell.tile.victims track by $index" ng-show="type != 'None'" style="margin-left:50px;" >
+                <div ng-repeat="(direction, type) in cell.tile.victims track by $index" ng-if="type != 'None'" style="margin-left:50px;" >
                     <input type="checkbox" ng-model="tile.scoredItems.rescueKits[direction]" ng-true-value="1" ng-false-value="0" id="{{ 'victimi-' + $index }}" disabled><label class="checkbox" for="{{ 'victimi-' + $index }}" ng-style="{backgroundColor: kitStatus(tile.scoredItems.victims[direction],tile.scoredItems.rescueKits[direction],type) ? '#d3f5d3': '#f5d3d4'}" ng-click="clickSound()">
                     <img src="/images/red.png" height=45px ng-if="type=='Red'">
                     <img src="/images/green.png" height=45px ng-if="type=='Green'">
