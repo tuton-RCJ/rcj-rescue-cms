@@ -24,3 +24,5 @@ block css
     link(href="/components/font-awesome-5/css/all.min.css" rel="stylesheet")
     link(rel='stylesheet' href='/components/angular-bootstrap/dist/ui-bootstrap-csp.css')
     link(rel='stylesheet' href='/components/angular-ui-select/dist/select.min.css')
+    if process.env.ENVIRONMENT == "STG"
+        link(rel='stylesheet',href='/stylesheets/stg.css')

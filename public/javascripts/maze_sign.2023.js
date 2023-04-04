@@ -2,7 +2,58 @@
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 var marker = {};
 var socket;
-let maxKit = {};
+let victimConstant = {};
+let victimTypes = [];
+const victimConstantWL = {
+    "Heated": {
+        "maxKitNum": 1,
+        "linearPoint": 10,
+        "floatingPoint": 30
+    },
+    "H": {
+        "maxKitNum": 3,
+        "linearPoint": 10,
+        "floatingPoint": 30
+    },
+    "S": {
+        "maxKitNum": 2,
+        "linearPoint": 10,
+        "floatingPoint": 30
+    },
+    "U": {
+        "maxKitNum": 0,
+        "linearPoint": 10,
+        "floatingPoint": 30
+    },
+    "Red": {
+        "maxKitNum": 1,
+        "linearPoint": 5,
+        "floatingPoint": 15
+    },
+    "Yellow": {
+        "maxKitNum": 1,
+        "linearPoint": 5,
+        "floatingPoint": 15
+    },
+    "Green": {
+        "maxKitNum": 0,
+        "linearPoint": 5,
+        "floatingPoint": 15
+    }
+};
+
+const victimConstantNL = {
+    "Red": {
+        "maxKitNum": 1,
+        "linearPoint": 15,
+        "floatingPoint": 30
+    },
+    "Green": {
+        "maxKitNum": 1,
+        "linearPoint": 15,
+        "floatingPoint": 30
+    }
+};
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$translate', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $translate, $cookies) {
@@ -142,20 +193,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
                 $scope.leagueType = response.data.leagueType;
                 if ($scope.leagueType == "entry") {
-                    maxKit={
-                        'Red': 1,
-                        'Green': 1
-                    }
+                    victimConstant = victimConstantNL;
                 } else {
-                    maxKit={
-                        'Heated': 1,
-                        'H': 3,
-                        'S': 2,
-                        'U': 0,
-                        'Red': 1,
-                        'Yellow': 1,
-                        'Green': 0
-                    }
+                    victimConstant = victimConstantWL;
                 }
 
                 for (let i = 0; i < response.data.cells.length; i++) {
@@ -225,6 +265,16 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.isUndefined = function (thing) {
         return (typeof thing === "undefined");
+    }
+    
+    $scope.allItemScore = function () {
+        let score = 0;
+        for(let x = 1; x <= width * 2;  x += 2) {
+            for(let y = 1; y <= length * 2; y += 2) {
+                score += $scope.tilePoint(x,y,0, true);
+            }
+        }
+        return score;
     }
 
 
@@ -296,32 +346,32 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         if(cell.tile.victims.top != "None"){
             possible++;
             current += tile.scoredItems.victims.top;
-            possible += maxKit[cell.tile.victims.top];
-            current += Math.min(tile.scoredItems.rescueKits.top,maxKit[cell.tile.victims.top]);
+            possible += victimConstant[cell.tile.victims.top].maxKitNum;
+            current += Math.min(tile.scoredItems.rescueKits.top,victimConstant[cell.tile.victims.top].maxKitNum);
         }
         if(cell.tile.victims.left != "None"){
             possible++;
             current += tile.scoredItems.victims.left;
-            possible += maxKit[cell.tile.victims.left];
-            current += Math.min(tile.scoredItems.rescueKits.left,maxKit[cell.tile.victims.left]);
+            possible += victimConstant[cell.tile.victims.left].maxKitNum;
+            current += Math.min(tile.scoredItems.rescueKits.left,victimConstant[cell.tile.victims.left].maxKitNum);
         }
         if(cell.tile.victims.right != "None"){
             possible++;
             current += tile.scoredItems.victims.right;
-            possible += maxKit[cell.tile.victims.right];
-            current += Math.min(tile.scoredItems.rescueKits.right,maxKit[cell.tile.victims.right]);
+            possible += victimConstant[cell.tile.victims.right].maxKitNum;
+            current += Math.min(tile.scoredItems.rescueKits.right,victimConstant[cell.tile.victims.right].maxKitNum);
         }
         if(cell.tile.victims.bottom != "None"){
             possible++;
             current += tile.scoredItems.victims.bottom;
-            possible += maxKit[cell.tile.victims.bottom];
-            current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
+            possible += victimConstant[cell.tile.victims.bottom].maxKitNum;
+            current += Math.min(tile.scoredItems.rescueKits.bottom,victimConstant[cell.tile.victims.bottom].maxKitNum);
         }
         if(cell.tile.victims.floor != "None"){
             possible++;
             current += tile.scoredItems.victims.floor;
-            possible += maxKit[cell.tile.victims.floor];
-            current += Math.min(tile.scoredItems.rescueKits.floor,maxKit[cell.tile.victims.floor]);
+            possible += victimConstant[cell.tile.victims.floor].maxKitNum;
+            current += Math.min(tile.scoredItems.rescueKits.floor,victimConstant[cell.tile.victims.floor].maxKitNum);
         }
 
         if (tile.processing)
@@ -365,12 +415,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.tilePoint = function (x, y, z, isTile) {
         // If this is a non-existent tile
         var cell = $scope.cells[x + ',' + y + ',' + z];
-        var victimPoint = cell.isLinear ? 10:30;
 
         if (!cell)
-            return;
+            return 0;
         if (!isTile)
-            return;
+            return 0;
 
         if (!$scope.tiles[x + ',' + y + ',' + z]) {
             $scope.tiles[x + ',' + y + ',' + z] = {
@@ -421,104 +470,28 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 current+=5;
             }
         }
-        switch (cell.tile.victims.top) {
-            case 'H':
-                current += victimPoint * tile.scoredItems.victims.top;
-                current += 10*Math.min(tile.scoredItems.rescueKits.top , 3);
-                break;
-            case 'S':
-                current += victimPoint * tile.scoredItems.victims.top;
-                current += 10*Math.min(tile.scoredItems.rescueKits.top , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.top;
-                current += 10*Math.min(tile.scoredItems.rescueKits.top , 1);
-                break;
-            case 'Red':
-            case 'Yellow':
-                current += (victimPoint * tile.scoredItems.victims.top / 2);
-                current += 10*Math.min(tile.scoredItems.rescueKits.top , 1);
-                break;
-            case 'U':
-            case 'Green':
-                current += victimPoint * tile.scoredItems.victims.top / 2;
-                break;
+
+        let wallPointType = cell.isLinear ? 'linearPoint' : 'floatingPoint';
+
+        if (cell.tile.victims.top in victimConstant) {
+            current += victimConstant[cell.tile.victims.top][wallPointType] * tile.scoredItems.victims.top;
+            current += 10 * Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
         }
-        switch (cell.tile.victims.right) {
-            case 'H':
-                current += victimPoint * tile.scoredItems.victims.right;
-                current += 10*Math.min(tile.scoredItems.rescueKits.right , 3);
-                break;
-            case 'S':
-                current += victimPoint * tile.scoredItems.victims.right;
-                current += 10*Math.min(tile.scoredItems.rescueKits.right , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.right;
-                current += 10*Math.min(tile.scoredItems.rescueKits.right , 1);
-                break;
-            case 'Red':
-            case 'Yellow':
-                current += (victimPoint * tile.scoredItems.victims.right / 2);
-                current += 10*Math.min(tile.scoredItems.rescueKits.right , 1);
-                break;
-            case 'U':
-            case 'Green':
-                current += victimPoint * tile.scoredItems.victims.right / 2;
-                break;
+        if (cell.tile.victims.right in victimConstant) {
+            current += victimConstant[cell.tile.victims.right][wallPointType] * tile.scoredItems.victims.right;
+            current += 10 * Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
         }
-        switch (cell.tile.victims.bottom) {
-            case 'H':
-                current += victimPoint * tile.scoredItems.victims.bottom;
-                current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 3);
-                break;
-            case 'S':
-                current += victimPoint * tile.scoredItems.victims.bottom;
-                current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.bottom;
-                current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 1);
-                break;
-            case 'Red':
-            case 'Yellow':
-                current += (victimPoint * tile.scoredItems.victims.bottom / 2);
-                current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 1);
-                break;
-            case 'U':
-            case 'Green':
-                current += victimPoint * tile.scoredItems.victims.bottom / 2;
-                break;
+        if (cell.tile.victims.left in victimConstant) {
+            current += victimConstant[cell.tile.victims.left][wallPointType] * tile.scoredItems.victims.left;
+            current += 10 * Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
         }
-        switch (cell.tile.victims.left) {
-            case 'H':
-                current += victimPoint * tile.scoredItems.victims.left;
-                current += 10*Math.min(tile.scoredItems.rescueKits.left , 3);
-                break;
-            case 'S':
-                current += victimPoint * tile.scoredItems.victims.left;
-                current += 10*Math.min(tile.scoredItems.rescueKits.left , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.left;
-                current += 10*Math.min(tile.scoredItems.rescueKits.left , 1);
-                break;
-            case 'Red':
-            case 'Yellow':
-                current += (victimPoint * tile.scoredItems.victims.left / 2);
-                current += 10*Math.min(tile.scoredItems.rescueKits.left , 1);
-                break;
-            case 'U':
-            case 'Green':
-                current += victimPoint * tile.scoredItems.victims.left / 2;
-                break;
+        if (cell.tile.victims.bottom in victimConstant) {
+            current += victimConstant[cell.tile.victims.bottom][wallPointType] * tile.scoredItems.victims.bottom;
+            current += 10 * Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
         }
-        switch (cell.tile.victims.floor) {
-            case 'Red':
-            case 'Green':
-                current += (cell.isLinear ? 15:30) * tile.scoredItems.victims.floor;
-                current += 10 * Math.min(tile.scoredItems.rescueKits.floor , 1);
-                break;
+        if (cell.tile.victims.floor in victimConstant) {
+            current += victimConstant[cell.tile.victims.floor][wallPointType] * tile.scoredItems.victims.floor;
+            current += 10 * Math.min(tile.scoredItems.rescueKits.floor, victimConstant[cell.tile.victims.floor].maxKitNum);
         }
 
         return current;
@@ -818,7 +791,7 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     };
 
     $scope.kitStatus = function(light, kit, type){
-        return (maxKit[type] <= kit);
+        return (victimConstant[type].maxKitNum <= kit);
     };
 
     $scope.modalRotate = function(dir){

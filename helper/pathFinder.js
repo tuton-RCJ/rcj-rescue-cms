@@ -55,6 +55,7 @@ function traverse(curTile, entryDir, tiles, map, index, chpCount, restartFlag) {
     return;
   }
 
+  curTile.next_dir.push(exitDir(curTile, entryDir));
   if (nextTile === undefined || evacTile(nextTile)) {
     if (nextTile) {
       nextTile.evacEntrance = dir2num(flipDir(exitDir(curTile, entryDir)));
@@ -69,7 +70,7 @@ function traverse(curTile, entryDir, tiles, map, index, chpCount, restartFlag) {
     curTile.next.push(
       `${map.startTile2.x},${map.startTile2.y},${map.startTile2.z}`
     );
-    curTile.next_dir.push(exitDir(curTile, entryDir));
+    
 
     let startDir2 = '';
     const startPaths2 = startTile2.tileType.paths;
@@ -104,7 +105,6 @@ function traverse(curTile, entryDir, tiles, map, index, chpCount, restartFlag) {
     return;
   }
   curTile.next.push(next_Coord);
-  curTile.next_dir.push(exitDir(curTile, entryDir));
 
   traverse(
     nextTile,

@@ -348,11 +348,11 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
     }
 
     $scope.checkUploaded = function(name){
-        return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
+        return($scope.uploaded.some((n) => new RegExp('^' + name + '\\.*').test(n)));
     }
 
     $scope.nameUploaded = function(name){
-        return($scope.uploaded[$scope.uploaded.findIndex((n) => new RegExp(name+'\\.').test(n))]);
+        return($scope.uploaded[$scope.uploaded.findIndex((n) => new RegExp('^' + name + '\\.*').test(n))]);
     }
 
     $scope.getPdfLink = function(name){
@@ -361,7 +361,7 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
 
     $scope.getVideoList = function(name){
         let res = $scope.uploaded.filter(function(value) {
-            return new RegExp(name+'\\.').test(value);
+            return new RegExp('^' + name + '\\.*').test(value);
         });
         res.sort(function(first, second){
             if ( first.match(/.mp4/)) {

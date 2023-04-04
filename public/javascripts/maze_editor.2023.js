@@ -298,7 +298,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             width: $scope.width,
             finished: $scope.finished,
             startTile: $scope.startTile,
-            cells: $scope.cells
+            cells: $scope.cells,
+            leagueType: $scope.leagueType
         };
         console.log(map);
         console.log("Update map", mapId);
@@ -337,7 +338,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             width: $scope.width,
             finished: $scope.finished,
             startTile: $scope.startTile,
-            cells: $scope.cells
+            cells: $scope.cells,
+            leagueType: $scope.leagueType
         };
         $http.post("/api/maps/maze", map).then(function (response) {
             console.log(response.data);
@@ -755,6 +757,7 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
                     $scope.duration = data.duration || 480;
                     $scope.name = data.name;
                     $scope.finished = data.finished;
+                    $scope.leagueType = data.leagueType;
                     
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
                     

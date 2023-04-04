@@ -178,10 +178,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             // Scoring elements of the tiles
             $scope.stiles = response.data.tiles;
 
-            for (let i = 0; i < response.data.tiles.length; i++) {
-                if (response.data.tiles[i].isDropTile) {
-                    $scope.actualUsedDropTiles++;
-                    f = true;
+            let checkPointNumber = 1;
+
+            for(let i in $scope.stiles){
+                if ($scope.isCheckPoint($scope.stiles[i])) {
+                    marker[i] = checkPointNumber;
+                    checkPointNumber++;
                 }
             }
 
@@ -228,6 +230,17 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }, function (response) {
             console.log("Error: " + response.statusText);
         });
+    }
+
+    $scope.isCheckPoint = function(tile) {
+        return findItem("checkpoint", tile.scoredItems) != null;
+    }
+
+    function findItem(item,tile) {
+        for(let i=0;i<tile.length;i++){
+            if(tile[i].item == item) return i;
+        }
+        return null;
     }
 
     $scope.count_victim_list = function(type){
@@ -296,54 +309,54 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     }
 
     $scope.showElements = function (x, y, z) {
-      var mtile = $scope.mtiles[x + ',' + y + ',' + z];
-      var isDropTile = false;
-      var stile = [];
-      var stileIndex = [];
+        var mtile = $scope.mtiles[x + ',' + y + ',' + z];
+        var isDropTile = false;
+        var stile = [];
+        var stileIndex = [];
 
-      // If this is not a created tile
-      if (!mtile || mtile.index.length == 0)
-        return;
-      for (var i = 0; i < mtile.index.length; i++) {
-        stile.push($scope.stiles[mtile.index[i]]);
-        stileIndex.push(mtile.index[i])
-        if ($scope.stiles[mtile.index[i]].isDropTile) {
-          isDropTile = true;
+        // If this is not a created tile
+        if (!mtile || mtile.index.length == 0)
+            return;
+        for (var i = 0; i < mtile.index.length; i++) {
+            stile.push($scope.stiles[mtile.index[i]]);
+            stileIndex.push(mtile.index[i])
+            if ($scope.isCheckPoint($scope.stiles[mtile.index[i]])) {
+                isCheckPointTile = true;
+            }
         }
-      }
 
 
-      var total = (mtile.items.obstacles > 0 ||
-        mtile.items.speedbumps > 0 ||
-        mtile.tileType.gaps > 0 ||
-        mtile.tileType.intersections > 0 ||
-        mtile.tileType.seesaw > 0 ||
-        undefined2false(mtile.items.rampPoints)) * mtile.index.length;
+        var total = (mtile.items.obstacles > 0 ||
+            mtile.items.speedbumps > 0 ||
+            mtile.tileType.gaps > 0 ||
+            mtile.tileType.intersections > 0 ||
+            mtile.tileType.seesaw > 0 ||
+            undefined2false(mtile.items.rampPoints)) * mtile.index.length;
 
-      // Add the number of possible passes for drop tiles
-      if (isDropTile) {
-        total = 0;
-        for (let i = 0; i < stile.length; i++) {
-          if (stileIndex[i] < $scope.mapIndexCount) {
-            total++;
-          }
+        // Add the number of possible passes for check point tiles
+        if (isCheckPointTile) {
+            total = 0;
+            for (let i = 0; i < stile.length; i++) {
+                if (stileIndex[i] < $scope.mapIndexCount) {
+                    total++;
+                }
+            }
         }
-      }
 
 
-      if (total == 0) {
-        return;
-      } else if (total > 1) {
-        // Show modal
-        $scope.open(x, y, z);
-        // Save data from modal when closing it
-      }
+        if (total == 0) {
+            return;
+        } else if (total > 1) {
+            // Show modal
+            $scope.open(x, y, z);
+            // Save data from modal when closing it
+        }
     }
 
-  function undefined2false(tmp) {
-    if (tmp) return true;
-    return false;
-  }
+    function undefined2false(tmp) {
+        if (tmp) return true;
+        return false;
+    }
 
     $scope.open = function (x, y, z) {
         var modalInstance = $uibModal.open({
@@ -373,6 +386,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                     nine[7] = $scope.mtiles[(x) + ',' + (y + 1) + ',' + z];
                     nine[8] = $scope.mtiles[(x + 1) + ',' + (y + 1) + ',' + z];
                     return nine;
+                },
+                isCheckPoint: function(){
+                    return $scope.isCheckPoint;
                 }
             }
         }).closed.then(function (result) {
@@ -423,6 +439,7 @@ app.directive('tile', function () {
                 else if(ro < 0) ro+= 360;
                 return ro;
             }
+            
             $scope.tileNumber = function (tile) {
                 $scope.tileN = 1;
                 var ret_txt = "";
@@ -448,18 +465,14 @@ app.directive('tile', function () {
                 }
                 return ret_txt;
             }
+            
             $scope.checkpointNumber = function (tile) {
                 var ret_txt = "";
                 if (!tile) return;
                 for (var i = 0; i < tile.index.length; i++) {
                     if (marker[tile.index[i]]) {
-                        var count = 0;
-                        for (var j = 0; j < tile.index[i]; j++) {
-                            if (marker[j]) count++;
-                        }
-                        count++;
                         if (ret_txt != "") ret_txt += '&'
-                        ret_txt += count;
+                        ret_txt += marker[tile.index[i]];
                     } else {
                         return ret_txt;
                     }
@@ -467,11 +480,10 @@ app.directive('tile', function () {
                 return ret_txt;
             }
 
-
-            $scope.isDropTile = function (tile) {
-                if ((!tile || tile.index.length == 0) && !isStart(tile))
+            $scope.isCheckPointTile = function (tile) {
+                if (!tile || tile.index.length == 0)
                     return;
-                return $scope.$parent.stiles[tile.index[0]].isDropTile;
+                return $scope.$parent.isCheckPoint($scope.$parent.stiles[tile.index[0]]);
             }
 
             $scope.isStart = function (tile) {
@@ -631,9 +643,9 @@ app.directive('tile', function () {
                     tile.items.speedbumps == 0 &&
                     !tile.items.rampPoints &&
                     tile.tileType.gaps == 0 &&
-                    tile.tileType.intersections == 0 &&
                     tile.tileType.seesaw == 0 &&
-                    !$scope.$parent.stiles[tile.index[0]].isDropTile && !isStart(tile)
+                    tile.tileType.intersections == 0 &&
+                    !$scope.isCheckPointTile(tile) && !isStart(tile)
                 ) {
                     return;
                 }
@@ -644,11 +656,8 @@ app.directive('tile', function () {
                 var possible = 0;
 
                 for(let i=0;i<tile.index.length;i++){
-                    possible += $scope.$parent.stiles[tile.index[i]].scoredItems.length;
-                }
-
-                for (var i = 0; i < tile.index.length; i++) {
-                    for(let j = 0; j < $scope.$parent.stiles[tile.index[i]].scoredItems.length;j++){
+                    for(let j=0;j<$scope.$parent.stiles[tile.index[i]].scoredItems.length;j++){
+                        possible++;
                         if($scope.$parent.stiles[tile.index[i]].scoredItems[j].scored){
                             successfully++;
                         }
@@ -702,10 +711,11 @@ app.directive('tile', function () {
 });
 
 
-app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'stiles', 'nineTile', 'startTile',function ($scope, $uibModalInstance, mtile, stiles, nineTile,startTile) {
+app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'stiles', 'nineTile', 'startTile', 'isCheckPoint',function ($scope, $uibModalInstance, mtile, stiles, nineTile, startTile, isCheckPoint) {
     $scope.mtile = mtile;
     $scope.stiles = stiles;
     $scope.nineTile = nineTile;
+    $scope.isCheckPoint = isCheckPoint;
     $scope.words = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth"];
     $scope.next = [];
     for (var i = 0, d; d = mtile.next[i]; i++) {
@@ -796,10 +806,10 @@ app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'mtile', 'st
         return tilerot;
     }
 
-     $scope.isDropTile = function (tile) {
+    $scope.isCheckPointTile = function (tile) {
         if (!tile || tile.index.length == 0)
             return;
-        return $scope.stiles[tile.index[0]].isDropTile;
+        return $scope.isCheckPoint($scope.stiles[tile.index[0]]);
     }
 
     $scope.isStart = function (tile) {

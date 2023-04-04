@@ -7,23 +7,30 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
         window.location = path
     }
 
-    $scope.time = 6;
+    $scope.time = 10;
     $scope.nowI = 0;
 
 
     function updateTime(){
         $scope.time--;
-        if($scope.time == 0){
+        if($scope.time <= 0){
             $scope.nowI += 8;
-            if($scope.nowI >= $scope.table.data.length){
+            try {
+                if($scope.nowI >= $scope.table.data.length){
+                    window.parent.iframeEnd();
+                    clearInterval(inter);
+                    return;
+                }
+            } catch {
                 window.parent.iframeEnd();
                 clearInterval(inter);
                 return;
             }
+            
 
             //$scope.showTableData = $scope.table.data.slice(nowI,nowI+8);
             //console.log($scope.showTableData);
-            $scope.time = 6;
+            $scope.time = 10;
         }
         $scope.$apply();
     }
@@ -90,13 +97,8 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
 
             for(let run of runs){
                 try{
-                    var teamname = run.team.name.split(' ');
-                    run.teamCode = teamname[0];
-                    run.teamName = teamname[1];
-                    for(let i = 2; i < teamname.length;i++){
-                        run.teamName = run.teamName + " " + teamname[i];
-                    }
-
+                    run.teamCode = run.team.teamCode;
+                    run.teamName = run.team.name;
                 }
                 catch(e){
 
@@ -109,9 +111,6 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
           $scope.fields = []
           $scope.rounds = []
           for (let run of $scope.runs) {
-              console.log(run);
-              //console.log(run.field.league);
-              //console.log($scope.team.league);
               if (run.field.league == league && run.round._id == round) {
                   if (!array_exist($scope.fields, run.field.name)) $scope.fields.push(run.field);
                   if (!array_exist($scope.rounds, run.round.name)) $scope.rounds.push(run.round);
@@ -142,10 +141,8 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
 
 
           $scope.table = $scope.table[0];
-          console.log($scope.table);
 
           $scope.showTableData = $scope.table.data;
-          console.log($scope.showTableData);
         });
 
     });

@@ -4,6 +4,8 @@ nav.navbar(style='background: #5F021F; color: #fff; position: fixed; top: 0; z-i
     a.navbar-brand(href='/home', style="color: #ecf0f1;")
         img.d-inline-block.align-top(src="/images/logo.png", style="height:23px;width:auto;")
         | &nbsp;RCJ CMS
+        if process.env.ENVIRONMENT != "PROD" && process.env.ENVIRONMENT != null
+            | &nbsp; (#{process.env.ENVIRONMENT})
     if typeof(user) == "undefined"
         i.fas.fa-user-circle.fa-2x(aria-hidden='true')
     else

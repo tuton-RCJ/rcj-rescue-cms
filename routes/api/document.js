@@ -462,7 +462,8 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
             }
 
             // Streaming Video
-            if (mime.getType(path).includes('video')) {
+            let mimeType = mime.getType(path)
+            if (mimeType != null && mimeType.includes('video')) {
               try {
                 const fileSize = stat.size;
                 const { range } = req.headers;
@@ -482,7 +483,7 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
                     'Content-Range': `bytes ${start}-${end}/${fileSize}`,
                     'Accept-Ranges': 'bytes',
                     'Content-Length': chunksize,
-                    'Content-Type': mime.getType(path),
+                    'Content-Type': mimeType,
                   };
 
                   res.writeHead(206, head);
@@ -491,7 +492,7 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
                 }
                 const head = {
                   'Content-Length': fileSize,
-                  'Content-Type': mime.getType(path),
+                  'Content-Type': mimeType,
                 };
 
                 res.writeHead(200, head);
@@ -506,9 +507,11 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
                   res.statusCode = 500
                   res.end('Cloud not make stream')
               })
-              res.writeHead(200, {
-                'Content-Type': mime.getType(path),
-              });
+              let head = {}
+              if(mimeType != null) {
+                head['Content-Type'] = mimeType;
+              }
+              res.writeHead(200, head);
               stream.pipe(res);
             }
           });
@@ -667,9 +670,12 @@ publicRouter.get('/files/usercontent/:teamId/:token/:fileName', function (req, r
                 res.statusCode = 500
                 res.end('Cloud not make stream')
             })
-            res.writeHead(200, {
-              'Content-Type': mime.getType(path),
-            });
+            let mimeType = mime.getType(path);
+            let head = {}
+            if(mimeType != null) {
+              head['Content-Type'] = mimeType;
+            }
+            res.writeHead(200, head);
             stream.pipe(res);
           });
         } else {
@@ -1008,7 +1014,7 @@ privateRouter.post(
                         });
                         const ft = mime.getType(originalname);
 
-                        if (ft.includes('video')) {
+                        if (ft != null && ft.includes('video')) {
                           const filepath = `${__dirname}/../../documents/${dbTeam.competition._id}/${teamId}/review/${req.user.username}/${sanitize(fileName)}`;
                           fs.unlink(
                             `${filepath}-thumbnail.png`,
@@ -1135,7 +1141,8 @@ privateRouter.get(
               }
 
               // Streaming Video
-              if (mime.getType(path).includes('video')) {
+              let mimeType = mime.getType(path);
+              if (mimeType != null && mimeType.includes('video')) {
                 try {
                   const fileSize = stat.size;
                   const { range } = req.headers;
@@ -1157,7 +1164,7 @@ privateRouter.get(
                       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
                       'Accept-Ranges': 'bytes',
                       'Content-Length': chunksize,
-                      'Content-Type': mime.getType(path),
+                      'Content-Type': mimeType,
                     };
 
                     res.writeHead(206, head);
@@ -1166,7 +1173,7 @@ privateRouter.get(
                   }
                   const head = {
                     'Content-Length': fileSize,
-                    'Content-Type': mime.getType(path),
+                    'Content-Type': mimeType,
                   };
 
                   res.writeHead(200, head);
@@ -1181,9 +1188,11 @@ privateRouter.get(
                     res.statusCode = 500
                     res.end('Cloud not make stream')
                 })
-                res.writeHead(200, {
-                  'Content-Type': mime.getType(path),
-                });
+                let head = {}
+                if(mimeType != null) {
+                  head['Content-Type'] = mimeType;
+                }
+                res.writeHead(200, head);
                 stream.pipe(res);
               }
             });
@@ -1313,9 +1322,12 @@ privateRouter.get(
                   res.statusCode = 500
                   res.end('Cloud not make stream')
               })
-              res.writeHead(200, {
-                'Content-Type': mime.getType(path),
-              });
+              let mimeType = mime.getType(path);
+              let head = {}
+              if(mimeType != null) {
+                head['Content-Type'] = mimeType;
+              }
+              res.writeHead(200, head);
               stream.pipe(res);
             });
           } else {
@@ -1465,9 +1477,12 @@ privateRouter.get(
                       res.statusCode = 500
                       res.end('Cloud not make stream')
                   })
-                  res.writeHead(200, {
-                    'Content-Type': mime.getType(files[0]),
-                  });
+                  let mimeType = mime.getType(files[0]);
+                  let head = {}
+                  if(mimeType != null) {
+                    head['Content-Type'] = mimeType;
+                  }
+                  res.writeHead(200, head);
                   stream.pipe(res);
                 } else {
                   // Handle file not found
@@ -1477,9 +1492,12 @@ privateRouter.get(
                       res.statusCode = 500
                       res.end('Cloud not make stream')
                   })
-                  res.writeHead(200, {
-                    'Content-Type': mime.getType(path),
-                  });
+                  let mimeType = mime.getType(path);
+                  let head = {}
+                  if(mimeType != null) {
+                    head['Content-Type'] = mimeType;
+                  }
+                  res.writeHead(200, head);
                   stream.pipe(res);
                 }
               }
@@ -1535,9 +1553,12 @@ adminRouter.get('/templates/documentForm/:fileName', function (req, res, next) {
           res.statusCode = 500
           res.end('Cloud not make stream')
       })
-      res.writeHead(200, {
-        'Content-Type': mime.getType(dir_path),
-      });
+      let mimeType = mime.getType(dir_path);
+      let head = {}
+      if(mimeType != null) {
+        head['Content-Type'] = mimeType;
+      }
+      res.writeHead(200, head);
       stream.pipe(res);
   });
 });
@@ -1556,9 +1577,12 @@ privateRouter.get('/map/:fileName',
               res.statusCode = 500
               res.end('Cloud not make stream')
           })
-          res.writeHead(200, {
-            'Content-Type': mime.getType(files[0]),
-          });
+          let mimeType = mime.getType(files[0]);
+          let head = {}
+          if(mimeType != null) {
+            head['Content-Type'] = mimeType;
+          }
+          res.writeHead(200, head);
           stream.pipe(res);
         } else {
           // Handle file not found
@@ -1568,9 +1592,12 @@ privateRouter.get('/map/:fileName',
               res.statusCode = 500
               res.end('Cloud not make stream')
           })
-          res.writeHead(200, {
-            'Content-Type': mime.getType(path),
-          });
+          let mimeType = mime.getType(path);
+          let head = {}
+          if(mimeType != null) {
+            head['Content-Type'] = mimeType;
+          }
+          res.writeHead(200, head);
           stream.pipe(res);
         }
       }

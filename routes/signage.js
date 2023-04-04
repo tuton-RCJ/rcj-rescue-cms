@@ -9,6 +9,8 @@ const { ObjectId } = require('mongoose').Types;
 const auth = require('../helper/authLevels');
 const competitiondb = require('../models/competition');
 const { ACCESSLEVELS } = require('../models/user');
+const { LINE_LEAGUES, MAZE_LEAGUES } = competitiondb;
+
 
 /* GET home page. */
 
@@ -78,62 +80,18 @@ privateRouter.get(
 );
 
 privateRouter.get(
-  '/display/:competitionid/run/:sigId',
+  '/display/:competitionid/run/:sigId/:grpId',
   function (req, res, next) {
     const id = req.params.competitionid;
-    const { sigId } = req.params;
+    const { sigId, grpId } = req.params;
 
     if (!ObjectId.isValid(id)) {
       return next();
     }
 
     if (auth.authCompetition(req.user, id, ACCESSLEVELS.VIEW))
-      res.render('runs_monitor', { id, user: req.user, sigId });
+      res.render('runs_monitor', { id, user: req.user, sigId, grpId });
     else res.render('access_denied', { user: req.user });
-  }
-);
-
-privateRouter.get(
-  '/display/:competitionid/score/Maze',
-  function (req, res, next) {
-    const id = req.params.competitionid;
-    const league = 'Maze';
-
-    if (!ObjectId.isValid(id)) {
-      return next();
-    }
-
-    competitiondb.competition
-      .findOne({
-        _id: id,
-      })
-      .lean()
-      .exec(function (err, data) {
-        if (err) {
-          logger.error(err);
-          res.status(400).send({
-            msg: 'Could not get competition',
-            err: err.message,
-          });
-        } else {
-          let num = 20;
-          if (data) {
-            for (const i in data.ranking) {
-              if (data.ranking[i].league == 'Maze') {
-                num = data.ranking[i].num;
-                break;
-              }
-            }
-          }
-          res.render('maze_score_signage', {
-            id,
-            user: req.user,
-            league,
-            num,
-            get: req.query,
-          });
-        }
-      });
   }
 );
 
@@ -168,13 +126,23 @@ privateRouter.get(
               }
             }
           }
-          res.render('line_score_signage', {
-            id,
-            user: req.user,
-            league,
-            num,
-            get: req.query,
-          });
+          if (LINE_LEAGUES.includes(league)) {
+            res.render('line_score_signage', {
+              id,
+              user: req.user,
+              league,
+              num,
+              get: req.query,
+            });
+          } else {
+            res.render('maze_score_signage', {
+              id,
+              user: req.user,
+              league,
+              num,
+              get: req.query,
+            });
+          }
         }
       });
   }

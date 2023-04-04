@@ -106,16 +106,15 @@ html(ng-app="LineScore")
                     td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}") {{("00"+run.time.minutes).slice(-2)}}:{{("00"+run.time.seconds).slice(-2)}}
                     td.text-center(ng-bind='run.rescuedVictims' ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league!='LineNL'")
                     td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league=='LineNL'")
-                      .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
-                        img(src='/images/blackVictim.png', style="height:20px;")
-                        span(style="font-size:20px;") {{run.rescuedNLS}}
-                      .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;")
+                      .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Unknown > 0")
+                        img(src='/images/unknownVictim.png', style="height:20px;")
+                        span(style="font-size:20px;") ×{{run.rescuedNL_Unknown}}
+                      .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Live > 0")
                         img(src='/images/greenVictim.png', style="height:20px;")
-                        span(style="font-size:20px;") {{run.rescuedNLG}}
-                      //.img-thumbnail(style="padding:0;display: inline-block;")
-                        img(src='/images/misidentNL.png', style="height:20px;")
-                        span(style="font-size:20px;") {{run.rescueNLMis}}
-                          td.text-center(ng-bind='run.LoPsNum' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
+                        span(style="font-size:20px;") ×{{run.rescuedNL_Live}}
+                      .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Dead > 0")
+                        img(src='/images/blackVictim.png', style="height:20px;")
+                        span(style="font-size:20px;") ×{{run.rescuedNL_Dead}}
                     td.text-center(ng-bind='run.LoPsNum' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
         h6(style="text-align:center;margin-top:10px;", ng-if="comment.bottom")
           i.fas.fa-info-circle &nbsp;{{comment.bottom}}

@@ -33,7 +33,7 @@ app.controller("MapSelectorController", ['$scope', '$http', function ($scope, $h
     })
 
     $scope.checkUploaded = function(name){
-        return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
+        return($scope.uploaded.some((n) => new RegExp('^' + name + '\\.*').test(n)));
     }
 
     $scope.getVideoLink = function(path){
@@ -42,7 +42,7 @@ app.controller("MapSelectorController", ['$scope', '$http', function ($scope, $h
 
     $scope.getVideoList = function(name){
         let res = $scope.uploaded.filter(function(value) {
-            return new RegExp(name+'\\.').test(value);
+            return new RegExp('^' + name + '\\.*').test(value);
         });
         res.sort(function(first, second){
             if ( first.match(/.mp4/)) {

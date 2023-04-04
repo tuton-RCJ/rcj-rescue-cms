@@ -48,7 +48,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         })
         
         $scope.checkUploaded = function(name){
-            return($scope.uploaded.some((n) => new RegExp(name+'\\.').test(n)));
+            return($scope.uploaded.some((n) => new RegExp('^' + name + '\\.*').test(n)));
         }
         
         $scope.getVideoLink = function(path){
@@ -57,7 +57,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         
         $scope.getVideoList = function(name){
             let res = $scope.uploaded.filter(function(value) {
-                return new RegExp(name+'\\.').test(value);
+                return new RegExp('^' + name + '\\.*').test(value);
             });
             res.sort(function(first, second){
                 if ( first.match(/.mp4/)) {

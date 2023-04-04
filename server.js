@@ -14,7 +14,7 @@ const packageJson = require('./package.json');
 process.env.cms_version = packageJson.version;
 process.env.cms_copyright = packageJson.copyright;
 logger.info(`#######################################`);
-logger.info(` Welcome to RoboCupJunior CMS v${process.env.cms_version}`);
+logger.info(` Welcome to RCJ CMS ${process.env.ENVIRONMENT} instance v${process.env.cms_version}`);
 logger.info(`#######################################`);
 
  function isExistFile(file) {

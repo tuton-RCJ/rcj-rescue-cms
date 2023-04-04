@@ -143,7 +143,8 @@ function returnFile(req, res, competition, folder, fileName){
     }
 
     // Streaming Video
-    if (mime.getType(path).includes('video')) {
+    let mimeType = mime.getType(path);
+    if (mimeType != null && mimeType.includes('video')) {
       try {
         const fileSize = stat.size;
         const { range } = req.headers;
@@ -163,7 +164,7 @@ function returnFile(req, res, competition, folder, fileName){
             'Content-Range': `bytes ${start}-${end}/${fileSize}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize,
-            'Content-Type': mime.getType(path),
+            'Content-Type': mimeType,
           };
 
           res.writeHead(206, head);
@@ -172,7 +173,7 @@ function returnFile(req, res, competition, folder, fileName){
         }
         const head = {
           'Content-Length': fileSize,
-          'Content-Type': mime.getType(path),
+          'Content-Type': mimeType,
         };
 
         res.writeHead(200, head);
@@ -187,9 +188,11 @@ function returnFile(req, res, competition, folder, fileName){
           res.statusCode = 500
           res.end('Cloud not make stream')
       })
-      res.writeHead(200, {
-        'Content-Type': mime.getType(path),
-      });
+      let head = {}
+      if(mimeType != null) {
+        head['Content-Type'] = mimeType;
+      }
+      res.writeHead(200, head);
       stream.pipe(res);
     }
   });
