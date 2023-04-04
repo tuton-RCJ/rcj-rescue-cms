@@ -1519,7 +1519,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         `;
 
         const area4Part = ({roomNum, x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
-        Area4_${roomNum} {
+        Area4_${roomNum-1} {
             X ${x}
             Y ${y}
             DIR ${rot}
@@ -2654,7 +2654,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     $scope.openCustomRoom4 = function() {
-        if ($scope.selectRoom == -1) {
+        if ($scope.roomTiles[2].length > 0) {
             let minX = -1;
             let maxX = 0;
             let minY = -1;
@@ -2797,6 +2797,7 @@ app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function (
         //$scope.$parent.room4CanvasSave = canvas.toDataURL("image/png");
         $scope.$parent.room4CanvasSave = null;
         $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
+        $scope.$parent.drawBlueBox();
     }
 
     $scope.click = function() {
@@ -2893,6 +2894,7 @@ app.directive("drawing", function(){
         let img = new Image;
         img.onload = function() {
             context.drawImage(img, 0, 0, room4Canvas.width, room4Canvas.height);
+            $scope.$parent.drawBlueBox();
             $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
             $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
         }
@@ -2905,7 +2907,6 @@ app.directive("drawing", function(){
         let maxX = 0;
         let minY = -1;
         let maxY = 0;
-        
         for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
             let tileStr = $scope.$parent.roomTiles[2][i];
             let x = tileStr.slice(0, tileStr.indexOf(","));
@@ -2923,25 +2924,29 @@ app.directive("drawing", function(){
         room4Height = (maxY - minY) / 2 + 1;
 
         let blockWidth = room4Canvas.width / room4Width;
-        for (let x = minX; x <= maxX; x = parseInt(x) + 2) {
-            for (let y = minY; y <= maxY; y = parseInt(y) + 2) {
-                let found = false;
-                for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
-                    if ($scope.$parent.roomTiles[2][i] == x+','+y+',0') {
-                        found = true;
-                        break;
+        
+        $scope.$parent.drawBlueBox = function () {
+            for (let x = minX; x <= maxX; x = parseInt(x) + 2) {
+                for (let y = minY; y <= maxY; y = parseInt(y) + 2) {
+                    let found = false;
+                    for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+                        if ($scope.$parent.roomTiles[2][i] == x+','+y+',0') {
+                            found = true;
+                            break;
+                        }
                     }
-                }
-                if (!found) {
-                    let startX = (x - minX) / 2 * blockWidth;
-                    let startY = (y - minY) / 2 * blockWidth;
-                    context.fillStyle = blue;
-                    context.fillRect(startX, startY, blockWidth, blockWidth);
-                    context.fillStyle = white;
+                    if (!found) {
+                        let startX = (x - minX) / 2 * blockWidth;
+                        let startY = (y - minY) / 2 * blockWidth;
+                        context.fillStyle = blue;
+                        context.fillRect(startX, startY, blockWidth, blockWidth);
+                        context.fillStyle = white;
+                    }
                 }
             }
         }
 
+        $scope.$parent.drawBlueBox();
 
         element.bind('mousedown', function(event){
             if(event.offsetX!==undefined){
@@ -3016,6 +3021,8 @@ app.directive("drawing", function(){
                     ctx.lineWidth = 2;
                 // draw it
                 ctx.stroke();
+
+                $scope.$parent.drawBlueBox();
             }
         }
         }
