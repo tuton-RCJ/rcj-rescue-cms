@@ -60,15 +60,9 @@ module.exports.calculateLineScore = function (run) {
         for (const victim of run.rescueOrder) {
           if (victim.type == 'K') {
             if (run.kitLevel == 1)
-              multiplier *= Math.max(
-                1100 - 25 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
+              multiplier *= 1100;
             else
-              multiplier *= Math.max(
-                1300 - 25 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
+              multiplier *= 1300;
             error *= 1000;
           } else if (victim.effective) {
             multiplier *= Math.max(
@@ -82,15 +76,9 @@ module.exports.calculateLineScore = function (run) {
         for (const victim of run.rescueOrder) {
           if (victim.type == 'K') {
             if (run.kitLevel == 1)
-              multiplier *= Math.max(
-                1200 - 50 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
+              multiplier *= 1200;
             else
-              multiplier *= Math.max(
-                1600 - 50 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
+              multiplier *= 1600;
             error *= 1000;
           } else if (victim.effective) {
             multiplier *= Math.max(

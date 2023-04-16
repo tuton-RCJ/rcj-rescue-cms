@@ -313,6 +313,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 if($scope.kitLevel == 1) multiplier = 1200;
                 else multiplier = 1600;
             }
+            return "x" + String(multiplier/1000);
         }
         else if (!effective) return "----";
         else if ($scope.evacuationLevel == 1) { // Low Level

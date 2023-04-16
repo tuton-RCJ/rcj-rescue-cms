@@ -67,7 +67,7 @@
         | {{'common.stotal' | translate}} : {{raw_score - checkTotal() - exitBonusPoints() - nlPoints()}} {{'common.point' |translate}}
 hr
 h2 {{'line.sign.checkPointScore' | translate}}
-.row(　style='margin-bottom:30px;text-align:center;display: flex;flex-wrap: wrap;')
+.row(style='margin-bottom:30px;text-align:center;display: flex;flex-wrap: wrap;')
   .col-md-9.col-lg-10
     .row
       .col-md-4.col-lg-3(ng-repeat='cp in checkPointDistance track by $index')
@@ -228,11 +228,6 @@ div(ng-if="league!='LineNL'")
                   br
                   span(style='font-size:1vw;color:#444;')
                     | {{calc_victim_multipliers("K",true,0)}}
-                    |  - ({{evacuationLevel-1?'x0.05':'x0.025'}} ×
-                    i.fas.fa-step-forward
-                    | {{LoPs[EvacuationAreaLoPIndex]}}
-                    span(style='font-size:10px;') times
-                    |  )
                   br
                   span.badge.badge-info(style='margin-top:10px;')
                     span(style='font-size:25px;') {{calc_victim_multipliers("K",true)}}

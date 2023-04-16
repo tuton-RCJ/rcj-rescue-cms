@@ -52,8 +52,8 @@ function line_calc_score(run) {
             if (run.evacuationLevel == 1) {
                 for (let victim of run.rescueOrder) {
                     if(victim.type == "K"){
-                        if(run.kitLevel == 1) multiplier *= Math.max(1100-(25*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
-                        else multiplier *= Math.max(1300-(25*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
+                        if(run.kitLevel == 1) multiplier *= 1100;
+                        else multiplier *= 1300;
                         error *= 1000;
                     } else if (victim.effective){
                         multiplier *= Math.max(1200-(25*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
@@ -63,8 +63,8 @@ function line_calc_score(run) {
             } else if (run.evacuationLevel == 2) {
                 for (let victim of run.rescueOrder) {
                     if(victim.type == "K"){
-                        if(run.kitLevel == 1) multiplier *= Math.max(1200-(50*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
-                        else multiplier *= Math.max(1600-(50*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
+                        if(run.kitLevel == 1) multiplier *= 1200;
+                        else multiplier *= 1600;
                         error *= 1000;
                     } else if (victim.effective){
                         multiplier *= Math.max(1400-(50*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
