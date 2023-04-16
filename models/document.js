@@ -11,8 +11,9 @@ const reviewSchema = new Schema({
   competition: {type: ObjectId, ref: 'Competition'},
   reviewer: {type: ObjectId, ref: 'User'},
   name: {type: String, default: ''},
-  comments: [[{type: String, default: ''}]]
+  comments: {type: Map, of: String}
 })
+reviewSchema.index({ team: 1, competition: 1, reviewer: 1}, { unique: true });
 
 
 const review = mongoose.model('review', reviewSchema)

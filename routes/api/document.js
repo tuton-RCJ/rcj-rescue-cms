@@ -738,10 +738,56 @@ privateRouter.get('/review/:teamId', function (req, res, next) {
   });
 });
 
-adminRouter.delete('/review/:reviewId/:block/:question', function (req, res, next) {
-  const { reviewId } = req.params;
-  const { block } = req.params;
-  const { question } = req.params;
+privateRouter.get('/review/:teamId/myComments', function (req, res, next) {
+  const { teamId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team.findById(teamId).exec(function (err, dbTeam) {
+    if (err) {
+      if (!err) err = { message: 'No team found' };
+      res.status(404).send({
+        msg: 'Could not get team',
+        err: err.message,
+      });
+    } else if (dbTeam) {
+      if (
+        auth.authCompetition(req.user, dbTeam.competition, ACCESSLEVELS.VIEW)
+      ) {
+        documentDb.review
+          .findOne({
+            team: teamId,
+            reviewer: req.user._id
+          })
+          .populate('reviewer', 'username')
+          .populate('team', 'competition')
+          .exec(function (err, dbReview) {
+            if (dbReview) {
+              res.send(dbReview);
+            } else {
+              res.status(404).send({
+                msg: 'Could not get review'
+              });
+            }
+          });
+      } else {
+        res.status(401).send({
+          msg: 'Operation not permited',
+        });
+      }
+    } else {
+      res.status(400).send({
+        msg: 'Could not get team',
+        err: 'No team found',
+      });
+    }
+  });
+});
+
+adminRouter.delete('/review/:reviewId/:questionId', function (req, res, next) {
+  const { reviewId, questionId } = req.params;
 
   if (!ObjectId.isValid(reviewId)) {
     return next();
@@ -758,41 +804,59 @@ adminRouter.delete('/review/:reviewId/:block/:question', function (req, res, nex
         });
       } else if (dbReview) {
         if(auth.authCompetition(req.user, dbReview.competition, ACCESSLEVELS.ADMIN)){
-          if(block == -1){ // Delete whole review
-            documentDb.review.deleteOne({ '_id': reviewId }, (err) => {
-              if(err){
-                res.status(400).send({
-                  msg: 'Delete error',
-                  err: err.message,
-                });
-              }else{
-                res.status(200).send({
-                  msg: 'Deleted',
-                });
-              }
-            });
-          }else{
-            if(dbReview.comments.length > block && dbReview.comments[block].length > question){
-              dbReview.comments[block][question] = '';
-              dbReview.markModified('comments');
-              dbReview.save(function(err) {
-                if(err){
-                  res.status(400).send({
-                    msg: 'Delete error',
-                    err: err.message,
-                  });
-                }else{
-                  res.status(200).send({
-                    msg: 'Deleted',
-                  });
-                }
-              })
-            }else{
+          dbReview.comments.delete(questionId);
+          dbReview.markModified('comments');
+          dbReview.save(function(err) {
+            if(err){
               res.status(400).send({
-                msg: 'Delete posititon error'
+                msg: 'Delete error',
+                err: err.message,
+              });
+            }else{
+              res.status(200).send({
+                msg: 'Deleted',
               });
             }
-          }
+          })
+        }else{
+          res.status(400).send({
+            msg: 'Competition auth error :('
+          });
+        }
+      }
+    });
+});
+
+adminRouter.delete('/review/:reviewId', function (req, res, next) {
+  const { reviewId } = req.params;
+
+  if (!ObjectId.isValid(reviewId)) {
+    return next();
+  }
+
+  documentDb.review
+    .findOne({ _id: reviewId})
+    .exec(function (err, dbReview) {
+      if (err) {
+        if (!err) err = { message: 'No review found' };
+        res.status(400).send({
+          msg: 'Could not get review',
+          err: err.message,
+        });
+      } else if (dbReview) {
+        if(auth.authCompetition(req.user, dbReview.competition, ACCESSLEVELS.ADMIN)){
+          documentDb.review.deleteOne({ '_id': reviewId }, (err) => {
+            if(err){
+              res.status(400).send({
+                msg: 'Delete error',
+                err: err.message,
+              });
+            }else{
+              res.status(200).send({
+                msg: 'Deleted',
+              });
+            }
+          });
         }else{
           res.status(400).send({
             msg: 'Competition auth error :('

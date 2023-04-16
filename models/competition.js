@@ -286,7 +286,7 @@ const teamSchema = new Schema({
       enabled  : {type: Boolean, default: true},
       public  : {type: Boolean, default: false},
       token    : {type: String, default: ''},
-      answers  : [[{type: String, default: null}]]
+      answers  : {type: Map, of: String}
     }),
     select: false
   }

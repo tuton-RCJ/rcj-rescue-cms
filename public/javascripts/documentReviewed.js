@@ -107,6 +107,8 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
         $scope.competition = response.data
     })
 
+    let reviewQuestions = {};
+
     $http.get("/api/teams/" + teamId).then(function (response) {
         $scope.team = response.data;
 
@@ -126,8 +128,10 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
             $scope.review = response.data.review;
             publicToken = response.data.publicToken;
 
+
             for(let r of $scope.review){
                 for(let q of r.questions){
+                    reviewQuestions[q._id] = q;
                     if(q.type != "run") continue;
                     $http.get(`/api/document/run/${teamId}/${q._id}`).then(function (response) {
                         $scope.runScore[q._id] = response.data;
@@ -137,14 +141,16 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
             $http.get("/api/document/answer/"+ $scope.team._id + "/" + token).then(function (response) {
                 $scope.answers = response.data;
-                if(!$scope.answers.length){
-                    for(let b of $scope.blocks){
-                        let ba = [];
-                        for(let q of b.questions){
-                            if(q.type == "select") ba.push('option0');
-                            else ba.push('');
+                for(let b of $scope.blocks){
+                    for(let q of b.questions){
+                        if ($scope.answers[q._id] == null) {
+                            if(q.type == "select") {
+                                $scope.answers[q._id] = "option0";
+                            } else {
+                                $scope.answers[q._id] = "";
+                            }
                         }
-                        $scope.answers.push(ba);
+                        
                     }
                 }
             });
@@ -170,32 +176,41 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
     function updateReviewList(){
         $http.get("/api/document/review/" + teamId).then(function (response) {
-            $scope.reviewComments = response.data;
-            for(let c of $scope.reviewComments){
+            let comments = response.data;
+            $scope.reviewComments = {};
+            for(let c of comments){
                 if(!c.reviewer){
                     c.reviewer = {
                         username: c.name
                     };
                 }
+
+                Object.keys(c.comments).forEach(key => {
+                    if ($scope.reviewComments[key] == undefined) {
+                        $scope.reviewComments[key] = [];
+                    }
+
+                    if (reviewQuestions[key].type != 'scale') {
+                        $scope.reviewComments[key].push({
+                            "_id": c._id,
+                            "user": c.reviewer.username,
+                            "comment": c.comments[key]
+                        })
+                    } else {
+                        let score = parseInt(c.comments[key]);
+                        if (!isNaN(score)) {
+                            $scope.reviewComments[key].push({
+                                "_id": c._id,
+                                "user": c.reviewer.username,
+                                "score": score
+                            })
+                        }
+                    }
+                    
+                })
             }
 
-            $scope.rating=[];
-            if(!$scope.reviewComments) return 0;
-            for(let c of $scope.reviewComments){
-                for(let b in c.comments){
-                    for(let q in c.comments[b]){
-                        if($scope.review[b].questions[q].type != 'scale') continue;
-                        if(c.comments[b][q] == ''){
-                            continue;
-                        }
-                        let r = Number(c.comments[b][q]);
-                        if(!$scope.rating[b]) $scope.rating[b] = [];
-                        if(!$scope.rating[b][q]) $scope.rating[b][q] = [];
-                        $scope.rating[b][q].push(r);
-                        $scope.scaleFlag = true;
-                    }
-                }
-            }
+            console.log($scope.reviewComments)
         })
     }
 
@@ -385,7 +400,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
     }
 
     
-    $scope.removeComment = function(id, block, question){
+    $scope.removeComment = function(reviewId, questionId){
         Swal({
             title: deleteReview,
             type: 'warning',
@@ -413,7 +428,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                         confirmButtonText: 'Yes, delete it!'
                       }).then((result) => {
                         if (result.value) {
-                            $http.delete(`/api/document/review/${id}/${block}/${question}`).then(function (response) {
+                            $http.delete(`/api/document/review/${reviewId}/${questionId}`).then(function (response) {
                                 Toast.fire({
                                     type: 'success',
                                     title: deleted
@@ -441,7 +456,7 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                         confirmButtonText: 'Yes, delete it!'
                       }).then((result) => {
                         if (result.value) {
-                            $http.delete(`/api/document/review/${id}/-1/-1`).then(function (response) {
+                            $http.delete(`/api/document/review/${reviewId}`).then(function (response) {
                                 Toast.fire({
                                     type: 'success',
                                     title: deleted
