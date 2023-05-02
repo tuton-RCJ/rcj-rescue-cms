@@ -42,6 +42,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.roomTiles = [[], [], []];
     $scope.roomColors = ["red", "green", "blue"]
     $scope.area4Room = 0
+    $scope.room4VicTypes = [];
     $scope.area4 = [
         {value: "None", type: 0},
         {value: "Custom Room", type: 1},
@@ -2324,6 +2325,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         return Math.sqrt(Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2));
     }
 
+
     function createArea4Victims(startHumanId, startHazardId) {
         let outputStrVic = "";
         let outputStrHaz = "";
@@ -2335,7 +2337,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let src = cv.matFromImageData(imgData);*/
         let src = cv.imread($scope.room4Img);
 
-        let vicIm = new cv.Mat();
+        let vicIm = new cv.Mat()
         let low = new cv.Mat(src.rows, src.cols, src.type(), [100, 0, 0, 0]);
         let high = new cv.Mat(src.rows, src.cols, src.type(), [255, 50, 50, 255]);
         cv.inRange(src, low, high, vicIm);
@@ -2350,6 +2352,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             cv.CHAIN_APPROX_SIMPLE
         );
 
+        $scope.area4VicScore = 0;
         for (let x = 0; x < vicContours.size(); x++) {
             let M = cv.moments(vicContours.get(x), false);
             let cx = M.m10/M.m00;
@@ -2423,7 +2426,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             let vicX = parseFloat(((closePoint[1] / imgWidth) * room4Width).toFixed(roundDigits)) + room4xOffset;
             let vicY = parseFloat(((closePoint[0] / imgHeight) * room4Height).toFixed(roundDigits)) + room4zOffset;
 
-            let rand = parseInt(Math.random() * scoringElem.length);
+            let rand = 0;
+            if ($scope.room4VicTypes.length != vicContours.size()) {
+                rand = parseInt(Math.random() * scoringElem.length);
+                $scope.room4VicTypes.push(rand);
+            }
+            else
+                rand = $scope.room4VicTypes[x];
             if (rand <= 2) { // victim
                 outputStrVic += `
                     Victim {
@@ -2597,7 +2606,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let exitBonus = 0;
         const victims = ["H", "S", "U"];
         const hazards = ["P", "O", "F", "C"];
-        const areaMultiplier = [0, 1, 1.25, 1.5];
+        const areaMultiplier = [0, 1, 1.25, 1.5, 2];
         Object.keys($scope.cells).map(function(key){
             let cell = $scope.cells[key];
             if(cell.isTile){
@@ -2608,7 +2617,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(hazards.includes(cell.tile.victims[dir])){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     });
                 }
@@ -2621,7 +2630,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(v >= 5 && v <= 8){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     }
                 }
@@ -2631,6 +2640,24 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
             }
         });
+        if ($scope.area4Room.value == "Custom Room") {
+            createArea4Solid();
+            createArea4Victims(0, 0);
+            console.log($scope.room4VicTypes)
+            for (let i = 0; i < $scope.room4VicTypes.length; i++) {
+                if ($scope.room4VicTypes[i] <= 3)
+                    victimScore += (15 + 10) * areaMultiplier[4];
+                else
+                    victimScore += (30 + 20) * areaMultiplier[4];
+            }
+        }
+        else if ($scope.area4Room.value != "None") {
+            for (let i = 0; i < $scope.area4Room.humans.length; i++)
+                victimScore += $scope.area4Room.humans[i].score * areaMultiplier[4];
+            for (let i = 0; i < $scope.area4Room.hazards.length; i++)
+                victimScore += $scope.area4Room.hazards[i].score * areaMultiplier[4];
+        }
+        
 
         if(victimScore > 0) exitBonus += (victimScore + checkpointScore) * 0.1
 
