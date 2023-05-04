@@ -16,6 +16,7 @@ append scripts
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
   script(src="/components/html2canvas/index.js")
+  script(src="/javascripts/opencv.js")
 
 append css
   link(href="/stylesheets/maze_edit.css" rel="stylesheet")
@@ -35,7 +36,12 @@ block content
                 button.btn.btn-dark(type='button', ng-click='export()') {{"admin.simMapEditor.export" | translate}}
             .col-md-4
                 input#select(type='file', name='select')
+
         br
+        //.row
+            canvas#room4canvas(width='300', height='300' drawing)
+        //row
+            canvas#outputCanvas(width='300', height='300')
         .row
             .col-md-12
                 .input-group.mb-3
@@ -75,7 +81,11 @@ block content
                         i.far.fa-check-square(ng-show='selectRoom == 2') &nbsp;
                         | {{"admin.simMapEditor.select4" | translate}}
                     span.input-group-text {{"admin.simMapEditor.pick4" | translate}}: &nbsp;
-                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]")
+                        select(ng-model='area4Room', ng-options="room as room.value for room in area4", ng-init="area4Room=area4[0]", ng-change="updateRoom4Pick()", style="margin-right:10px;")
+                        //input#selectImg(type='file', style="border-style:solid; border-color:black; border-width:1px;border-radius:3%; padding:5px; display:none;")
+                        //img#inputImg(src="/images/barcode.png", style="display:none;")
+                        button.btn.btn-outline-dark#showRoom4Canvas(type='button', ng-click='openCustomRoom4()', style="margin:5px;display:none;")
+                            p Create Custom Room 4
 
         .row
             .col-11
