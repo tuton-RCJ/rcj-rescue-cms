@@ -948,6 +948,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         cv.imshow('outputCanvas', src);*/
 
         $scope.recalculateLinear();
+        createArea4Solid();
+        createArea4Victims(0, 0);
         var map = {
             name: $scope.name,
             length: $scope.length,
@@ -960,6 +962,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             time: $scope.time,
             area4Room: $scope.area4Room,
             room4CanvasSave: $scope.room4CanvasSave,
+            room4VicTypes: $scope.room4VicTypes,
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -2072,6 +2075,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.area4Room = data.area4Room;
                     $scope.room4CanvasSave = data.room4CanvasSave;
                     $scope.room4Img.src = $scope.room4CanvasSave;
+                    $scope.room4VicTypes = data.room4VicTypes;
 
                     $scope.updateRoom4Pick();
 
@@ -2344,6 +2348,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         );
 
         $scope.area4VicScore = 0;
+        if ($scope.room4VicTypes.length != vicContours.size())
+            $scope.room4VicTypes = []
         for (let x = 0; x < vicContours.size(); x++) {
             let M = cv.moments(vicContours.get(x), false);
             let cx = M.m10/M.m00;
