@@ -47,6 +47,7 @@ block content
             th {{"common.map" | translate}}
             th {{"common.field" | translate}}
             th {{"common.starttime" | translate}}
+            th {{"admin.common.normalization_group_id" | translate}}
             th {{"common.operation" | translate}}
         tbody
           tr
@@ -65,6 +66,8 @@ block content
                     i.fa.fa-calendar(aria-hidden='true')
                 input.form-control(type="text" uib-datepicker-popup ng-model="startDate" ng-change="updateStartTime()" is-open="startDatePopup.opened" datepicker-options="startDateOptions" close-text="Close")
               div(uib-timepicker ng-model="startTime" ng-change="updateStartTime()" hour-step="1" minute-step="5" show-meridian="false" show-spinners='true')
+            td
+              input(ng-model='run.normalizationGroup' style="width:100%;")
             td
               button(ng-click='addRun()') {{"admin.mazeRun.add" | translate}}
       a(ng-href='/admin/{{competitionId}}/maze/runs/bulk') {{"admin.mazeRun.bulk" | translate}}

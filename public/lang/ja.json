@@ -562,6 +562,9 @@
         }
     },
     "admin": {
+        "common": {
+            "normalization_group_id": "正規化グループID"
+        },
         "home": {
             "competitions": "大会",
             "c_item": "ツール・設定",

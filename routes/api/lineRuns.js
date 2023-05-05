@@ -708,6 +708,7 @@ adminRouter.delete('/:runids', function (req, res) {
  * @apiParam {String} team        The team id
  * @apiParam {String} field       The field id
  * @apiParam {String} map         The map id
+ * @apiParam {String} normalizationGroup         The normalization group id
  *
  * @apiSuccess (200) {String} msg Success msg
  * @apiSuccess (200) {String} id  The new run id
@@ -725,6 +726,7 @@ adminRouter.post('/', function (req, res) {
     map: run.map,
     startTime: run.startTime,
     group: run.group,
+    normalizationGroup: run.normalizationGroup
   }).save(function (err, data) {
     if (err) {
       logger.error(err);

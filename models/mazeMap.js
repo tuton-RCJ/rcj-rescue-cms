@@ -39,7 +39,7 @@ const tileSchema = new Schema({
   black        : {type: Boolean, default: false},
   ramp         : {type: Boolean, default: false},
   steps        : {type: Boolean, default: false},
-  blueTile     : {type: Boolean, default: false},
+  blue         : {type: Boolean, default: false},
   victims      : {
     top   : {
       type   : String,

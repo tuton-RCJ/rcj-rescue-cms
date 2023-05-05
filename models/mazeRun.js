@@ -27,13 +27,14 @@ const mazeRunSchema = new Schema({
     required: true,
     index   : true
   },
-  round      : {type: ObjectId, ref: 'Round', required: true, index: true},
-  team       : {type: ObjectId, ref: 'Team', required: false, index: true},
-  field      : {type: ObjectId, ref: 'Field', required: true, index: true},
-  map        : {type: ObjectId, ref: 'MazeMap', required: true, index: true},
-  group      : {type: Number, min: 0},
-  diceNumber : {type: Number, default: null},
-  manualFlag : {type: Boolean, default: false},
+  round             : {type: ObjectId, ref: 'Round', required: true, index: true},
+  team              : {type: ObjectId, ref: 'Team', required: false, index: true},
+  field             : {type: ObjectId, ref: 'Field', required: true, index: true},
+  map               : {type: ObjectId, ref: 'MazeMap', required: true, index: true},
+  group             : {type: Number, min: 0},
+  normalizationGroup: {type: String, index: true},
+  diceNumber        : {type: Number, default: null},
+  manualFlag        : {type: Boolean, default: false},
 
   tiles    : [{
     x          : {type: Number, integer: true, required: true},

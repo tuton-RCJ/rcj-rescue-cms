@@ -92,7 +92,8 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 field: $scope.run.field._id,
                 map: $scope.run.map._id,
                 competition: competitionId,
-                startTime: $scope.startTime.getTime()
+                startTime: $scope.startTime.getTime(),
+                normalizationGroup: $scope.run.normalizationGroup
             }
 
             //console.log(run)

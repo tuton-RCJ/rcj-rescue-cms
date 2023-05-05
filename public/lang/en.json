@@ -564,6 +564,9 @@
         }
     },
     "admin": {
+        "common": {
+            "normalization_group_id": "Normalization Group ID"
+        },
         "home": {
             "competitions": "Competitions",
             "c_item": "Tool / Settings",
