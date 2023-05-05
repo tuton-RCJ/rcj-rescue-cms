@@ -280,7 +280,7 @@ publicRouter.get('/:runid', function (req, res, next) {
       'round',
       { path: 'team', select: 'name league' },
       'field',
-      'competition',
+      { path: 'competition', select: 'name' }
     ]);
   }
 
