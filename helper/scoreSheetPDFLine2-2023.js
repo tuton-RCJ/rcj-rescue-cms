@@ -43,7 +43,7 @@ async function drawRun(doc, config, scoringRun) {
     doc,
     0,
     0,
-    'scoresheet_generation/line/base2020.png',
+    'scoresheet_generation/line/base2023.png',
     841.89,
     595.28,
     'center'

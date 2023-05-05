@@ -54,7 +54,7 @@ function drawRun(doc, config, scoringRun) {
     doc,
     0,
     0,
-    'scoresheet_generation/maze/base2020.png',
+    'scoresheet_generation/maze/base2023.png',
     841.89,
     595.28,
     'center'
