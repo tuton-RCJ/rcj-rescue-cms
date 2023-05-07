@@ -20,6 +20,7 @@ html(ng-app="ddApp")
       .col-md-3.col-sm4.col-7
         i.fas.fa-calculator.fa-2x(aria-hidden='true') &nbsp;
         li.navbar-brand(href='#')  {{score}} {{'common.point' | translate}}
+        i.fa.fa-chart-bar(ng-if="normalizedScore != null" aria-hidden='true')  : {{normalizedScore}}
       .col-md-3.col-sm4.col-5
         i.fas.fa-stopwatch.fa-2x(aria-hidden='true') &nbsp;
         li.navbar-brand(href='#')  {{minutes*60*1000+seconds*1000 | date:'m:ss'}}
@@ -70,6 +71,22 @@ html(ng-app="ddApp")
       br
       br
       include line_view_common
+      .alert.alert-success(role='alert')
+        .row
+          .col-md-6
+            .d-none.d-sm-block
+              i.fa.fa-calculator.fa-3x(aria-hidden='true')  : {{score}} {{'common.point' | translate}} &nbsp;
+              i.fa.fa-chart-bar.fa-2x(ng-if="normalizedScore != null" aria-hidden='true')  : {{normalizedScore}}
+            .d-sm-none
+              i.fa.fa-calculator.fa-2x(aria-hidden='true')  : {{score}} {{'common.point' | translate}} &nbsp;
+              i.fa.fa-chart-bar(ng-if="normalizedScore != null" aria-hidden='true')  : {{normalizedScore}}
+          .col-md-6
+            .d-none.d-sm-block
+              i.fas.fa-stopwatch.fa-3x(aria-hidden='true')
+                | : {{minutes}} {{'common.min' | translate}} {{seconds}} {{'common.sec' | translate}}
+            .d-sm-none
+              i.fas.fa-stopwatch.fa-2x(aria-hidden='true')
+                | : {{minutes}} {{'common.min' | translate}} {{seconds}} {{'common.sec' | translate}}
       br
       if user
           .row(style='margin:0 0 30 0;')

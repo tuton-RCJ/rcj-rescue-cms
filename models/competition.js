@@ -27,19 +27,30 @@ if(cluster.isMaster){
   logger.debug("Available other leagues : " + OTHER_LEAGUES);
 }
 
-
-
 const SUPPORT_RULES = ["2023"];
 
 const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, OTHER_LEAGUES);
-
-const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', 'zip', 'run'];
 
 module.exports.LINE_LEAGUES = LINE_LEAGUES;
 module.exports.MAZE_LEAGUES = MAZE_LEAGUES;
 module.exports.LEAGUES = LEAGUES;
 module.exports.LEAGUES_JSON = LEAGUES_JSON;
 
+const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', 'zip', 'run'];
+
+const SUM_OF_BEST_N_GAMES = "SUM_OF_BEST_N_GAMES"
+const SUM_OF_NORMALIZED_BEST_N_GAMES = "SUM_OF_NORMALIZED_BEST_N_GAMES"
+const SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT = "SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT"
+
+const NON_NORMALIZED_RANKING_MODE = [SUM_OF_BEST_N_GAMES];
+const NORMALIZED_RANKING_MODE = [SUM_OF_NORMALIZED_BEST_N_GAMES, SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT];
+const RANKING_MODE = [].concat(NON_NORMALIZED_RANKING_MODE, NORMALIZED_RANKING_MODE);
+const DOCUMENT_RANKING = [SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT];
+
+module.exports.NON_NORMALIZED_RANKING_MODE = NON_NORMALIZED_RANKING_MODE;
+module.exports.NORMALIZED_RANKING_MODE = NORMALIZED_RANKING_MODE;
+module.exports.RANKING_MODE = RANKING_MODE;
+module.exports.DOCUMENT_RANKING = DOCUMENT_RANKING;
 
 /**
  *
@@ -64,6 +75,8 @@ const competitionSchema = new Schema({
     'league': {type: String, enum: LEAGUES},
     'num': {type: Number, default: 20}
   }],
+  discloseRanking: {type: Boolean, default: false},
+  rankingMode: {type: String, enum: RANKING_MODE, default: RANKING_MODE[0]},
   publicToken: {type: String, default: function(){
     return crypto.randomBytes(16).reduce((p, i) => p + (i % 32).toString(32), '')
   }, select: false},
@@ -118,6 +131,7 @@ const competitionSchema = new Schema({
           'title': {type: String, default: ''},
         }],
         'color': {type: String, default: '2980b9'},
+        'weight': {type: Number, default: 0, min: 0, max: 1},
         'questions': [{
           'i18n':[{
             'language' : {type: String, default: ''},

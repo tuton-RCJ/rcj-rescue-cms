@@ -239,7 +239,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
         function updateRunList() {
             $http.get("/api/competitions/" + competitionId +
-                "/line/runs?populate=true").then(function (response) {
+                "/line/runs?normalized=true").then(function (response) {
                 var runs = response.data;
                 for (let run of runs) {
                     if (!run.team) {

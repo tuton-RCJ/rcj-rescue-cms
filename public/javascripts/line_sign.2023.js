@@ -176,8 +176,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     function loadNewRun() {
         $http.get("/api/runs/line/" + runId +
-            "?populate=true").then(function (response) {
-            console.log(response.data);
+            "?normalized=true").then(function (response) {
             $scope.LoPs = response.data.LoPs;
             $scope.evacuationLevel = response.data.evacuationLevel;
             $scope.kitLevel = response.data.kitLevel;
@@ -185,6 +184,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.field = response.data.field.name;
             $scope.score = response.data.score;
             $scope.raw_score = response.data.raw_score;
+            $scope.normalizedScore = response.data.normalizedScore;
             $scope.multiplier = response.data.multiplier;
             $scope.showedUp = response.data.showedUp;
             $scope.started = response.data.started;

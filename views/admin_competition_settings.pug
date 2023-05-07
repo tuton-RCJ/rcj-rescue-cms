@@ -79,6 +79,18 @@ block content
       h1 {{"admin.settings.ranking" | translate}}
       .row
         .col-10
+          div(style="display: flex;")
+            span(style="margin-top:5px;") {{"admin.settings.discloseRanking" | translate}} &nbsp;
+            label.toggle-button-001
+              input(type='checkbox' ng-model="discloseRanking")
+          .input-group(style="width:100%;margin 0 auto;")
+            .input-group-prepend
+              span.input-group-text {{"admin.settings.rankingMode" | translate}}
+            select.custom-select(ng-model='rankingMode')
+              option(value="SUM_OF_BEST_N_GAMES") SUM OF BEST N GAMES
+              option(value="SUM_OF_NORMALIZED_BEST_N_GAMES") SUM OF NORMALIZED BEST N GAMES
+              option(value="SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") SUM OF NORMALIZED BEST N GAMES + NORMALIZED DOCUMENT SCORE
+          br
           p {{"admin.settings.useNum" | translate}}
           .input-group(style="width:100%;margin-bottom:20px;" ng-repeat="rank in ranking")
             .input-group-prepend

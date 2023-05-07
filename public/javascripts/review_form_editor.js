@@ -164,6 +164,7 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
         let tmp = {
             i18n: i18n,
             color: '2980b9',
+            weight: 0,
             questions: []
         };
         $scope.blocks.splice(number,0,tmp);

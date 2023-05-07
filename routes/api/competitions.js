@@ -243,6 +243,8 @@ adminRouter.put('/:competitionid', function (req, res, next) {
           dbCompetition.ranking.push(tmp);
         }
       }
+      if (data.discloseRanking != null) dbCompetition.discloseRanking = data.discloseRanking;
+      if (data.rankingMode != null) dbCompetition.rankingMode = data.rankingMode;
       if (data.documents != null) {
         if (data.documents.enable != null)
           dbCompetition.documents.enable = data.documents.enable;

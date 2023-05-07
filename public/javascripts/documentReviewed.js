@@ -298,38 +298,6 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
         return false;
     }
 
-
-    const sum  = function(arr) {  
-        return arr.reduce(function(prev, current, i, arr) {
-            if(isNaN(current)) return prev;
-            return prev+current;
-        });
-    };
-
-    const isNumberCount = function(arr){
-        let count = 0;
-        for(let a of arr){
-            if(!isNaN(a)) count += 1;
-        }
-        return count;
-    }
-
-    $scope.calcAve = function(blockIndex, questionIndex){
-        if(!$scope.rating || !$scope.rating[blockIndex] || !$scope.rating[blockIndex][questionIndex] || $scope.rating[blockIndex][questionIndex].length == 0 ) return 0;
-        return sum($scope.rating[blockIndex][questionIndex]) / isNumberCount($scope.rating[blockIndex][questionIndex]);
-    }
-    $scope.calcScore = function(){
-        let score = 0;
-        for(let b in $scope.rating){
-            for(let q in $scope.rating[b]){
-                if($scope.review[b].questions[q].type != 'scale') continue;
-                score += $scope.calcAve(b, q);
-            }
-        }
-        return score;
-    }
-
-
     $scope.updateUploaded = function(){
         $http.get("/api/document/files/" + $scope.team._id + '/' + token).then(function (response) {
             $scope.uploaded = response.data;

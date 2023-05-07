@@ -11,6 +11,8 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
     $scope.description = response.data.description;
     $scope.logo = response.data.logo;
     $scope.competitonUseRule = response.data.rule;
+    $scope.discloseRanking = response.data.discloseRanking;
+    $scope.rankingMode = response.data.rankingMode;
     let ranking  = response.data.ranking;
     $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
       let leagues = response.data;
@@ -39,9 +41,6 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
     $scope.rules = response.data;
   })
 
-
-
-
   $scope.updateAuthority = function (userid, acLevel) {
     $http.put("/api/users/" + userid + "/" + competitionId + "/" + acLevel).then(function (response) {
       updateUserList()
@@ -49,6 +48,10 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
       console.log(error)
     })
 
+  }
+
+  $scope.toggleRanking = function() {
+    $scope.discloseRanking = !$scope.discloseRanking;
   }
 
   $scope.go = function (path) {
@@ -65,7 +68,9 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
       color: $scope.cColor,
       message: $scope.message,
       description: $scope.description,
-      ranking: $scope.ranking
+      ranking: $scope.ranking,
+      discloseRanking: $scope.discloseRanking,
+      rankingMode: $scope.rankingMode
     }
 
     $http.put("/api/competitions/" + $scope.competitionId, data).then(function (response) {

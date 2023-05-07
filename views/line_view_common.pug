@@ -310,17 +310,3 @@ div(ng-if="league=='LineNL'")
         p(style='text-align:center;height:30px;') {{'line.sign.exitBonus' | translate}}
         h1 {{ exitBonusPoints()}} {{'common.point' | translate}}
   hr
-.alert.alert-success(role='alert')
-  .row
-    .col-md-6
-      .d-none.d-sm-block
-        i.fa.fa-calculator.fa-3x(aria-hidden='true')  : {{score}} {{'common.point' | translate}}
-      .d-sm-none
-        i.fa.fa-calculator.fa-2x(aria-hidden='true')  : {{score}} {{'common.point' | translate}}
-    .col-md-6
-      .d-none.d-sm-block
-        i.fas.fa-stopwatch.fa-3x(aria-hidden='true')
-          | : {{minutes}} {{'common.min' | translate}} {{seconds}} {{'common.sec' | translate}}
-      .d-sm-none
-        i.fas.fa-stopwatch.fa-2x(aria-hidden='true')
-          | : {{minutes}} {{'common.min' | translate}} {{seconds}} {{'common.sec' | translate}}

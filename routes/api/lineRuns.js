@@ -50,7 +50,10 @@ publicRouter.get('/', getLineRuns);
 
 function getLineRuns(req, res) {
   const competition = req.query.competition || req.params.competition;
+  const normalized = req.query.normalized;
+  const minimum = req.query.minimum;
 
+  let maxScoreCache = {};
   let query;
   if (competition != null && competition.constructor === String) {
     if (req.query.ended == 'false') {
@@ -73,40 +76,38 @@ function getLineRuns(req, res) {
     query = lineRun.find({});
   }
 
-  if (req.query.minimum) {
+  if (minimum) {
     query.select('competition round team field status started startTime sign');
   } else {
     query.select(
-      'competition round team field map score raw_score multiplier time status started LoPs comment startTime sign rescueOrder nl group exitBonus evacuationLevel kitLevel'
+      'competition round team field map score raw_score multiplier time status started LoPs comment startTime sign rescueOrder nl group normalizationGroup exitBonus evacuationLevel kitLevel'
     );
   }
 
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      {
-        path: 'competition',
-        select: 'name',
-      },
-      {
-        path: 'round',
-        select: 'name',
-      },
-      {
-        path: 'team',
-        select: 'name league teamCode',
-      },
-      {
-        path: 'field',
-        select: 'name league',
-      },
-      {
-        path: 'map',
-        select: 'name',
-      },
-    ]);
-  }
+  query.populate([
+    {
+      path: 'competition',
+      select: 'name discloseRanking rankingMode',
+    },
+    {
+      path: 'round',
+      select: 'name',
+    },
+    {
+      path: 'team',
+      select: 'name league teamCode',
+    },
+    {
+      path: 'field',
+      select: 'name league',
+    },
+    {
+      path: 'map',
+      select: 'name',
+    },
+  ]);
 
-  query.lean().exec(function (err, dbRuns) {
+  query.lean().exec(async function (err, dbRuns) {
     if (err) {
       logger.error(err);
       res.status(400).send({
@@ -130,13 +131,44 @@ function getLineRuns(req, res) {
           delete dbRuns[i].comment;
           delete dbRuns[i].sign;
         }
+
+        // return normalized score
+        if (!minimum && normalized && dbRuns[i].competition.rankingMode == "SUM_OF_NORMALIZED_BEST_N_GAMES") {
+          // disclose runking enabled OR the user is ADMIN of the competition
+          if (dbRuns[i].competition.discloseRanking || auth.authCompetition(
+            req.user,
+            dbRuns[i].competition._id,
+            ACCESSLEVELS.ADMIN
+          )) {
+            let maxScore = await getMaxScoreWithCache(dbRuns[i].competition._id, dbRuns[i].normalizationGroup, maxScoreCache);
+            dbRuns[i].normalizedScore = dbRuns[i].score / maxScore;
+          }
+        }
       }
       res.status(200).send(dbRuns);
     }
   });
 }
-
 module.exports.getLineRuns = getLineRuns;
+
+async function getMaxScoreWithCache(competitionId, normalizationGroup, cache) {
+  if (cache[competitionId] != null) {
+    if (cache[competitionId][normalizationGroup] != null) {
+      console.log("HIT")
+      return cache[competitionId][normalizationGroup];
+    }
+  } else {
+    cache[competitionId] = {};
+  }
+  let maxScore = await lineRun.findOne({
+    competition: competitionId,
+    normalizationGroup: normalizationGroup
+  }).select("score").sort({
+    score: -1
+  }).exec()
+  cache[competitionId][normalizationGroup] = maxScore.score;
+  return cache[competitionId][normalizationGroup];
+}
 
 privateRouter.get(
   '/find/team_status/:competitionid/:teamid/:status',
@@ -266,25 +298,20 @@ publicRouter.get(
  * @apiError (400) {String} err The error message
  * @apiError (400) {String} msg The error message
  */
-publicRouter.get('/:runid', function (req, res, next) {
+publicRouter.get('/:runid', async function (req, res, next) {
   const id = req.params.runid;
+  const normalized = req.query.normalized
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
 
-  const query = lineRun.findById(id, '-__v');
-
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      'round',
-      { path: 'team', select: 'name league' },
-      'field',
-      { path: 'competition', select: 'name' }
-    ]);
-  }
-
-  query.exec(async function (err, dbRun) {
+  lineRun.findById(id, '-__v').populate([
+    'round',
+    { path: 'team', select: 'name league' },
+    'field',
+    { path: 'competition', select: 'name discloseRanking rankingMode' }
+  ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
       return res.status(400).send({
@@ -321,6 +348,25 @@ publicRouter.get('/:runid', function (req, res, next) {
       if (authResult == 2) {
         delete dbRun.comment;
         delete dbRun.sign;
+      }
+
+      // return normalized value
+      if (normalized && dbRun.competition.rankingMode == "SUM_OF_NORMALIZED_BEST_N_GAMES") {
+        // disclose runking enabled OR the user is ADMIN of the competition
+        if (dbRun.competition.discloseRanking || auth.authCompetition(
+          req.user,
+          dbRun.competition._id,
+          ACCESSLEVELS.ADMIN
+        )) {
+          let maxScore = await lineRun.findOne({
+            competition: dbRun.competition._id,
+            normalizationGroup: dbRun.normalizationGroup
+          }).select("score").sort({
+            score: -1
+          }).exec()
+          dbRun = dbRun.toObject()
+          dbRun.normalizedScore = dbRun.score / maxScore.score;
+        }
       }
       return res.status(200).send(dbRun);
     }

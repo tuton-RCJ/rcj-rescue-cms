@@ -236,9 +236,6 @@ block content
                                                         if admin
                                                             i.fas.fa-eraser(style="color: #e74c3c;" ng-click="removeComment(review._id, question._id)")
                                                     td(ng-bind="review.score")
-                                                tr
-                                                    td(style="background-color: #FFA9A9;") {{"document.review.ratingAve" | translate}}
-                                                    td(ng-bind="calcAve(blockIndex, questionIndex)" style="background-color: #FFA9A9;")
 
 
                                     div(ng-if="question.type=='picture'")
