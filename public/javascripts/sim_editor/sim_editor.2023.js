@@ -948,8 +948,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         cv.imshow('outputCanvas', src);*/
 
         $scope.recalculateLinear();
-        createArea4Solid();
-        createArea4Victims(0, 0);
+        if ($scope.area4Room.value == "Custom Room") {
+            createArea4Solid();
+            createArea4Victims(0, 0);
+        }
         var map = {
             name: $scope.name,
             length: $scope.length,
@@ -2640,7 +2642,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         if ($scope.area4Room.value == "Custom Room") {
             createArea4Solid();
             createArea4Victims(0, 0);
-            console.log($scope.room4VicTypes)
             for (let i = 0; i < $scope.room4VicTypes.length; i++) {
                 if ($scope.room4VicTypes[i] <= 3)
                     victimScore += (15 + 10) * areaMultiplier[4];
