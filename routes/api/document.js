@@ -880,7 +880,7 @@ adminRouter.get('/reviews/:competition', function (req, res, next) {
         team: { $ne: null }
       })
       .populate('reviewer', 'username')
-      .populate('team', 'teamCode name league')
+      .populate('team', 'teamCode name league country')
       .exec(function (err, dbReview) {
         if (err) {
           if (!err) err = { message: 'No review found' };
