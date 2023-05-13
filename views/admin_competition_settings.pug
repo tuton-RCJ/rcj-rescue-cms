@@ -88,8 +88,8 @@ block content
               span.input-group-text {{"admin.settings.rankingMode" | translate}}
             select.custom-select(ng-model='rankingMode')
               option(value="SUM_OF_BEST_N_GAMES") SUM OF BEST N GAMES
-              option(value="SUM_OF_NORMALIZED_BEST_N_GAMES") SUM OF NORMALIZED BEST N GAMES
-              option(value="SUM_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") SUM OF NORMALIZED BEST N GAMES + NORMALIZED DOCUMENT SCORE
+              option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES") MEAN OF NORMALIZED BEST N GAMES
+              option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") 0.8 * MEAN OF NORMALIZED BEST N GAMES + 0.2 * NORMALIZED DOCUMENT SCORE
           br
           p {{"admin.settings.useNum" | translate}}
           .input-group(style="width:100%;margin-bottom:20px;" ng-repeat="rank in ranking")

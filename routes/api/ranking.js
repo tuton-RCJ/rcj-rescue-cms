@@ -30,7 +30,7 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   let allRunsDb = await lineRun.find({
     competition: competition
-  }).select("team score normalizationGroup LoPs rescueOrder nl isNL time")
+  }).select("team score normalizationGroup LoPs rescueOrder nl isNL time startTime")
   .populate([
     {
       path: 'team',
@@ -66,6 +66,7 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
       teamRuns[e].games.sort(sortRunsNormalized)
       bestRuns = teamRuns[e].games.slice(0, sumGameNumber);
       teamRuns[e].gameSum.normalizedScore = sum(bestRuns.map(run => run.normalizedScore));
+      teamRuns[e].gameSum.normalizedScoreMean = teamRuns[e].gameSum.normalizedScore / bestRuns.length;
     } else {
       teamRuns[e].games.sort(sortRuns)
       bestRuns = teamRuns[e].games.slice(0, sumGameNumber);
@@ -94,9 +95,46 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the LoPs
     teamRuns[e].gameSum.lops = sum(bestRuns.map(run => sum(run.LoPs)));
+
+    // Sort by startTime
+    teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);
   })
 
-  res.status(200).send(teamRuns);
+  if (competitiondb.DOCUMENT_RANKING.includes(rankingMode)) {
+    let documentScore = await getDocumentScore(competition, league);
+    for (let d of documentScore) {
+      teamRuns[d._id].docuement = {
+        details: d.details,
+        score: d.score
+      };
+    }
+  }
+
+  let ranking = Object.values(teamRuns);
+  ranking.map(r => {
+    r.team = r.games[0].team;
+    r.games.map(g => delete g.team)
+  });
+
+  switch(rankingMode) {
+    case competitiondb.SUM_OF_BEST_N_GAMES:
+      ranking.map(r => r.finalScore = r.gameSum.score);
+      break;
+    case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES:
+      ranking.map(r => r.finalScore = r.gameSum.normalizedScoreMean);
+      break;
+    case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT:
+      ranking.map(r => r.finalScore = 0.8* r.gameSum.normalizedScoreMean + 0.2 * r.docuement.score);
+      console.log("AAA")
+  }
+  console.log(ranking)
+
+  ranking.sort(sortFinalScore);
+
+  res.status(200).send({
+    mode: rankingMode,
+    ranking: ranking
+  });
 });
 
 function sortRuns(a, b) {
@@ -135,6 +173,24 @@ function sortRunsNormalized(a, b) {
   }
 }
 
+function sortFinalScore(a, b) {
+  if (a.finalScore == b.finalScore) {
+      if (a.gameSum.time.minutes < b.gameSum.time.minutes) {
+          return -1
+      } else if (a.gameSum.time.minutes > b.gameSum.time.minutes) {
+          return 1
+      } else if (a.gameSum.time.seconds < b.gameSum.time.seconds) {
+          return -1
+      } else if (a.gameSum.time.seconds > b.gameSum.time.seconds) {
+          return 1
+      } else {
+          return 0
+      }
+  } else {
+      return b.finalScore - a.finalScore
+  }
+}
+
 function sum(array) {
   if (array.length == 0) return 0;
   return array.reduce(function(a,b){
@@ -157,25 +213,27 @@ adminRouter.get('/:competitionId/:leagueId/document', async function (req, res, 
     return res.status(403).send("User access permission error");
   }
 
+  res.status(200).send(await getDocumentScore(competition, league));
+});
+
+async function getDocumentScore(competitionId, leagueId) {
   // Retrieve review questions
-  let competitionDb = await competitiondb.competition.findById(competition).lean().exec();
+  let competitionDb = await competitiondb.competition.findById(competitionId).lean().exec();
   if (competitionDb == null) return res.status(404).send("Could not find competition");
-  let reviewQuestions = competitionDb.documents.leagues.find(d => d.league == league).review;
+  let reviewQuestions = competitionDb.documents.leagues.find(d => d.league == leagueId).review;
 
   // Retrieve all temas of the league
   let teamsDb = await competitiondb.team.find({
-    competition: competition,
-    league: league
+    competition: competitionId,
+    league: leagueId
   }).select("name teamCode country").lean().exec();
-  console.log(teamsDb);
   let teamIds = teamsDb.map(t => t._id);
 
   // Retrieve all review results
   let reviewResults = await review.find({
-    competition: competition,
+    competition: competitionId,
     team: { $in: teamIds }
   }).lean().exec();
-  console.log(reviewResults)
 
   // Questions list
   let questions = {};
@@ -190,7 +248,6 @@ adminRouter.get('/:competitionId/:leagueId/document', async function (req, res, 
       }
     }
   }
-  console.log(questions);
 
   let result = [];
   let blockScores = {};
@@ -242,12 +299,13 @@ adminRouter.get('/:competitionId/:leagueId/document', async function (req, res, 
       if (maxScore == 0) block.normalizedScore = 0;
       else block.normalizedScore = block.score / maxScore;
       score += block.normalizedScore * weights[block.blockId];
+      block.weight = weights[block.blockId];
     }
     team.score = score;
   }
 
-  res.status(200).send(result);
-});
+  return result;
+}
 
 publicRouter.all('*', function (req, res, next) {
   next();
