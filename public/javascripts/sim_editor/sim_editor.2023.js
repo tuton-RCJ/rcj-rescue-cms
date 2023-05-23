@@ -2280,7 +2280,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         fullContPoints = [];
         for (let i = 0; i < contours.size(); i++) {
             outputStr +=
-                "DEF CURVED Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
+                "Solid {\n children [\n DEF CURVED" + String(i) + " Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
 
             let contour = contours.get(i);
             let points = contour.data32S;
@@ -2320,7 +2320,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 "-1,";
             for (let j = 0; j < contPoints.length; j++)
                 outputStr += (j * 2 + 1).toString() + ",";
-            outputStr += "-1,\n]\n}\n}";
+            outputStr += "-1,\n]\n}\n}\n]\n" +
+                            "boundingObject USE CURVED" + String(i) + 
+                            "\nname \"curved" + String(i) + "\"\n}";
         }
         outputStr += '\n]\n}\n';
 
