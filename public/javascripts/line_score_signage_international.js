@@ -76,8 +76,7 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', function ($sco
     
 
     function updateRunList(callback) {
-        $http.get("/api/competitions/" + competitionId +
-            "/line/runs?populate=true").then(function (response) {
+        $http.get(`/api/runs/line/competition/${competitionId}`).then(function (response) {
             var runs = response.data
 
             for(let run of runs){

@@ -11,29 +11,38 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
     $scope.description = response.data.description;
     $scope.logo = response.data.logo;
     $scope.competitonUseRule = response.data.rule;
-    $scope.discloseRanking = response.data.discloseRanking;
-    $scope.rankingMode = response.data.rankingMode;
     let ranking  = response.data.ranking;
     $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
       let leagues = response.data;
       $scope.ranking = [];
       for(let i in leagues){
-        let num = 20;
-        if(ranking){
-          for(let j in ranking){
-            if(ranking[j].league == leagues[i].id){
-              num = ranking[j].num;
-              break;
-            }
+        let index = -1;
+        for(let j in ranking){
+          if(ranking[j].league == leagues[i].id){
+            index = j;
+            break;
           }
         }
-        let tmp = {
-          'id': leagues[i].id,
-          'name': leagues[i].name,
-          'count': num
+        if (index == -1) {
+          $scope.ranking.push({
+            'id': leagues[i].id,
+            'name': leagues[i].name,
+            'count': 20,
+            'disclose': false,
+            'mode': "SUM_OF_BEST_N_GAMES"
+          });
+        } else {
+          console.log(ranking[index])
+          $scope.ranking.push({
+            'id': leagues[i].id,
+            'name': leagues[i].name,
+            'count': ranking[index].num,
+            'disclose': ranking[index].disclose,
+            'mode': ranking[index].mode
+          });
         }
-        $scope.ranking.push(tmp);
       }
+      console.log($scope.ranking)
     })
   })
 
@@ -50,10 +59,6 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
 
   }
 
-  $scope.toggleRanking = function() {
-    $scope.discloseRanking = !$scope.discloseRanking;
-  }
-
   $scope.go = function (path) {
     window.location = path
   }
@@ -68,9 +73,7 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
       color: $scope.cColor,
       message: $scope.message,
       description: $scope.description,
-      ranking: $scope.ranking,
-      discloseRanking: $scope.discloseRanking,
-      rankingMode: $scope.rankingMode
+      ranking: $scope.ranking
     }
 
     $http.put("/api/competitions/" + $scope.competitionId, data).then(function (response) {

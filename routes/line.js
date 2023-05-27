@@ -41,45 +41,23 @@ publicRouter.get('/:competitionid/score/:league', function (req, res, next) {
     return next();
   }
 
-  competitiondb.competition
-    .findOne({
-      _id: id,
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get competition',
-          err: err.message,
-        });
-      } else {
-        let num = 20;
-        for (const i in data.ranking) {
-          if (data.ranking[i].league == league) {
-            num = data.ranking[i].num;
-            break;
-          }
-        }
-        res.render('line_score', {
-          id,
-          user: req.user,
-          league,
-          num,
-          get: req.query,
-        });
-      }
-    });
+  return res.render('line_score', {
+    id,
+    user: req.user,
+    league,
+    get: req.query,
+  });
 });
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
+  const iframe = req.query.iframe;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_view', { id, user: req.user, rule });
+  res.render('line_view', { id, user: req.user, rule, iframe });
 });
 
 publicRouter.get('/view/field/:competitionid/:fieldid', function (req, res) {

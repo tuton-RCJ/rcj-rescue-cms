@@ -34,7 +34,6 @@ const mazeRunSchema = new Schema({
   group             : {type: Number, min: 0},
   normalizationGroup: {type: String, index: true},
   diceNumber        : {type: Number, default: null},
-  manualFlag        : {type: Boolean, default: false},
 
   tiles    : [{
     x          : {type: Number, integer: true, required: true},
@@ -63,7 +62,12 @@ const mazeRunSchema = new Schema({
   }],
   LoPs     : {type: Number, min: 0, default: 0},
   misidentification: {type: Number, min:0, default:0},
-  foundVictims: {type: Number, min:0, default: 0},
+  foundVictims: [
+    {
+      type: {type: String},
+      count: {type: Number, min: 0, default: 0}
+    }
+  ],
   distKits: {type: Number, min:0, default: 0},
   exitBonus: {type: Boolean, default: false},
   score    : {type: Number, min: 0, default: 0},

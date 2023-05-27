@@ -29,8 +29,10 @@ block content
       br
       .row
         div(ng-repeat="league in leagues" class="col-md-{{12/leagues.length}}")
-          button(ng-click="go('/line/' + competition._id + '/score/' + league.id)" class='btn btn-outline-danger btn-lg btn-block' style="margin-bottom:20px;")
-            i.fas.fa-trophy(aria-hidden='true') &nbsp;[{{league.name}}]&nbsp;{{'line.competition.result' | translate}}
+          button(ng-click="go('/line/' + competition._id + '/score/' + league.id)" class='btn btn-outline-danger btn-lg btn-block' style="margin-bottom:20px;" ng-show="rankingOpen[league.id]")
+            i.fas.fa-trophy.fa-3x(aria-hidden='true')
+            p [{{league.name}}]
+            p(style="font-size: 30px; margin:0;") {{'common.rank' | translate}}
 
       br
       .refine

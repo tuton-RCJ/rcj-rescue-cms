@@ -129,6 +129,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.stiles = data.tiles;
                 $scope.score = data.score;
                 $scope.raw_score = data.raw_score;
+                $scope.normalizedScore = data.normalizedScore;
                 $scope.multiplier = data.multiplier;
                 $scope.showedUp = data.showedUp;
                 $scope.LoPs = data.LoPs;
@@ -286,7 +287,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
-                $scope.go('/home/access_denied');
+                $scope.go(`/home/access_denied?iframe=${iframe}`);
             }
         });
     }
@@ -339,7 +340,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
           let liveCount = 0;
           for (i of $scope.range(index)) {
             let v = $scope.victim_list[i]
-            if (v.victimType == "LIVE") liveCount ++;
+            if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
           }
           if (liveCount != 2) return 1.0;
         }

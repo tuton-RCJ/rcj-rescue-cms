@@ -84,6 +84,11 @@
         "map": "マップ",
         "rank": "順位",
         "score": "得点",
+        "mean": "平均",
+        "sum": "合計",
+        "weightedSum": "加重合計",
+        "gamesScore": "競技得点",
+        "documentScore": "ドキュメントの正規化スコア",
         "normalizedScore": "正規化スコア",
         "time": "時間",
         "rescued": "救助",
@@ -303,7 +308,6 @@
         },
         "competition": {
             "title": "Line 競技選択",
-            "result": "競技結果・速報順位",
             "refine": {
                 "filter": "競技絞り込み",
                 "round": "ラウンド",
@@ -318,6 +322,9 @@
         },
         "score": {
             "rank": "順位",
+            "finalScore": "最終得点",
+            "game": "競技",
+            "document": "ドキュメント",
             "all": "全競技",
             "sort": "ラウンドでソート",
             "team": "チーム名でソート"
@@ -452,7 +459,6 @@
         },
         "competition": {
             "title": "Maze 競技選択",
-            "result": "@:line.competition.result",
             "refine": {
                 "filter": "@:line.competition.refine.filter",
                 "round": "@:line.competition.refine.round",
@@ -590,7 +596,6 @@
             "set": "設定",
             "rule": "適用ルール",
             "ranking": "順位付け設定",
-            "useNum": "順位付けに使用する競技の数を設定してください．設定は，全てのチームを登録した後に行なってください．デフォルト：20競技",
             "leagueName": "リーグ名",
             "num": "使用競技数",
             "discloseRanking": "順位を公開",

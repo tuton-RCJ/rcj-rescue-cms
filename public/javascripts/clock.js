@@ -66,8 +66,7 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
     
     
     function update_line_list(){
-        $http.get("/api/competitions/" + competitionId +
-            "/line/runs?populate=true&minimum=true&ended=true").then(function (response) {
+        $http.get(`/api/runs/line/competition/${competitionId}?populate=true&minimum=true&ended=true`).then(function (response) {
             lr = response.data
             $scope.runs=[];
             for(let run of lr){
@@ -105,8 +104,7 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
     }
     
     function update_maze_list(){
-        $http.get("/api/competitions/" + competitionId +
-            "/maze/runs?populate=true&minimum=true&ended=true").then(function (response) {
+        $http.get(`/api/runs/maze/competition/${competitionId}?minimum=true&ended=true`).then(function (response) {
             mr = response.data
             $scope.runs=[];
             for(let run of lr){

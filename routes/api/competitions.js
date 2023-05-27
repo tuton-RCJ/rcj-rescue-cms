@@ -239,12 +239,12 @@ adminRouter.put('/:competitionid', function (req, res, next) {
           const tmp = {
             league: data.ranking[i].id,
             num: data.ranking[i].count,
+            disclose: data.ranking[i].disclose,
+            mode: data.ranking[i].mode
           };
           dbCompetition.ranking.push(tmp);
         }
       }
-      if (data.discloseRanking != null) dbCompetition.discloseRanking = data.discloseRanking;
-      if (data.rankingMode != null) dbCompetition.rankingMode = data.rankingMode;
       if (data.documents != null) {
         if (data.documents.enable != null)
           dbCompetition.documents.enable = data.documents.enable;

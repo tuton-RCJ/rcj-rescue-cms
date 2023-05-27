@@ -190,7 +190,7 @@ html(ng-app="ddApp")
                 button.btn.btn-outline-dark(type='button', ng-click='tileRot(90)')
                   i.fas.fa-redo(aria-hidden='true')
             div(style='clear:both;')
-            #wrapTile.mx-auto(style='margin-top:5px;')
+            #wrapTile(style='margin-top:5px;')
               table.map(ng-if='sRotate == 0')
                 tbody
                   tr(ng-repeat='r in range(2*length + 1)')

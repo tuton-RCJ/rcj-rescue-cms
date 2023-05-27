@@ -230,8 +230,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         }
 
         function updateRunList() {
-            $http.get("/api/competitions/" + competitionId +
-                "/maze/runs?populate=true").then(function (response) {
+            $http.get(`/api/runs/maze/competition/${competitionId}?normalized=true`).then(function (response) {
                 var runs = response.data;
                 for (let run of runs) {
                     if (!run.team) {

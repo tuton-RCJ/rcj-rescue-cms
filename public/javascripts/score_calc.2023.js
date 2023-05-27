@@ -51,8 +51,6 @@ function line_calc_score(run) {
         if (run.rescueOrder) {
             let liveCount = 0;
             for (let victim of run.rescueOrder) {
-                if (victim.victimType == "LIVE") liveCount ++;
-
                 if (victim.victimType == "LIVE" && victim.zoneType == "RED") continue;
                 if (victim.victimType == "KIT" && victim.zoneType == "RED") continue;
                 if (victim.victimType == "DEAD" && victim.zoneType == "GREEN") continue;
@@ -75,6 +73,7 @@ function line_calc_score(run) {
                 else multiplier *= Math.max(1400-(50*run.LoPs[run.EvacuationAreaLoPIndex]),1000);
                 
                 error *= 1000;
+                if (victim.victimType == "LIVE") liveCount ++;
             }
             multiplier /= error;
         }

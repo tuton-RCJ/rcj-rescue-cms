@@ -122,8 +122,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 console.log(data);
                 $scope.exitBonus = data.exitBonus;
                 $scope.score = data.score;
+                $scope.normalizedScore = data.normalizedScore;
                 $scope.LoPs = data.LoPs;
-                $scope.foundVictims = data.foundVictims;
+                $scope.foundVictims = sum(data.foundVictims.map(v => v.count));
                 $scope.distKits = data.distKits;
                 $scope.MisIdent = data.misidentification;
 
@@ -146,19 +147,18 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     function loadNewRun() {
         $http.get("/api/runs/maze/" + runId +
-            "?populate=true").then(function (response) {
-
-            console.log(response.data);
+            "?normalized=true").then(function (response) {
             $scope.exitBonus = response.data.exitBonus;
             $scope.field = response.data.field.name;
             $scope.round = response.data.round.name;
             $scope.score = response.data.score;
+            $scope.normalizedScore = response.data.normalizedScore;
             $scope.team = response.data.team.name;
             $scope.league = response.data.team.league;
             $scope.competition = response.data.competition.name;
             $scope.competition_id = response.data.competition._id;
             $scope.LoPs = response.data.LoPs;
-            $scope.foundVictims = response.data.foundVictims;
+            $scope.foundVictims = sum(response.data.foundVictims.map(v => v.count));
             $scope.distKits = response.data.distKits;
             $scope.MisIdent = response.data.misidentification;
 
@@ -214,7 +214,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
-                $scope.go('/home/access_denied');
+                $scope.go(`/home/access_denied?iframe=${iframe}`);
             }
         });
     }
@@ -724,7 +724,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             if($scope.sRotate%180 == 0){
                 var tilesize_w = (b.width()-2*(width+1)) / (width+1 + (width+1)/12);
-                console.log(tilesize_w);
                 var tilesize_h = (window.innerHeight - 130) /(length + length/12*(length+1));
             }else{
                 var tilesize_w = (b.width() - (20 + 11 * (length + 1))) / length;
@@ -831,7 +830,12 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
 }]);
 
 
-
+function sum(array) {
+    if (array.length == 0) return 0;
+    return array.reduce(function(a,b){
+        return a + b;
+    });
+}
 
 $(window).on('beforeunload', function () {
     socket.emit('unsubscribe', 'runs/' + runId);

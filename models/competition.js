@@ -76,10 +76,10 @@ const competitionSchema = new Schema({
   description: {type: String, default: ""},
   ranking: [{
     'league': {type: String, enum: LEAGUES},
-    'num': {type: Number, default: 20}
+    'num': {type: Number, default: 20},
+    'mode': {type: String, enum: RANKING_MODE, default: RANKING_MODE[0]},
+    'disclose': {type: Boolean, default: false}
   }],
-  discloseRanking: {type: Boolean, default: false},
-  rankingMode: {type: String, enum: RANKING_MODE, default: RANKING_MODE[0]},
   publicToken: {type: String, default: function(){
     return crypto.randomBytes(16).reduce((p, i) => p + (i % 32).toString(32), '')
   }, select: false},

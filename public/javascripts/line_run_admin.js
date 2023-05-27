@@ -238,8 +238,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
 
         function updateRunList() {
-            $http.get("/api/competitions/" + competitionId +
-                "/line/runs?normalized=true").then(function (response) {
+            $http.get(`/api/runs/line/competition/${competitionId}?normalized=true`).then(function (response) {
                 var runs = response.data;
                 for (let run of runs) {
                     if (!run.team) {
@@ -435,6 +434,49 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
           }
           return count;
         }
+
+        $scope.active_victim = function (victims, index){
+            let victim = victims[index];
+            if (victim == undefined) return false;
+        
+            // Effective check
+            if(victim.victimType == "LIVE" && victim.zoneType == "RED") return false;
+            if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return false;
+            if(victim.victimType == "KIT" && victim.zoneType == "RED") return false;
+        
+            // Effective check for dead victim
+            if (victim.victimType == "DEAD") {
+              let liveCount = 0;
+              for (i of $scope.range(index)) {
+                let v = victims[i]
+                if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
+              }
+              if (liveCount != 2) return false;
+            }
+            
+            return true;    
+        };
+
+        $scope.victimImgPath = function(victim) {
+            switch(victim.victimType) {
+                case 'LIVE':
+                    return 'liveVictim.png';
+                case 'DEAD':
+                    return 'deadVictim.png';
+                case 'KIT':
+                    return 'rescueKit.png';
+            }
+        }
+    
+        $scope.evacZoneColor = function(victim) {
+            switch(victim.zoneType) {
+                case 'GREEN':
+                    return "#1dd1a1";
+                case 'RED':
+                    return "#e55039";
+            }
+        }
+          
 
 }])
     .directive("runsReadFinished", ['$timeout', function ($timeout) {

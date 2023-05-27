@@ -84,6 +84,11 @@
         "map": "Map",
         "rank": "Rank",
         "score": "Score",
+        "mean": "Mean",
+        "sum": "Sum",
+        "weightedSum": "Weighted sum",
+        "gamesScore": "Games score",
+        "documentScore": "Normalized score for document",
         "normalizedScore": "Normalized score",
         "time": "Time",
         "rescued": "Rescued",
@@ -303,7 +308,6 @@
         },
         "competition": {
             "title": "Line runs",
-            "result": "Result (preliminary report ranking)",
             "refine": {
                 "filter": "Filter",
                 "round": "Round",
@@ -318,6 +322,9 @@
         },
         "score": {
             "rank": "Rank",
+            "finalScore": "Final score",
+            "game": "Games",
+            "document": "Document",
             "all": "All runs",
             "sort": "Sort by round",
             "team": "Sort by team name"
@@ -454,7 +461,6 @@
         },
         "competition": {
             "title": "Maze runs",
-            "result": "@:line.competition.result",
             "refine": {
                 "filter": "@:line.competition.refine.filter",
                 "round": "@:line.competition.refine.round",
@@ -592,7 +598,6 @@
             "set": "Save",
             "rule": "Rule",
             "ranking": "Ranking",
-            "useNum": "Set the number of games to be used for ranking.  Make this setting after registering all teams. Default: 20 games",
             "leagueName": "League name",
             "num": "Number of games",
             "discloseRanking": "Make rankings public",

@@ -8,7 +8,6 @@ append scripts
   script.
     var competitionId = "#{id}"
     var league = "#{league}"
-    var UseRunsNumber = "#{num}"
     var get = !{JSON.stringify(get)}
   script(src = '/components/datatables/media/js/jquery.dataTables.min.js')
   script(src = '/components/angular-datatables/demo/src/archives/dist/angular-datatables.min.js')
@@ -32,85 +31,61 @@ block content
     p(ng-bind-html="competition.message")
   br
   center
-    .loader(ng-if="Runs==null")
+    .loader(ng-if="ranking==null")
       img(src="/images/loader2.gif")
       p {{'common.loading' | translate}}
-  div(ng-if="Runs!=null")
+  div(ng-if="ranking!=null")
     .row#rank
       .col-lg-12
         h3 [{{'line.score.rank' | translate}}] {{league.name}}
         table.custom(style="overflow: scroll;")
           thead
             tr
-              th.text-center {{'common.rank' | translate}}
-              th.text-center {{'common.team' | translate}}
-              th.text-center {{'common.score' | translate}}
-              th.text-center {{'common.time' | translate}}
-              th.text-center {{'common.rescued' | translate}}
-              th.text-center {{'common.lops' | translate}}
-          tbody
-            tr(ng-repeat='run in RunsTop track by $index')
-              td.text-center(ng-bind='$index + 1' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-bind='run.team.name' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-bind='run.score' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}") {{("00"+run.time.minutes).slice(-2)}}:{{("00"+run.time.seconds).slice(-2)}}
-              td.text-center(ng-bind='run.rescuedVictims' ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league!='LineNL'")
-              td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league=='LineNL'")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Unknown > 0")
-                  img(src='/images/unknownVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") ×{{run.rescuedNL_Unknown}}
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Live > 0")
-                  img(src='/images/greenVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") ×{{run.rescuedNL_Live}}
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="run.rescuedNL_Dead > 0")
-                  img(src='/images/blackVictim.png', style="height:20px;")
-                  span(style="font-size:20px;") ×{{run.rescuedNL_Dead}}
-              td.text-center(ng-bind='run.LoPsNum' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-    .row
-      hr
-    .row#allRuns
-      .col-lg-12
-        h3 [{{'line.score.all' | translate}}] {{league.name}}
-        label {{'line.score.sort' | translate}}
-          input(type="checkbox" style='display:inline;' ng-model="sortOrder" ng-true-value="'[round.name,team.name,field.name]'" ng-false-value="['-score','time.minutes*60+time.seconds','-rescueOrder.length','LoPsNum']")
-        label &nbsp;&nbsp;&nbsp;&nbsp;{{'line.score.team' | translate}}
-          input(type="checkbox" style='display:inline;' ng-model="sortOrder" ng-true-value="'[team.name,round.name,field.name]'" ng-false-value="['-score','time.minutes*60+time.seconds','-rescueOrder.length','LoPsNum']")
-        table.custom(style="overflow: scroll;")
-          thead
+              th.text-center(rowspan="2") {{'common.rank' | translate}}
+              th.text-center(ng-show="showMode.teamCode", rowspan="2") {{'common.teamCode' | translate}}
+              th.text-center(rowspan="2") {{'common.team' | translate}}
+              th.text-center(rowspan="2") {{'line.score.finalScore' | translate}}
+              th.text-center(colspan="{{maxGameNum + 4}}") {{'line.score.game' | translate}}
+              th.text-center(colspan="{{documentBlock.length + 1}}" ng-show="showMode.documentScore") {{'line.score.document' | translate}}
             tr
-              th.text-center {{'common.team' | translate}}
-              th.text-center {{'common.round' | translate}}
-              th.text-center {{'common.field' | translate}}
-              th.text-center {{'common.score' | translate}}
               th.text-center {{'common.time' | translate}}
               th.text-center {{'common.rescued' | translate}}
               th.text-center {{'common.lops' | translate}}
+              th.text-center(ng-show="showMode.normalGameScore", colspan="{{maxGameNum}}") {{'common.gamesScore' | translate}}
+              th.text-center(ng-show="showMode.normalGameScore") {{'common.sum' | translate}}
+              th.text-center(ng-show="showMode.normalizedGameScore", colspan="{{maxGameNum}}") {{'common.normalizedScore' | translate}}
+              th.text-center(ng-show="showMode.normalizedGameScore") {{'common.mean' | translate}}
+              th.text-center(ng-show="showMode.documentScore", ng-repeat="block in documentBlock") {{langContent(block.i18n, 'title')}}
+              th.text-center(ng-show="showMode.documentScore") {{'common.weightedSum' | translate}}
           tbody
-            tr(ng-repeat='run in Runs | orderBy:sortOrder')
-              td.text-center(ng-bind='run.team.name' ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-bind='run.round.name'  ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-bind='run.field.name'  ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-bind='run.score'  ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-              td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}") {{("00"+run.time.minutes).slice(-2)}}:{{("00"+run.time.seconds).slice(-2)}}
-              td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}"  ng-if="run.team.league!='LineNL'")
-                span.badge.badge-warning(ng-show='run.evacuationLevel == 1') Level 1
-                span.badge.badge-danger(ng-show='run.evacuationLevel == 2') Level 2
-                span(ng-repeat='victim in run.rescueOrder', style='margin-left:5px;')
-                  img(src='/images/liveVictim.png', width='20px', ng-if="victim.type == 'L'")
-                  img(src='/images/deadVictim.png', width='20px', ng-if="victim.type == 'D'")
-                  img(src='/images/rescuekit-1.png', width='20px', ng-if="victim.type == 'K' && run.kitLevel==1")
-                  img(src='/images/rescuekit-2.png', width='20px', ng-if="victim.type == 'K' && run.kitLevel==2")
-                span &nbsp;×{{run.multiplier}}
-              td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="run.team.league=='LineNL'")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlUnknownVictimCount)")
-                  img(src='/images/unknownVictim.png', style="height:20px;")
-                  span(style="font-size:20px;")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlLiveVictimCount)")
-                  img(src='/images/greenVictim.png', style="height:20px;")
-                  span(style="font-size:20px;")
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlDeadVictimCount)")
-                  img(src='/images/blackVictim.png', style="height:20px;")
-                  span(style="font-size:20px;")            
-              td.text-center(ng-bind='run.LoPsNum'  ng-style="run.isplaying && {'background-color': '#ffffa8'}")
-    br
-    br
+            tr(ng-repeat='team in ranking track by $index')
+              td.text-center(ng-bind='$index + 1')
+              td.text-center(ng-show="showMode.teamCode", ng-bind='team.team.teamCode')
+              td.text-center(ng-bind='team.team.name')
+              td.text-center(ng-bind='team.finalScore')
+              td.text-center {{("00"+team.gameSum.time.minutes).slice(-2)}}:{{("00"+team.gameSum.time.seconds).slice(-2)}}
+              if league == 'LineNL'
+                td.text-center
+                  .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="team.gameSum.victims.unknown > 0")
+                    img(src='/images/unknownVictim.png', style="height:20px;")
+                    span(style="font-size:15px;") ×{{team.gameSum.victims.unknown}}
+                  .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="team.gameSum.victims.live > 0")
+                    img(src='/images/greenVictim.png', style="height:20px;")
+                    span(style="font-size:15px;") ×{{team.gameSum.victims.live}}
+                  .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-show="team.gameSum.victims.dead > 0")
+                    img(src='/images/blackVictim.png', style="height:20px;")
+                    span(style="font-size:15px;") ×{{team.gameSum.victims.dead}}
+              else 
+                td.text-center
+                  .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in team.gameSum.victims" ng-style="{backgroundColor: evacZoneColor(victim)}")
+                    img(ng-src='/images/{{victimImgPath(victim)}}', style="height:20px;")
+                    span(style="font-size:15px;") ×{{victim.count}}
+              
+              td.text-center(ng-bind='team.gameSum.lops')
+              td.text-center(ng-show="showMode.normalGameScore", ng-repeat="gameIndex in range(maxGameNum)" ng-bind="team.games[gameIndex].score" ng-click="openRunDetails(team.games[gameIndex]._id)" ng-style="{backgroundColor: team.games[gameIndex].used ? '':'#ccc'}")
+              td.text-center(ng-show="showMode.normalGameScore", ng-bind='team.gameSum.score')
+              td.text-center(ng-show="showMode.normalizedGameScore", ng-repeat="gameIndex in range(maxGameNum)" ng-bind="team.games[gameIndex].normalizedScore.toFixed(4)" ng-click="openRunDetails(team.games[gameIndex]._id)" ng-style="{backgroundColor: team.games[gameIndex].used ? '':'#ccc'}")
+              td.text-center(ng-show="showMode.normalizedGameScore", ng-bind='team.gameSum.normalizedScoreMean.toFixed(4)')
+              
+              td.text-center(ng-show="showMode.documentScore", ng-repeat="block in team.document.details", ng-bind='block.normalizedScore.toFixed(4)')
+              td.text-center(ng-show="showMode.documentScore", ng-bind='team.document.score.toFixed(4)')
