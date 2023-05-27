@@ -10,6 +10,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         var runListTimer = null;
         var runListChanged = false;
 
+        var timeOffset = new Date().getTimezoneOffset() * -1;
 
         function timerUpdateRunList() {
             if (runListChanged) {
@@ -288,8 +289,8 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         }
 
 
-        $scope.go_scoreSheet2 = function (runid) {
-          window.open("/api/runs/maze/scoresheet2?run=" + runid,"_blank");
+        $scope.go_scoreSheet2 = function (runId) {
+          window.open(`/api/runs/maze/scoresheet2?run=${runId}&offset=${timeOffset}`,"_blank");
         }
 
         $scope.go_judge = function (runid) {
@@ -395,7 +396,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         };
 
         $scope.go_scoreSheetInTimeRange2 = function () {
-          window.open("/api/runs/maze/scoresheet2?competition=" + $scope.competitionId + "&startTime=" + $scope.scoreSheetStartDateTime.getTime() + "&endTime=" + $scope.scoreSheetEndDateTime.getTime(), "_blank")
+          window.open(`/api/runs/maze/scoresheet2?competition=${$scope.competitionId}&startTime=${$scope.scoreSheetStartDateTime.getTime()}&endTime=${ $scope.scoreSheetEndDateTime.getTime()}&offset=${timeOffset}`, "_blank")
         }
 
 }])

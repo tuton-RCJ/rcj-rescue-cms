@@ -582,6 +582,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   const round = req.query.round || req.params.round;
   const startTime = req.query.startTime || req.params.startTime;
   const endTime = req.query.endTime || req.params.endTime;
+  const offset = req.query.offset;
 
   if (!competition && !run && !round) {
     return next();
@@ -649,6 +650,9 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
         msg: 'Could not get runs',
       });
     } else if (dbRuns) {
+      dbRuns.map(run => {
+        run.startTime += parseInt(offset)*60*1000;
+      })
       for (let i = 0; i < dbRuns.length; i++) {
         if (dbRuns[i].tiles.length === 0 && !dbRuns[i].diceNumber && dbRuns[i].map.dice.length > 0) {
           const randomMapIndex = Math.floor(

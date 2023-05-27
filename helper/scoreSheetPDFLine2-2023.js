@@ -94,7 +94,7 @@ async function drawRun(doc, config, scoringRun) {
     doc,
     124,
     60,
-    `${`0${dateTime.getHours()}`.slice(-2)}:${`0${dateTime.getMinutes()}`.slice(
+    `${`0${dateTime.getUTCHours()}`.slice(-2)}:${`0${dateTime.getUTCMinutes()}`.slice(
       -2
     )}`,
     15,
