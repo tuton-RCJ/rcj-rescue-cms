@@ -196,10 +196,6 @@ function drawRun(doc, config, scoringRun) {
       linear: [],
       floating: [],
     },
-    Heated: {
-      linear: [],
-      floating: [],
-    },
     Red: {
       linear: [],
       floating: [],
@@ -334,83 +330,6 @@ function drawRun(doc, config, scoringRun) {
   const base_size_y = 29;
   const text_padding = 7;
 
-  // Draw box for victim "Heated" (Linear)
-  for (const v of itemList.Heated.linear) {
-    pdf.drawImage(
-      doc,
-      x,
-      y,
-      'scoresheet_generation/maze/l1.png',
-      base_size_x,
-      50,
-      'center'
-    );
-    pdf.drawImage(
-      doc,
-      x + 2,
-      y + 2,
-      'scoresheet_generation/maze/thermometer.png',
-      base_size_y - 5,
-      base_size_y - 5,
-      'center'
-    );
-    pdf.drawTextWithAlign(
-      doc,
-      x + 20,
-      y + text_padding,
-      v.name,
-      20,
-      'black',
-      base_size_y,
-      'center'
-    );
-    x += base_size_x;
-    if (x >= 810) {
-      x = 453;
-      y += base_size_y;
-    }
-  }
-
-  // Draw box for victim "Heated" (Floating)
-  for (const v of itemList.Heated.floating) {
-    pdf.drawImage(
-      doc,
-      x,
-      y,
-      'scoresheet_generation/maze/f1.png',
-      base_size_x,
-      50,
-      'center'
-    );
-    pdf.drawImage(
-      doc,
-      x + 2,
-      y + 2,
-      'scoresheet_generation/maze/thermometer.png',
-      base_size_y - 5,
-      base_size_y - 5,
-      'center'
-    );
-    pdf.drawImage(
-      doc,
-      x + 23,
-      y + 2,
-      `scoresheet_generation/maze/${v.name}.png`,
-      base_size_y - 5,
-      base_size_y - 5,
-      'center'
-    );
-    x += base_size_x;
-    if (x >= 810) {
-      x = 453;
-      y += base_size_y;
-    }
-  }
-
-  if (x != 453) {
-    x = 453;
-    y += base_size_y;
-  }
   // Draw box for victim "H" (Linear)
   for (const v of itemList.H.linear) {
     pdf.drawImage(

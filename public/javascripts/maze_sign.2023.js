@@ -5,11 +5,6 @@ var socket;
 let victimConstant = {};
 let victimTypes = [];
 const victimConstantWL = {
-    "Heated": {
-        "maxKitNum": 1,
-        "linearPoint": 10,
-        "floatingPoint": 30
-    },
     "H": {
         "maxKitNum": 3,
         "linearPoint": 10,

@@ -16,10 +16,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.tiles = {};
 
     $scope.victimsList = {
-        "Heated": {
-            "image": "thermometer.png",
-            "kit": 1
-        },
         "H": {
             "image": "H.png",
             "kit": 3
@@ -56,10 +52,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             "floating":[]
         },
         "U":{
-            "linear":[],
-            "floating":[]
-        },
-        "Heated":{
             "linear":[],
             "floating":[]
         },

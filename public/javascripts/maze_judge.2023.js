@@ -265,7 +265,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 };
             } else {
                 maxKit={
-                    'Heated': 1,
                     'H': 3,
                     'S': 2,
                     'U': 0,
