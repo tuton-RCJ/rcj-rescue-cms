@@ -947,6 +947,13 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
         $scope.tile.scoredItems.steps = !$scope.tile.scoredItems.steps;
     };
 
+    $scope.applyEntryVictimRestriction= function(direction) {
+        playSound(sClick);
+        if (!$scope.tile.scoredItems.victims[direction]) {
+            $scope.tile.scoredItems.rescueKits[direction] = 0;
+        }
+    }
+
 
     $scope.lightStatus = function(light, kit){
         if(light) return true;
