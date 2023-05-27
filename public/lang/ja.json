@@ -599,7 +599,8 @@
             "leagueName": "リーグ名",
             "num": "使用競技数",
             "discloseRanking": "順位を公開",
-            "rankingMode": "順位付けモード"
+            "rankingMode": "順位付けモード",
+            "preparation": "準備モード（競技結果非公開）"
         },
         "line_tSet": {
             "new_tSet": "タイルセット名を入力 ",
@@ -759,6 +760,7 @@
             "ramp": "坂",
             "cp" : "チェックポイント",
             "black" : "黒タイル",
+            "blue": "青タイル",
             "down": "坂の下の水平なタイル",
             "up": "坂の上の水平なタイル",
             "top": "@:admin.lineMapEditor.top",

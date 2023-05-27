@@ -601,7 +601,8 @@
             "leagueName": "League name",
             "num": "Number of games",
             "discloseRanking": "Make rankings public",
-            "rankingMode": "Ranking Mode"
+            "rankingMode": "Ranking Mode",
+            "preparation": "Preparation mode(hide game results)"
         },
         "line_tSet": {
             "new_tSet": "Input tile set name",
@@ -761,6 +762,7 @@
             "ramp": "Ramp",
             "cp" : "Check point",
             "black" : "Black tile",
+            "blue": "Blue tile",
             "down": "Bottom horizontal tile at ramp",
             "up": "Top horizontal tile at ramp",
             "top": "@:admin.lineMapEditor.top",

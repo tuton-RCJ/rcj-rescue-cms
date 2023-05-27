@@ -14,6 +14,9 @@
     </li>
     <div ng-if="leagueType == 'standard'">
       <li>
+        <input type="checkbox" ng-model="cell.tile.blue" id="isBlue"><label class="checkbox" for="isBlue">{{"admin.mazeMapEditor.blue" | translate}}</label>
+      </li>
+      <li>
         <input type="checkbox" ng-model="cell.tile.ramp" id="isRamp"><label class="checkbox" for="isRamp">{{"admin.mazeMapEditor.ramp" | translate}}</label>
       </li>
       <li>
@@ -30,13 +33,12 @@
       <tr>
         <th width="20%">&nbsp;</th>
         <th width="12%"><img src="/images/no_victims.png" alt="None" height="20"></th>
-        <th width="12%"><img src="/images/thermometer.png" alt="Heat" height="20"></th>
         <th width="12%">H</th>
         <th width="12%">S</th>
         <th width="12%">U</th>
-        <th width="12%"><img src="/images/Red.png" alt="None" height="20"></th>
-        <th width="12%"><img src="/images/Yellow.png" alt="Heat" height="20"></th>
-        <th width="12%"><img src="/images/Green.png" alt="None" height="20"></th>
+        <th width="12%"><img src="/images/Red.png" alt="Red" height="20"></th>
+        <th width="12%"><img src="/images/Yellow.png" alt="Yellow" height="20"></th>
+        <th width="12%"><img src="/images/Green.png" alt="Green" height="20"></th>
       </tr>
       <tr>
         <th class="col">{{"admin.mazeMapEditor.top" | translate}}</th>

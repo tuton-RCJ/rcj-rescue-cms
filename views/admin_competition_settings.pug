@@ -59,6 +59,11 @@ block content
             textarea.form-control(ng-model="description" rows=5 style="width:100%")
 
         .col-md-4
+          div(style="display: flex;")
+              span(style="margin-top:5px;") {{"admin.settings.preparation" | translate}} &nbsp;
+              label.toggle-button-001
+                input(type='checkbox' ng-model="preparation")
+          hr
           span {{"admin.settings.logo" | translate}}
             br
             canvas#canvas(style="display:none;")

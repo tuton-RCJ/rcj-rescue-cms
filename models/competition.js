@@ -74,6 +74,7 @@ const competitionSchema = new Schema({
   color: {type: String, default: "#000"},
   message: {type: String, default: ""},
   description: {type: String, default: ""},
+  preparation: {type: Boolean, default: true},
   ranking: [{
     'league': {type: String, enum: LEAGUES},
     'num': {type: Number, default: 20},

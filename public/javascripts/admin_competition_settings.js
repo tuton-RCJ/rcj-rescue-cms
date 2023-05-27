@@ -11,6 +11,7 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
     $scope.description = response.data.description;
     $scope.logo = response.data.logo;
     $scope.competitonUseRule = response.data.rule;
+    $scope.preparation = response.data.preparation;
     let ranking  = response.data.ranking;
     $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
       let leagues = response.data;
@@ -73,7 +74,8 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
       color: $scope.cColor,
       message: $scope.message,
       description: $scope.description,
-      ranking: $scope.ranking
+      ranking: $scope.ranking,
+      preparation: $scope.preparation
     }
 
     $http.put("/api/competitions/" + $scope.competitionId, data).then(function (response) {

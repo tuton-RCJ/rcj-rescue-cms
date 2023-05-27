@@ -232,6 +232,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
       if (data.message != null) dbCompetition.message = data.message;
       if (data.description != null)
         dbCompetition.description = data.description;
+      if (data.preparation != null) dbCompetition.preparation = data.preparation;
 
       if (data.ranking != null) {
         dbCompetition.ranking = [];

@@ -80,7 +80,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name ranking',
+      select: 'name ranking preparation',
     },
     {
       path: 'round',
@@ -108,23 +108,26 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
       });
     } else if (dbRuns) {
       // Hide map and field from public
-      for (let i = 0; i < dbRuns.length; i++) {
-        if (!auth.authViewRun(req.user, dbRuns[i], ACCESSLEVELS.NONE + 1)) {
-          delete dbRuns[i].map;
-          delete dbRuns[i].field;
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
-        } else if (
-          !auth.authCompetition(
-            req.user,
-            dbRuns[i].competition,
-            ACCESSLEVELS.VIEW
-          )
-        ) {
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
+      dbRuns.map(run => {        
+        switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {
+          case 0:
+            delete run.map;
+            delete run.field;
+            delete run.score;
+            delete run.time;
+            delete run.LoPs;
+            delete run.raw_score
+            delete run.multiplier;
+            delete run.rescueOrder;
+            delete run.nl;
+            delete run.exitBonus;
+            delete run.evacuationLevel;
+            delete run.kitLevel;
+          case 2:
+            delete run.comment;
+            delete run.sign;
         }
-      }
+      })
 
       // return normalized score
       if (!minimum && normalized && auth.authCompetition(
@@ -300,7 +303,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
     'round',
     { path: 'team', select: 'name league teamCode' },
     'field',
-    { path: 'competition', select: 'name ranking' }
+    { path: 'competition', select: 'name ranking preparation' }
   ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
@@ -314,7 +317,8 @@ publicRouter.get('/:runid', async function (req, res, next) {
       const authResult = auth.authViewRun(
         req.user,
         dbRun,
-        ACCESSLEVELS.NONE + 1
+        ACCESSLEVELS.NONE + 1,
+        dbRun.competition.preparation
       );
       if (authResult == 0) return res.status(401).send();
 

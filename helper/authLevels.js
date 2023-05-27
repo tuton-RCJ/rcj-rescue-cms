@@ -17,17 +17,17 @@ function authCompetition(user, competitionId, level) {
 }
 module.exports.authCompetition = authCompetition;
 
-function authViewRun(user, run, level) {
+function authViewRun(user, run, level, preparation = false) {
   let competitionId;
   if (run == null) {
     return 0;
   }
 
   if (user == null) {
-    if (run.sign.captain != '') {
+    if (run.sign.captain != '' || run.status == 6) {
+      if (preparation) return 0;
       return 2;
     }
-    if (run.status == 6) return 2;
     return 0;
   }
 
@@ -43,10 +43,10 @@ function authViewRun(user, run, level) {
   if (authCompetition(user, competitionId, level)) {
     return 1;
   }
-  if (run.sign.captain != '') {
+  if (run.sign.captain != '' || run.status == 6) {
+    if (preparation) return 0;
     return 2;
   }
-  if (run.status == 6) return 2;
   return 0;
 }
 module.exports.authViewRun = authViewRun;

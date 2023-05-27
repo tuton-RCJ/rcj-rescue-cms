@@ -11,7 +11,7 @@ const scoreSheetPDF2 = require('../../helper/scoreSheetPDFMaze2');
 const auth = require('../../helper/authLevels');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
-
+const { VICTIMS } = require('../../models/mazeMap');
 
 let socketIo;
 
@@ -67,21 +67,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   if (req.query.minimum && !normalized) {
     query.select('competition round team field status started startTime sign');
   } else if (req.query.timetable && !normalized) {
-    query.select('round team field startTime group');
-    query.populate([
-      {
-        path: 'team',
-        select: 'name league teamCode',
-      },
-      {
-        path: 'round',
-        select: 'name',
-      },
-      {
-        path: 'field',
-        select: 'name league',
-      },
-    ]);
+    query.select('competition round team field startTime group');
   } else {
     query.select(
       'competition round team field map score time status started comment startTime sign LoPs exitBonus foundVictims misidentification normalizationGroup'
@@ -91,7 +77,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name ranking',
+      select: 'name ranking preparation',
     },
     {
       path: 'round',
@@ -120,23 +106,24 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
       });
     } else if (dbRuns) {
       // Hide map and field from public
-      for (let i = 0; i < dbRuns.length; i++) {
-        if (!auth.authViewRun(req.user, dbRuns[i], ACCESSLEVELS.NONE + 1)) {
-          delete dbRuns[i].map;
-          delete dbRuns[i].field;
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
-        } else if (
-          !auth.authCompetition(
-            req.user,
-            dbRuns[i].competition,
-            ACCESSLEVELS.VIEW
-          )
-        ) {
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
+      dbRuns.map(run => {
+        switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {
+          case 0:
+            delete run.map;
+            delete run.field;
+            delete run.score;
+            delete run.time;
+            delete run.LoPs;
+            delete run.exitBonus;
+            delete run.foundVictims;
+            delete run.misidentification;
+          case 2:
+            delete run.comment;
+            delete run.sign;
         }
-      }
+
+        if (run.foundVictims) run.foundVictims = run.foundVictims.sort((a,b) => VICTIMS.indexOf(a.type) - VICTIMS.indexOf(b.type));
+      })
 
       // return normalized score
       if (normalized && auth.authCompetition(
@@ -312,7 +299,7 @@ publicRouter.get('/:runid', function (req, res, next) {
       'round',
       { path: 'team', select: 'name league teamCode' },
       'field',
-      { path: 'competition', select: 'name ranking' }
+      { path: 'competition', select: 'name ranking preparation' }
     ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
@@ -323,7 +310,7 @@ publicRouter.get('/:runid', function (req, res, next) {
     }
     // Hide map and field from public
     // Hide map and field from public
-    const authResult = auth.authViewRun(req.user, dbRun, ACCESSLEVELS.VIEW);
+    const authResult = auth.authViewRun(req.user, dbRun, ACCESSLEVELS.VIEW, dbRun.competition.preparation);
     if (authResult == 0) {
       return res.status(401).send({
         msg: 'You have no authority to access this api!!',
