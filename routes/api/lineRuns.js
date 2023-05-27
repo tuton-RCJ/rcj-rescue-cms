@@ -492,7 +492,7 @@ privateRouter.put('/:runid', function (req, res, next) {
         }
 
         if (run.status) {
-          if (dbRun.status > run.status) delete run.status;
+          if (dbRun.status > run.status && dbRun.status != 6) delete run.status;
         }
 
         const prevStatus = dbRun.status;
