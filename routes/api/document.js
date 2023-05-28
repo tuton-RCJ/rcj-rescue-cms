@@ -1587,7 +1587,7 @@ adminRouter.get('/templates/documentForm', function (req, res, next) {
 
     const d = [];
     for (const dirent of dirents) {
-      if (!dirent.isDirectory()) {
+      if (!dirent.isDirectory() && path.extname(dirent.name).toLowerCase() === '.json') {
         const tmp = {
           name: escape(path.basename(dirent.name, '.json')),
           path: escape(dirent.name),
@@ -1603,6 +1603,56 @@ adminRouter.get('/templates/documentForm/:fileName', function (req, res, next) {
   const { fileName } = req.params;
 
   const dir_path = `${__dirname}/../../templates/documentForm/${sanitize(fileName)}`;
+  fs.stat(dir_path, (err, stat) => {
+    // Handle file not found
+    if (err !== null && err.code === 'ENOENT') {
+      res.status(404).send({
+        msg: 'File not found',
+      });
+      return;
+    }
+
+    const stream = fs.createReadStream(dir_path)
+      stream.on('error', (error) => {
+          res.statusCode = 500
+          res.end('Cloud not make stream')
+      })
+      let mimeType = mime.getType(dir_path);
+      let head = {}
+      if(mimeType != null) {
+        head['Content-Type'] = mimeType;
+      }
+      res.writeHead(200, head);
+      stream.pipe(res);
+  });
+});
+
+adminRouter.get('/templates/reviewForm', function (req, res, next) {
+  const dir_path = `${__dirname}/../../templates/reviewForm/`;
+  fs.readdir(dir_path, { withFileTypes: true }, (err, dirents) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const d = [];
+    for (const dirent of dirents) {
+      if (!dirent.isDirectory() && path.extname(dirent.name).toLowerCase() === '.json') {
+        const tmp = {
+          name: escape(path.basename(dirent.name, '.json')),
+          path: escape(dirent.name),
+        };
+        d.push(tmp);
+      }
+    }
+    res.send(d);
+  });
+});
+
+adminRouter.get('/templates/reviewForm/:fileName', function (req, res, next) {
+  const { fileName } = req.params;
+
+  const dir_path = `${__dirname}/../../templates/reviewForm/${sanitize(fileName)}`;
   fs.stat(dir_path, (err, stat) => {
     // Handle file not found
     if (err !== null && err.code === 'ENOENT') {

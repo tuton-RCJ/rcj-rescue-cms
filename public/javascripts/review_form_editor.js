@@ -103,8 +103,6 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
     $http.get("/api/competitions/" + competitionId + "/documents/" + leagueId + "/review").then(function (response) {
         if(response.data.blocks) $scope.blocks = response.data.review;
         else $scope.blocks = []
-        if(response.data.notifications) $scope.notifications = response.data.notifications;
-        else $scope.notifications = []
         if(response.data.languages) $scope.languages = response.data.languages;
         else $scope.languages = []
         if($scope.languages == null || $scope.languages.length != availableLangs.length){
@@ -297,7 +295,18 @@ app.controller('FormEditorController', ['$scope', '$uibModal', '$log', '$http', 
         }
     }
 
+    $scope.selectedTemplate = null;
+    $http.get("/api/document/templates/reviewForm").then(function (response) {
+        $scope.templates = response.data
+    })
 
+    $scope.changeTemplate = function(){
+        if(!$scope.selectedTemplate) return;
+        $http.get(`/api/document/templates/reviewForm/${$scope.selectedTemplate}`).then(function (response) {
+            $scope.blocks = response.data.review;
+            $scope.languages = response.data.languages;
+        })
+    }
 
     $scope.export = function () {
         var data = {
