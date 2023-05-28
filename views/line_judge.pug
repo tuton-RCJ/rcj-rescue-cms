@@ -395,5 +395,5 @@ html(ng-app="ddApp")
                     button.btn.btn-danger(type='button', ng-click='handover()', ng-disabled='startedTime', ng-show='networkError') {{'line.judge.handover' | translate}}
       .row(style='margin:20 0 0 0;')
         .col-md12
-          button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="getParam('return')? go(getParam('return')):go('/line/' + competition._id)")
+          button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="getParam('return')? go(getParam('return')):go('/line/' + competition._id + '/' + league)")
             i.fas.fa-undo(aria-hidden='true')  {{'common.back' | translate}}

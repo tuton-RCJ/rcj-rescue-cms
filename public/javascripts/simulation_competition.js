@@ -1,6 +1,6 @@
-var app = angular.module("MazeCompetition", ['ngTouch','pascalprecht.translate', 'ngCookies','ngSanitize']);
+var app = angular.module("SimulationCompetition", ['ngTouch','pascalprecht.translate', 'ngCookies','ngSanitize']);
 var socket;
-app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
+app.controller("SimulationCompetitionController", ['$scope', '$http', '$translate', function ($scope, $http, $translate) {
         $scope.competitionId = competitionId
         $scope.isJudge = isJudge
         if (isJudge == 0) $scope.show_ended = true
@@ -30,7 +30,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
         $scope.teamName = ""
 
         
-        $http.get(`/api/runs/maze/competition/${competitionId}?populate=true&minimum=true&ended=false`).then(function (response) {
+        $http.get(`/api/runs/simulation/competition/${competitionId}?populate=true&minimum=true&ended=false`).then(function (response) {
             $scope.runs = response.data
         })
 
@@ -51,7 +51,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
             transports: ['websocket']
         });
         if (typeof competitionId !== 'undefined') {
-            socket.emit('subscribe', 'runs/maze/' + competitionId + '/status');
+            socket.emit('subscribe', 'runs/simulation/' + competitionId + '/status');
 
             socket.on('StatusChanged', function () {
                 $scope.update_list();
@@ -80,7 +80,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
 
         $scope.update_list = function () {
             
-            $http.get(`/api/runs/maze/competition/${competitionId}?populate=true&minimum=true&ended=${$scope.show_ended}`).then(function (response) {
+            $http.get(`/api/runs/simulation/competition/${competitionId}?populate=true&minimum=true&ended=${$scope.show_ended}`).then(function (response) {
                 var runs = response.data.filter(r => r.team.league == league);
 
                 for (let run of runs) {
@@ -168,12 +168,12 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
 
 
         $scope.go = function (path) {
-            socket.emit('unsubscribe', 'runs/maze/' + competitionId + '/status');
+            socket.emit('unsubscribe', 'runs/simulation/' + competitionId + '/status');
             window.location = path
         }
 
         $scope.go_judge = function (path, team_name) {
-            socket.emit('unsubscribe', 'runs/maze/' + competitionId + '/status');
+            socket.emit('unsubscribe', 'runs/simulation/' + competitionId + '/status');
             swal({
                 title: team_name,
                 text: val_go_judge,
@@ -220,5 +220,5 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
 
 
 $(window).on('beforeunload', function () {
-    socket.emit('unsubscribe', 'runs/maze/' + competitionId + '/status');
+    socket.emit('unsubscribe', 'runs/simulation/' + competitionId + '/status');
 });

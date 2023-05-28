@@ -591,7 +591,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }).then((result) => {
             if (result.value) {
                 if($scope.getParam('return')) $scope.go($scope.getParam('return'));
-                else $scope.go("/line/" + $scope.competition_id);
+                else $scope.go("/line/" + $scope.competition_id + "/" + $scope.league);
             }
         })
         console.log("Success!!");

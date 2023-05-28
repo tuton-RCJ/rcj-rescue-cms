@@ -17,13 +17,13 @@ append scripts
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     a.breadcrumb-item(ng-click='go("/home/"+ competitionId)') {{competition.name}}
-    a.breadcrumb-item(ng-click="go('/line/'+ competitionId)") Line
-    span.breadcrumb-item.active {{league.name}} Score
+    a.breadcrumb-item(ng-click="go('/line/'+ competitionId + '/' + league.id)") {{league.name}}
+    span.breadcrumb-item.active Score
 
 block content
   .row
   .col-md12
-    button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="go('/line/' + competitionId)")
+    button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="go('/line/' + competitionId + '/' + league.id)")
       i.fas.fa-undo(aria-hidden='true') {{'common.back' | translate }}
   br
   .alert.alert-success(role='alert' ng-if="competition.message")

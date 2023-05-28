@@ -32,7 +32,7 @@ html(ng-app="ddApp")
       .container-fluid.nav-cont
         .row
           .col-md12
-            button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="getParam('return')? go(getParam('return')):go('/maze/' + competition_id)")
+            button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="getParam('return')? go(getParam('return')):go('/maze/' + competition_id + '/' + league)")
               i.fas.fa-undo(aria-hidden='true')  {{'common.back' | translate}}
         .row
           .col-md-12

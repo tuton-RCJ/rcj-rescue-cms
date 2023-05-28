@@ -39,8 +39,8 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
         }, {})
     })
 
-    $http.get("/api/teams/leagues/line/" + competitionId).then(function (response) {
-        $scope.leagues = response.data;
+    $http.get("/api/competitions/leagues/" + league).then(function (response) {
+        $scope.league = response.data
     })
     
     // launch socket.io
@@ -74,7 +74,7 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
 
     $scope.update_list = function () {
         $http.get(`/api/runs/line/competition/${competitionId}?populate=true&minimum=true&ended=${$scope.show_ended}`).then(function (response) {
-            var runs = response.data
+            var runs = response.data.filter(r => r.team.league == league);
             
             for (let run of runs) {
                 if (!run.team) {
@@ -84,7 +84,7 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
                 }
             }
             
-            $scope.runs = runs
+            $scope.runs = runs;
 
             // TODO: This should be done with Set, needs polyfill?
             if(!$scope.rounds && !$scope.fields){

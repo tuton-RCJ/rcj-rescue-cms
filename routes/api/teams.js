@@ -51,26 +51,8 @@ publicRouter.get('/leagues/:league/:competitionId', async function (req, res) {
     },
   ]);
 
-  const ret = [];
-  for (const i in result) {
-    let name;
-    let type;
-    for (const j in LEAGUES_JSON) {
-      if (LEAGUES_JSON[j].id == result[i]._id) {
-        type = LEAGUES_JSON[j].type;
-        name = LEAGUES_JSON[j].name;
-        break;
-      }
-    }
-    if (type == league || league == 'all') {
-      const tmp = {
-        id: result[i]._id,
-        name,
-        type,
-      };
-      ret.push(tmp);
-    }
-  }
+  let teamLeagues = result.map(r => r._id);
+  let ret = LEAGUES_JSON.filter(l => teamLeagues.includes(l.id) && (l.type == league || league == 'all'));
   res.send(ret);
 });
 

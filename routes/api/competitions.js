@@ -20,10 +20,7 @@ const mazeRunsApi = require('./mazeRuns');
 const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
 
-const { LINE_LEAGUES } = competitiondb;
-const { MAZE_LEAGUES } = competitiondb;
-const { LEAGUES } = competitiondb;
-const { LEAGUES_JSON } = competitiondb;
+const { LEAGUES, LEAGUES_JSON, LINE_LEAGUES, MAZE_LEAGUES, SIM_LEAGUES } = competitiondb;
 
 const { ACCESSLEVELS } = require('../../models/user');
 
@@ -566,6 +563,8 @@ privateRouter.get('/:competition/:league/teams', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;
@@ -701,6 +700,8 @@ publicRouter.get('/:competition/:league/fields', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;
@@ -824,6 +825,8 @@ publicRouter.get('/:competition/:league/rounds', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;

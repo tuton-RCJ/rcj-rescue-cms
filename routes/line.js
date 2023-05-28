@@ -11,33 +11,36 @@ const ruleDetector = require('../helper/ruleDetector');
 const { ACCESSLEVELS } = require('../models/user');
 const competitiondb = require('../models/competition');
 
-const { LEAGUES } = competitiondb;
+const { LINE_LEAGUES } = competitiondb;
 
 /* GET home page. */
 
-publicRouter.get('/:competitionid', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.JUDGE))
-    res.render('line_competition', { id, user: req.user, judge: 1 });
-  else res.render('line_competition', { id, user: req.user, judge: 0 });
-});
-
-publicRouter.get('/:competitionid/score/:league', function (req, res, next) {
+publicRouter.get('/:competitionid/:league', function (req, res, next) {
   const id = req.params.competitionid;
   const { league } = req.params;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  if (
-    LEAGUES.filter(function (elm) {
-      return elm == league;
-    }).length == 0
-  ) {
+
+  if (!LINE_LEAGUES.includes(league)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.JUDGE))
+    res.render('line_competition', { id, user: req.user, judge: 1 , league});
+  else res.render('line_competition', { id, user: req.user, judge: 0 , league});
+});
+
+publicRouter.get('/:competitionid/:league/score', function (req, res, next) {
+  const id = req.params.competitionid;
+  const { league } = req.params;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (!LINE_LEAGUES.includes(league)) {
     return next();
   }
 

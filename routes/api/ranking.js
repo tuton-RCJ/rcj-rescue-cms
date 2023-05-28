@@ -7,6 +7,7 @@ const { ObjectId } = require('mongoose').Types;
 const logger = require('../../config/logger').mainLogger;
 const { lineRun } = require('../../models/lineRun');
 const { mazeRun } = require('../../models/mazeRun');
+const { simRun } = require('../../models/simRun');
 const auth = require('../../helper/authLevels');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
@@ -299,6 +300,140 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the exitBonus
     teamRuns[e].gameSum.exitBonus = sum(bestRuns.map(run => run.exitBonus ? 1:0));
+
+    // Sort by startTime
+    teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);
+  })
+
+  let result = {
+    mode: rankingMode
+  };
+
+  if (competitiondb.DOCUMENT_RANKING.includes(rankingMode)) {
+    let documentResult = await getDocumentScore(competition, league);
+    let documentScore = documentResult.result;
+    result.documentBlockTitles = documentResult.blockTitles;
+    for (let d of documentScore) {
+      if (teamRuns[d._id]) {
+        teamRuns[d._id].document = {
+          details: d.details,
+          score: d.score
+        };
+      }
+    }
+  }
+
+  let ranking = Object.values(teamRuns);
+  ranking.map(r => {
+    r.team = r.games[0].team;
+    r.games.map(g => delete g.team)
+  });
+
+  switch(rankingMode) {
+    case competitiondb.SUM_OF_BEST_N_GAMES:
+      ranking.map(r => r.finalScore = r.gameSum.score);
+      break;
+    case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES:
+      ranking.map(r => r.finalScore = r.gameSum.normalizedScoreMean);
+      break;
+    case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT:
+      ranking.map(r => r.finalScore = 0.8* r.gameSum.normalizedScoreMean + 0.2 * r.document.score);
+  }
+
+  ranking.sort(sortFinalScore);
+  result.ranking = ranking;
+
+  res.status(200).send(result);
+});
+
+// For simulation
+publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
+  const competition = req.params.competitionId;
+  const league = req.params.leagueId;
+
+  if (!ObjectId.isValid(competition)) {
+    return next();
+  }
+  if (!competitiondb.SIM_LEAGUES.includes(league)) {
+    return next();
+  }
+
+  let competitionDb = await competitiondb.competition.findById(competition).lean().exec();
+  let rankingSettings = competitionDb.ranking.find(r => r.league == league);
+  if (!rankingSettings) {
+    rankingSettings = {
+      mode: competitiondb.SUM_OF_BEST_N_GAMES,
+      disclose: false,
+      num: 20
+    }
+  }
+  if (!rankingSettings.disclose && !auth.authCompetition(
+    req.user,
+    competition,
+    ACCESSLEVELS.ADMIN
+  )) {
+    return res.status(401).send();
+  }
+  let sumGameNumber = rankingSettings.num;
+  let rankingMode = rankingSettings.mode;
+
+  let allRunsDb = await simRun.find({
+    competition: competition
+  }).select("team score normalizationGroup time startTime")
+  .populate([
+    {
+      path: 'team',
+      select: 'name teamCode league'
+    }
+  ]).lean().exec();
+
+  let allRunsLeague = allRunsDb.filter(r => r.team.league == league);
+
+  if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+    let normGroups = allRunsLeague.map(r => r.normalizationGroup);
+    normGroups = [...new Set(normGroups)];
+    let maxScore = {};
+    for (let n of normGroups) {
+      maxScore[n] = Math.max(...allRunsLeague.filter(run => run.normalizationGroup == n).map(run => run.score))
+    }
+    allRunsLeague.map(run => {
+      if (maxScore[run.normalizationGroup] == 0) run.normalizedScore = 0;
+      else run.normalizedScore = run.score / maxScore[run.normalizationGroup];
+    })
+  }
+
+  let teamRuns = {};
+  for (let run of allRunsLeague) {
+    if (teamRuns[run.team._id] == null) teamRuns[run.team._id] = { games: [] };
+    teamRuns[run.team._id].games.push(run);
+  }
+
+  Object.keys(teamRuns).map(e => {
+    teamRuns[e].gameSum = {};
+    let bestRuns;
+    if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+      teamRuns[e].games.sort(sortRunsNormalized)
+      bestRuns = teamRuns[e].games.slice(0, sumGameNumber);
+      teamRuns[e].gameSum.normalizedScore = sum(bestRuns.map(run => run.normalizedScore));
+      teamRuns[e].gameSum.normalizedScoreMean = teamRuns[e].gameSum.normalizedScore / bestRuns.length;
+    } else {
+      teamRuns[e].games.sort(sortRuns)
+      bestRuns = teamRuns[e].games.slice(0, sumGameNumber);
+      teamRuns[e].gameSum.score = sum(bestRuns.map(run => run.score));
+    }
+
+    // Mark used or not
+    teamRuns[e].games.map((run, index) => {
+      if (index < sumGameNumber) run.used = true;
+      else run.used = false;
+    })
+
+    // Sum of the time
+    teamRuns[e].gameSum.time = {};
+    teamRuns[e].gameSum.time.minutes = sum(bestRuns.map(run => run.time.minutes));
+    teamRuns[e].gameSum.time.seconds = sum(bestRuns.map(run => run.time.seconds));
+    teamRuns[e].gameSum.time.minutes += Math.floor(teamRuns[e].gameSum.time.seconds / 60);
+    teamRuns[e].gameSum.time.seconds %= 60;
 
     // Sort by startTime
     teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);

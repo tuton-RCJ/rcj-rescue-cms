@@ -4,5 +4,5 @@
   {"type": "line", "id": "LineNL", "name": "Rescue Line Entry"},
   {"type": "maze", "id": "Maze",   "name": "Rescue Maze"},
   {"type": "maze", "id": "MazeNL",   "name": "Rescue Maze Entry"},
-  {"type": "other", "id": "Erebus",   "name": "Erebus"}
+  {"type": "simulation", "id": "Erebus",   "name": "Rescue Simulation (Erebus)"}
 ]

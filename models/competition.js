@@ -13,26 +13,39 @@ const LEAGUES_JSON = require('../leagues')
 
 let LINE_LEAGUES = [];
 let MAZE_LEAGUES = [];
+let SIM_LEAGUES = [];
 let OTHER_LEAGUES = [];
 
-for(let i in LEAGUES_JSON){
-  if(LEAGUES_JSON[i].type == "line") LINE_LEAGUES.push(LEAGUES_JSON[i].id);
-  if(LEAGUES_JSON[i].type == "maze") MAZE_LEAGUES.push(LEAGUES_JSON[i].id);
-  if(LEAGUES_JSON[i].type == "other") OTHER_LEAGUES.push(LEAGUES_JSON[i].id);
-}
+LEAGUES_JSON.map(l => {
+  switch(l.type) {
+    case 'line':
+      LINE_LEAGUES.push(l.id);
+      break;
+    case 'maze':
+      MAZE_LEAGUES.push(l.id);
+      break;
+    case 'simulation':
+      SIM_LEAGUES.push(l.id);
+      break;
+    default:
+      OTHER_LEAGUES.push(l.id);
+  }
+});
 
 if(cluster.isMaster){
   logger.debug("Available line leagues : " + LINE_LEAGUES);
   logger.debug("Available maze leagues : " + MAZE_LEAGUES);
+  logger.debug("Available simulation leagues : " + SIM_LEAGUES);
   logger.debug("Available other leagues : " + OTHER_LEAGUES);
 }
 
 const SUPPORT_RULES = ["2023"];
 
-const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, OTHER_LEAGUES);
+const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, SIM_LEAGUES, OTHER_LEAGUES);
 
 module.exports.LINE_LEAGUES = LINE_LEAGUES;
 module.exports.MAZE_LEAGUES = MAZE_LEAGUES;
+module.exports.SIM_LEAGUES = SIM_LEAGUES;
 module.exports.LEAGUES = LEAGUES;
 module.exports.LEAGUES_JSON = LEAGUES_JSON;
 

@@ -2,53 +2,6 @@
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 var marker = {};
 var socket;
-let victimConstant = {};
-let victimTypes = [];
-const victimConstantWL = {
-    "H": {
-        "maxKitNum": 3,
-        "linearPoint": 10,
-        "floatingPoint": 30
-    },
-    "S": {
-        "maxKitNum": 2,
-        "linearPoint": 10,
-        "floatingPoint": 30
-    },
-    "U": {
-        "maxKitNum": 0,
-        "linearPoint": 10,
-        "floatingPoint": 30
-    },
-    "Red": {
-        "maxKitNum": 1,
-        "linearPoint": 5,
-        "floatingPoint": 15
-    },
-    "Yellow": {
-        "maxKitNum": 1,
-        "linearPoint": 5,
-        "floatingPoint": 15
-    },
-    "Green": {
-        "maxKitNum": 0,
-        "linearPoint": 5,
-        "floatingPoint": 15
-    }
-};
-
-const victimConstantNL = {
-    "Red": {
-        "maxKitNum": 1,
-        "linearPoint": 15,
-        "floatingPoint": 30
-    },
-    "Green": {
-        "maxKitNum": 1,
-        "linearPoint": 15,
-        "floatingPoint": 30
-    }
-};
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$translate', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $translate, $cookies) {
@@ -84,22 +37,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         // = translationId;
     });
 
-    $scope.countWords = ["Bottom", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Ninth"];
-    $scope.z = 0;
-
-    $scope.MisIdent = 0;
-
     $scope.enableSign = [false,false,false];
     $scope.signData = [null,null,null];
-
-    $scope.cells = {};
-    $scope.tiles = {};
-
-    //$cookies.remove('sRotate')
-    if($cookies.get('sRotate')){
-        $scope.sRotate = Number($cookies.get('sRotate'));
-    }
-    else $scope.sRotate = 0;
 
     if (typeof runId !== 'undefined') {
         $scope.runId = runId;
@@ -114,25 +53,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         if (typeof runId !== 'undefined') {
             socket.emit('subscribe', 'runs/' + runId);
             socket.on('data', function (data) {
-                console.log(data);
-                $scope.exitBonus = data.exitBonus;
                 $scope.score = data.score;
-                $scope.normalizedScore = data.normalizedScore;
-                $scope.LoPs = data.LoPs;
-                $scope.foundVictims = sum(data.foundVictims.map(v => v.count));
-                $scope.distKits = data.distKits;
-                $scope.MisIdent = data.misidentification;
-
                 // Verified time by timekeeper
                 $scope.minutes = data.time.minutes;
                 $scope.seconds = data.time.seconds;
 
-                // Scoring elements of the tiles
-                for (var i = 0; i < data.tiles.length; i++) {
-                    $scope.tiles[data.tiles[i].x + ',' +
-                        data.tiles[i].y + ',' +
-                        data.tiles[i].z] = data.tiles[i];
-                }
                 $scope.$apply();
                 console.log("Updated view from socket.io");
             });
@@ -141,21 +66,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     })();
 
     function loadNewRun() {
-        $http.get("/api/runs/maze/" + runId +
+        $http.get("/api/runs/simulation/" + runId +
             "?normalized=true").then(function (response) {
-            $scope.exitBonus = response.data.exitBonus;
             $scope.field = response.data.field.name;
             $scope.round = response.data.round.name;
             $scope.score = response.data.score;
-            $scope.normalizedScore = response.data.normalizedScore;
             $scope.team = response.data.team.name;
             $scope.league = response.data.team.league;
             $scope.competition = response.data.competition.name;
             $scope.competition_id = response.data.competition._id;
-            $scope.LoPs = response.data.LoPs;
-            $scope.foundVictims = sum(response.data.foundVictims.map(v => v.count));
-            $scope.distKits = response.data.distKits;
-            $scope.MisIdent = response.data.misidentification;
 
             // Verified time by timekeeper
             $scope.minutes = response.data.time.minutes;
@@ -168,44 +87,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             }
 
             $scope.comment = response.data.comment;
-
-            // Scoring elements of the tiles
-            for (let i = 0; i < response.data.tiles.length; i++) {
-                $scope.tiles[response.data.tiles[i].x + ',' +
-                    response.data.tiles[i].y + ',' +
-                    response.data.tiles[i].z] = response.data.tiles[i];
-            }
-
-            // Get the map
-            $http.get("/api/maps/maze/" + response.data.map +
-                "?populate=true").then(function (response) {
-                console.log(response.data);
-                $scope.startTile = response.data.startTile;
-                $scope.height = response.data.height;
-
-                $scope.width = response.data.width;
-                $scope.length = response.data.length;
-
-                $scope.leagueType = response.data.leagueType;
-                if ($scope.leagueType == "entry") {
-                    victimConstant = victimConstantNL;
-                } else {
-                    victimConstant = victimConstantWL;
-                }
-
-                for (let i = 0; i < response.data.cells.length; i++) {
-                    $scope.cells[response.data.cells[i].x + ',' +
-                        response.data.cells[i].y + ',' +
-                        response.data.cells[i].z] = response.data.cells[i];
-                }
-                width = response.data.width;
-                length = response.data.length;
-                $timeout($scope.tile_size, 0);
-
-            }, function (response) {
-                console.log("Error: " + response.statusText);
-            });
-
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
@@ -213,41 +94,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             }
         });
     }
-
-    $scope.reliability = function(){
-        if ($scope.leagueType == "entry") {
-            return Math.max(($scope.foundVictims * 10) - ($scope.LoPs * 5),0);
-        } else {
-            return Math.max(($scope.foundVictims + $scope.distKits - $scope.LoPs)*10,0);
-        }
-    }
-
-    $scope.reliabilityLoPs = function(){
-        if ($scope.leagueType == "entry") {
-            return Math.min($scope.foundVictims * 10, $scope.LoPs * 5);
-        } else {
-            return Math.min(($scope.foundVictims + $scope.distKits)*10, $scope.LoPs*10);
-        }
-    }
-
-    $scope.changeFloor = function (z){
-        playSound(sClick);
-        $scope.z = z;
-        $timeout($scope.tile_size, 100);
-    }
-
-    $scope.tileRot = function (r){
-        playSound(sClick);
-        $scope.sRotate += r;
-        if($scope.sRotate >= 360)$scope.sRotate -= 360;
-        else if($scope.sRotate < 0) $scope.sRotate+= 360;
-        $timeout($scope.tile_size, 0);
-
-        $cookies.put('sRotate', $scope.sRotate, {
-          path: '/'
-        });
-    }
-
 
     $scope.range = function (n) {
         arr = [];
@@ -261,262 +107,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.isUndefined = function (thing) {
         return (typeof thing === "undefined");
     }
-    
-    $scope.allItemScore = function () {
-        let score = 0;
-        for(let x = 1; x <= width * 2;  x += 2) {
-            for(let y = 1; y <= length * 2; y += 2) {
-                score += $scope.tilePoint(x,y,0, true);
-            }
-        }
-        return score;
-    }
-
-
-    $scope.tileStatus = function (x, y, z, isTile) {
-        // If this is a non-existent tile
-        var cell = $scope.cells[x + ',' + y + ',' + z];
-        if (!cell)
-            return;
-        if (!isTile)
-            return;
-
-        if (!$scope.tiles[x + ',' + y + ',' + z]) {
-            $scope.tiles[x + ',' + y + ',' + z] = {
-                scoredItems: {
-                    speedbump: false,
-                    checkpoint: false,
-                    ramp: false,
-                    steps:  false,
-                    victims: {
-                        top: false,
-                        right: false,
-                        left: false,
-                        bottom: false,
-                        floor: false
-                    },
-                    rescueKits: {
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        left: 0,
-                        floor: 0
-                    }
-                }
-            };
-        }
-        var tile = $scope.tiles[x + ',' + y + ',' + z];
-
-        // Current "score" for this tile
-        var current = 0;
-        // Max "score" for this tile. Score is added 1 for every passed mission
-        var possible = 0;
-
-
-        if (cell.tile.speedbump) {
-            possible++;
-            if (tile.scoredItems.speedbump) {
-                current++;
-            }
-        }
-        if (cell.tile.checkpoint) {
-            possible++;
-            if (tile.scoredItems.checkpoint) {
-                current++;
-            }
-        }
-        if (cell.tile.ramp) {
-            possible+=1;
-            if (tile.scoredItems.ramp) {
-                current++;
-            }
-        }
-        if (cell.tile.steps) {
-            possible++;
-            if (tile.scoredItems.steps) {
-                current++;
-            }
-        }
-
-        if(cell.tile.victims.top != "None"){
-            possible++;
-            current += tile.scoredItems.victims.top;
-            possible += victimConstant[cell.tile.victims.top].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.top,victimConstant[cell.tile.victims.top].maxKitNum);
-        }
-        if(cell.tile.victims.left != "None"){
-            possible++;
-            current += tile.scoredItems.victims.left;
-            possible += victimConstant[cell.tile.victims.left].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.left,victimConstant[cell.tile.victims.left].maxKitNum);
-        }
-        if(cell.tile.victims.right != "None"){
-            possible++;
-            current += tile.scoredItems.victims.right;
-            possible += victimConstant[cell.tile.victims.right].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.right,victimConstant[cell.tile.victims.right].maxKitNum);
-        }
-        if(cell.tile.victims.bottom != "None"){
-            possible++;
-            current += tile.scoredItems.victims.bottom;
-            possible += victimConstant[cell.tile.victims.bottom].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.bottom,victimConstant[cell.tile.victims.bottom].maxKitNum);
-        }
-        if(cell.tile.victims.floor != "None"){
-            possible++;
-            current += tile.scoredItems.victims.floor;
-            possible += victimConstant[cell.tile.victims.floor].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.floor,victimConstant[cell.tile.victims.floor].maxKitNum);
-        }
-
-        if (tile.processing)
-            return "processing";
-        else if (current > 0 && current == possible)
-            return "done";
-        else if (current > 0)
-            return "halfdone";
-        else if (possible > 0)
-            return "undone";
-        else
-            return "";
-    }
-
-
-    $scope.cellClick = function (x, y, z, isWall, isTile) {
-        var cell = $scope.cells[x + ',' + y + ',' + z];
-        if (!cell)
-            return;
-        if (!isTile)
-            return;
-        playSound(sClick);
-
-        var tile = $scope.tiles[x + ',' + y + ',' + z];
-
-        var hasVictims = (cell.tile.victims.top != "None") ||
-          (cell.tile.victims.right != "None") ||
-          (cell.tile.victims.bottom != "None") ||
-          (cell.tile.victims.left != "None") ||
-          (cell.tile.victims.floor != "None");
-        // Total number of scorable things on this tile
-        var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + cell.tile.ramp + hasVictims;
-
-        if (total > 1 || hasVictims) {
-            // Open modal for multi-select
-            $scope.open(x, y, z);
-        }
-
-    };
-
-    $scope.tilePoint = function (x, y, z, isTile) {
-        // If this is a non-existent tile
-        var cell = $scope.cells[x + ',' + y + ',' + z];
-
-        if (!cell)
-            return 0;
-        if (!isTile)
-            return 0;
-
-        if (!$scope.tiles[x + ',' + y + ',' + z]) {
-            $scope.tiles[x + ',' + y + ',' + z] = {
-                scoredItems: {
-                    speedbump: false,
-                    checkpoint: false,
-                    ramp: false,
-                    victims: {
-                        top: false,
-                        right: false,
-                        left: false,
-                        bottom: false,
-                        floor: false
-                    },
-                    rescueKits: {
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        left: 0,
-                        floor: 0
-                    }
-                }
-            };
-        }
-        var tile = $scope.tiles[x + ',' + y + ',' + z];
-
-        // Current "score" for this tile
-        var current = 0;
-
-
-        if (cell.tile.speedbump) {
-            if (tile.scoredItems.speedbump) {
-                current+=5;
-            }
-        }
-        if (cell.tile.checkpoint) {
-            if (tile.scoredItems.checkpoint) {
-                current+=10;
-            }
-        }
-        if (cell.tile.ramp) {
-            if (tile.scoredItems.ramp) {
-                current+=10;
-            }
-        }
-        if (cell.tile.steps) {
-            if (tile.scoredItems.steps) {
-                current+=5;
-            }
-        }
-
-        let wallPointType = cell.isLinear ? 'linearPoint' : 'floatingPoint';
-
-        if (cell.tile.victims.top in victimConstant) {
-            current += victimConstant[cell.tile.victims.top][wallPointType] * tile.scoredItems.victims.top;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
-        }
-        if (cell.tile.victims.right in victimConstant) {
-            current += victimConstant[cell.tile.victims.right][wallPointType] * tile.scoredItems.victims.right;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
-        }
-        if (cell.tile.victims.left in victimConstant) {
-            current += victimConstant[cell.tile.victims.left][wallPointType] * tile.scoredItems.victims.left;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
-        }
-        if (cell.tile.victims.bottom in victimConstant) {
-            current += victimConstant[cell.tile.victims.bottom][wallPointType] * tile.scoredItems.victims.bottom;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
-        }
-        if (cell.tile.victims.floor in victimConstant) {
-            current += victimConstant[cell.tile.victims.floor][wallPointType] * tile.scoredItems.victims.floor;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.floor, victimConstant[cell.tile.victims.floor].maxKitNum);
-        }
-
-        return current;
-    };
-
-
-    $scope.open = function (x, y, z) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            templateUrl: '/templates/maze_view_modal.html',
-            controller: 'ModalInstanceCtrl',
-            size: 'lm',
-            resolve: {
-                cell: function () {
-                    return $scope.cells[x + ',' + y + ',' + z];
-                },
-                tile: function () {
-                    return $scope.tiles[x + ',' + y + ',' + z];
-                },
-                sRotate: function (){
-                    return $scope.sRotate;
-                },
-                leagueType: function () {
-                    return $scope.leagueType;
-                }
-            }
-        }).closed.then(function (result) {
-            console.log("Closed modal");
-        });
-    };
 
     $scope.getParam = function (key) {
         var str = location.search.split("?");
@@ -551,7 +141,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }).then((result) => {
             if (result.value) {
                 if($scope.getParam('return')) $scope.go($scope.getParam('return'));
-                else $scope.go("/maze/" + $scope.competition_id + "/" + $scope.league);
+                else $scope.go("/simulation/" + $scope.competition_id + "/" + $scope.league);
             }
         })
         console.log("Success!!");
@@ -609,7 +199,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.send_sign = function () {
         playSound(sClick);
-        var sign_empty = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj48c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMCIgaGVpZ2h0PSIwIj48L3N2Zz4="
         var run = {}
         run.comment = $scope.comment;
         run.sign = {}
@@ -649,9 +238,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             confirmButtonColor: "#ec6c62"
         }).then((result) => {
             if (result.value) {
-                console.log("STATUS UPDATED(4)")
                 run.status = 4;
-                $http.put("/api/runs/maze/" + runId, run).then(function (response) {
+                $http.put("/api/runs/simulation/" + runId, run).then(function (response) {
                     setTimeout($scope.success_message, 500);
                 }, function (response) {
                     playSound(sError);
