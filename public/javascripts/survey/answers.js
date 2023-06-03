@@ -83,9 +83,13 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
         return(data[target]);
     }
 
-    $scope.getAnswer = function(answers, question){
-        let answer = answers.filter(a => a.questionId == question.questionId)
+    $scope.getAnswer = function(ans, question){
+        let answer = ans.answer.filter(a => a.questionId == question.questionId)
         if(answer.length == 1){
+            if (question.type == 'file') {
+                console.log(ans)
+                return `<a href="/api/survey/answer/${ans.team._id}/${ans.team.document.token}/${survId}/file/${question.questionId}" >${answer[0].answer}</a>`;
+            }
             return answer[0].answer;
         }
         return "";

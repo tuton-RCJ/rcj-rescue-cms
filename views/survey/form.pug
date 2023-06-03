@@ -14,6 +14,7 @@ append scripts
   script(src="/javascripts/survey/form.js")
   script(src='/components/quill/index.js')
   script(src='/components/ngQuill/src/ng-quill.js')
+  script(src="/components/ng-file-upload/ng-file-upload.min.js")
 
 append css
     style.
@@ -86,7 +87,29 @@ block content
                     else
                         .btn-group
                             button.btn.btn-outline-primary(type='button', ng-repeat='ans in rangeS(question.scale.least, question.scale.most)', ng-class='{active: answers[question.questionId] == ans}')  {{ans}}
-
+                div(ng-if="question.type=='file'")
+                    strong {{"document.form.max20" | translate}}
+                    .row(ng-if="answers[question.questionId]", style="width:100%;")
+                        .col-12
+                            strong(style="color:#e74c3c;") {{"document.form.overwrite" | translate}}
+                            br
+                            div(style="text-align:center;margin:10px 0px;")
+                                a.btn.btn-primary(type='file' ng-href="/api/survey/answer/{{team._id}}/{{token}}/{{survey._id}}/file/{{question.questionId}}")
+                                    i.fas.fa-file-archive &nbsp;
+                                    | {{"document.form.uploaded" | translate}}
+                    if editable
+                        .d-sm-flex.flex-row
+                            div
+                                button.btn.btn-warning(type='file' ngf-select='uploadFiles(question, $file, $invalidFiles)' ngf-max-size='20MB')
+                                    i.far.fa-folder-open
+                                    | {{"document.form.selectFile" | translate}}
+                            div(style="color:#e74c3c;margin-left:10px;", ng-if="question.errFile.$error")
+                                span ERROR: {{question.errFile.$error}}
+                            .flex-fill(style="margin:10px 0px 0px 10px;", ng-show="question.f.progress > 0")
+                                .progress
+                                    .progress-bar(role='progressbar' style='width: {{question.f.progress}}%;' aria-valuenow='{{question.f.progress}}' aria-valuemin='0' aria-valuemax='100') {{question.f.progress}}%
+                            div(style="color:#e74c3c;margin-top:10px;", ng-if="question.errorMsg")
+                                span {{question.errorMsg}}
 
                 hr(ng-if="!$last")
 

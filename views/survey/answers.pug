@@ -42,7 +42,7 @@ block content
               tr(ng-repeat="ans in answers | orderBy: ['team.teamCode','team.name']")
                 td(ng-bind="ans.team.teamCode")
                 td(ng-bind="ans.team.name")
-                td(ng-repeat="question in survey.questions" ng-bind-html="getAnswer(ans.answer, question)")
+                td(ng-repeat="question in survey.questions" ng-bind-html="getAnswer(ans, question)")
                 td
                   button.btn.btn-primary.btn-sm(type='button', ng-click="edit(ans)", style="margin:0 5px;")
                     i.fas.fa-edit

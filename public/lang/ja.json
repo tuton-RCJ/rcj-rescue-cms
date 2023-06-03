@@ -1010,6 +1010,7 @@
             "video": "動画",
             "pdf": "PDFファイル",
             "archive": "圧縮ファイル",
+            "file": "ファイルアップロード",
             "requiredOrNot": "項目種別",
             "required": "必須",
             "optional": "任意",

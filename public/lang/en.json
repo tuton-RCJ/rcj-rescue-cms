@@ -1011,6 +1011,7 @@
             "picture": "Picture",
             "video": "Video",
             "pdf": "PDF file",
+            "file": "Upload file",
             "archive": "Compressed file",
             "requiredOrNot": "Item type",
             "required": "Required",

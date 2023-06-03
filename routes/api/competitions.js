@@ -958,6 +958,12 @@ adminRouter.delete('/:competitionid', function (req, res, next) {
           }
         });
 
+        fs.rmdir(`${__dirname}/../../survey/${id}`, { recursive: true }, (err) => {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
+
         fs.rmdir(`${__dirname}/../../backup/${id}`, { recursive: true }, (err) => {
           if (err) {
             logger.error(err.message);

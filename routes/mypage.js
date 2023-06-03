@@ -202,13 +202,13 @@ publicRouter.get('/:teamId/:token/survey/:survId', function (req, res, next) {
                   return renderSurveyForm(req, res, team, token, survey._id, true);  
                 }
                 surveyDb.surveyAnswer
-                .find({
+                .findOne({
                   survey: survId,
                   team: team._id,
                   competition: team.competition
                 })
                 .exec(function (err, ans) {
-                  if (ans.length == 0) {
+                  if (ans == undefined || ans.fixed == false) {
                     return renderSurveyForm(req, res, team, token, survey._id, true);
                   }else{
                     return renderSurveyForm(req, res, team, token, survey._id, false);
