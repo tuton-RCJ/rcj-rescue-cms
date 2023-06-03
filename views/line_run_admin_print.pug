@@ -148,7 +148,7 @@ html(ng-app="RunAdmin")
               td(ng-if="showVictim && run.team.league != 'LineNL'")
                 span.badge.badge-warning(style="margin-right:5px;" ng-show='run.evacuationLevel == 1') Level 1
                 span.badge.badge-danger(style="margin-right:5px;" ng-show='run.evacuationLevel == 2') Level 2
-                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in run.rescueOrder" ng-style="{backgroundColor: evacZoneColor(victim), opacity: active_victim(run.rescueOrder, $index) ? '1.0':'0.5'}")
+                .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in run.rescueOrder" ng-style="{backgroundColor: evacZoneColor(victim), opacity: active_victim(run.rescueOrder, $index) ? '1.0':'0.3'}")
                   img(ng-src='/images/{{victimImgPath(victim)}}', style="height:20px;")                
               td.text-center(ng-style="run.isplaying && {'background-color': '#ffffa8'}" ng-if="showVictim && run.team.league=='LineNL'")
                 .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in range(run.nlUnknownVictimCount)")

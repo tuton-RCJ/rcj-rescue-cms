@@ -564,7 +564,11 @@ async function getDocumentScore(competitionId, leagueId) {
   // Retrieve review questions
   let competitionDb = await competitiondb.competition.findById(competitionId).lean().exec();
   if (competitionDb == null) return res.status(404).send("Could not find competition");
-  let reviewQuestions = competitionDb.documents.leagues.find(d => d.league == leagueId).review;
+  let leagueInfo = competitionDb.documents.leagues.find(d => d.league == leagueId)
+  let reviewQuestions = [];
+  if (leagueInfo) {
+    reviewQuestions = leagueInfo.review;
+  }
 
   // Retrieve all temas of the league
   let teamsDb = await competitiondb.team.find({
