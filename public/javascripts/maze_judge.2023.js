@@ -265,7 +265,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 };
             } else {
                 maxKit={
-                    'Heated': 1,
                     'H': 3,
                     'S': 2,
                     'U': 0,
@@ -946,6 +945,13 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
         playSound(sClick);
         $scope.tile.scoredItems.steps = !$scope.tile.scoredItems.steps;
     };
+
+    $scope.applyEntryVictimRestriction= function(direction) {
+        playSound(sClick);
+        if (!$scope.tile.scoredItems.victims[direction]) {
+            $scope.tile.scoredItems.rescueKits[direction] = 0;
+        }
+    }
 
 
     $scope.lightStatus = function(light, kit){

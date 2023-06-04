@@ -27,13 +27,13 @@ const mazeRunSchema = new Schema({
     required: true,
     index   : true
   },
-  round      : {type: ObjectId, ref: 'Round', required: true, index: true},
-  team       : {type: ObjectId, ref: 'Team', required: false, index: true},
-  field      : {type: ObjectId, ref: 'Field', required: true, index: true},
-  map        : {type: ObjectId, ref: 'MazeMap', required: true, index: true},
-  group      : {type: Number, min: 0},
-  diceNumber : {type: Number, default: null},
-  manualFlag : {type: Boolean, default: false},
+  round             : {type: ObjectId, ref: 'Round', required: true, index: true},
+  team              : {type: ObjectId, ref: 'Team', required: false, index: true},
+  field             : {type: ObjectId, ref: 'Field', required: true, index: true},
+  map               : {type: ObjectId, ref: 'MazeMap', required: true, index: true},
+  group             : {type: Number, min: 0},
+  normalizationGroup: {type: String, index: true},
+  diceNumber        : {type: Number, default: null},
 
   tiles    : [{
     x          : {type: Number, integer: true, required: true},
@@ -62,7 +62,12 @@ const mazeRunSchema = new Schema({
   }],
   LoPs     : {type: Number, min: 0, default: 0},
   misidentification: {type: Number, min:0, default:0},
-  foundVictims: {type: Number, min:0, default: 0},
+  foundVictims: [
+    {
+      type: {type: String},
+      count: {type: Number, min: 0, default: 0}
+    }
+  ],
   distKits: {type: Number, min:0, default: 0},
   exitBonus: {type: Boolean, default: false},
   score    : {type: Number, min: 0, default: 0},

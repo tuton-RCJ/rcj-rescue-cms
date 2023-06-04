@@ -67,6 +67,10 @@ table tr:nth-child(even) {
     background-color: black;
 }
 
+.tile.blue {
+    background-color: blue;
+}
+
 .tile.swamp {
     background-color: #CD853F;
 }

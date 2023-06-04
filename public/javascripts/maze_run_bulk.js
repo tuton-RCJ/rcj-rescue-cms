@@ -82,13 +82,14 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
   exe = function () {
     var time = new Date(obj[$scope.now][4]);
     var run = {
-            round: find($scope.rounds,obj[$scope.now][0]),
-            team: findT($scope.teams,obj[$scope.now][1]),
-            group: findTG($scope.teams,obj[$scope.now][1]),
-            field: find($scope.fields,obj[$scope.now][3]),
-            map: find($scope.maps,obj[$scope.now][2]),
-            competition: competitionId,
-            startTime: time.getTime()
+      round: find($scope.rounds,obj[$scope.now][0]),
+      team: findT($scope.teams,obj[$scope.now][1]),
+      group: findTG($scope.teams,obj[$scope.now][1]),
+      field: find($scope.fields,obj[$scope.now][3]),
+      map: find($scope.maps,obj[$scope.now][2]),
+      competition: competitionId,
+      startTime: time.getTime(),
+      normalizationGroup: obj[$scope.now][5]
     }
     
     $http.post("/api/runs/maze", run).then(function (response) {
@@ -147,7 +148,7 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
           console.log(obj)
           
           // tableで出力
-          var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th><th>Map name</th><th>Field name</th><th>Start Time</th></tr></thead><tbody>';
+          var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th><th>Map name</th><th>Field name</th><th>Start Time</th><th>Normalization Group ID</th></tr></thead><tbody>';
           for (var i = 1; i < obj.length; i++) {
             insert += '<tr>';
             insert += '<td>';
@@ -169,6 +170,11 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
             insert += '<td>';
             insert += new Date(obj[i][4]);
             insert += '</td>';
+
+            insert += '<td>';
+            insert += obj[i][5];
+            insert += '</td>';
+
             insert += '</tr>';
           }
           insert += '</tbody></table>';

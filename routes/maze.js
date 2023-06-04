@@ -10,68 +10,49 @@ const ruleDetector = require('../helper/ruleDetector');
 const { ACCESSLEVELS } = require('../models/user');
 const competitiondb = require('../models/competition');
 
-const { LEAGUES } = competitiondb;
+const { MAZE_LEAGUES } = competitiondb;
 
 /* GET home page. */
-publicRouter.get('/:competitionid', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.JUDGE))
-    res.render('maze_competition', { id, user: req.user, judge: 1 });
-  else res.render('maze_competition', { id, user: req.user, judge: 0 });
-});
-
-publicRouter.get('/:competitionid/score/:league', function (req, res, next) {
+publicRouter.get('/:competitionid/:league', function (req, res, next) {
   const id = req.params.competitionid;
   const { league } = req.params;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  if (
-    LEAGUES.filter(function (elm) {
-      return elm == league;
-    }).length == 0
-  ) {
+
+  if (!MAZE_LEAGUES.includes(league)) {
     return next();
   }
 
-  competitiondb.competition
-    .findOne({
-      _id: id,
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get competition',
-          err: err.message,
-        });
-      } else {
-        let num = 20;
-        for (const i in data.ranking) {
-          if (data.ranking[i].league == league) {
-            num = data.ranking[i].num;
-            break;
-          }
-        }
-        res.render('maze_score', {
-          id,
-          user: req.user,
-          league,
-          num,
-          get: req.query,
-        });
-      }
-    });
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.JUDGE))
+    res.render('maze_competition', { id, user: req.user, judge: 1, league});
+  else res.render('maze_competition', { id, user: req.user, judge: 0, league});
+});
+
+publicRouter.get('/:competitionid/:league/score', function (req, res, next) {
+  const id = req.params.competitionid;
+  const { league } = req.params;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  
+  if (!MAZE_LEAGUES.includes(league)) {
+    return next();
+  }
+
+  return res.render('maze_score', {
+    id,
+    user: req.user,
+    league,
+    get: req.query,
+  });
 });
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
+  const iframe = req.query.iframe;
 
   if (!ObjectId.isValid(id)) {
     return next();
@@ -81,6 +62,7 @@ publicRouter.get('/view/:runid', async function (req, res, next) {
     id,
     user: req.user,
     rule,
+    iframe
   });
 });
 

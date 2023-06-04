@@ -20,10 +20,7 @@ const mazeRunsApi = require('./mazeRuns');
 const logger = require('../../config/logger').mainLogger;
 const auth = require('../../helper/authLevels');
 
-const { LINE_LEAGUES } = competitiondb;
-const { MAZE_LEAGUES } = competitiondb;
-const { LEAGUES } = competitiondb;
-const { LEAGUES_JSON } = competitiondb;
+const { LEAGUES, LEAGUES_JSON, LINE_LEAGUES, MAZE_LEAGUES, SIM_LEAGUES } = competitiondb;
 
 const { ACCESSLEVELS } = require('../../models/user');
 
@@ -232,6 +229,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
       if (data.message != null) dbCompetition.message = data.message;
       if (data.description != null)
         dbCompetition.description = data.description;
+      if (data.preparation != null) dbCompetition.preparation = data.preparation;
 
       if (data.ranking != null) {
         dbCompetition.ranking = [];
@@ -239,6 +237,8 @@ adminRouter.put('/:competitionid', function (req, res, next) {
           const tmp = {
             league: data.ranking[i].id,
             num: data.ranking[i].count,
+            disclose: data.ranking[i].disclose,
+            mode: data.ranking[i].mode
           };
           dbCompetition.ranking.push(tmp);
         }
@@ -563,6 +563,8 @@ privateRouter.get('/:competition/:league/teams', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;
@@ -698,6 +700,8 @@ publicRouter.get('/:competition/:league/fields', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;
@@ -821,6 +825,8 @@ publicRouter.get('/:competition/:league/rounds', function (req, res, next) {
     leagueArr = LINE_LEAGUES;
   } else if (league == 'maze') {
     leagueArr = MAZE_LEAGUES;
+  } else if (league == 'simulation') {
+    leagueArr = SIM_LEAGUES;
   } else if (
     LEAGUES.filter(function (elm) {
       return elm.indexOf(league) != -1;
@@ -947,6 +953,12 @@ adminRouter.delete('/:competitionid', function (req, res, next) {
         });
 
         fs.rmdir(`${__dirname}/../../cabinet/${id}`, { recursive: true }, (err) => {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
+
+        fs.rmdir(`${__dirname}/../../survey/${id}`, { recursive: true }, (err) => {
           if (err) {
             logger.error(err.message);
           }

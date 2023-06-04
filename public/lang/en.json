@@ -2,15 +2,9 @@
     "language_name": "English",
     "select_lang": "Select a Language",
     "home": {
-        "line": "Rescue Line",
-        "maze": "Rescue Maze",
         "login": "Login",
         "logout": "Logout",
         "about": "The RoboCupJunior Competition Management System is designed for help the referees of RoboCupJunior Rescue Line / Maze.  In this system, it is very easy to do everything related to competition management, from course map creation to score calculation and ranking.  If you are a judge of a competition that adopts this system, please login from the button below. The competition OC knows the ID and password.  If you are a player, you can check the detailed results and ranking of the competition by choosing the competition you participated from the list below.",
-        "line_description": "The robot must be durable and intelligent enough to navigate through treacherous terrain with hills, uneven land and rubble without getting stuck. When the robot finally finds the victims, it has to gently and carefully transport the victims to the safe evacuation point where humans can take over the rescue. After the victim rescue, the robot should be able to find its way out of the dangerous area. ",
-        "maze_description": "The robot must be durable and intelligent enough to navigate through treacherous terrain with hills, uneven land and rubble without getting stuck. The robot must search for victims, dispense rescue kits, and signal the position of the victims so the humans can take over. ",
-        "go_line": "Go Line",
-        "go_maze": "Go Maze",
         "management": "Settings / Competition Management",
         "access_level": "The you logged in account, {{account}}, does not have permission to access Competition Management.",
         "goScanner": "Manual input of score sheet"
@@ -84,6 +78,12 @@
         "map": "Map",
         "rank": "Rank",
         "score": "Score",
+        "mean": "Mean",
+        "sum": "Sum",
+        "weightedSum": "Weighted sum",
+        "gamesScore": "Games score",
+        "documentScore": "Normalized score for document",
+        "normalizedScore": "Normalized score",
         "time": "Time",
         "rescued": "Rescued",
         "lops": "LoPs",
@@ -297,12 +297,8 @@
         "complete": "Complete the interview"
     },
     "line": {
-        "home": {
-            "title": "Line - Competitions"
-        },
         "competition": {
             "title": "Line runs",
-            "result": "Result (preliminary report ranking)",
             "refine": {
                 "filter": "Filter",
                 "round": "Round",
@@ -317,6 +313,9 @@
         },
         "score": {
             "rank": "Rank",
+            "finalScore": "Final score",
+            "game": "Games",
+            "document": "Document",
             "all": "All runs",
             "sort": "Sort by round",
             "team": "Sort by team name"
@@ -448,12 +447,8 @@
         }
     },
     "maze": {
-        "home": {
-            "title": "Maze - Competitions"
-        },
         "competition": {
             "title": "Maze runs",
-            "result": "@:line.competition.result",
             "refine": {
                 "filter": "@:line.competition.refine.filter",
                 "round": "@:line.competition.refine.round",
@@ -564,6 +559,9 @@
         }
     },
     "admin": {
+        "common": {
+            "normalization_group_id": "Normalization Group ID"
+        },
         "home": {
             "competitions": "Competitions",
             "c_item": "Tool / Settings",
@@ -588,9 +586,11 @@
             "set": "Save",
             "rule": "Rule",
             "ranking": "Ranking",
-            "useNum": "Set the number of games to be used for ranking.  Make this setting after registering all teams. Default: 20 games",
             "leagueName": "League name",
-            "num": "Number of games"
+            "num": "Number of games",
+            "discloseRanking": "Make rankings public",
+            "rankingMode": "Ranking Mode",
+            "preparation": "Preparation mode(hide game results)"
         },
         "line_tSet": {
             "new_tSet": "Input tile set name",
@@ -622,6 +622,7 @@
             "management": "Management",
             "line": "Line",
             "maze": "Maze",
+            "simulation": "Simulation",
             "maps": "Maps(Field layout)",
             "runs": "Runs",
             "backup": "Backup",
@@ -750,6 +751,7 @@
             "ramp": "Ramp",
             "cp" : "Check point",
             "black" : "Black tile",
+            "blue": "Blue tile",
             "down": "Bottom horizontal tile at ramp",
             "up": "Top horizontal tile at ramp",
             "top": "@:admin.lineMapEditor.top",
@@ -792,8 +794,41 @@
             "delS": "@:admin.lineRun.delS",
             "statusReset": "@:admin.lineRun.statusReset"
         },
+        "simRun": {
+            "title": "Simulation Runs",
+            "add": "@:admin.lineRun.add",
+            "bulk": "@:admin.teams.bulk",
+            "status": "@:admin.lineRun.status",
+            "st0": "@:admin.lineRun.st0",
+            "st1": "@:admin.lineRun.st1",
+            "st2": "@:admin.lineRun.st2",
+            "st3": "@:admin.lineRun.st3",
+            "st4": "@:admin.lineRun.st4",
+            "st5": "@:admin.lineRun.st5",
+            "st6": "@:admin.lineRun.st6",
+            "selectAll": "@:admin.lineRun.selectAll",
+            "delS": "@:admin.lineRun.delS",
+            "statusReset": "@:admin.lineRun.statusReset"
+        },
         "mazeRunBulk": {
             "title": "Maze Run Bulk Registration",
+            "s1T": "@:admin.lineRunBulk.s1T",
+            "s1D": "@:admin.lineRunBulk.s1D",
+            "s2T": "@:admin.lineRunBulk.s2T",
+            "s2D1": "@:admin.lineRunBulk.s2D1",
+            "s2D2": "@:admin.lineRunBulk.s2D2",
+            "s2D3": "@:admin.lineRunBulk.s2D3",
+            "s2D4": "@:admin.lineRunBulk.s2D4",
+            "s2D5": "@:admin.lineRunBulk.s2D5 ",
+            "s2D6": "@:admin.lineRunBulk.s2D6 ",
+            "s3T": "@:admin.lineRunBulk.s3T",
+            "s3D": "@:admin.lineRunBulk.s3D",
+            "exe": "@:admin.lineRunBulk.exe",
+            "inpro": "@:admin.lineRunBulk.inpro",
+            "complete": "@:admin.lineRunBulk.complete"
+        },
+        "simRunBulk": {
+            "title": "Simulation Run Bulk Registration",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",
@@ -976,6 +1011,7 @@
             "picture": "Picture",
             "video": "Video",
             "pdf": "PDF file",
+            "file": "Upload file",
             "archive": "Compressed file",
             "requiredOrNot": "Item type",
             "required": "Required",
@@ -993,7 +1029,8 @@
             "title": "Document Review Form Editor",
             "export": "Export this review forms to Json file",
             "import": "Importing review forms from Json files",
-            "languageWarn": "The language settings are linked to the settings of the forms for the team."
+            "languageWarn": "The language settings are linked to the settings of the forms for the team.",
+            "weight": "Score weight(0~1)"
         },
         "form":{
             "languageError": "This form is not available in your language, so it will be displayed in an alternative language.",

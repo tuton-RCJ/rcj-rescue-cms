@@ -88,7 +88,8 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
             field: find($scope.fields,obj[$scope.now][3]),
             map: find($scope.maps,obj[$scope.now][2]),
             competition: competitionId,
-            startTime: time.getTime()
+            startTime: time.getTime(),
+            normalizationGroup: obj[$scope.now][5]
         }
         console.log(run)
 
@@ -148,7 +149,7 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
                     console.log(obj)
 
                     // tableで出力
-                    var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th><th>Map name</th><th>Field name</th><th>Start Time</th></tr></thead><tbody>';
+                    var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th><th>Map name</th><th>Field name</th><th>Start Time</th><th>Normalization Group ID</th></tr></thead><tbody>';
                     for (var i = 1; i < obj.length; i++) {
                         insert += '<tr>';
                         insert += '<td>';
@@ -170,6 +171,11 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
                         insert += '<td>';
                         insert += new Date(obj[i][4]);
                         insert += '</td>';
+
+                        insert += '<td>';
+                        insert += obj[i][5];
+                        insert += '</td>';
+
                         insert += '</tr>';
                     }
                     insert += '</tbody></table>';

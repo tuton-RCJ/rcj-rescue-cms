@@ -38,7 +38,7 @@ backupQueue.process('backup', function(job, done){
   fs.mkdirsSync(folderPath);
 
   jobProgress = 0;
-  const maxCount = 16;
+  const maxCount = 17;
   let outputCount = 0;
   job.progress(0);
   job.update({
@@ -80,6 +80,20 @@ backupQueue.process('backup', function(job, done){
 
   // Copy Cabinet Folder
   fs.copy(`./cabinet/${competitionId}`, `${folderPath}/cabinet`, (err) => {
+    if(err){
+      done(new Error(err));
+    }else{
+      outputCount ++;
+      jobProgress += 50/maxCount;
+      job.progress(Math.floor(jobProgress));
+      if(outputCount == maxCount){
+        makeZip(job, done, folderPath);
+      }
+    }
+  });
+
+  // Copy Suevey Folder
+  fs.copy(`./survey/${competitionId}`, `${folderPath}/survey`, (err) => {
     if(err){
       done(new Error(err));
     }else{
@@ -336,6 +350,27 @@ backupQueue.process('restore', function(job, done){
       fs.copy(`${base_tmp_path}uploads/${folder}/cabinet`, `${__dirname}/../cabinet/${competition[0]._id}`, (err) => {
         chmodr(
           `${__dirname}/../cabinet/${competition[0]._id}`,
+          0o777,
+          (err) => {
+            if (err) {
+              done(new Error(err));
+            }else{
+              updated ++;
+              jobProgress += 50/maxCount;
+              job.progress(Math.floor(jobProgress));
+              if(updated == maxCount){
+                job.progress(100);
+                done();
+              }
+            }
+          }
+        );
+      });
+
+      // Copy Survey Folder
+      fs.copy(`${base_tmp_path}uploads/${folder}/survey`, `${__dirname}/../survey/${competition[0]._id}`, (err) => {
+        chmodr(
+          `${__dirname}/../survey/${competition[0]._id}`,
           0o777,
           (err) => {
             if (err) {

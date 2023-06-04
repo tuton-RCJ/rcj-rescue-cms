@@ -58,8 +58,7 @@ app.controller("MazeTimetableController", ['$scope', '$http', '$translate','$win
     }
 
     $scope.update_list = function () {
-        $http.get("/api/competitions/" + competitionId +
-            "/maze/runs?timetable=true" +
+        $http.get(`/api/runs/maze/competition/${competitionId}?timetable=true` +
             $scope.show_ended).then(function (response) {
             var runs = response.data
             $scope.runs = runs

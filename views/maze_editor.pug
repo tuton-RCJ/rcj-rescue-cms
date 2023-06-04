@@ -134,7 +134,7 @@ block content
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
-                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z)")
+                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z)")
                                 .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
                                     img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
                                     img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
@@ -142,10 +142,6 @@ block content
                                     div(ng-if="leagueType == 'standard'")
                                         img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")
                                         img.tile-image(ng-src='/images/steps.png', ng-show="cells[c+','+r+','+z].tile.steps")
-                                        img.tile-image(ng-src='/images/heated_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Heated'")
-                                        img.tile-image(ng-src='/images/heated_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Heated'")
-                                        img.tile-image(ng-src='/images/heated_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Heated'")
-                                        img.tile-image(ng-src='/images/heated_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Heated'")
                                         img.tile-image(ng-src='/images/h_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'H'")
                                         img.tile-image(ng-src='/images/h_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'H'")
                                         img.tile-image(ng-src='/images/h_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'H'")
@@ -217,7 +213,7 @@ block content
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
-                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'linear': cells[c+','+r+','+z].isLinear}" , ng-style="wallColor(c,r,z)")
+                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}" , ng-style="wallColor(c,r,z)")
                                 .tile-image-container(ng-show="cells[c+','+r+','+z].isTile" style="position: relative;")
                                     div.maru.size_normal.blue1(style="left:1px;top:1px;position: absolute;border-radius:0%;z-index:3;" ng-if="cells[c+','+r+','+z].tile.checkpoint")
                                         div.letter3(ng-bind="itemNumber('checkpoint',c,r,z)")
@@ -233,23 +229,6 @@ block content
                                         img.tile-image(ng-src='/images/steps.png', ng-show="cells[c+','+r+','+z].tile.steps")
                                         div.maru.size_normal.blue1(style="right:13px;top:12px;position: absolute;z-index:3;border-radius:25%;" ng-if="cells[c+','+r+','+z].tile.steps")
                                             div.letter3(ng-bind="itemNumber('steps',c,r,z)")
-
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.top == 'Heated'")
-                                            img.tile-image(ng-src='/images/heated_top.png')
-                                            div.maru.size_normal.pink1(style="right:5px;top:-10px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Heated',c,r,z,'top')")
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.right == 'Heated'")
-                                            img.tile-image(ng-src='/images/heated_right.png')
-                                            div.maru.size_normal.pink1(style="right:-10px;bottom:5px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Heated',c,r,z,'right')")
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.left == 'Heated'")
-                                            img.tile-image(ng-src='/images/heated_left.png')
-                                            div.maru.size_normal.pink1(style="left:-10px;top:5px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Heated',c,r,z,'left')")
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.bottom == 'Heated'")
-                                            img.tile-image(ng-src='/images/heated_bottom.png')
-                                            div.maru.size_normal.pink1(style="left:5px;bottom:-10px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Heated',c,r,z,'bottom')")
 
                                         div(ng-if="cells[c+','+r+','+z].tile.victims.top == 'H'")
                                             img.tile-image(ng-src='/images/h_top.png')

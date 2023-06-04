@@ -49,7 +49,8 @@ privateRouter.get('/:competitionid/teams', function (req, res, next) {
 });
 
 publicRouter.get('/access_denied', function (req, res) {
-  res.render('access_denied', { user: req.user });
+  const iframe = req.query.iframe;
+  res.render('access_denied', { user: req.user, iframe});
 });
 
 module.exports.public = publicRouter;

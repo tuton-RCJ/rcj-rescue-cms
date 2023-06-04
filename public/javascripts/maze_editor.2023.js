@@ -646,7 +646,6 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             "H": 3,
             "S": 2,
             "U": 0,
-            "Heated": 1,
             "Red": 1,
             "Yellow": 1,
             "Green": 0,

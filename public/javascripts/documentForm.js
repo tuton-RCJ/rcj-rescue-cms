@@ -154,14 +154,16 @@ app.controller('DocumentFormController', ['$scope', '$uibModal', '$log', '$http'
 
             $http.get("/api/document/answer/"+ $scope.team._id + "/" + token).then(function (response) {
                 $scope.answers = response.data;
-                if(!$scope.answers.length){
-                    for(let b of $scope.blocks){
-                        let ba = [];
-                        for(let q of b.questions){
-                            if(q.type == "select") ba.push('option0');
-                            else ba.push('');
+                for(let b of $scope.blocks){
+                    for(let q of b.questions){
+                        if ($scope.answers[q._id] == null) {
+                            if(q.type == "select") {
+                                $scope.answers[q._id] = "option0";
+                            } else {
+                                $scope.answers[q._id] = "";
+                            }
                         }
-                        $scope.answers.push(ba);
+                        
                     }
                 }
             });

@@ -9,7 +9,7 @@ const mazeFill = require('../helper/mazeFill')
 
 const logger = require('../config/logger').mainLogger
 
-const VICTIMS = ['H', 'S', 'U', "Heated", "Red", "Yellow", "Green", "None"];
+const VICTIMS = ['H', 'S', 'U', "Red", "Yellow", "Green", "None"];
 
 const MazeRun = require('./mazeRun')
 
@@ -39,7 +39,7 @@ const tileSchema = new Schema({
   black        : {type: Boolean, default: false},
   ramp         : {type: Boolean, default: false},
   steps        : {type: Boolean, default: false},
-  blueTile     : {type: Boolean, default: false},
+  blue         : {type: Boolean, default: false},
   victims      : {
     top   : {
       type   : String,

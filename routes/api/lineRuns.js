@@ -12,7 +12,8 @@ const auth = require('../../helper/authLevels');
 const scoreSheetLinePDF2 = require('../../helper/scoreSheetPDFLine2');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
-const initRunData = require('../../helper/initRunData')
+const initRunData = require('../../helper/initRunData');
+const { leagues } = require('../../leagues');
 
 let socketIo;
 
@@ -21,7 +22,7 @@ module.exports.connectSocketIo = function (io) {
 };
 
 /**
- * @api {get} /runs/line Get runs
+ * @api {get} /runs/line/competition/:competitionId Get runs
  * @apiName GetRun
  * @apiGroup Run
  * @apiVersion 1.0.1
@@ -46,67 +47,60 @@ module.exports.connectSocketIo = function (io) {
  *
  * @apiError (400) {String} msg The error message
  */
-publicRouter.get('/', getLineRuns);
+publicRouter.get('/competition/:competitionId', function (req, res, next) {
+  const competition = req.params.competitionId;
+  const normalized = req.query.normalized;
+  const minimum = req.query.minimum;
 
-function getLineRuns(req, res) {
-  const competition = req.query.competition || req.params.competition;
-
-  let query;
-  if (competition != null && competition.constructor === String) {
-    if (req.query.ended == 'false') {
-      query = lineRun.find({
-        competition,
-        status: { $lte: 1 },
-      });
-    } else {
-      query = lineRun.find({
-        competition,
-      });
-    }
-  } else if (Array.isArray(competition)) {
-    query = lineRun.find({
-      competition: {
-        $in: competition.filter(ObjectId.isValid),
-      },
-    });
-  } else {
-    query = lineRun.find({});
+  if (!ObjectId.isValid(competition)) {
+    return next();
   }
 
-  if (req.query.minimum) {
+  let maxScoreCache = {};
+  let query;
+  if (req.query.ended == 'false') {
+    query = lineRun.find({
+      competition,
+      status: { $lte: 1 },
+    });
+  } else {
+    query = lineRun.find({
+      competition,
+    });
+  }
+
+  if (minimum) {
     query.select('competition round team field status started startTime sign');
   } else {
     query.select(
-      'competition round team field map score raw_score multiplier time status started LoPs comment startTime sign rescueOrder nl group exitBonus evacuationLevel kitLevel'
+      'competition round team field map score raw_score multiplier time status started LoPs comment startTime sign rescueOrder nl group normalizationGroup exitBonus evacuationLevel kitLevel'
     );
   }
 
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      {
-        path: 'competition',
-        select: 'name',
-      },
-      {
-        path: 'round',
-        select: 'name',
-      },
-      {
-        path: 'team',
-        select: 'name league teamCode',
-      },
-      {
-        path: 'field',
-        select: 'name league',
-      },
-      {
-        path: 'map',
-        select: 'name',
-      },
-    ]);
-  }
+  query.populate([
+    {
+      path: 'competition',
+      select: 'name ranking preparation',
+    },
+    {
+      path: 'round',
+      select: 'name',
+    },
+    {
+      path: 'team',
+      select: 'name league teamCode',
+    },
+    {
+      path: 'field',
+      select: 'name league',
+    },
+    {
+      path: 'map',
+      select: 'name',
+    },
+  ]);
 
-  query.lean().exec(function (err, dbRuns) {
+  query.lean().exec(async function (err, dbRuns) {
     if (err) {
       logger.error(err);
       res.status(400).send({
@@ -114,29 +108,60 @@ function getLineRuns(req, res) {
       });
     } else if (dbRuns) {
       // Hide map and field from public
-      for (let i = 0; i < dbRuns.length; i++) {
-        if (!auth.authViewRun(req.user, dbRuns[i], ACCESSLEVELS.NONE + 1)) {
-          delete dbRuns[i].map;
-          delete dbRuns[i].field;
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
-        } else if (
-          !auth.authCompetition(
-            req.user,
-            dbRuns[i].competition,
-            ACCESSLEVELS.VIEW
-          )
-        ) {
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
+      dbRuns.map(run => {        
+        switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {
+          case 0:
+            delete run.map;
+            delete run.field;
+            delete run.score;
+            delete run.time;
+            delete run.LoPs;
+            delete run.raw_score
+            delete run.multiplier;
+            delete run.rescueOrder;
+            delete run.nl;
+            delete run.exitBonus;
+            delete run.evacuationLevel;
+            delete run.kitLevel;
+          case 2:
+            delete run.comment;
+            delete run.sign;
         }
+      })
+
+      // return normalized score
+      if (!minimum && normalized && auth.authCompetition(
+        req.user,
+        competition,
+        ACCESSLEVELS.ADMIN
+      )) {
+        dbRuns.map(run => {
+          let rankingSettings = run.competition.ranking.find(r => r.league == run.team.league);
+          if (!rankingSettings) {
+            rankingSettings = {
+              mode: competitiondb.SUM_OF_BEST_N_GAMES
+            };
+          }
+          if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
+            let maxScore = getMaxScoreWithCache(dbRuns, run.team.league, run.normalizationGroup, maxScoreCache);
+            if (maxScore == 0) run.normalizedScore = 0;
+            else run.normalizedScore = run.score / maxScore;
+          }
+        });
       }
       res.status(200).send(dbRuns);
     }
   });
-}
+});
 
-module.exports.getLineRuns = getLineRuns;
+function getMaxScoreWithCache(runs, league, normalizationGroup, cache) {
+  if (cache[league+normalizationGroup] != null) {
+    return cache[league+normalizationGroup];
+  }
+  cache[league+normalizationGroup] = Math.max(...runs.filter(run => run.team.league == league && run.normalizationGroup == normalizationGroup)
+    .map(run => run.score));  
+  return cache[league+normalizationGroup];
+}
 
 privateRouter.get(
   '/find/team_status/:competitionid/:teamid/:status',
@@ -266,25 +291,20 @@ publicRouter.get(
  * @apiError (400) {String} err The error message
  * @apiError (400) {String} msg The error message
  */
-publicRouter.get('/:runid', function (req, res, next) {
+publicRouter.get('/:runid', async function (req, res, next) {
   const id = req.params.runid;
+  const normalized = req.query.normalized
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
 
-  const query = lineRun.findById(id, '-__v');
-
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      'round',
-      { path: 'team', select: 'name league' },
-      'field',
-      'competition',
-    ]);
-  }
-
-  query.exec(async function (err, dbRun) {
+  lineRun.findById(id, '-__v').populate([
+    'round',
+    { path: 'team', select: 'name league teamCode' },
+    'field',
+    { path: 'competition', select: 'name ranking preparation' }
+  ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
       return res.status(400).send({
@@ -297,9 +317,10 @@ publicRouter.get('/:runid', function (req, res, next) {
       const authResult = auth.authViewRun(
         req.user,
         dbRun,
-        ACCESSLEVELS.NONE + 1
+        ACCESSLEVELS.NONE + 1,
+        dbRun.competition.preparation
       );
-      if (authResult == 0) return res.status(403).send();
+      if (authResult == 0) return res.status(401).send();
 
       // Init run data
       let initDbRun = await initRunData.initLine(dbRun);
@@ -321,6 +342,37 @@ publicRouter.get('/:runid', function (req, res, next) {
       if (authResult == 2) {
         delete dbRun.comment;
         delete dbRun.sign;
+      }
+
+      dbRun = dbRun.toObject();
+
+      // return normalized value
+      let rankingSettings = dbRun.competition.ranking.find(r => r.league == dbRun.team.league);
+      if (!rankingSettings) {
+        rankingSettings = {
+          mode: competitiondb.SUM_OF_BEST_N_GAMES,
+          disclose: false,
+          num: 20
+        }
+      }
+      if (normalized && competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
+        // disclose ranking enabled OR the user is ADMIN of the competition
+        if (rankingSettings.disclose || auth.authCompetition(
+          req.user,
+          dbRun.competition._id,
+          ACCESSLEVELS.ADMIN
+        )) {
+          let maxScore = await lineRun.find({
+            competition: dbRun.competition._id,
+            normalizationGroup: dbRun.normalizationGroup
+          }).populate({
+            path: 'team',
+            select: 'league'
+          }).select("score").exec();
+          maxScore = Math.max(...maxScore.filter(run => run.team.league == dbRun.team.league).map(run => run.score));
+          if (maxScore == 0) dbRun.normalizedScore = 0;
+          else dbRun.normalizedScore = dbRun.score / maxScore;
+        }
       }
       return res.status(200).send(dbRun);
     }
@@ -440,7 +492,7 @@ privateRouter.put('/:runid', function (req, res, next) {
         }
 
         if (run.status) {
-          if (dbRun.status > run.status) delete run.status;
+          if (dbRun.status > run.status && dbRun.status != 6) delete run.status;
         }
 
         const prevStatus = dbRun.status;
@@ -554,6 +606,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   const round = req.query.round || req.params.round;
   const startTime = req.query.startTime || req.params.startTime;
   const endTime = req.query.endTime || req.params.endTime;
+  const offset = req.query.offset;
 
   if (!competition && !run && !round) {
     return next();
@@ -622,6 +675,9 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
         msg: 'Could not get runs',
       });
     } else if (dbRuns) {
+      dbRuns.map(run => {
+        run.startTime += parseInt(offset)*60*1000;
+      })
       scoreSheetLinePDF2.generateScoreSheet(res, dbRuns);
     }
   });
@@ -708,6 +764,7 @@ adminRouter.delete('/:runids', function (req, res) {
  * @apiParam {String} team        The team id
  * @apiParam {String} field       The field id
  * @apiParam {String} map         The map id
+ * @apiParam {String} normalizationGroup         The normalization group id
  *
  * @apiSuccess (200) {String} msg Success msg
  * @apiSuccess (200) {String} id  The new run id
@@ -725,6 +782,7 @@ adminRouter.post('/', function (req, res) {
     map: run.map,
     startTime: run.startTime,
     group: run.group,
+    normalizationGroup: run.normalizationGroup
   }).save(function (err, data) {
     if (err) {
       logger.error(err);

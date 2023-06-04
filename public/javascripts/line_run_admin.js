@@ -4,14 +4,13 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         $scope.competitionId = competitionId
         $scope.showTeam = true;
 
-
-
         updateRunList();
         launchSocketIo();
 
         var runListTimer = null;
         var runListChanged = false;
 
+        var timeOffset = new Date().getTimezoneOffset() * -1;
 
         function timerUpdateRunList() {
             if (runListChanged) {
@@ -92,7 +91,8 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 field: $scope.run.field._id,
                 map: $scope.run.map._id,
                 competition: competitionId,
-                startTime: $scope.startTime.getTime()
+                startTime: $scope.startTime.getTime(),
+                normalizationGroup: $scope.run.normalizationGroup
             }
 
             //console.log(run)
@@ -237,8 +237,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
 
         function updateRunList() {
-            $http.get("/api/competitions/" + competitionId +
-                "/line/runs?populate=true").then(function (response) {
+            $http.get(`/api/runs/line/competition/${competitionId}?normalized=true`).then(function (response) {
                 var runs = response.data;
                 for (let run of runs) {
                     if (!run.team) {
@@ -297,8 +296,8 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         }
 
 
-        $scope.go_scoreSheet2 = function (runid) {
-          window.open("/api/runs/line/scoresheet2?run=" + runid,"_blank");
+        $scope.go_scoreSheet2 = function (runId) {
+          window.open(`/api/runs/line/scoresheet2?run=${runId}&offset=${timeOffset}`,"_blank");
         };
 
         $scope.go_judge = function (runid) {
@@ -424,7 +423,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
 
         $scope.go_scoreSheetInTimeRange2 = function () {
-          window.open("/api/runs/line/scoresheet2?competition=" + $scope.competitionId + "&startTime=" + $scope.scoreSheetStartDateTime.getTime()+ "&endTime=" + $scope.scoreSheetEndDateTime.getTime(), "_blank")
+          window.open(`/api/runs/line/scoresheet2?competition=${$scope.competitionId}&startTime=${$scope.scoreSheetStartDateTime.getTime()}&endTime=${ $scope.scoreSheetEndDateTime.getTime()}&offset=${timeOffset}`, "_blank")
         };
         
         $scope.total = function (lops) {
@@ -434,6 +433,49 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
           }
           return count;
         }
+
+        $scope.active_victim = function (victims, index){
+            let victim = victims[index];
+            if (victim == undefined) return false;
+        
+            // Effective check
+            if(victim.victimType == "LIVE" && victim.zoneType == "RED") return false;
+            if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return false;
+            if(victim.victimType == "KIT" && victim.zoneType == "RED") return false;
+        
+            // Effective check for dead victim
+            if (victim.victimType == "DEAD") {
+              let liveCount = 0;
+              for (i of $scope.range(index)) {
+                let v = victims[i]
+                if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
+              }
+              if (liveCount != 2) return false;
+            }
+            
+            return true;    
+        };
+
+        $scope.victimImgPath = function(victim) {
+            switch(victim.victimType) {
+                case 'LIVE':
+                    return 'liveVictim.png';
+                case 'DEAD':
+                    return 'deadVictim.png';
+                case 'KIT':
+                    return 'rescueKit.png';
+            }
+        }
+    
+        $scope.evacZoneColor = function(victim) {
+            switch(victim.zoneType) {
+                case 'GREEN':
+                    return "#1dd1a1";
+                case 'RED':
+                    return "#e55039";
+            }
+        }
+          
 
 }])
     .directive("runsReadFinished", ['$timeout', function ($timeout) {

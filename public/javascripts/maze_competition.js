@@ -29,17 +29,21 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
         var showAllTeams = true
         $scope.teamName = ""
 
-        $http.get("/api/competitions/" + competitionId +
-            "/maze/runs?populate=true&minimum=true&ended=false").then(function (response) {
+        
+        $http.get(`/api/runs/maze/competition/${competitionId}?populate=true&minimum=true&ended=false`).then(function (response) {
             $scope.runs = response.data
-            //console.log($scope.teams)
         })
 
         $http.get("/api/competitions/" + competitionId).then(function (response) {
-            $scope.competition = response.data
+            $scope.competition = response.data;
+            $scope.rankingOpen = $scope.competition.ranking.reduce((result, current) => {
+                result[current.league] = current.disclose;
+                return result;
+            }, {})
         })
-        $http.get("/api/teams/leagues/maze/" + competitionId).then(function (response) {
-          $scope.leagues = response.data
+        
+        $http.get("/api/competitions/leagues/" + league).then(function (response) {
+            $scope.league = response.data
         })
 
         // launch socket.io
@@ -75,10 +79,9 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
         }
 
         $scope.update_list = function () {
-            $http.get("/api/competitions/" + competitionId +
-                "/maze/runs?populate=true&minimum=true&ended=" +
-                $scope.show_ended).then(function (response) {
-                var runs = response.data
+            
+            $http.get(`/api/runs/maze/competition/${competitionId}?populate=true&minimum=true&ended=${$scope.show_ended}`).then(function (response) {
+                var runs = response.data.filter(r => r.team.league == league);
 
                 for (let run of runs) {
                     if (!run.team) {
@@ -88,7 +91,7 @@ app.controller("MazeCompetitionController", ['$scope', '$http', '$translate', fu
                     }
                 }
 
-                $scope.runs = runs
+                $scope.runs = runs;
 
 
                 // TODO: This should be done with Set, needs polyfill?

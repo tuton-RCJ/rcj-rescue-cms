@@ -2,15 +2,9 @@
     "language_name": "日本語",
     "select_lang": "言語選択",
     "home": {
-        "line": "Rescue Line",
-        "maze": "Rescue Maze",
         "login": "ログイン",
         "logout": "ログアウト",
         "about": "RoboCupJunior Competition Management System は，ロボカップジュニア レスキューライン/メイズ の審判の補助を目的に制作されました．このシステムでは，コースマップの作成からスコアの計算やランク付けまで，ロボカップジュニアの大会におけるレスキュー競技の運営に関連するすべての作業を非常に簡単に実行できます．あなたが，このシステムを採用する大会の審判である場合は，下のボタンからログインしてください．ログインに必要なIDとパスワードは，大会のOC（運営委員）が知っています．あなたが，このシステムを採用する大会に参加した選手であるならば、以下のリストからあなたが参加した大会を選ぶことによって，競技の詳細な結果と順位を確認することができます．",
-        "line_description": "様々な障害を乗り越えながらライントレースを行い，最後に被災者を模した球体を所定の場所に運んで救出する競技．",
-        "maze_description": "壁で囲まれた空間をロボットが自律走行し，熱を発する被災者を発見，レスキューキットを配布する競技．",
-        "go_line": "Go Line",
-        "go_maze": "Go Maze",
         "management": "各種設定・大会管理",
         "access_level": "ログイン中のアカウント， {{account}} は，「大会管理」にアクセスする権限がありません.",
         "goScanner": "スコアシートのマニュアル入力"
@@ -84,6 +78,12 @@
         "map": "マップ",
         "rank": "順位",
         "score": "得点",
+        "mean": "平均",
+        "sum": "合計",
+        "weightedSum": "加重合計",
+        "gamesScore": "競技得点",
+        "documentScore": "ドキュメントの正規化スコア",
+        "normalizedScore": "正規化スコア",
         "time": "時間",
         "rescued": "救助",
         "lops": "進行停止",
@@ -297,12 +297,8 @@
         "complete": "インタビューを完了"
     },
     "line": {
-        "home": {
-            "title": "Line - 大会選択"
-        },
         "competition": {
             "title": "Line 競技選択",
-            "result": "競技結果・速報順位",
             "refine": {
                 "filter": "競技絞り込み",
                 "round": "ラウンド",
@@ -317,6 +313,9 @@
         },
         "score": {
             "rank": "順位",
+            "finalScore": "最終得点",
+            "game": "競技",
+            "document": "ドキュメント",
             "all": "全競技",
             "sort": "ラウンドでソート",
             "team": "チーム名でソート"
@@ -446,12 +445,8 @@
         }
     },
     "maze": {
-        "home": {
-            "title": "Maze - 大会選択"
-        },
         "competition": {
             "title": "Maze 競技選択",
-            "result": "@:line.competition.result",
             "refine": {
                 "filter": "@:line.competition.refine.filter",
                 "round": "@:line.competition.refine.round",
@@ -562,6 +557,9 @@
         }
     },
     "admin": {
+        "common": {
+            "normalization_group_id": "正規化グループID"
+        },
         "home": {
             "competitions": "大会",
             "c_item": "ツール・設定",
@@ -586,9 +584,11 @@
             "set": "設定",
             "rule": "適用ルール",
             "ranking": "順位付け設定",
-            "useNum": "順位付けに使用する競技の数を設定してください．設定は，全てのチームを登録した後に行なってください．デフォルト：20競技",
             "leagueName": "リーグ名",
-            "num": "使用競技数"
+            "num": "使用競技数",
+            "discloseRanking": "順位を公開",
+            "rankingMode": "順位付けモード",
+            "preparation": "準備モード（競技結果非公開）"
         },
         "line_tSet": {
             "new_tSet": "タイルセット名を入力 ",
@@ -620,6 +620,7 @@
             "management": "管理設定",
             "line": "Line",
             "maze": "Maze",
+            "simulation": "Simulation",
             "maps": "マップ（フィールドレイアウト）管理",
             "runs": "競技管理",
             "backup": "バックアップ",
@@ -748,6 +749,7 @@
             "ramp": "坂",
             "cp" : "チェックポイント",
             "black" : "黒タイル",
+            "blue": "青タイル",
             "down": "坂の下の水平なタイル",
             "up": "坂の上の水平なタイル",
             "top": "@:admin.lineMapEditor.top",
@@ -790,8 +792,41 @@
             "delS": "@:admin.lineRun.delS",
             "statusReset": "@:admin.lineRun.statusReset"
         },
+        "simRun": {
+            "title": "Simulation 競技管理",
+            "add": "@:admin.lineRun.add",
+            "bulk": "@:admin.teams.bulk",
+            "status": "@:admin.lineRun.status",
+            "st0": "@:admin.lineRun.st0",
+            "st1": "@:admin.lineRun.st1",
+            "st2": "@:admin.lineRun.st2",
+            "st3": "@:admin.lineRun.st3",
+            "st4": "@:admin.lineRun.st4",
+            "st5": "@:admin.lineRun.st5",
+            "st6": "@:admin.lineRun.st6",
+            "selectAll": "@:admin.lineRun.selectAll",
+            "delS": "@:admin.lineRun.delS",
+            "statusReset": "@:admin.lineRun.statusReset"
+        },
         "mazeRunBulk": {
             "title": "Maze 競技一括登録",
+            "s1T": "@:admin.lineRunBulk.s1T",
+            "s1D": "@:admin.lineRunBulk.s1D",
+            "s2T": "@:admin.lineRunBulk.s2T",
+            "s2D1": "@:admin.lineRunBulk.s2D1",
+            "s2D2": "@:admin.lineRunBulk.s2D2",
+            "s2D3": "@:admin.lineRunBulk.s2D3",
+            "s2D4": "@:admin.lineRunBulk.s2D4",
+            "s2D5": "@:admin.lineRunBulk.s2D5",
+            "s2D6": "@:admin.lineRunBulk.s2D6",
+            "s3T": "@:admin.lineRunBulk.s3T",
+            "s3D": "@:admin.lineRunBulk.s3D",
+            "exe": "@:admin.lineRunBulk.exe",
+            "inpro": "@:admin.lineRunBulk.inpro",
+            "complete": "@:admin.lineRunBulk.complete"
+        },
+        "simRunBulk": {
+            "title": "Simulation 競技一括登録",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",
@@ -975,6 +1010,7 @@
             "video": "動画",
             "pdf": "PDFファイル",
             "archive": "圧縮ファイル",
+            "file": "ファイルアップロード",
             "requiredOrNot": "項目種別",
             "required": "必須",
             "optional": "任意",
@@ -991,7 +1027,8 @@
             "title": "ドキュメント　レビューフォームエディタ",
             "export": "このレビューフォームをJsonファイルにエクスポート",
             "import": "レビューフォームをJsonファイルからインポート",
-            "languageWarn": "言語設定は，チーム向けフォームの設定と連動しています．"
+            "languageWarn": "言語設定は，チーム向けフォームの設定と連動しています．",
+            "weight": "スコアの重み(0~1)"
         },
         "form":{
             "languageError": "このフォームは，お使いの言語に対応していませんので，代替言語で表示します．",

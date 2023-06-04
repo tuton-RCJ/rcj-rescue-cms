@@ -168,56 +168,45 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
 
             $http.get("/api/document/answer/"+ $scope.team._id + "/" + token).then(function (response) {
                 $scope.answers = response.data;
-                if(!$scope.answers.length){
-                    for(let b of $scope.blocks){
-                        let ba = [];
-                        for(let q of b.questions){
-                            if(q.type == "select") ba.push('option0');
-                            else ba.push('');
+                for(let b of $scope.blocks){
+                    for(let q of b.questions){
+                        if ($scope.answers[q._id] == null) {
+                            if(q.type == "select") {
+                                $scope.answers[q._id] = "option0";
+                            } else {
+                                $scope.answers[q._id] = "";
+                            }
                         }
-                        $scope.answers.push(ba);
+                        
                     }
                 }
             });
 
-            $http.get("/api/document/review/" + teamId).then(function (response) {
-                $scope.reviewComments = response.data;
-                let fil = $scope.reviewComments.filter((r) => r.reviewer && r.reviewer._id == userId);
-                $scope.myComments = [];
-
-                if(fil.length == 0){
-                    for(let b of $scope.review){
-                        let ba = [];
-                        for(let q of b.questions){
+            $http.get("/api/document/review/" + teamId + "/myComments").then(function (response) {
+                $scope.myComments = response.data.comments;
+                for(let b of $scope.review){
+                    for(let q of b.questions){
+                        if ($scope.myComments[q._id] == null) {
                             if(q.type == "select"){
-                                ba.push('option0');
+                                $scope.myComments[q._id] = "option0";
                             }
                             else{
-                                ba.push('');
+                                $scope.myComments[q._id] = "";
                             }
                         }
-                        $scope.myComments.push(ba);
                     }
-                }else{
-                    $scope.myComments = fil[0].comments;
-                    for(let ri in $scope.review){
-                        console.log(ri)
-                        if($scope.myComments[ri] == null){
-                            $scope.myComments[ri] = [];
+                }
+            }, function() {
+                $scope.myComments = new Map();
+                for(let b of $scope.review){
+                    for(let q of b.questions){
+                        if(q.type == "select"){
+                            $scope.myComments[q._id] = "option0";
                         }
-                        if(!$scope.myComments[ri]){
-                            $scope.myComments.push([]);
-                        }
-                        let count = $scope.review[ri].questions.length - $scope.myComments[ri].length;
-                        for(let i=0; i<count;i++){
-                            if($scope.review[ri].questions[$scope.myComments[ri].length].type == "select") $scope.myComments[ri].push('option0');
-                            else $scope.myComments[ri].push('');
-                        }
-                        for(let mc of $scope.myComments[ri]){
-                            if(mc == null) mc = '';
+                        else{
+                            $scope.myComments[q._id] = "";
                         }
                     }
-                    console.log($scope.myComments)
                 }
             })
             
@@ -257,11 +246,9 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
         });
     }
 
-    $scope.scaleAnswer = function(b, q, a){
-        if(!$scope.myComments[b]) $scope.myComments[b] = [];
-
-        if($scope.int($scope.myComments[b][q]) === a) $scope.myComments[b][q] = '';
-        else $scope.myComments[b][q] = a;
+    $scope.scaleAnswer = function(qid, a){
+        if($scope.int($scope.myComments[qid]) === a) $scope.myComments[qid] = '';
+        else $scope.myComments[qid] = a;
     }
 
     $scope.langContent = function(data, target){
