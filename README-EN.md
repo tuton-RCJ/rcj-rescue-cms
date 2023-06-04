@@ -2,7 +2,7 @@
 This is a scoring system used in RoboCupJunior's rescue line & maze competition.
 
 ## Supported rules
-* 2022 final rules published by International RoboCupJunior Rescue Technical Committee / [Line](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueLine_Rules_final01.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueMaze_Rules_final01.pdf)
+* 2023 final rules published by International RoboCupJunior Rescue Technical Committee / [Line](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueLine2023Rules.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueMaze2023Rules.pdf)
 * 2023 rules published by Japanese Regional Committee for entry leagues / [Line-Entry](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view) / [Maze-Entry](https://drive.google.com/file/d/1uMUyGcmFgs-j8imhE3vgOHX1gyz4r_J8/view?usp=sharing)
 ## Demo
 The latest version is running. It is built using Docker image and working under OCI arm instance.
@@ -15,7 +15,7 @@ The latest version is running. It is built using Docker image and working under 
 * RoboCup Junior 2017 Kanto (Japanese local competition)
 * RoboCup Junior Japan Open 2017 Gifu-Nakatsugawa (Japanese national competition)
 
-### 2017 rule
+### 2017 rules
 * RoboCup 2017 Nagoya Japan
 * NEST Robocon 2017
 * RoboCup Junior 2018 North-Saitama (Japanese local competition)
@@ -29,11 +29,11 @@ The latest version is running. It is built using Docker image and working under 
 * RoboCup Junior 2018 Kansai (Japanese local competition)
 * RoboCup Junior Japan Open 2018 Wakayama (Japanese national competition)
 
-### 2018 rule
+### 2018 rules
 * RoboCup 2018 Montreal Canada
 * Kansai Summer Open Competition 2018
 
-### 2019 rule
+### 2019 rules
 * RoboCup Junior 2019 Tokai (Japanese local competition)
 * RoboCup Junior 2019 Saitama (Japanese local competition)
 * RoboCup Junior 2019 Hiroshima (Japanese local competition)
@@ -45,10 +45,22 @@ The latest version is running. It is built using Docker image and working under 
 * RoboCup Junior 2020 Osaka-Central (Japanese local competition)
 * RoboCup Junior 2020 Kansai (Japanese local competition)
 
-### 2021 rule
+### 2021 rules
 * RoboCup Junior 2021 Tokai (Japanese local competition)
 * RoboCupJunior Japan 2021 Online (Japanese national competition)
 * RoboCup2021 WORLDWIDE
+
+### 2022 rules
+* RoboCup 2022 Bangkok Thailand
+
+### 2023 rules
+* RoboCup Junior 2023 Tokai (Japanese local competition)
+* RoboCup Junior 2023 Kansai (Japanese local competition)
+* RoboCup Junior 2023 Kanto (Japanese local competition)
+* RoboCup Junior 2023 Hiroshima (Japanese local competition)
+* RoboCup Junior Japan Open 2023 Nagoya (Japanese national competition)
+* Torneo Mexicano de Robótica 2023 (Mexican national competition)
+* RoboCup 2023 Bordeaux France
 
 ## Usage
 ### Using Docker（Recomended）

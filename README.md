@@ -11,21 +11,18 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 これは，ロボカップジュニアレスキュー競技で用いられる大会管理システムです．  
 
 #### 対応ルール
-* International RoboCupJunior Rescue Technical Committee により発行された2022最終ルール / [Line](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueLine_Rules_final01.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2022Rules/2022_RescueMaze_Rules_final01.pdf)
+* International RoboCupJunior Rescue Committee により発行された2023ルール / [Line](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueLine2023Rules.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueMaze2023Rules.pdf)
 * 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2023ルール / [レスキュー・ライン・エントリー](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view) / [レスキュー・メイズ・エントリー](https://drive.google.com/file/d/1uMUyGcmFgs-j8imhE3vgOHX1gyz4r_J8/view?usp=sharing)
-* *国際2023ルール(Draft)には、2022年12月末を目処に対応いたします。*
 --
 
 
 [大元のプロジェクト](https://github.com/TechnoX/rcj-rescue-scoring)からフォークして開発を進めています．
 主な変更点は以下の通りです．
 
-* Line競技において，ワールドリーグと日本リーグを追加
-* Line結果画面において，ワールドリーグと日本リーグの結果を横並びで表示
 * ユーザー管理機能を強化
 * マップの回転機能を追加
 * インタビュー機能を追加
-* 国際2022ルールに対応
+* 国際2023ルールに対応
 * ラインのタイルセットの在庫管理に対応
 * 大会データーのバックアップ/リストアに対応
 * トラブル発生時のハンドオーバーに対応
@@ -42,6 +39,7 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 [https://osaka.rcj.cloud](https://osaka.rcj.cloud)
 
 ## 更新情報
+* [2023/06/04] 国際2023ルールに対応しました。
 * [2022/10/09] レスキュー・メイズ・エントリー 2023ルールに対応しました
 * [2022/09/17] レスキュー・ライン・エントリー 2023ルールに対応しました
 * [2021/10/02] 2022ルールに暫定対応しました．
@@ -97,6 +95,15 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 
 ### 2022年ルール対応版
 * RoboCup 2022 Bangkok Thailand
+
+### 2023年ルール対応版
+* ロボカップジュニア2023 東海ブロック大会
+* ロボカップジュニア2023 関東ブロック大会
+* ロボカップジュニア2023 関西ブロック大会
+* ロボカップジュニア2023 広島ブロック大会
+* ロボカップジュニア ジャパンオープン2023 名古屋
+* Torneo Mexicano de Robótica 2023 (メキシコ)
+* RoboCup 2023 Bordeaux France
 
 ## 使用方法
 ### Dockerを利用（推奨）
