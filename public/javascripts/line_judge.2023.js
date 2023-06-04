@@ -330,8 +330,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         $scope.mtiles = {};
 
         // Get max victim count
-        $scope.maxLiveVictims = response.data.victims.live;
-        $scope.maxDeadVictims = response.data.victims.dead;
+        $scope.maxLiveVictims = 2;
+        $scope.maxDeadVictims = 1;
 
 
         $scope.mapIndexCount = response.data.indexCount;
@@ -489,33 +489,63 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
   };
 
 
-  $scope.calc_victim_multipliers = function (type, effective){
+  $scope.calc_victim_type_lop_multiplier = function (type, lop=-1){
+    if(lop == -1) lop = $scope.LoPs[$scope.EvacuationAreaLoPIndex];
     let multiplier;
-    if(type == "K"){
-      if($scope.evacuationLevel == 1){
-        if($scope.kitLevel == 1) multiplier = 1100;
-        else multiplier = 1300;
-      }else{
-        if($scope.kitLevel == 1) multiplier = 1200;
-        else multiplier = 1600;
-      }
+    if(type == "KIT"){
+        if($scope.evacuationLevel == 1){
+            if($scope.kitLevel == 1) return 1.1;
+            else return 1.3;
+        }else{
+            if($scope.kitLevel == 1) return 1.2;
+            else return 1.6;
+        }
     }
-    else if (!effective) return "----";
     else if ($scope.evacuationLevel == 1) { // Low Level
-      multiplier = 1200;
+        multiplier = 1200;
     } else { // High Level
-      multiplier = 1400;
+        multiplier = 1400;
     }
 
-    if($scope.evacuationLevel == 1) multiplier = Math.max(multiplier - 25*$scope.LoPs[$scope.EvacuationAreaLoPIndex],1000);
-    else multiplier = Math.max(multiplier - 50*$scope.LoPs[$scope.EvacuationAreaLoPIndex],1000);
-    return "x" + String(multiplier/1000);
+    if($scope.evacuationLevel == 1) multiplier = Math.max(multiplier - 25*lop,1000);
+    else multiplier = Math.max(multiplier - 50*lop,1000);
+    return multiplier/1000;
   };
+
+  $scope.calc_victim_multipliers = function (index){
+    let victim = $scope.victim_list[index];
+    if (victim == undefined) return 0;
+
+    // Effective check
+    if(victim.victimType == "LIVE" && victim.zoneType == "RED") return 1.0;
+    if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return 1.0;
+    if(victim.victimType == "KIT" && victim.zoneType == "RED") return 1.0;
+
+    // Effective check for dead victim
+    if (victim.victimType == "DEAD") {
+      let liveCount = 0;
+      for (i of $scope.range(index)) {
+        let v = $scope.victim_list[i]
+        if (v.victimType == "LIVE") liveCount ++;
+      }
+      if (liveCount != 2) return 1.0;
+    }
+    
+    return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
+  };
+
+  $scope.victim_bk_color = function (index, zoneType) {
+    let m = $scope.calc_victim_multipliers(index);
+    if (m == 0 || zoneType != $scope.victim_list[index].zoneType) return '#fff';
+    if (m == 1) return '#ccc';
+    if (zoneType == "RED") return '#ffc1ff';
+    return '#e0ffc1';
+  }
 
   $scope.count_victim_list = function (type) {
     let count = 0;
     for (victiml of $scope.victim_list) {
-      if (!victiml.type.indexOf(type)) {
+      if (!victiml.victimType.indexOf(type)) {
         count++;
       }
     }
@@ -534,60 +564,36 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   $scope.addVictimTmp = function (type) {
     playSound(sClick);
-    if (type == "L") {
-      if ($scope.count_victim_list("L") + $scope.count_victim_tmp("L") >= $scope.maxLiveVictims) return;
-    } else if(type == "D") {
-      if ($scope.count_victim_list("D") + $scope.count_victim_tmp("D") >= $scope.maxDeadVictims) return;
+    if (type == "LIVE") {
+      if ($scope.count_victim_list("LIVE") + $scope.count_victim_tmp("LIVE") >= $scope.maxLiveVictims) return;
+    } else if(type == "DEAD") {
+      if ($scope.count_victim_list("DEAD") + $scope.count_victim_tmp("DEAD") >= $scope.maxDeadVictims) return;
     } else{ //Rescue Kit
-      if ($scope.count_victim_list("K") + $scope.count_victim_tmp("K") >= 1) return;
+      if ($scope.count_victim_list("KIT") + $scope.count_victim_tmp("KKIT") >= 1) return;
     }
     $scope.victim_tmp.push(type);
   };
 
-  $scope.addVictim = function (type) {
+  $scope.addVictim = function (victimType, zoneType) {
     let tmp = {};
-    tmp.effective = true;
-    if (type == "L") {
-      tmp.type = "L";
-      if ($scope.count_victim_list("L") >= $scope.maxLiveVictims) return;
-    } else if(type == "D") {
-      tmp.type = "D";
-      if ($scope.count_victim_list("D") >= $scope.maxDeadVictims) return;
-      if ($scope.count_victim_list("L") >= $scope.maxLiveVictims) { // All live victim rescued
-
-      } else {
-        tmp.effective = false;
-      }
-    }else{ //Rescue Kit
-      tmp.type = "K";
-      if ($scope.count_victim_list("K") >= 1) return;
+    tmp.zoneType = zoneType;
+    if (victimType == "LIVE") {
+      tmp.victimType = "LIVE";
+      if ($scope.count_victim_list("LIVE") >= $scope.maxLiveVictims) return;
+    } else if(victimType == "DEAD") {
+      tmp.victimType = "DEAD";
+      if ($scope.count_victim_list("DEAD") >= $scope.maxDeadVictims) return;
+    } else { //Rescue Kit
+      tmp.victimType = "KIT";
+      if ($scope.count_victim_list("KIT") >= 1) return;
     }
-
-
     $scope.victim_list.push(tmp);
+    console.log(tmp);
   };
-
-  function reStateVictim() {
-    let count = 0;
-    for (victiml of $scope.victim_list) {
-      if (!victiml.type.indexOf("L")) {
-        count++;
-      }
-      if (!victiml.type.indexOf("D")) {
-        if (count >= 1) {
-          victiml.effective = true;
-        } else {
-          victiml.effective = false;
-        }
-      }
-
-    }
-  }
 
   $scope.delete_victim = function (index) {
     playSound(sClick);
     $scope.victim_list.splice(index, 1);
-    reStateVictim();
 
     upload_run({
       rescueOrder: $scope.victim_list
@@ -599,28 +605,28 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.victim_tmp.splice(index, 1);
   };
 
-  $scope.victimRegist = function () {
+  $scope.victimRegist = function (zoneType) {
     playSound(sClick);
     let live = 0;
     let dead = 0;
     let kit = 0;
     for (victiml of $scope.victim_tmp) {
-      if (!victiml.indexOf("L")) {
+      if (!victiml.indexOf("LIVE")) {
         live++;
-      } else if (!victiml.indexOf("D")) {
+      } else if (!victiml.indexOf("DEAD")) {
         dead++;
       } else{
         kit ++;
       }
     }
     for (let i = 0; i < live; i++) {
-      $scope.addVictim("L");
+      $scope.addVictim("LIVE", zoneType);
     }
     for (let i = 0; i < dead; i++) {
-      $scope.addVictim("D");
+      $scope.addVictim("DEAD", zoneType);
     }
 
-    if(kit) $scope.addVictim("K");
+    if(kit) $scope.addVictim("KIT", zoneType);
 
     $scope.victim_tmp_clear();
 

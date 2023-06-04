@@ -58,8 +58,7 @@ app.controller("LineTimetableController", ['$scope', '$http', '$translate','$win
     }
 
     $scope.update_list = function () {
-        $http.get("/api/competitions/" + competitionId +
-            "/line/runs?timetable=true&populate=true").then(function (response) {
+        $http.get(`/api/runs/line/competition/${competitionId}?timetable=true&populate=true`).then(function (response) {
             var runs = response.data
             $scope.runs = runs
 

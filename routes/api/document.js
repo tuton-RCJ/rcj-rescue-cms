@@ -738,10 +738,56 @@ privateRouter.get('/review/:teamId', function (req, res, next) {
   });
 });
 
-adminRouter.delete('/review/:reviewId/:block/:question', function (req, res, next) {
-  const { reviewId } = req.params;
-  const { block } = req.params;
-  const { question } = req.params;
+privateRouter.get('/review/:teamId/myComments', function (req, res, next) {
+  const { teamId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team.findById(teamId).exec(function (err, dbTeam) {
+    if (err) {
+      if (!err) err = { message: 'No team found' };
+      res.status(404).send({
+        msg: 'Could not get team',
+        err: err.message,
+      });
+    } else if (dbTeam) {
+      if (
+        auth.authCompetition(req.user, dbTeam.competition, ACCESSLEVELS.VIEW)
+      ) {
+        documentDb.review
+          .findOne({
+            team: teamId,
+            reviewer: req.user._id
+          })
+          .populate('reviewer', 'username')
+          .populate('team', 'competition')
+          .exec(function (err, dbReview) {
+            if (dbReview) {
+              res.send(dbReview);
+            } else {
+              res.status(404).send({
+                msg: 'Could not get review'
+              });
+            }
+          });
+      } else {
+        res.status(401).send({
+          msg: 'Operation not permited',
+        });
+      }
+    } else {
+      res.status(400).send({
+        msg: 'Could not get team',
+        err: 'No team found',
+      });
+    }
+  });
+});
+
+adminRouter.delete('/review/:reviewId/:questionId', function (req, res, next) {
+  const { reviewId, questionId } = req.params;
 
   if (!ObjectId.isValid(reviewId)) {
     return next();
@@ -758,41 +804,59 @@ adminRouter.delete('/review/:reviewId/:block/:question', function (req, res, nex
         });
       } else if (dbReview) {
         if(auth.authCompetition(req.user, dbReview.competition, ACCESSLEVELS.ADMIN)){
-          if(block == -1){ // Delete whole review
-            documentDb.review.deleteOne({ '_id': reviewId }, (err) => {
-              if(err){
-                res.status(400).send({
-                  msg: 'Delete error',
-                  err: err.message,
-                });
-              }else{
-                res.status(200).send({
-                  msg: 'Deleted',
-                });
-              }
-            });
-          }else{
-            if(dbReview.comments.length > block && dbReview.comments[block].length > question){
-              dbReview.comments[block][question] = '';
-              dbReview.markModified('comments');
-              dbReview.save(function(err) {
-                if(err){
-                  res.status(400).send({
-                    msg: 'Delete error',
-                    err: err.message,
-                  });
-                }else{
-                  res.status(200).send({
-                    msg: 'Deleted',
-                  });
-                }
-              })
-            }else{
+          dbReview.comments.delete(questionId);
+          dbReview.markModified('comments');
+          dbReview.save(function(err) {
+            if(err){
               res.status(400).send({
-                msg: 'Delete posititon error'
+                msg: 'Delete error',
+                err: err.message,
+              });
+            }else{
+              res.status(200).send({
+                msg: 'Deleted',
               });
             }
-          }
+          })
+        }else{
+          res.status(400).send({
+            msg: 'Competition auth error :('
+          });
+        }
+      }
+    });
+});
+
+adminRouter.delete('/review/:reviewId', function (req, res, next) {
+  const { reviewId } = req.params;
+
+  if (!ObjectId.isValid(reviewId)) {
+    return next();
+  }
+
+  documentDb.review
+    .findOne({ _id: reviewId})
+    .exec(function (err, dbReview) {
+      if (err) {
+        if (!err) err = { message: 'No review found' };
+        res.status(400).send({
+          msg: 'Could not get review',
+          err: err.message,
+        });
+      } else if (dbReview) {
+        if(auth.authCompetition(req.user, dbReview.competition, ACCESSLEVELS.ADMIN)){
+          documentDb.review.deleteOne({ '_id': reviewId }, (err) => {
+            if(err){
+              res.status(400).send({
+                msg: 'Delete error',
+                err: err.message,
+              });
+            }else{
+              res.status(200).send({
+                msg: 'Deleted',
+              });
+            }
+          });
         }else{
           res.status(400).send({
             msg: 'Competition auth error :('
@@ -816,7 +880,7 @@ adminRouter.get('/reviews/:competition', function (req, res, next) {
         team: { $ne: null }
       })
       .populate('reviewer', 'username')
-      .populate('team', 'league')
+      .populate('team', 'teamCode name league country')
       .exec(function (err, dbReview) {
         if (err) {
           if (!err) err = { message: 'No review found' };
@@ -1523,7 +1587,7 @@ adminRouter.get('/templates/documentForm', function (req, res, next) {
 
     const d = [];
     for (const dirent of dirents) {
-      if (!dirent.isDirectory()) {
+      if (!dirent.isDirectory() && path.extname(dirent.name).toLowerCase() === '.json') {
         const tmp = {
           name: escape(path.basename(dirent.name, '.json')),
           path: escape(dirent.name),
@@ -1539,6 +1603,56 @@ adminRouter.get('/templates/documentForm/:fileName', function (req, res, next) {
   const { fileName } = req.params;
 
   const dir_path = `${__dirname}/../../templates/documentForm/${sanitize(fileName)}`;
+  fs.stat(dir_path, (err, stat) => {
+    // Handle file not found
+    if (err !== null && err.code === 'ENOENT') {
+      res.status(404).send({
+        msg: 'File not found',
+      });
+      return;
+    }
+
+    const stream = fs.createReadStream(dir_path)
+      stream.on('error', (error) => {
+          res.statusCode = 500
+          res.end('Cloud not make stream')
+      })
+      let mimeType = mime.getType(dir_path);
+      let head = {}
+      if(mimeType != null) {
+        head['Content-Type'] = mimeType;
+      }
+      res.writeHead(200, head);
+      stream.pipe(res);
+  });
+});
+
+adminRouter.get('/templates/reviewForm', function (req, res, next) {
+  const dir_path = `${__dirname}/../../templates/reviewForm/`;
+  fs.readdir(dir_path, { withFileTypes: true }, (err, dirents) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    const d = [];
+    for (const dirent of dirents) {
+      if (!dirent.isDirectory() && path.extname(dirent.name).toLowerCase() === '.json') {
+        const tmp = {
+          name: escape(path.basename(dirent.name, '.json')),
+          path: escape(dirent.name),
+        };
+        d.push(tmp);
+      }
+    }
+    res.send(d);
+  });
+});
+
+adminRouter.get('/templates/reviewForm/:fileName', function (req, res, next) {
+  const { fileName } = req.params;
+
+  const dir_path = `${__dirname}/../../templates/reviewForm/${sanitize(fileName)}`;
   fs.stat(dir_path, (err, stat) => {
     // Handle file not found
     if (err !== null && err.code === 'ENOENT') {

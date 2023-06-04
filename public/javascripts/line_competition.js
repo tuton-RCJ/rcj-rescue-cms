@@ -32,11 +32,15 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
     $scope.teamName = ""
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
-        $scope.competition = response.data
+        $scope.competition = response.data;
+        $scope.rankingOpen = $scope.competition.ranking.reduce((result, current) => {
+            result[current.league] = current.disclose;
+            return result;
+        }, {})
     })
 
-    $http.get("/api/teams/leagues/line/" + competitionId).then(function (response) {
-        $scope.leagues = response.data
+    $http.get("/api/competitions/leagues/" + league).then(function (response) {
+        $scope.league = response.data
     })
     
     // launch socket.io
@@ -69,10 +73,8 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
     }
 
     $scope.update_list = function () {
-        $http.get("/api/competitions/" + competitionId +
-            "/line/runs?populate=true&minimum=true&ended=" +
-            $scope.show_ended).then(function (response) {
-            var runs = response.data
+        $http.get(`/api/runs/line/competition/${competitionId}?populate=true&minimum=true&ended=${$scope.show_ended}`).then(function (response) {
+            var runs = response.data.filter(r => r.team.league == league);
             
             for (let run of runs) {
                 if (!run.team) {
@@ -82,7 +84,7 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
                 }
             }
             
-            $scope.runs = runs
+            $scope.runs = runs;
 
             // TODO: This should be done with Set, needs polyfill?
             if(!$scope.rounds && !$scope.fields){

@@ -11,7 +11,7 @@ const scoreSheetPDF2 = require('../../helper/scoreSheetPDFMaze2');
 const auth = require('../../helper/authLevels');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
-
+const { VICTIMS } = require('../../models/mazeMap');
 
 let socketIo;
 
@@ -20,7 +20,7 @@ module.exports.connectSocketIo = function (io) {
 };
 
 /**
- * @api {get} /runs/maze Get runs
+ * @api {get} /runs/maze/competition/:competitionId
  * @apiName GetRun
  * @apiGroup Run
  * @apiVersion 1.0.0
@@ -41,83 +41,61 @@ module.exports.connectSocketIo = function (io) {
  *
  * @apiError (400) {String} msg The error message
  */
-publicRouter.get('/', getMazeRuns);
+publicRouter.get('/competition/:competitionId', function (req, res, next) {
+  const competition = req.params.competitionId;
+  const normalized = req.query.normalized;
 
-function getMazeRuns(req, res) {
-  const competition = req.query.competition || req.params.competition;
+  if (!ObjectId.isValid(competition)) {
+    return next();
+  }
 
+  let maxScoreCache = {};
   let query;
-  if (competition != null && competition.constructor === String) {
-    if (req.query.ended == 'false') {
-      query = mazeRun.find({
-        competition,
-        status: {
-          $lte: 1,
-        },
-      });
-    } else {
-      query = mazeRun.find({
-        competition,
-      });
-    }
-  } else if (Array.isArray(competition)) {
+  if (req.query.ended == 'false') {
     query = mazeRun.find({
-      competition: {
-        $in: competition.filter(ObjectId.isValid),
+      competition,
+      status: {
+        $lte: 1,
       },
     });
   } else {
-    query = mazeRun.find({});
+    query = mazeRun.find({
+      competition,
+    });
   }
 
-  if (req.query.minimum) {
+  if (req.query.minimum && !normalized) {
     query.select('competition round team field status started startTime sign');
-  } else if (req.query.timetable) {
-    query.select('round team field startTime group');
-    query.populate([
-      {
-        path: 'team',
-        select: 'name league teamCode',
-      },
-      {
-        path: 'round',
-        select: 'name',
-      },
-      {
-        path: 'field',
-        select: 'name league',
-      },
-    ]);
+  } else if (req.query.timetable && !normalized) {
+    query.select('competition round team field startTime group');
   } else {
     query.select(
-      'competition round team field map score time status started comment startTime sign LoPs exitBonus foundVictims'
+      'competition round team field map score time status started comment startTime sign LoPs exitBonus foundVictims misidentification normalizationGroup'
     );
   }
 
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
-      {
-        path: 'competition',
-        select: 'name',
-      },
-      {
-        path: 'round',
-        select: 'name',
-      },
-      {
-        path: 'team',
-        select: 'name league teamCode',
-      },
-      {
-        path: 'field',
-        select: 'name league',
-      },
-      {
-        path: 'map',
-        select: 'name',
-      },
-    ]);
-  }
+  query.populate([
+    {
+      path: 'competition',
+      select: 'name ranking preparation',
+    },
+    {
+      path: 'round',
+      select: 'name',
+    },
+    {
+      path: 'team',
+      select: 'name league teamCode',
+    },
+    {
+      path: 'field',
+      select: 'name league',
+    },
+    {
+      path: 'map',
+      select: 'name',
+    },
+  ]);
 
   query.lean().exec(function (err, dbRuns) {
     if (err) {
@@ -128,28 +106,58 @@ function getMazeRuns(req, res) {
       });
     } else if (dbRuns) {
       // Hide map and field from public
-      for (let i = 0; i < dbRuns.length; i++) {
-        if (!auth.authViewRun(req.user, dbRuns[i], ACCESSLEVELS.NONE + 1)) {
-          delete dbRuns[i].map;
-          delete dbRuns[i].field;
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
-        } else if (
-          !auth.authCompetition(
-            req.user,
-            dbRuns[i].competition,
-            ACCESSLEVELS.VIEW
-          )
-        ) {
-          delete dbRuns[i].comment;
-          delete dbRuns[i].sign;
+      dbRuns.map(run => {
+        switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {
+          case 0:
+            delete run.map;
+            delete run.field;
+            delete run.score;
+            delete run.time;
+            delete run.LoPs;
+            delete run.exitBonus;
+            delete run.foundVictims;
+            delete run.misidentification;
+          case 2:
+            delete run.comment;
+            delete run.sign;
         }
+
+        if (run.foundVictims) run.foundVictims = run.foundVictims.sort((a,b) => VICTIMS.indexOf(a.type) - VICTIMS.indexOf(b.type));
+      })
+
+      // return normalized score
+      if (normalized && auth.authCompetition(
+        req.user,
+        competition,
+        ACCESSLEVELS.ADMIN
+      )) {
+        dbRuns.map(run => {
+          let rankingSettings = run.competition.ranking.find(r => r.league == run.team.league);
+          if (!rankingSettings) {
+            rankingSettings = {
+              mode: competitiondb.SUM_OF_BEST_N_GAMES
+            };
+          }
+          if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
+            let maxScore = getMaxScoreWithCache(dbRuns, run.team.league, run.normalizationGroup, maxScoreCache);
+            if (maxScore == 0) run.normalizedScore = 0;
+            else run.normalizedScore = run.score / maxScore;
+          }
+        });
       }
       res.status(200).send(dbRuns);
     }
   });
+});
+
+function getMaxScoreWithCache(runs, league, normalizationGroup, cache) {
+  if (cache[league+normalizationGroup] != null) {
+    return cache[league+normalizationGroup];
+  }
+  cache[league+normalizationGroup] = Math.max(...runs.filter(run => run.team.league == league && run.normalizationGroup == normalizationGroup)
+    .map(run => run.score));  
+  return cache[league+normalizationGroup];
 }
-module.exports.getMazeRuns = getMazeRuns;
 
 privateRouter.get(
   '/find/team_status/:competitionid/:teamid/:status',
@@ -281,23 +289,18 @@ publicRouter.get(
  */
 publicRouter.get('/:runid', function (req, res, next) {
   const id = req.params.runid;
+  const normalized = req.query.normalized
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
 
-  const query = mazeRun.findById(id, '-__v');
-
-  if (req.query.populate !== undefined && req.query.populate) {
-    query.populate([
+  mazeRun.findById(id, '-__v').populate([
       'round',
       { path: 'team', select: 'name league teamCode' },
       'field',
-      'competition',
-    ]);
-  }
-
-  query.lean().exec(function (err, dbRun) {
+      { path: 'competition', select: 'name ranking preparation' }
+    ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
       return res.status(400).send({
@@ -307,7 +310,7 @@ publicRouter.get('/:runid', function (req, res, next) {
     }
     // Hide map and field from public
     // Hide map and field from public
-    const authResult = auth.authViewRun(req.user, dbRun, ACCESSLEVELS.VIEW);
+    const authResult = auth.authViewRun(req.user, dbRun, ACCESSLEVELS.VIEW, dbRun.competition.preparation);
     if (authResult == 0) {
       return res.status(401).send({
         msg: 'You have no authority to access this api!!',
@@ -316,6 +319,37 @@ publicRouter.get('/:runid', function (req, res, next) {
     if (authResult == 2) {
       delete dbRun.comment;
       delete dbRun.sign;
+    }
+
+    dbRun = dbRun.toObject();
+
+    // return normalized value
+    let rankingSettings = dbRun.competition.ranking.find(r => r.league == dbRun.team.league);
+    if (!rankingSettings) {
+      rankingSettings = {
+        mode: competitiondb.SUM_OF_BEST_N_GAMES,
+        disclose: false,
+        num: 20
+      }
+    }
+    if (normalized && competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
+      // disclose runking enabled OR the user is ADMIN of the competition
+      if (rankingSettings.disclose || auth.authCompetition(
+        req.user,
+        dbRun.competition._id,
+        ACCESSLEVELS.ADMIN
+      )) {
+        let maxScore = await mazeRun.find({
+          competition: dbRun.competition._id,
+          normalizationGroup: dbRun.normalizationGroup
+        }).populate({
+          path: 'team',
+          select: 'league'
+        }).select("score").exec();
+        maxScore = Math.max(...maxScore.filter(run => run.team.league == dbRun.team.league).map(run => run.score));
+        if (maxScore == 0) dbRun.normalizedScore = 0;
+        else dbRun.normalizedScore = dbRun.score / maxScore;
+      }
     }
     return res.status(200).send(dbRun);
   });
@@ -488,13 +522,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
         if (prevStatus != dbRun.status) statusUpdate = 1;
 
-        let retScoreCals;
-        if (dbRun.manualFlag)
-          retScoreCals = scoreCalculator
-            .calculateMazeScoreManual(dbRun)
-            .split(',');
-        else
-          retScoreCals = scoreCalculator.calculateMazeScore(dbRun).split(',');
+        let retScoreCals = scoreCalculator.calculateMazeScore(dbRun);
 
         if (!retScoreCals) {
           logger.error('Value Error');
@@ -503,9 +531,9 @@ privateRouter.put('/:runid', function (req, res, next) {
           });
         }
 
-        dbRun.score = retScoreCals[0];
-        dbRun.foundVictims = retScoreCals[1];
-        dbRun.distKits = retScoreCals[2];
+        dbRun.score = retScoreCals.score;
+        dbRun.foundVictims = retScoreCals.victims;
+        if (retScoreCals.kits) dbRun.distKits = retScoreCals.kits;
 
         if (
           dbRun.score > 0 ||
@@ -554,6 +582,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   const round = req.query.round || req.params.round;
   const startTime = req.query.startTime || req.params.startTime;
   const endTime = req.query.endTime || req.params.endTime;
+  const offset = req.query.offset;
 
   if (!competition && !run && !round) {
     return next();
@@ -621,6 +650,9 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
         msg: 'Could not get runs',
       });
     } else if (dbRuns) {
+      dbRuns.map(run => {
+        run.startTime += parseInt(offset)*60*1000;
+      })
       for (let i = 0; i < dbRuns.length; i++) {
         if (dbRuns[i].tiles.length === 0 && !dbRuns[i].diceNumber && dbRuns[i].map.dice.length > 0) {
           const randomMapIndex = Math.floor(
@@ -876,6 +908,7 @@ adminRouter.post('/', function (req, res) {
       field: run.field,
       map: run.map,
       startTime: run.startTime,
+      normalizationGroup: run.normalizationGroup
     };
   } else {
     var regist = {
@@ -885,6 +918,7 @@ adminRouter.post('/', function (req, res) {
       field: run.field,
       map: run.map,
       startTime: run.startTime,
+      normalizationGroup: run.normalizationGroup
     };
   }
   new mazeRun(regist).save(function (err, data) {

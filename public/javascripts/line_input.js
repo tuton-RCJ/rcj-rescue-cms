@@ -1,5 +1,5 @@
 /*********************************************************************************/
-// This file is a RoboCup Junior Rescue 2019 rule correspondence version. //
+// This file is a RoboCup Junior Rescue 2023 rule correspondence version. //
 /*********************************************************************************/
 
 // register the directive with your app module
@@ -301,117 +301,94 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return arr;
     }
 
-
-
     $scope.count_victim_list = function (type) {
-        let count = 0
-        for (victiml of $scope.victim_list) {
-            if (!victiml.type.indexOf(type)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    $scope.count_victim_tmp = function (type) {
-        let count = 0
-        for (victiml of $scope.victim_tmp) {
-            if (!victiml.indexOf(type)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    $scope.addVictimTmp = function (type) {
-        playSound(sClick);
-        if (type == "L") {
-            if ($scope.count_victim_list("L") + $scope.count_victim_tmp("L") >= $scope.maxLiveVictims) return;
-        } else if(type == "D") {
-            if ($scope.count_victim_list("D") + $scope.count_victim_tmp("D") >= $scope.maxDeadVictims) return;
-        } else{ //Rescue Kit
-            if ($scope.count_victim_list("K") + $scope.count_victim_tmp("K") >= 1) return;
-        }
-        $scope.victim_tmp.push(type);
-        $scope.victimRegist();
-    };
-
-    $scope.addVictim = function (type) {
-        let tmp = {};
-        tmp.effective = true;
-        if (type == "L") {
-            tmp.type = "L";
-            if ($scope.count_victim_list("L") >= $scope.maxLiveVictims) return;
-        } else if(type == "D") {
-            tmp.type = "D";
-            if ($scope.count_victim_list("D") >= $scope.maxDeadVictims) return;
-            if ($scope.count_victim_list("L") >= 1) { // At least one live victim rescued
-
-            } else {
-                tmp.effective = false;
-            }
-        }else{ //Rescue Kit
-            tmp.type = "K";
-            if ($scope.count_victim_list("K") >= 1) return;
-        }
-
-
-        $scope.victim_list.push(tmp);
-    };
-
-    function reStateVictim() {
         let count = 0;
         for (victiml of $scope.victim_list) {
-            if (!victiml.type.indexOf("L")) {
-                count++;
-            }
-            if (!victiml.type.indexOf("D")) {
-                if (count >= 1) {
-                    victiml.effective = true;
-                } else {
-                    victiml.effective = false;
-                }
-            }
-
+          if (!victiml.victimType.indexOf(type)) {
+            count++;
+          }
         }
-    }
-
-    $scope.delete_victim = function (index) {
+        return count;
+      };
+    
+      $scope.count_victim_tmp = function (type) {
+        let count = 0;
+        for (victiml of $scope.victim_tmp) {
+          if (!victiml.indexOf(type)) {
+            count++;
+          }
+        }
+        return count;
+      };
+    
+      $scope.addVictimTmp = function (type) {
+        playSound(sClick);
+        if (type == "LIVE") {
+          if ($scope.count_victim_list("LIVE") + $scope.count_victim_tmp("LIVE") >= $scope.maxLiveVictims) return;
+        } else if(type == "DEAD") {
+          if ($scope.count_victim_list("DEAD") + $scope.count_victim_tmp("DEAD") >= $scope.maxDeadVictims) return;
+        } else{ //Rescue Kit
+          if ($scope.count_victim_list("KIT") + $scope.count_victim_tmp("KKIT") >= 1) return;
+        }
+        $scope.victim_tmp.push(type);
+      };
+    
+      $scope.addVictim = function (victimType, zoneType) {
+        let tmp = {};
+        tmp.zoneType = zoneType;
+        if (victimType == "LIVE") {
+          tmp.victimType = "LIVE";
+          if ($scope.count_victim_list("LIVE") >= $scope.maxLiveVictims) return;
+        } else if(victimType == "DEAD") {
+          tmp.victimType = "DEAD";
+          if ($scope.count_victim_list("DEAD") >= $scope.maxDeadVictims) return;
+        } else { //Rescue Kit
+          tmp.victimType = "KIT";
+          if ($scope.count_victim_list("KIT") >= 1) return;
+        }
+        $scope.victim_list.push(tmp);
+      };
+    
+      $scope.delete_victim = function (index) {
         playSound(sClick);
         $scope.victim_list.splice(index, 1);
-        reStateVictim();
+      };
 
-    };
-
-    $scope.victimRegist = function () {
+      $scope.delete_victim_tmp = function (index) {
+        playSound(sClick);
+        $scope.victim_tmp.splice(index, 1);
+      };
+    
+      $scope.victimRegist = function (zoneType) {
+        playSound(sClick);
         let live = 0;
         let dead = 0;
         let kit = 0;
         for (victiml of $scope.victim_tmp) {
-            if (!victiml.indexOf("L")) {
-                live++;
-            } else if (!victiml.indexOf("D")) {
-                dead++;
-            } else{
-                kit ++;
-            }
+          if (!victiml.indexOf("LIVE")) {
+            live++;
+          } else if (!victiml.indexOf("DEAD")) {
+            dead++;
+          } else{
+            kit ++;
+          }
         }
         for (let i = 0; i < live; i++) {
-            $scope.addVictim("L");
+          $scope.addVictim("LIVE", zoneType);
         }
         for (let i = 0; i < dead; i++) {
-            $scope.addVictim("D");
+          $scope.addVictim("DEAD", zoneType);
         }
-
-        if(kit) $scope.addVictim("K");
-
+    
+        if(kit) $scope.addVictim("KIT", zoneType);
+    
         $scope.victim_tmp_clear();
-    };
-
-    $scope.victim_tmp_clear = function () {
+      };
+    
+      $scope.victim_tmp_clear = function () {
         playSound(sClick);
         $scope.victim_tmp = [];
-    }
+      };
 
     $scope.changeLevel = function (n) {
         playSound(sClick);

@@ -129,6 +129,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.stiles = data.tiles;
                 $scope.score = data.score;
                 $scope.raw_score = data.raw_score;
+                $scope.normalizedScore = data.normalizedScore;
                 $scope.multiplier = data.multiplier;
                 $scope.showedUp = data.showedUp;
                 $scope.LoPs = data.LoPs;
@@ -176,8 +177,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     function loadNewRun() {
         $http.get("/api/runs/line/" + runId +
-            "?populate=true").then(function (response) {
-            console.log(response.data);
+            "?normalized=true").then(function (response) {
             $scope.LoPs = response.data.LoPs;
             $scope.evacuationLevel = response.data.evacuationLevel;
             $scope.kitLevel = response.data.kitLevel;
@@ -185,6 +185,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.field = response.data.field.name;
             $scope.score = response.data.score;
             $scope.raw_score = response.data.raw_score;
+            $scope.normalizedScore = response.data.normalizedScore;
             $scope.multiplier = response.data.multiplier;
             $scope.showedUp = response.data.showedUp;
             $scope.started = response.data.started;
@@ -286,7 +287,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
-                $scope.go('/home/access_denied');
+                $scope.go(`/home/access_denied?iframe=${iframe}`);
             }
         });
     }
@@ -302,19 +303,18 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return findItem("checkpoint", tile.scoredItems) != null;
     }
 
-    $scope.calc_victim_multipliers = function (type, effective, lop=-1){
+    $scope.calc_victim_type_lop_multiplier = function (type, lop=-1){
         if(lop == -1) lop = $scope.LoPs[$scope.EvacuationAreaLoPIndex];
         let multiplier;
-        if(type == "K"){
+        if(type == "KIT"){
             if($scope.evacuationLevel == 1){
-                if($scope.kitLevel == 1) multiplier = 1100;
-                else multiplier = 1300;
+                if($scope.kitLevel == 1) return 1.1;
+                else return 1.3;
             }else{
-                if($scope.kitLevel == 1) multiplier = 1200;
-                else multiplier = 1600;
+                if($scope.kitLevel == 1) return 1.2;
+                else return 1.6;
             }
         }
-        else if (!effective) return "----";
         else if ($scope.evacuationLevel == 1) { // Low Level
             multiplier = 1200;
         } else { // High Level
@@ -323,8 +323,38 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
         if($scope.evacuationLevel == 1) multiplier = Math.max(multiplier - 25*lop,1000);
         else multiplier = Math.max(multiplier - 50*lop,1000);
-        return "x" + String(multiplier/1000);
+        return multiplier/1000;
     };
+
+    $scope.calc_victim_multipliers = function (index){
+        let victim = $scope.victim_list[index];
+        if (victim == undefined) return 0;
+    
+        // Effective check
+        if(victim.victimType == "LIVE" && victim.zoneType == "RED") return 1.0;
+        if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return 1.0;
+        if(victim.victimType == "KIT" && victim.zoneType == "RED") return 1.0;
+    
+        // Effective check for dead victim
+        if (victim.victimType == "DEAD") {
+          let liveCount = 0;
+          for (i of $scope.range(index)) {
+            let v = $scope.victim_list[i]
+            if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
+          }
+          if (liveCount != 2) return 1.0;
+        }
+        
+        return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
+      };
+    
+      $scope.victim_bk_color = function (index, zoneType) {
+        let m = $scope.calc_victim_multipliers(index);
+        if (m == 0 || zoneType != $scope.victim_list[index].zoneType) return '#fff';
+        if (m == 1) return '#ccc';
+        if (zoneType == "RED") return '#ffc1ff';
+        return '#e0ffc1';
+      }
 
     $scope.nlPoints = function(){
         let point = 0;
@@ -561,7 +591,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         }).then((result) => {
             if (result.value) {
                 if($scope.getParam('return')) $scope.go($scope.getParam('return'));
-                else $scope.go("/line/" + $scope.competition_id);
+                else $scope.go("/line/" + $scope.competition_id + "/" + $scope.league);
             }
         })
         console.log("Success!!");

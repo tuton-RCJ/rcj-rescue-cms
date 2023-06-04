@@ -185,7 +185,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 }
             } else {
                 maxKit={
-                    'Heated': 1,
                     'H': 3,
                     'S': 2,
                     'U': 0,
@@ -423,10 +422,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 current += victimPoint * tile.scoredItems.victims.top;
                 current += 10*Math.min(tile.scoredItems.rescueKits.top , 2);
                 break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.top;
-                current += 10*Math.min(tile.scoredItems.rescueKits.top , 1);
-                break;
             case 'Red':
             case 'Yellow':
                 current += (victimPoint * tile.scoredItems.victims.top / 2);
@@ -445,10 +440,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             case 'S':
                 current += victimPoint * tile.scoredItems.victims.right;
                 current += 10*Math.min(tile.scoredItems.rescueKits.right , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.right;
-                current += 10*Math.min(tile.scoredItems.rescueKits.right , 1);
                 break;
             case 'Red':
             case 'Yellow':
@@ -469,10 +460,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 current += victimPoint * tile.scoredItems.victims.bottom;
                 current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 2);
                 break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.bottom;
-                current += 10*Math.min(tile.scoredItems.rescueKits.bottom , 1);
-                break;
             case 'Red':
             case 'Yellow':
                 current += (victimPoint * tile.scoredItems.victims.bottom / 2);
@@ -491,10 +478,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             case 'S':
                 current += victimPoint * tile.scoredItems.victims.left;
                 current += 10*Math.min(tile.scoredItems.rescueKits.left , 2);
-                break;
-            case 'Heated':
-                current += victimPoint * tile.scoredItems.victims.left;
-                current += 10*Math.min(tile.scoredItems.rescueKits.left , 1);
                 break;
             case 'Red':
             case 'Yellow':

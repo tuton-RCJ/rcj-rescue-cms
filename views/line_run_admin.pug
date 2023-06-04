@@ -47,6 +47,7 @@ block content
             th {{"common.map" | translate}}
             th {{"common.field" | translate}}
             th {{"common.starttime" | translate}}
+            th {{"admin.common.normalization_group_id" | translate}}
             th {{"common.operation" | translate}}
         tbody
           tr
@@ -65,6 +66,8 @@ block content
                     i.fa.fa-calendar(aria-hidden='true')
                 input.form-control(type="text" uib-datepicker-popup ng-model="startDate" ng-change="updateStartTime()" is-open="startDatePopup.opened" datepicker-options="startDateOptions" close-text="Close")
               div(uib-timepicker ng-model="startTime" ng-change="updateStartTime()" hour-step="1" minute-step="5" show-meridian="false" show-spinners='true' style="border-bottom:0px;border-left:0px;")
+            td
+                  input(ng-model='run.normalizationGroup' style="width:100%;")
             td
               button(ng-click='addRun()') {{"admin.lineRun.add" | translate}}
       a(ng-href='/admin/{{competitionId}}/line/runs/bulk') {{"admin.lineRun.bulk" | translate}}
@@ -132,10 +135,13 @@ block content
             th
             th {{"common.starttime" | translate}}
             th {{"common.round" | translate}}
+            th {{"common.teamCode" | translate}}
             th {{"common.team" | translate}}
             th {{"common.field" | translate}}
             th {{"common.map" | translate}}
+            th {{"admin.common.normalization_group_id" | translate}}
             th {{"common.score" | translate}}
+            th(ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'") {{"common.normalizedScore" | translate}}
             th {{"common.time" | translate}}
             th {{"admin.lineRun.status" | translate}}
             th {{"common.comment" | translate}}
@@ -146,10 +152,13 @@ block content
                 input(type='checkbox' ng-model='run.checked' style="display:initial;")
             td(ng-bind='run.startTime | date:"dd EEE HH:mm"' ng-style="{'background-color':statusColor(run.status)}" )
             td(ng-bind='run.round.name' ng-style="{'background-color':statusColor(run.status)}" )
+            td(ng-bind='run.team.teamCode' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.team.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.field.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.map.name' ng-style="{'background-color':statusColor(run.status)}")
+            td(ng-bind='run.normalizationGroup' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.score' ng-style="{'background-color':statusColor(run.status)}")
+            td(ng-bind='run.normalizedScore' ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'" ng-style="{'background-color':statusColor(run.status)}") 
             td(ng-bind="run.time.minutes*60*1000+run.time.seconds*1000 | date:'mm:ss'" ng-style="{'background-color':statusColor(run.status)}")
             td(ng-style="{'background-color':statusColor(run.status)}")
               span(ng-if="run.status==-1") Not yet set check points

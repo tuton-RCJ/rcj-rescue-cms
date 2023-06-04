@@ -1,11 +1,9 @@
 var app = angular.module("MazeScore", ['ngTouch','datatables', 'pascalprecht.translate', 'ngCookies','ngSanitize'])
-app.controller("MazeScoreController", ['$scope', '$http', function ($scope, $http) {
-    console.log(UseRunsNumber);
+app.controller("MazeScoreController", ['$scope', '$http', '$sce', '$translate', function ($scope, $http, $sce, $translate) {
     $scope.competitionId = competitionId;
 
     $scope.showTeam = true;
 
-    $scope.sortOrder = ['-score','time.minutes*60+time.seconds','-foundVictims','LoPs'];
     $scope.go = function (path) {
         window.location = path
     }
@@ -17,20 +15,21 @@ app.controller("MazeScoreController", ['$scope', '$http', function ($scope, $htt
     $scope.time = 10;
     var inter;
     launchSocketIo()
-    updateRunList(function () {
-        setTimeout(function () {
-            window.scrollTo(0, window.scrollY +
-                document.getElementById("rank").getBoundingClientRect().top -
-                50);
-        }, 200)
-    })
-    /*if (get['autoscroll'] != undefined) {
-        scrollpage()
-    }*/
+    getRankInfo()
 
     $scope.comment = [];
     $scope.comment.top = "";
     $scope.comment.bottom = "The scores are based on the sum of all the run (the minimum score is not subtracted yet).";
+
+    $scope.showMode = {
+        normalGameScore: false,
+        normalizedGameScore: false,
+        documentScore: false,
+        teamCode: false
+    }
+
+    const currentLang = $translate.proposedLanguage() || $translate.use();
+    $scope.displayLang = currentLang;
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
@@ -62,83 +61,42 @@ app.controller("MazeScoreController", ['$scope', '$http', function ($scope, $htt
         inter = setInterval(updateTime, 1000);
     }
 
-    function updateRunList(callback) {
-        $http.get("/api/competitions/" + competitionId +
-            "/maze/runs?populate=true").then(function (response) {
-            var runs = response.data
+    function getRankInfo(callback) {
+        $http.get(`/api/ranking/${competitionId}/${league}`).then(function (response) {
+            var rankingInfo = response.data;
+            $scope.documentBlock = response.data.documentBlockTitles;
+            $scope.ranking = rankingInfo.ranking;
             
-            for(let run of runs){
-                try{
-                    run.teamCode = run.team.teamCode;
-                    run.teamName = run.team.name;
-                }
-                catch(e){
+            $scope.showMode.teamCode = $scope.ranking.some(t => t.team.teamCode);
 
-                }
+            if (rankingInfo.mode == "SUM_OF_BEST_N_GAMES") {
+                $scope.showMode.normalGameScore = true;
+            } else {
+                $scope.showMode.normalizedGameScore = true;
             }
-            //console.log(runs)
 
-            $scope.mazeRuns = []
-            var mazeTeamRuns = {}
-
-            for (var i in runs) {
-                var run = runs[i]
-
-                if (run.status >= 2 || run.score != 0 || run.time.minutes != 0 ||
-                    run.time.seconds != 0) {
-                    if (run.team.league == league) {
-                        $scope.mazeRuns.push(run)
-                        if (mazeTeamRuns[run.team._id] === undefined) {
-                            mazeTeamRuns[run.team._id] = {
-                                team: {
-                                    name: run.team.name,
-                                    code: run.teamCode,
-                                    name_only: run.teamName,
-                                    teamCode: run.team.teamCode
-                                },
-                                runs: [run]
-                            }
-                        } else {
-                            mazeTeamRuns[run.team._id].runs.push(run)
-                        }
-                        var sum = sumBest(mazeTeamRuns[run.team._id].runs)
-                        //console.log(sum)
-                        mazeTeamRuns[run.team._id].sumScore = sum.score
-                        mazeTeamRuns[run.team._id].sumTime = sum.time
-                        mazeTeamRuns[run.team._id].sumExit = sum.exit
-                        mazeTeamRuns[run.team._id].sumLoPs = sum.lops
-                        mazeTeamRuns[run.team._id].sumFound = sum.found
-                    }
-                }
+            if (rankingInfo.mode == "MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") {
+                $scope.showMode.documentScore = true;
             }
-            //$scope.mazeRuns.sort(sortRuns)
 
-            $scope.mazeRunsTop = []
-            for (var i in mazeTeamRuns) {
-                var teamRun = mazeTeamRuns[i]
-                $scope.mazeRunsTop.push({
-                    team: teamRun.team,
-                    score: teamRun.sumScore,
-                    time: teamRun.sumTime,
-                    lops: teamRun.sumLoPs,
-                    exit: teamRun.sumExit,
-                    found: teamRun.sumFound,
-                    teamCode: teamRun.team.teamCode
-                })
-            }
-            $scope.mazeRunsTop.sort(sortRuns)
+            $scope.maxGameNum = Math.max(...$scope.ranking.map(t => t.games.length));
 
             if (callback != null && callback.constructor == Function) {
                 callback()
             }
             var now = new Date();
             $scope.updateTime = now.toLocaleString();
-        })
+        }, function (response) {
+            console.log("Error: " + response.statusText);
+            if (response.status == 401) {
+                $scope.go(`/home/access_denied`);
+            }
+        });
     }
 
     function timerUpdateRunList() {
         if (runListChanged) {
-            updateRunList();
+            getRankInfo();
             runListChanged = false;
             runListTimer = setTimeout(timerUpdateRunList, 1000 * 15);
         } else {
@@ -152,109 +110,47 @@ app.controller("MazeScoreController", ['$scope', '$http', function ($scope, $htt
             transports: ['websocket']
         }).connect(window.location.origin)
         socket.on('connect', function () {
-            socket.emit('subscribe', 'runs/maze/' + competitionId)
+            socket.emit('subscribe', `runs/maze/${competitionId}`)
         })
         socket.on('changed', function () {
             runListChanged = true;
             if (runListTimer == null) {
-                updateRunList();
+                getRankInfo();
                 runListChanged = false;
                 runListTimer = setTimeout(timerUpdateRunList, 1000 * 15)
             }
         })
     }
 
-    function sumBest(runs) {
-        let sum = {
-            score: 0,
-            time: {
-                minutes: 0,
-                seconds: 0
-            },
-            lops: 0,
-            exit: 0,
-            found: 0
-        }
+    $scope.langContent = function(data, target){
+        data[target] = $sce.trustAsHtml(data.filter( function( value ) {
+            return value.language == $scope.displayLang;
+        })[0][target]);
 
-        runs.sort(sortRuns)
-
-        for (let i = 0; i < Math.min(UseRunsNumber, runs.length); i++) {
-            sum.score += runs[i].score
-            sum.time.minutes += runs[i].time.minutes
-            sum.time.seconds += runs[i].time.seconds
-            sum.lops += runs[i].LoPs
-            if(runs[i].exitBonus) sum.exit++
-            sum.found += runs[i].foundVictims
-        }
-        sum.time.minutes += Math.floor(sum.time.seconds/60);
-        sum.time.seconds %= 60;
-
-        return sum
+        return(data[target]);
     }
 
-    function sortRuns(a, b) {
-        if (a.score == b.score) {
-            if (a.time.minutes < b.time.minutes) {
-                return -1
-            } else if (a.time.minutes > b.time.minutes) {
-                return 1
-            } else {
-                if (a.time.seconds < b.time.seconds) {
-                    return -1
-                } else if (a.time.seconds > b.time.seconds) {
-                    return 1
-                } else {
-                    if(a.exit > b.exit){
-                        return -1;
-                    }else if(a.exit < b.exit){
-                        return 1;
-                    }else if(a.found > b.found){
-                        return -1;
-                    }else if(a.found < b.found){
-                        return 1;
-                    }else if(a.lops > b.lops){
-                        return 1;
-                    }else if(a.lops < b.lops){
-                        return -1;
-                    }else{
-                        return 0;
-                    }
-                }
-            }
-        } else {
-            return b.score - a.score
+    $scope.range = function (n) {
+        arr = [];
+        for (var i = 0; i < n; i++) {
+            arr.push(i);
+        }
+        return arr;
+    }
+
+    $scope.openRunDetails = function(id) {
+        if (id) {
+            Swal.fire({
+                title: ``,
+                html: `<iframe src="/maze/view/${id}?iframe=true" style="margin-top:10px; border: none; width:100%; height: calc(100vh - 100px);"/>`,
+                showCloseButton: true,
+                showConfirmButton: false,
+                width: '95%'
+              })
         }
     }
 }])
 
-// HAX
-function scrollpage() {
-    var i = 1,
-        status = 0,
-        speed = 1,
-        period = 15
-
-    function f() {
-        window.scrollTo(0, window.scrollY +
-            document.getElementById("allRuns").getBoundingClientRect().top -
-            50 + i);
-        if (status == 0) {
-            i = i + speed;
-            if (document.getElementById("allRuns").getBoundingClientRect().bottom <
-                Math.max(document.documentElement.clientHeight, window.innerHeight ||
-                    0)) {
-                status = 1;
-                return setTimeout(f, 1000);
-            }
-        } else {
-            i = i - speed;
-            if (document.getElementById("allRuns").getBoundingClientRect().top > 50) {
-                status = 0;
-                return setTimeout(f, 1000);
-            }
-        }
-        setTimeout(f, period);
-    }
-
-    f();
-}
+$(window).on('beforeunload', function () {
+    socket.emit('unsubscribe', `runs/maze/${competitionId}`);
+});

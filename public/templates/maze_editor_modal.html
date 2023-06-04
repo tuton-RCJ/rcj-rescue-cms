@@ -14,6 +14,9 @@
     </li>
     <div ng-if="leagueType == 'standard'">
       <li>
+        <input type="checkbox" ng-model="cell.tile.blue" id="isBlue"><label class="checkbox" for="isBlue">{{"admin.mazeMapEditor.blue" | translate}}</label>
+      </li>
+      <li>
         <input type="checkbox" ng-model="cell.tile.ramp" id="isRamp"><label class="checkbox" for="isRamp">{{"admin.mazeMapEditor.ramp" | translate}}</label>
       </li>
       <li>
@@ -30,18 +33,16 @@
       <tr>
         <th width="20%">&nbsp;</th>
         <th width="12%"><img src="/images/no_victims.png" alt="None" height="20"></th>
-        <th width="12%"><img src="/images/thermometer.png" alt="Heat" height="20"></th>
         <th width="12%">H</th>
         <th width="12%">S</th>
         <th width="12%">U</th>
-        <th width="12%"><img src="/images/red.png" alt="None" height="20"></th>
-        <th width="12%"><img src="/images/yellow.png" alt="Heat" height="20"></th>
-        <th width="12%"><img src="/images/green.png" alt="None" height="20"></th>
+        <th width="12%"><img src="/images/Red.png" alt="Red" height="20"></th>
+        <th width="12%"><img src="/images/Yellow.png" alt="Yellow" height="20"></th>
+        <th width="12%"><img src="/images/Green.png" alt="Green" height="20"></th>
       </tr>
       <tr>
         <th class="col">{{"admin.mazeMapEditor.top" | translate}}</th>
         <td><input type="radio" ng-model="cell.tile.victims.top" value="None" style="display: block;"></td>
-        <td><input type="radio" ng-model="cell.tile.victims.top" value="Heated" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.top" value="H" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.top" value="S" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.top" value="U" style="display: block;"></td>
@@ -52,7 +53,6 @@
       <tr>
         <th class="col">{{"admin.mazeMapEditor.bottom" | translate}}</th>
         <td><input type="radio" ng-model="cell.tile.victims.bottom" value="None" style="display: block;"></td>
-        <td><input type="radio" ng-model="cell.tile.victims.bottom" value="Heated" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.bottom" value="H" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.bottom" value="S" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.bottom" value="U" style="display: block;"></td>
@@ -63,7 +63,6 @@
       <tr>
         <th class="col">{{"admin.mazeMapEditor.left" | translate}}</th>
         <td><input type="radio" ng-model="cell.tile.victims.left" value="None" style="display: block;"></td>
-        <td><input type="radio" ng-model="cell.tile.victims.left" value="Heated" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.left" value="H" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.left" value="S" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.left" value="U" style="display: block;"></td>
@@ -74,7 +73,6 @@
       <tr>
         <th class="col">{{"admin.mazeMapEditor.right" | translate}}</th>
         <td><input type="radio" ng-model="cell.tile.victims.right" value="None" style="display: block;"></td>
-        <td><input type="radio" ng-model="cell.tile.victims.right" value="Heated" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.right" value="H" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.right" value="S" style="display: block;"></td>
         <td><input type="radio" ng-model="cell.tile.victims.right" value="U" style="display: block;"></td>
@@ -90,8 +88,8 @@
       <tr>
         <th>&nbsp;</th>
         <th><img src="/images/no_victims.png" alt="None" height="20"></th>
-        <th><img src="/images/red.png" alt="None" height="20"></th>
-        <th><img src="/images/green.png" alt="None" height="20"></th>
+        <th><img src="/images/Red.png" alt="None" height="20"></th>
+        <th><img src="/images/Green.png" alt="None" height="20"></th>
       </tr>
       <tr>
         <th class="col">{{"admin.mazeMapEditor.floor" | translate}}</th>

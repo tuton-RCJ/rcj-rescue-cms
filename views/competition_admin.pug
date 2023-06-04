@@ -32,20 +32,25 @@ block content
 
       hr
       .row 
-        .col-md-6 
+        .col-md-5
           h3 {{"admin.competition.line" | translate}}
           .row 
             .col-md-6
               button(ng-click="go('/admin/' + competitionId + '/line/maps')" class='btn btn-outline-primary btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.maps" | translate}}
             .col-md-6 
               button(ng-click="go('/admin/' + competitionId + '/line/runs')" class='btn btn-outline-primary btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
-        .col-md-6
+        .col-md-5
           h3 {{"admin.competition.maze" | translate}}
           .row 
             .col-md-6
               button(ng-click="go('/admin/' + competitionId + '/maze/maps')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.maps" | translate}}
             .col-md-6 
               button(ng-click="go('/admin/' + competitionId + '/maze/runs')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
+        .col-md-2
+          h3 {{"admin.competition.simulation" | translate}}
+          .row 
+            .col-md-12
+              button(ng-click="go('/admin/' + competitionId + '/simulation/runs')" class='btn btn-outline-warning btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
       hr
       h3 {{"admin.competition.tools" | translate}}
       .row

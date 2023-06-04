@@ -75,8 +75,8 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
         }
     }
 
-    $http.get("/api/competitions/" + competitionId +
-      "/line/runs?timetable=true&populate=true").then(function (response) {
+    
+    $http.get(`/api/runs/line/competition/${competitionId}?timetable=true`).then(function (response) {
         var runs = response.data
 
         for(let run of runs){
@@ -91,8 +91,8 @@ app.controller("TimeTableController", ['$scope', '$http', '$sce', function ($sco
 
         $scope.runs = runs
 
-        $http.get("/api/competitions/" + competitionId +
-          "/maze/runs?timetable=true&populate=true").then(function (response) {
+        
+        $http.get(`/api/runs/maze/competition/${competitionId}?timetable=true&populate=true`).then(function (response) {
             var runs = response.data
 
             for(let run of runs){

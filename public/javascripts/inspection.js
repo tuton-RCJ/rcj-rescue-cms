@@ -44,30 +44,6 @@ app.controller("InspectionController", ['$scope', '$http', 'Upload', '$timeout',
         }
     })
 
-
-    
-
-    /*$http.get("/api/competitions/" + competitionId +
-        "/line/runs?populate=true").then(function (response) {
-        var runs = response.data
-        for (var i in runs) {
-            runs[i].LoPsNum = 0
-            for (var j in runs[i].LoPs) {
-                if (runs[i].LoPs[j] == null) {
-                    runs[i].LoPs[j] = 0
-                }
-                runs[i].LoPsNum += runs[i].LoPs[j]
-            }
-        }
-        $scope.lruns = runs
-    })
-    $http.get("/api/competitions/" + competitionId +
-        "/maze/runs?populate=true").then(function (response) {
-        var runs = response.data
-        $scope.mruns = runs
-    })*/
-
-
     $scope.go = function (path) {
         window.location = path
     }

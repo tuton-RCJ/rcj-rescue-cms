@@ -71,12 +71,12 @@ html(ng-app="ddApp")
                   .col-md-5
                     .row
                       .col-6(style='position: relative;')
-                        img.img-thumbnail(src='/images/level1.png', width='100%', ng-style="{'background-color': evacuationLevel==1?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==1?'1':'0.4' }")
+                        img.img-thumbnail(src='/images/evacZone/green_lv1.png', width='100%', ng-style="{'background-color': evacuationLevel==1?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==1?'1':'0.4' }")
                         div(style='position:absolute; top:10px; left:30px;') {{'line.judge.low' | translate}}
                         div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==1')
                           i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
                       .col-6(style='position: relative;')
-                        img.img-thumbnail(src='/images/level2.png', width='100%', ng-style="{'background-color': evacuationLevel==2?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==2?'1':'0.4' }")
+                        img.img-thumbnail(src='/images/evacZone/green_lv2.png', width='100%', ng-style="{'background-color': evacuationLevel==2?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==2?'1':'0.4' }")
                         div(style='position:absolute; top:10px; left:30px;') {{'line.judge.high' | translate}}
                         div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==2')
                           i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
@@ -97,17 +97,31 @@ html(ng-app="ddApp")
                     .row
                       .col-12
                         h6 {{'line.judge.rescuedVictims' | translate}}
-                        table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-repeat='j in range(6)', ng-if='victim_list.length > j*5 || j == 0')
+                        table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-if='victim_list.length > 0')
                           tbody
                             tr
-                              th(style='text-align:center;', ng-repeat='i in range(5)') {{j*5 + i+1}}
+                              th Zone
+                              th(style='text-align:center;', ng-repeat='i in range(4)') {{i+1}}
                             tr
-                              td(ng-repeat='i in range(5)', ng-style="{'background-color': victim_list[j*5 + i].effective?'#E1FFFE':'#ccc'}")
-                                img(src='/images/liveVictim.png', width='60px', ng-if="victim_list[j*5 + i].type == 'L'")
-                                img(src='/images/deadVictim.png', width='60px', ng-if="victim_list[j*5 + i].type == 'D'")
-                                img(src='/images/rescuekit-1.png', width='60px', ng-if="victim_list[j*5 + i].type == 'K' && kitLevel==1")
-                                img(src='/images/rescuekit-2.png', width='60px', ng-if="victim_list[j*5 + i].type == 'K' && kitLevel==2")
-                                span(style='width:60px;', ng-hide='victim_list[j*5 + i]') ---
+                              td
+                                img(src='/images/evacZone/red_lv1.png', height='50px', ng-if="evacuationLevel == 1")
+                                img(src='/images/evacZone/red_lv2.png', height='50px', ng-if="evacuationLevel == 2")
+                              td(ng-repeat='i in range(4)', ng-dblclick='delete_victim(i)', ng-swipe-left='delete_victim(i)')
+                                div(ng-if="victim_list[i].zoneType == 'RED'")
+                                  img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
+                                  img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
+                                  img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
+                                  img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==2")
+                            tr
+                              td
+                                img(src='/images/evacZone/green_lv1.png', height='50px', ng-if="evacuationLevel == 1")
+                                img(src='/images/evacZone/green_lv2.png', height='50px', ng-if="evacuationLevel == 2")
+                              td(ng-repeat='i in range(4)', ng-dblclick='delete_victim(i)', ng-swipe-left='delete_victim(i)')
+                                div(ng-if="victim_list[i].zoneType == 'GREEN'")
+                                  img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
+                                  img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
+                                  img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
+                                  img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==2")
           .col-md-12(style="margin-top:20px;")
             .card
               h4.card-header

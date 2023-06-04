@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 const competitiondb = require('./competition');
 const {LEAGUES} = competitiondb;
-const QUESTION_TYPES = ['input', 'select', 'scale'];
+const QUESTION_TYPES = ['input', 'select', 'scale', 'file'];
 
 const logger = require('../config/logger').mainLogger
 
@@ -60,7 +60,8 @@ const surveyAnswerSchema = new Schema({
   answer:[{
     questionId: {type: String},
     answer: {type: String, default: null}
-  }]
+  }],
+  fixed: {type: Boolean, default: false}
 })
 
 

@@ -14,7 +14,13 @@ const auth = require('../../helper/authLevels');
 const logger = require('../../config/logger').mainLogger;
 const surveyDb = require('../../models/survey');
 const competitiondb = require('../../models/competition');
-
+let fs = require('fs-extra');
+const gracefulFs = require('graceful-fs');
+fs = gracefulFs.gracefulify(fs);
+const multer = require('multer');
+const path = require('path');
+const mkdirp = require('mkdirp');
+var crypto = require("crypto");
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const N = 32;
@@ -213,6 +219,11 @@ adminRouter.delete('/delete/:competitionId/:surveyId', function (req, res, next)
             err: err.message,
           });
         }
+        fs.rmdir(`${__dirname}/../../survey/${competitionId}/${surveyId}`, { recursive: true }, (err) => {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
         return res.status(200).send({
           msg: "Deleted"
         });
@@ -329,7 +340,7 @@ publicRouter.get('/list/:competitionId/:leagueId/:teamId', function (req, res, n
             resData.push({
               '_id': surv._id,
               'reEdit': surv.reEdit,
-              'sent': dbAnswer.some(a => a.survey.toString() === surv._id.toString()),
+              'sent': dbAnswer.some(a => a.survey.toString() === surv._id.toString() && a.fixed),
               'deadline': surv.deadline,
               'open': surv.open,
               'i18n': surv.i18n,
@@ -503,7 +514,8 @@ publicRouter.put('/answer/:teamId/:token/:survId', function (req, res, next) {
                 survey: survId,
                 team: team._id,
                 competition: team.competition,
-                answer: ansData
+                answer: ansData,
+                fixed: true
               }).save(function (err, data) {
                 if (err) {
                   logger.error(err);
@@ -517,8 +529,9 @@ publicRouter.put('/answer/:teamId/:token/:survId', function (req, res, next) {
                 });
               });
             }else{//UPDATE
-              if(survey.reEdit || admin){
+              if(survey.reEdit || admin || ans.fixed == false){
                 ans.answer = ansData;
+                ans.fixed = true;
                 ans.save(function (err, data) {
                   if (err) {
                     logger.error(err);
@@ -599,25 +612,291 @@ adminRouter.get('/answer/:competitionId/:survId', function (req, res, next) {
     return;
   }
 
-  surveyDb.surveyAnswer
-  .find({
-    competition: competitionId,
-    survey: survId
+  surveyDb.survey
+    .findOne({
+      _id: survId,
+      competition: competitionId
+    })
+    .exec(function (err, dbSurvey) {
+      if (err) {
+        logger.error(err);
+        return res.status(400).send({
+          msg: 'Could not get survey',
+          err: err.message,
+        });
+      }
+
+      let questionTypes = {};
+      dbSurvey.questions.map(question => {
+        questionTypes[question.questionId] = question.type;
+      })
+
+      surveyDb.surveyAnswer
+        .find({
+          competition: competitionId,
+          survey: dbSurvey._id
+        })
+        .populate({ 
+          path: 'team',
+          select: 'name teamCode league document.token'
+        })
+        .lean()
+        .exec(function (err, dbAnswer) {
+          if (err) {
+            logger.error(err);
+            return res.status(400).send({
+              msg: 'Could not get answer',
+              err: err,
+            });
+          }
+          dbAnswer.map(team => {
+            team.answer.map(ans => {
+              if (questionTypes[ans.questionId] == 'file') {
+                let path = `${__dirname}/../../survey/${team.competition}/${dbSurvey._id}/${team.team._id}/${ans.questionId}`;
+                let hash = md5(path);
+                if (hash == '') ans.answer = "";
+                else ans.hash = hash;
+              }
+            })
+          })
+          return res.status(200).send({
+            questions: dbSurvey,
+            answers: dbAnswer
+          });
+        });
+    });
+
+  
+});
+
+function md5(filePath) {
+  try {
+    let b = fs.readFileSync(filePath);
+    let md5hash = crypto.createHash('md5');
+    md5hash.update(b);
+    return md5hash.digest("base64");
+  } catch (e) {
+    return '';
+  }
+}
+
+publicRouter.post('/answer/:teamId/:token/:survId/file/:questionId', function (req, res, next) {
+  const { teamId, token, survId, questionId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+  if (!ObjectId.isValid(survId)) {
+    return next();
+  }
+
+  competitiondb.team.findOne({
+    "_id": teamId,
+    "document.token": token
   })
-  .populate({ 
-    path: 'team',
-    select: 'name teamCode league document.token'
-  })
-  .exec(function (err, dbAnswer) {
-    if (err) {
-      logger.error(err);
-      return res.status(400).send({
-        msg: 'Could not get answer',
-        err: err,
+  .exec(function (err, team) {
+    if (err || team == null) {
+      if (!err) err = { message: 'No team found' };
+      return res.status(403).send({
+      });
+    } else if (team) {
+      surveyDb.survey
+      .findOne({
+        _id: survId,
+        competition: team.competition,
+        enable: true,
+        open: {$lt: new Date()},
+        $or: [
+          {league: team.league},
+          {team: team._id}
+        ],
+        "questions.questionId": questionId
+      })
+      .exec(function (err, survey) {
+        if (err || survey == null) {
+          return res.status(400).send({
+            msg: 'Cloud not found survey master'
+          });
+        } else if (survey) {
+          // check response can be updated
+          let canUpdate = false;
+          if(auth.authCompetition(req.user,team.competition,ACCESSLEVELS.ADMIN)){
+            canUpdate = true;
+          }else if(survey.deadline < new Date()){
+            return res.status(400).send({
+              msg: 'Deadline has already passed...'
+            });
+          }
+          if (survey.reEdit){
+            canUpdate = true;
+          }
+
+          surveyDb.surveyAnswer
+            .findOne({
+              competition: team.competition,
+              team: team._id,
+              survey: survId
+            })
+            .exec(function (err, dbAnswer) {
+              if (err) {
+                logger.error(err);
+                return res.status(400).send({
+                  msg: 'Could not get answer',
+                  err: err,
+                });
+              }
+              if (dbAnswer == undefined || dbAnswer.fixed == false) {
+                canUpdate = true;
+              }
+
+              if (!canUpdate) {
+                return res.status(400).send({
+                  msg: 'Could not update answer',
+                  err: err,
+                });
+              }
+
+              const destination = `${__dirname}/../../survey/${team.competition}/${survey._id}/${team._id}`;
+              if (!fs.existsSync(destination)) {
+                mkdirp.sync(destination);
+              }
+              const storage = multer.diskStorage({
+                destination(req, file, callback) {
+                  callback(
+                    null,
+                    destination
+                  );
+                },
+                filename(req, file, callback) {
+                  callback(null, questionId);
+                },
+              });
+
+              const upload = multer({
+                storage,
+              }).single('file');
+
+              upload(req, res, function (err) {
+                let fileName = `${questionId}${path.extname(req.file.originalname)}`;
+                let questionAnswerForFile = {
+                  questionId: questionId,
+                  answer: fileName
+                };
+                let answer = null;
+
+                if(dbAnswer){
+                  answer = dbAnswer;
+                  let index = answer.answer.findIndex(a => a.questionId == questionId);
+                  if (index == -1) {
+                    answer.answer.push(questionAnswerForFile)
+                  } else {
+                    answer.answer[index] = questionAnswerForFile;
+                  }
+                }else{
+                  answer = new surveyDb.surveyAnswer({
+                    survey: survId,
+                    team: team._id,
+                    competition: team.competition,
+                    answer: [questionAnswerForFile],
+                    fixed: false
+                  })
+                }
+
+                answer.save(function (err, data) {
+                  if (err) {
+                    logger.error(err);
+                    return res.status(400).send({
+                      msg: 'Error saving in db',
+                      err: err.message,
+                    });
+                  }
+                  res.status(200).send({
+                    msg: 'File is uploaded',
+                    fileName: fileName
+                  });
+                });
+              });
+            });
+        }
       });
     }
-    return res.status(200).send(dbAnswer);
   });
+});
+
+publicRouter.get('/answer/:teamId/:token/:survId/file/:questionId', function (req, res, next) {
+  const { teamId, token, survId, questionId } = req.params;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+  if (!ObjectId.isValid(survId)) {
+    return next();
+  }
+
+  competitiondb.team
+    .findOne({
+      _id: ObjectId(teamId),
+      'document.token': token
+    })
+    .exec(function (err, dbTeam) {
+      if (err || dbTeam == null) {
+        if (!err) err = { message: 'No team found' };
+        res.status(400).send({
+          msg: 'Could not get team',
+          err: err.message,
+        });
+      } else if (dbTeam != null) {
+        surveyDb.surveyAnswer
+          .findOne({
+            competition: dbTeam.competition,
+            team: dbTeam._id,
+            survey: survId
+          })
+          .exec(function (err, dbAnswer) {
+            if (err) {
+              logger.error(err);
+              return res.status(400).send({
+                msg: 'Could not get answer',
+                err: err,
+              });
+            }
+
+            let questionAnswer = dbAnswer.answer.find(a => a.questionId == questionId);
+            if (questionAnswer) {
+              let originalFileName = questionAnswer.answer;
+              let path = `${__dirname}/../../survey/${dbTeam.competition}/${survId}/${dbTeam._id}/${questionId}`;
+              fs.stat(path, (err, stat) => {
+                // Handle file not found
+                if (err !== null) {
+                  if(err.code === 'ENOENT'){
+                    return res.status(404).send({
+                      msg: 'File not found',
+                    });
+                  }
+                  return res.status(500).send({
+                    msg: 'Cloud not get file',
+                  });
+                }
+                
+                const stream = fs.createReadStream(path)
+                stream.on('error', (error) => {
+                    res.statusCode = 500
+                    res.end('Cloud not make stream')
+                })
+                let head = {
+                  'Content-Disposition': `attachment; filename=${dbTeam._id}-${originalFileName}`
+                }
+                res.writeHead(200, head);
+                stream.pipe(res);
+              });
+            } else {
+              return res.status(500).send({
+                msg: 'Could not get original file name'
+              });
+            }
+        });
+      }
+    });
 });
 
 publicRouter.all('*', function (req, res, next) {

@@ -59,6 +59,11 @@ block content
             textarea.form-control(ng-model="description" rows=5 style="width:100%")
 
         .col-md-4
+          div(style="display: flex;")
+              span(style="margin-top:5px;") {{"admin.settings.preparation" | translate}} &nbsp;
+              label.toggle-button-001
+                input(type='checkbox' ng-model="preparation")
+          hr
           span {{"admin.settings.logo" | translate}}
             br
             canvas#canvas(style="display:none;")
@@ -79,13 +84,24 @@ block content
       h1 {{"admin.settings.ranking" | translate}}
       .row
         .col-10
-          p {{"admin.settings.useNum" | translate}}
-          .input-group(style="width:100%;margin-bottom:20px;" ng-repeat="rank in ranking")
-            .input-group-prepend
-              span.input-group-text ID : {{rank.id}}
-              span.input-group-text {{"admin.settings.leagueName" | translate}} : {{rank.name}}
-              span.input-group-text {{"admin.settings.num" | translate}}
-            input.form-control(type='number', ng-model='rank.count' style="")
+          br
+          div(ng-repeat="rank in ranking track by $index" style="margin-top:10px;")
+            span(style="font-size:30px;") {{rank.name}} &nbsp;
+            span ID: {{rank.name}}
+            div(style="display: flex;margin-top:10px;")
+              span(style="margin-top:5px;") {{"admin.settings.discloseRanking" | translate}} &nbsp;
+              label.toggle-button-001
+                input(type='checkbox' ng-model="rank.disclose")
+            .input-group(style="width:100%;margin 0 auto;")
+              .input-group-prepend
+                span.input-group-text {{"admin.settings.rankingMode" | translate}}
+              select.custom-select(ng-model='rank.mode')
+                option(value="SUM_OF_BEST_N_GAMES") SUM OF BEST N GAMES
+                option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES") MEAN OF NORMALIZED BEST N GAMES
+                option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") 0.8 * MEAN OF NORMALIZED BEST N GAMES + 0.2 * NORMALIZED DOCUMENT SCORE
+              .input-group-prepend
+                span.input-group-text {{"admin.settings.num" | translate}}
+              input.form-control(type='number', ng-model='rank.count' style="max-width:100px;")
         .col-2(style="text-align:right;")
           button.btn.btn-success(type='button', ng-click='set()')
             i.fas.fa-check &nbsp;{{"admin.settings.set" | translate}}

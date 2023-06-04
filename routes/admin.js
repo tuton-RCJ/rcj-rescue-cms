@@ -467,35 +467,12 @@ router.get('/:competitionid/line/runs/print/ranking/:league',
       return next();
     }
 
-    competitiondb.competition
-      .findOne({
-        _id: id,
-      })
-      .lean()
-      .exec(function (err, data) {
-        if (err) {
-          logger.error(err);
-          res.status(400).send({
-            msg: 'Could not get competition',
-            err: err.message,
-          });
-        } else {
-          let num = 20;
-          for (const i in data.ranking) {
-            if (data.ranking[i].league == league) {
-              num = data.ranking[i].num;
-              break;
-            }
-          }
-          res.render('line_score_print', {
-            id,
-            user: req.user,
-            league,
-            num,
-            get: req.query,
-          });
-        }
-      });
+    res.render('line_score_print', {
+      id,
+      user: req.user,
+      league,
+      get: req.query,
+    });
   }
 );
 
@@ -575,35 +552,12 @@ router.get('/:competitionid/maze/runs/print/ranking/:league',
       return next();
     }
 
-    competitiondb.competition
-      .findOne({
-        _id: id,
-      })
-      .lean()
-      .exec(function (err, data) {
-        if (err) {
-          logger.error(err);
-          res.status(400).send({
-            msg: 'Could not get competition',
-            err: err.message,
-          });
-        } else {
-          let num = 20;
-          for (const i in data.ranking) {
-            if (data.ranking[i].league == league) {
-              num = data.ranking[i].num;
-              break;
-            }
-          }
-          res.render('maze_score_print', {
-            id,
-            user: req.user,
-            league,
-            num,
-            get: req.query,
-          });
-        }
-      });
+    res.render('maze_score_print', {
+      id,
+      user: req.user,
+      league,
+      get: req.query,
+    });
   }
 );
 
@@ -724,6 +678,65 @@ router.get('/kiosk/:kioskNum', function (req, res, next) {
   const num = req.params.kioskNum;
 
   res.render('kiosk', { num, user: req.user });
+});
+
+// Simulation
+router.get('/:competitionid/simulation/runs', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('simulation_run_admin', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/simulation/runs/print/ranking/:league',
+  function (req, res, next) {
+    const id = req.params.competitionid;
+    const { league } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return next();
+    }
+    
+    if (!competitiondb.SIM_LEAGUES.includes(league)) {
+      return next();
+    }
+
+    res.render('simulation_score_print', {
+      id,
+      user: req.user,
+      league,
+      get: req.query,
+    });
+  }
+);
+
+router.get('/:competitionid/simulation/runs/print', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('simulation_run_admin_print', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/simulation/runs/bulk', function (req, res, next) {
+  const id = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+
+  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
+    res.render('simulation_run_bulk', { id, user: req.user });
+  else res.render('access_denied', { user: req.user });
 });
 
 module.exports = router;

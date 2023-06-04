@@ -30,43 +30,41 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
         $scope.competition = response.data
     })
 
+    $http.get(`/api/survey/answer/${competitionId}/${survId}`).then(function (response) {
+        $scope.survey = response.data.questions;
 
-    $http.get(`/api/survey/edit/${competitionId}/${survId}`).then(function (response) {
-        $scope.survey = response.data;
+        let langCheck = false;
         //Check 1st lang
         for(let l of $scope.survey.languages){
             if(l.language == $scope.displayLang && l.enable){
-                updateAnswers();
-                return;
+                langCheck = true;
+                break;
             }
         }
 
-        //Set alternative lang
-        for(let l of $scope.survey.languages){
-            if(l.enable){
-                $scope.displayLang = l.language;
-                updateAnswers();
-                return;
+        if (!langCheck) {
+            //Set alternative lang
+            for(let l of $scope.survey.languages){
+                if(l.enable){
+                    $scope.displayLang = l.language;
+                    break;
+                }
             }
         }
-    })
-
-    function updateAnswers(){
-        $http.get(`/api/survey/answer/${competitionId}/${survId}`).then(function (response) {
-            $scope.answers = response.data;
-            for(let answer of $scope.answers){
-                for(let ans of answer.answer){
-                    let question = $scope.survey.questions.filter(q => q.questionId == ans.questionId);
-                    if(question.length == 1){
-                        question = question[0];
-                        if(question.type == 'select'){
-                            ans.answer = question.i18n.filter(i => i.language == $scope.displayLang)[0].options.filter(o => o.value == ans.answer)[0].text;
-                        }
+        
+        $scope.answers = response.data.answers;
+        for(let answer of $scope.answers){
+            for(let ans of answer.answer){
+                let question = $scope.survey.questions.filter(q => q.questionId == ans.questionId);
+                if(question.length == 1){
+                    question = question[0];
+                    if(question.type == 'select'){
+                        ans.answer = question.i18n.filter(i => i.language == $scope.displayLang)[0].options.filter(o => o.value == ans.answer)[0].text;
                     }
                 }
             }
-        })
-    }
+        }
+    })
     
 
     $scope.edit = function(surv){
@@ -83,9 +81,14 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
         return(data[target]);
     }
 
-    $scope.getAnswer = function(answers, question){
-        let answer = answers.filter(a => a.questionId == question.questionId)
+    $scope.getAnswer = function(ans, question){
+        let answer = ans.answer.filter(a => a.questionId == question.questionId)
         if(answer.length == 1){
+            if (question.type == 'file') {
+                let html = `<a href="/api/survey/answer/${ans.team._id}/${ans.team.document.token}/${survId}/file/${question.questionId}" >${answer[0].answer}</a>`;
+                if (answer[0].hash) html += `<br><span>MD5 Hash: ${answer[0].hash}</span>`;
+                return html;
+            }
             return answer[0].answer;
         }
         return "";

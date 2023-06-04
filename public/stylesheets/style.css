@@ -251,6 +251,38 @@ a {
     color: #679efd;
 }
 
+.evac_zone_btn_green{
+    display: inline-block;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    color: #74ff67;
+    border: dashed 1px #8dff67;
+    background-color: #c0ff88;
+    border-radius: 3px;
+    transition: .4s;
+}
+
+.evac_zone_btn_green:hover {
+    border-style: dotted;
+    color: #69c24b;
+}
+
+.evac_zone_btn_red{
+    display: inline-block;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    color: #ff6767;
+    border: dashed 1px #ff6767;
+    background-color: #ff8888;
+    border-radius: 3px;
+    transition: .4s;
+}
+
+.evac_zone_btn_red:hover {
+    border-style: dotted;
+    color: #c24b4b;
+}
+
 table.custom {
     border-top: 1px solid #4f4d47;
     border-right: 1px solid #4f4d47;
@@ -573,4 +605,40 @@ footer {
 
 .btn {
     white-space: normal!important;
+}
+
+.toggle-button-001 {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 30px;
+    border-radius: 30px;
+    background-color: #dddddd;
+    cursor: pointer;
+    transition: background-color .4s;
+}
+
+.toggle-button-001:has(:checked) {
+    background-color: #4bd865;
+}
+
+.toggle-button-001::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+    background-color: #fff;
+    content: '';
+    transition: left .4s;
+}
+
+.toggle-button-001:has(:checked)::after {
+    left: 50px;
+}
+
+.toggle-button-001 input {
+    display: none;
 }

@@ -16,10 +16,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.tiles = {};
 
     $scope.victimsList = {
-        "Heated": {
-            "image": "thermometer.png",
-            "kit": 1
-        },
         "H": {
             "image": "H.png",
             "kit": 3
@@ -33,15 +29,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             "kit": 0
         },
         "Red": {
-            "image": "red.png",
+            "image": "Red.png",
             "kit": 1
         },
         "Yellow": {
-            "image": "yellow.png",
+            "image": "Yellow.png",
             "kit": 1
         },
         "Green": {
-            "image": "green.png",
+            "image": "Green.png",
             "kit": 0
         }
     };
@@ -56,10 +52,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             "floating":[]
         },
         "U":{
-            "linear":[],
-            "floating":[]
-        },
-        "Heated":{
             "linear":[],
             "floating":[]
         },

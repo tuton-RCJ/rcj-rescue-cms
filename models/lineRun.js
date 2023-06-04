@@ -13,6 +13,9 @@ const logger = require('../config/logger').mainLogger
 
 const LINE_LEAGUES = require("./competition").LINE_LEAGUES
 
+const VICTIM_TYPE = ["LIVE", "DEAD", "KIT"]
+const ZONE_TYPE = ["RED", "GREEN"]
+
 const lineRunSchema = new Schema({
   competition: {
     type    : ObjectId,
@@ -20,11 +23,12 @@ const lineRunSchema = new Schema({
     required: true,
     index   : true
   },
-  round      : {type: ObjectId, ref: 'Round', required: true, index: true},
-  team       : {type: ObjectId, ref: 'Team', required: false, index: true},
-  field      : {type: ObjectId, ref: 'Field', required: true, index: true},
-  map        : {type: ObjectId, ref: 'LineMap', required: true, index: true},
-  group     : {type: Number, min: 0},
+  round             : {type: ObjectId, ref: 'Round', required: true, index: true},
+  team              : {type: ObjectId, ref: 'Team', required: false, index: true},
+  field             : {type: ObjectId, ref: 'Field', required: true, index: true},
+  map               : {type: ObjectId, ref: 'LineMap', required: true, index: true},
+  group             : {type: Number, min: 0},
+  normalizationGroup: {type: String, index: true},
 
   tiles             : [{
     type: new Schema({
@@ -51,8 +55,8 @@ const lineRunSchema = new Schema({
   },
   exitBonus         : {type: Boolean, default: false},
   rescueOrder : [{
-      type: {type: String},
-      effective: {type: Boolean}
+      victimType: {type: String, enum: VICTIM_TYPE},
+      zoneType: {type: String, enum: ZONE_TYPE}
   }],
   score             : {type: Number, min: -1000, default: 0},
   raw_score         : {type: Number, min: -1000, default: 0},

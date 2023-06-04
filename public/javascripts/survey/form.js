@@ -1,5 +1,5 @@
 // register the directive with your app module
-var app = angular.module('SurveyForm', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies', 'ngQuill', 'ngSanitize']);
+var app = angular.module('SurveyForm', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies', 'ngQuill', 'ngSanitize', 'ngFileUpload']);
 app.constant('NG_QUILL_CONFIG', {
     /*
      * @NOTE: this config/output is not localizable.
@@ -45,7 +45,7 @@ app.constant('NG_QUILL_CONFIG', {
   ])
 
 // function referenced by the drop target
-app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', '$translate','$sce', '$timeout' , function ($scope, $uibModal, $log, $http, $translate, $sce, $timeout) {
+app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', '$translate','$sce', '$timeout', 'Upload', function ($scope, $uibModal, $log, $http, $translate, $sce, $timeout, Upload) {
 
     const Toast = Swal.mixin({
         toast: true,
@@ -57,6 +57,13 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
     let saved_mes;
     $translate('document.saved').then(function (val) {
         saved_mes = val;
+    }, function (translationId) {
+    // = translationId;
+    });
+
+    let upload_mes;
+    $translate('document.uploaded').then(function (val) {
+        upload_mes = val;
     }, function (translationId) {
     // = translationId;
     });
@@ -216,6 +223,49 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
 
     $scope.go = function (path) {
         window.location = path
+    }
+
+    $scope.uploadFiles = function(question, file, errFiles) {
+        question.f = file;
+        question.errFile = errFiles && errFiles[0];
+        if(question.errFile){
+            Toast.fire({
+                type: 'error',
+                title: "Error",
+                html: question.errFile.$error + ' : ' + question.errFile.$errorParam
+            })
+        }
+        if (file) {            
+            question.uploading = true;
+            file.upload = Upload.upload({
+                url: `/api/survey/answer/${$scope.team._id}/${token}/${survId}/file/${question.questionId}`,
+                data: {file: file}
+            });
+
+            file.upload.then(function (response) {
+                $timeout(function () {
+                    $scope.answers[question.questionId] = response.data.fileName;
+                    file.result = response.data;
+                    Toast.fire({
+                        type: 'success',
+                        title: upload_mes
+                    })
+                    delete question.f;
+                    question.uploading = false;
+                });
+            }, function (response) {
+                if (response.status > 0){
+                     question.errorMsg = response.status + ': ' + response.data.msg;
+                     Toast.fire({
+                        type: 'error',
+                        title: "Error: " + response.statusText,
+                        html: response.data.msg
+                    })
+                }
+            }, function (evt) {
+                file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+            });
+        }   
     }
 
 }]);

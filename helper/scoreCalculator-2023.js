@@ -56,50 +56,31 @@ module.exports.calculateLineScore = function (run) {
 
     let error = 1;
     if (run.rescueOrder) {
-      if (run.evacuationLevel == 1) {
-        for (const victim of run.rescueOrder) {
-          if (victim.type == 'K') {
-            if (run.kitLevel == 1)
-              multiplier *= Math.max(
-                1100 - 25 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
-            else
-              multiplier *= Math.max(
-                1300 - 25 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
+      let liveCount = 0;
+      for (let victim of run.rescueOrder) {
+        if (victim.victimType == "LIVE" && victim.zoneType == "RED") continue;
+        if (victim.victimType == "KIT" && victim.zoneType == "RED") continue;
+        if (victim.victimType == "DEAD" && victim.zoneType == "GREEN") continue;
+
+        if (victim.victimType == "KIT") {
+            if (run.evacuationLevel == 1) {
+                if (run.kitLevel == 1) multiplier *= 1100;
+                else multiplier *= 1300;
+            } else {
+                if (run.kitLevel == 1) multiplier *= 1200;
+                else multiplier *= 1600;
+            }
             error *= 1000;
-          } else if (victim.effective) {
-            multiplier *= Math.max(
-              1200 - 25 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-              1000
-            );
-            error *= 1000;
-          }
+            continue;
         }
-      } else if (run.evacuationLevel == 2) {
-        for (const victim of run.rescueOrder) {
-          if (victim.type == 'K') {
-            if (run.kitLevel == 1)
-              multiplier *= Math.max(
-                1200 - 50 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
-            else
-              multiplier *= Math.max(
-                1600 - 50 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-                1000
-              );
-            error *= 1000;
-          } else if (victim.effective) {
-            multiplier *= Math.max(
-              1400 - 50 * run.LoPs[run.map.EvacuationAreaLoPIndex],
-              1000
-            );
-            error *= 1000;
-          }
-        }
+
+        if (victim.victimType == "DEAD" && liveCount != 2) continue;
+
+        if (run.evacuationLevel == 1) multiplier *= Math.max(1200-(25*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);
+        else multiplier *= Math.max(1400-(50*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);
+        
+        error *= 1000;
+        if (victim.victimType == "LIVE") liveCount ++;
       }
       multiplier /= error;
     }
@@ -157,7 +138,7 @@ module.exports.calculateMazeScore = function (run) {
     }
   }
 
-  let victims = 0;
+  let victims = {};
   let rescueKits = 0;
 
   for (let i = 0; i < run.tiles.length; i++) {
@@ -181,7 +162,6 @@ module.exports.calculateMazeScore = function (run) {
       H: 3,
       S: 2,
       U: 0,
-      Heated: 1,
       Red: 1,
       Yellow: 1,
       Green: 0,
@@ -189,7 +169,7 @@ module.exports.calculateMazeScore = function (run) {
 
     if (mapTiles[coord].tile.victims.top != 'None') {
       if (tile.scoredItems.victims.top) {
-        victims++;
+        addVictimCount(victims, mapTiles[coord].tile.victims.top);
         if (
           mapTiles[coord].tile.victims.top == 'Red' ||
           mapTiles[coord].tile.victims.top == 'Yellow' ||
@@ -205,7 +185,7 @@ module.exports.calculateMazeScore = function (run) {
     }
     if (mapTiles[coord].tile.victims.right != 'None') {
       if (tile.scoredItems.victims.right) {
-        victims++;
+        addVictimCount(victims, mapTiles[coord].tile.victims.right);
         if (
           mapTiles[coord].tile.victims.right == 'Red' ||
           mapTiles[coord].tile.victims.right == 'Yellow' ||
@@ -221,7 +201,7 @@ module.exports.calculateMazeScore = function (run) {
     }
     if (mapTiles[coord].tile.victims.bottom != 'None') {
       if (tile.scoredItems.victims.bottom) {
-        victims++;
+        addVictimCount(victims, mapTiles[coord].tile.victims.bottom);
         if (
           mapTiles[coord].tile.victims.bottom == 'Red' ||
           mapTiles[coord].tile.victims.bottom == 'Yellow' ||
@@ -237,7 +217,7 @@ module.exports.calculateMazeScore = function (run) {
     }
     if (mapTiles[coord].tile.victims.left != 'None') {
       if (tile.scoredItems.victims.left) {
-        victims++;
+        addVictimCount(victims, mapTiles[coord].tile.victims.left);
         if (
           mapTiles[coord].tile.victims.left == 'Red' ||
           mapTiles[coord].tile.victims.left == 'Yellow' ||
@@ -253,17 +233,23 @@ module.exports.calculateMazeScore = function (run) {
     }
   }
 
+  let totalVictimCount = sum(Object.values(victims));
+
   score += Math.min(rescueKits, 12) * 10;
 
-  score += Math.max((victims + Math.min(rescueKits, 12) - run.LoPs) * 10, 0);
+  score += Math.max((totalVictimCount + Math.min(rescueKits, 12) - run.LoPs) * 10, 0);
 
   if (run.exitBonus) {
-    score += victims * 10;
+    score += totalVictimCount * 10;
   }
 
   score -= Math.min(run.misidentification * 5, score);
 
-  return `${score},${victims},${Math.min(rescueKits, 12)}`;
+  return {
+    score: score,
+    victims: convert(victims),
+    kits: Math.min(rescueKits, 12)
+  }
 };
 
 module.exports.calculateMazeScoreEntry = function (run) {
@@ -277,8 +263,7 @@ module.exports.calculateMazeScoreEntry = function (run) {
     }
   }
 
-  let victims = 0;
-  let identified = 0;
+  let victims = {};
 
   for (let i = 0; i < run.tiles.length; i++) {
     const tile = run.tiles[i];
@@ -293,27 +278,51 @@ module.exports.calculateMazeScoreEntry = function (run) {
 
     if (mapTiles[coord].tile.victims.floor != 'None') {
       if (tile.scoredItems.victims.floor) {
-        victims++;
-        if (
-          mapTiles[coord].tile.victims.floor == 'Red' ||
-          mapTiles[coord].tile.victims.floor == 'Green'
-        )
-          score += mapTiles[coord].isLinear ? 15 : 30;
-      }
-      if (tile.scoredItems.rescueKits.floor > 0) {
-        score += 10;
-        identified ++;
+        score += mapTiles[coord].isLinear ? 15 : 30;
+
+        if (tile.scoredItems.rescueKits.floor > 0) {
+          score += 10;
+          addVictimCount(victims, mapTiles[coord].tile.victims.floor);
+        } else {
+          addVictimCount(victims, "Unknown");
+        }
       }
     }
   }
 
-  score += Math.max((victims * 10)  - (run.LoPs * 5), 0);
+  let totalVictimCount = sum(Object.values(victims));
+
+  score += Math.max((totalVictimCount * 10)  - (run.LoPs * 5), 0);
 
   if (run.exitBonus) {
-    score += victims * 10;
+    score += totalVictimCount * 10;
   }
 
   score -= Math.min(run.misidentification*5,score);
 
-  return `${score},${victims},${identified}`;
+  return {
+    score: score,
+    victims: convert(victims)
+  }
 };
+
+function addVictimCount(obj, type) {
+  if (obj[type] == null) obj[type] = 0;
+  obj[type] ++;
+}
+
+function sum(array) {
+  if (array.length == 0) return 0;
+  return array.reduce(function(a,b){
+    return a + b;
+  });
+}
+
+function convert(obj) {
+  return Object.entries(obj).map(o => {
+    return {
+      'type': o[0],
+      'count': o[1]
+    }
+  })
+}
