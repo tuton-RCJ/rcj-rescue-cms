@@ -20,7 +20,7 @@ fs = gracefulFs.gracefulify(fs);
 const multer = require('multer');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const { admin } = require('./lineMaps');
+var crypto = require("crypto");
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const N = 32;
@@ -612,26 +612,73 @@ adminRouter.get('/answer/:competitionId/:survId', function (req, res, next) {
     return;
   }
 
-  surveyDb.surveyAnswer
-  .find({
-    competition: competitionId,
-    survey: survId
-  })
-  .populate({ 
-    path: 'team',
-    select: 'name teamCode league document.token'
-  })
-  .exec(function (err, dbAnswer) {
-    if (err) {
-      logger.error(err);
-      return res.status(400).send({
-        msg: 'Could not get answer',
-        err: err,
-      });
-    }
-    return res.status(200).send(dbAnswer);
-  });
+  surveyDb.survey
+    .findOne({
+      _id: survId,
+      competition: competitionId
+    })
+    .exec(function (err, dbSurvey) {
+      if (err) {
+        logger.error(err);
+        return res.status(400).send({
+          msg: 'Could not get survey',
+          err: err.message,
+        });
+      }
+
+      let questionTypes = {};
+      dbSurvey.questions.map(question => {
+        questionTypes[question.questionId] = question.type;
+      })
+
+      surveyDb.surveyAnswer
+        .find({
+          competition: competitionId,
+          survey: dbSurvey._id
+        })
+        .populate({ 
+          path: 'team',
+          select: 'name teamCode league document.token'
+        })
+        .lean()
+        .exec(function (err, dbAnswer) {
+          if (err) {
+            logger.error(err);
+            return res.status(400).send({
+              msg: 'Could not get answer',
+              err: err,
+            });
+          }
+          dbAnswer.map(team => {
+            team.answer.map(ans => {
+              if (questionTypes[ans.questionId] == 'file') {
+                let path = `${__dirname}/../../survey/${team.competition}/${dbSurvey._id}/${team.team._id}/${ans.questionId}`;
+                let hash = md5(path);
+                if (hash == '') ans.answer = "";
+                else ans.hash = hash;
+              }
+            })
+          })
+          return res.status(200).send({
+            questions: dbSurvey,
+            answers: dbAnswer
+          });
+        });
+    });
+
+  
 });
+
+function md5(filePath) {
+  try {
+    let b = fs.readFileSync(filePath);
+    let md5hash = crypto.createHash('md5');
+    md5hash.update(b);
+    return md5hash.digest("base64");
+  } catch (e) {
+    return '';
+  }
+}
 
 publicRouter.post('/answer/:teamId/:token/:survId/file/:questionId', function (req, res, next) {
   const { teamId, token, survId, questionId } = req.params;
