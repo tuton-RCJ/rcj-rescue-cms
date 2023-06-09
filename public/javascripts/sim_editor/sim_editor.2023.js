@@ -2073,11 +2073,13 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.name = data.name;
                     $scope.time = data.time;
                     $scope.finished = data.finished;
+
                     $scope.roomTiles = data.roomTiles;
                     $scope.area4Room = data.area4Room;
                     $scope.room4CanvasSave = data.room4CanvasSave;
                     $scope.room4Img.src = $scope.room4CanvasSave;
-                    $scope.room4VicTypes = data.room4VicTypes;
+                    if (data.room4VicTypes != undefined)
+                        $scope.room4VicTypes = data.room4VicTypes;
 
                     $scope.updateRoom4Pick();
 
