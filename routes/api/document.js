@@ -436,9 +436,11 @@ publicRouter.get('/files/:teamId/:token/:fileName', function (req, res, next) {
       } else if (dbTeam) {
         let league = dbTeam.competition.documents.leagues.find(l => l.league == dbTeam.league);
         let question = undefined;
-        for(b of league.blocks){
-          question = b.questions.find(q => q.fileName!="" && ~fileName.indexOf(q.fileName));
-          if(question) break;
+        if (league) {
+          for(b of league.blocks){
+            question = b.questions.find(q => q.fileName!="" && ~fileName.indexOf(q.fileName));
+            if(question) break;
+          }
         }
         if(!question){
           question= {
