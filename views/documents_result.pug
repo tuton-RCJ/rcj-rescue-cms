@@ -81,6 +81,7 @@ block content
                 th {{"common.teamCode" | translate}}
                 th {{"common.team" | translate}}
                 th {{"common.region" | translate}}
+                th {{"document.result.numOfJudge" | translate}}
                 th(ng-repeat="b in teams[0].details track by $index" ng-bind="blockTitle[b.blockId]" ng-style="{backgroundColor: activeSortKey == b.blockId ? '#f1c40f':'#3498db'}")
                 th(ng-style="{backgroundColor: activeSortKey == -1 ? '#f1c40f':'#e74c3c'}")
                   i.fas.fa-calculator &nbsp;
@@ -92,8 +93,10 @@ block content
                 td
                   a(ng-click="go('/document/reviewed/' + team._id + '?return=/admin/' + competitionId + '/documents/' + leagueId + '/results')" ng-bind='team.name' style="color: #006699;") 
                 td(ng-bind='team.country')
+                td(ng-bind='team.reviewerNum')
                 td(ng-repeat="b in team.details" ng-style="{backgroundColor: activeSortKey == b.blockId ? '#f6e58d':'#dff9fb'}")
-                  span {{b.score}}
+                  span {{b.score}} &nbsp;
+                  i.fas.fa-exclamation-triangle(style='color: #ffaa00;' ng-show="b.warning || team.reviewerNum != b.reviewerNum")
                   br
                   i.fa.fa-chart-bar(style="font-size: 10px;") &nbsp;
                   span(style="font-size: 10px;") {{b.normalizedScore}}

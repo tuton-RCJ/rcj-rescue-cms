@@ -982,7 +982,8 @@
             "public": "一般公開"
         },
         "result": {
-            "title": "レビュー結果確認"
+            "title": "レビュー結果確認",
+            "numOfJudge": "評価者数"
         },
         "editor": {
             "title": "ドキュメント　フォームエディタ",

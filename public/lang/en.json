@@ -984,7 +984,8 @@
             "public": "Public Access"
         },
         "result": {
-            "title": "Review results"
+            "title": "Review results",
+            "numOfJudge": "Number of judge"
         },
         "editor": {
             "title": "Document Form Editor",

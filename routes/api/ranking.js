@@ -619,10 +619,13 @@ async function getDocumentScore(competitionId, leagueId) {
     team.details = [];
     for (let blockId in questions) {
       let blockScore = 0;
+      let warning = false;
+      let blockReviewerNum = [];
       for (let questionId of questions[blockId]) {
         if (comments[questionId] == null) continue;
         let ratings = comments[questionId].map(str => parseInt(str));
         let numReviewer = ratings.length;
+        blockReviewerNum.push(numReviewer);
 
         let score = 0;
         if (numReviewer >= MINIMUM_REVIEWER) {
@@ -636,12 +639,15 @@ async function getDocumentScore(competitionId, leagueId) {
       }
       team.details.push({
         blockId,
-        score: blockScore
+        score: blockScore,
+        warning: Math.min(...blockReviewerNum) != Math.max(...blockReviewerNum),
+        reviewerNum: Math.max(...blockReviewerNum)
       })
       if (blockScores[blockId] == null) blockScores[blockId] = [];
       blockScores[blockId].push(blockScore);
     }
 
+    team.reviewerNum = Math.max(...team.details.map(d => d.reviewerNum));
     result.push(team);
   }
 
