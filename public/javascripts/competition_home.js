@@ -21,6 +21,17 @@ app.controller("CompetitionHomeController", ['$scope', '$http', '$translate', fu
         let path = `/${league.type}/${competitionId}/${league.id}`
         window.location = path
     }
+
+    $scope.leagueImage = function (league) {
+        switch (league.id) {
+            case 'LineNL':
+                return "LineNL";
+            case 'MazeNL':
+                return "MazeNL";
+            default:
+                return league.type;
+        }
+    }
     
     cheet('↑ ↑ ↓ ↓ ← → ← → b a', function () {
         $scope.secretCommand = !$scope.secretCommand;

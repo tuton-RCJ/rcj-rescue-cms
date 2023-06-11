@@ -26,7 +26,7 @@ block content
         div(ng-repeat="league in leagues" ng-click = "goLeaguePage(league)" class="col-md-6 col-lg-4")
           .card(style='width: 100%;margin-bottom:20px;')
               a
-                img.card-img-top(ng-src="/images/leagues/{{league.id}}.png" style="width:100%; height:auto;")
+                img.card-img-top(ng-src="/images/leagues/{{leagueImage(league)}}.png" style="width:100%; height:auto;")
               .card-body
                 button(class='btn btn-primary btn-lg btn-block') 
                   i.fas.fa-arrow-right &nbsp;
