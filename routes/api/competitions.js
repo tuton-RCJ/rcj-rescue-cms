@@ -877,6 +877,9 @@ adminRouter.post('/', function (req, res) {
       let path = `${__dirname}/../../documents/${competitionid}`;
       mkdirp.sync(path);
 
+      path = `${__dirname}/../../survey/${competitionid}`;
+      mkdirp.sync(path);
+
       for(let l of LEAGUES){
         path = `${__dirname}/../../cabinet/${competitionid}/${l}`;
         mkdirp.sync(path);
