@@ -86,39 +86,34 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
             
             $scope.runs = runs;
 
-            // TODO: This should be done with Set, needs polyfill?
-            if(!$scope.rounds && !$scope.fields){
-                var rounds = {}
-                var fields = {}
-                for (var i = 0; i < runs.length; i++) {
-                    try {
-                        var round = runs[i].round.name
-                        if (!rounds.hasOwnProperty(round)) {
-                            rounds[round] = false
-                        }
-                    } catch (e) {
-
+            var rounds = {}
+            var fields = {}
+            for (var i = 0; i < runs.length; i++) {
+                try {
+                    var round = runs[i].round.name
+                    if (!rounds.hasOwnProperty(round)) {
+                        rounds[round] = false
                     }
-
-                    try {
-                        var field = runs[i].field.name
-
-                        if (!fields.hasOwnProperty(field)) {
-                            fields[field] = false
-                        }
-                    } catch (e) {
-
-                    }
-
+                } catch (e) {
 
                 }
 
-                $scope.rounds = objectSort(rounds)
-                $scope.fields = objectSort(fields)
+                try {
+                    var field = runs[i].field.name
+
+                    if (!fields.hasOwnProperty(field)) {
+                        fields[field] = false
+                    }
+                } catch (e) {
+
+                }
+
+
             }
 
+            $scope.rounds = objectSort(rounds)
+            $scope.fields = objectSort(fields)
         });
-    
     }
 
 

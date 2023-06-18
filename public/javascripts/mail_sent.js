@@ -179,7 +179,7 @@ app.controller('MailSentController', ['$scope', '$uibModal', '$log', '$http', '$
 
     $scope.list_filter = function (value, index, array) {
         if(value.team == null) return false;
-        return (showAllLeagues || $scope.Rleagues[value.league]) && (~value.subject.indexOf($scope.refineSubject))  && (~value.team.name.indexOf($scope.refineName)) && (~value.team.teamCode.indexOf($scope.refineCode)) && (~value.team.country.indexOf($scope.refineRegion))
+        return (showAllLeagues || $scope.Rleagues[value.team.league]) && (~value.subject.indexOf($scope.refineSubject))  && (~value.team.name.indexOf($scope.refineName)) && (~value.team.teamCode.indexOf($scope.refineCode)) && (~value.team.country.indexOf($scope.refineRegion))
     }
 
 }]);
