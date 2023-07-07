@@ -69,6 +69,7 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
             var rankingInfo = response.data;
             $scope.documentBlock = response.data.documentBlockTitles;
             $scope.ranking = rankingInfo.ranking;
+            $scope.runGroups = rankingInfo.runGroups;
             
             $scope.showMode.teamCode = $scope.ranking.some(t => t.team.teamCode);
 
@@ -82,7 +83,7 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
                 $scope.showMode.documentScore = true;
             }
 
-            $scope.maxGameNum = Math.max(...$scope.ranking.map(t => t.games.length));
+            $scope.maxGameNum = $scope.runGroups.length;
 
             if (callback != null && callback.constructor == Function) {
                 callback()

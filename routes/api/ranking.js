@@ -51,15 +51,21 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   let allRunsDb = await lineRun.find({
     competition: competition
-  }).select("team score normalizationGroup LoPs rescueOrder nl isNL time startTime")
+  }).select("team score normalizationGroup LoPs rescueOrder nl isNL time startTime round")
   .populate([
     {
       path: 'team',
       select: 'name teamCode league'
+    },
+    {
+      path: 'round',
+      select: 'name'
     }
   ]).lean().exec();
 
   let allRunsLeague = allRunsDb.filter(r => r.team.league == league);
+  let allRounds =[...new Set(allRunsLeague.map(r => r.round.name))].sort();
+  let allNormGroups =[...new Set(allRunsLeague.map(r => r.normalizationGroup))].sort();
 
   if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
     let normGroups = allRunsLeague.map(r => r.normalizationGroup);
@@ -138,9 +144,6 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the LoPs
     teamRuns[e].gameSum.lops = sum(bestRuns.map(run => sum(run.LoPs)));
-
-    // Sort by startTime
-    teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);
   })
 
   let result = {
@@ -165,7 +168,17 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   let ranking = Object.values(teamRuns);
   ranking.map(r => {
     r.team = r.games[0].team;
-    r.games.map(g => delete g.team)
+    r.games.map(g => delete g.team);
+    // Convert to object
+    if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.normalizationGroup]: value};
+      }, {});
+    } else {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.round.name]: value};
+      }, {});
+    }
   });
 
   switch(rankingMode) {
@@ -181,6 +194,12 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   ranking.sort(sortFinalScore);
   result.ranking = ranking;
+
+  if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+    result.runGroups = allNormGroups;
+  } else {
+    result.runGroups = allRounds;
+  }
 
   res.status(200).send(result);
 });
@@ -218,15 +237,21 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   let allRunsDb = await mazeRun.find({
     competition: competition
-  }).select("team score normalizationGroup LoPs misidentification foundVictims distKits exitBonus time startTime")
+  }).select("team score normalizationGroup LoPs misidentification foundVictims distKits exitBonus time startTime round")
   .populate([
     {
       path: 'team',
       select: 'name teamCode league'
+    },
+    {
+      path: 'round',
+      select: 'name'
     }
   ]).lean().exec();
 
   let allRunsLeague = allRunsDb.filter(r => r.team.league == league);
+  let allRounds =[...new Set(allRunsLeague.map(r => r.round.name))].sort();
+  let allNormGroups =[...new Set(allRunsLeague.map(r => r.normalizationGroup))].sort();
 
   if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
     let normGroups = allRunsLeague.map(r => r.normalizationGroup);
@@ -300,9 +325,6 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the exitBonus
     teamRuns[e].gameSum.exitBonus = sum(bestRuns.map(run => run.exitBonus ? 1:0));
-
-    // Sort by startTime
-    teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);
   })
 
   let result = {
@@ -326,7 +348,17 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   let ranking = Object.values(teamRuns);
   ranking.map(r => {
     r.team = r.games[0].team;
-    r.games.map(g => delete g.team)
+    r.games.map(g => delete g.team);
+    // Convert to object
+    if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.normalizationGroup]: value};
+      }, {});
+    } else {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.round.name]: value};
+      }, {});
+    }
   });
 
   switch(rankingMode) {
@@ -342,6 +374,12 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   ranking.sort(sortFinalScore);
   result.ranking = ranking;
+
+  if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+    result.runGroups = allNormGroups;
+  } else {
+    result.runGroups = allRounds;
+  }
 
   res.status(200).send(result);
 });
@@ -379,15 +417,21 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   let allRunsDb = await simRun.find({
     competition: competition
-  }).select("team score normalizationGroup time startTime")
+  }).select("team score normalizationGroup time startTime round")
   .populate([
     {
       path: 'team',
       select: 'name teamCode league'
+    },
+    {
+      path: 'round',
+      select: 'name'
     }
   ]).lean().exec();
 
   let allRunsLeague = allRunsDb.filter(r => r.team.league == league);
+  let allRounds =[...new Set(allRunsLeague.map(r => r.round.name))].sort();
+  let allNormGroups =[...new Set(allRunsLeague.map(r => r.normalizationGroup))].sort();
 
   if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
     let normGroups = allRunsLeague.map(r => r.normalizationGroup);
@@ -434,9 +478,6 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
     teamRuns[e].gameSum.time.seconds = sum(bestRuns.map(run => run.time.seconds));
     teamRuns[e].gameSum.time.minutes += Math.floor(teamRuns[e].gameSum.time.seconds / 60);
     teamRuns[e].gameSum.time.seconds %= 60;
-
-    // Sort by startTime
-    teamRuns[e].games.sort((a, b) => a.startTime - b.startTime);
   })
 
   let result = {
@@ -460,7 +501,17 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   let ranking = Object.values(teamRuns);
   ranking.map(r => {
     r.team = r.games[0].team;
-    r.games.map(g => delete g.team)
+    r.games.map(g => delete g.team);
+    // Convert to object
+    if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.normalizationGroup]: value};
+      }, {});
+    } else {
+      r.games = r.games.reduce((accumulator, value, index) => {
+        return {...accumulator, [value.round.name]: value};
+      }, {});
+    }
   });
 
   switch(rankingMode) {
@@ -476,6 +527,12 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
   ranking.sort(sortFinalScore);
   result.ranking = ranking;
+
+  if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode)) {
+    result.runGroups = allNormGroups;
+  } else {
+    result.runGroups = allRounds;
+  }
 
   res.status(200).send(result);
 });

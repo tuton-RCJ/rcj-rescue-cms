@@ -66,7 +66,8 @@ app.controller("SimulationScoreController", ['$scope', '$http', '$sce', '$transl
             var rankingInfo = response.data;
             $scope.documentBlock = response.data.documentBlockTitles;
             $scope.ranking = rankingInfo.ranking;
-            
+            $scope.runGroups = rankingInfo.runGroups;
+
             $scope.showMode.teamCode = $scope.ranking.some(t => t.team.teamCode);
 
             if (rankingInfo.mode == "SUM_OF_BEST_N_GAMES") {
@@ -79,7 +80,7 @@ app.controller("SimulationScoreController", ['$scope', '$http', '$sce', '$transl
                 $scope.showMode.documentScore = true;
             }
 
-            $scope.maxGameNum = Math.max(...$scope.ranking.map(t => t.games.length));
+            $scope.maxGameNum = $scope.runGroups.length;
 
             if (callback != null && callback.constructor == Function) {
                 callback()
