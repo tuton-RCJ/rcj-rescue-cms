@@ -104,20 +104,20 @@ html(ng-app="ddApp")
                               th(style='text-align:center;', ng-repeat='i in range(4)') {{i+1}}
                             tr
                               td
-                                img(src='/images/evacZone/red_lv1.png', height='50px', ng-if="evacuationLevel == 1")
-                                img(src='/images/evacZone/red_lv2.png', height='50px', ng-if="evacuationLevel == 2")
+                                img(src='/images/evacZone/green_lv1.png', height='50px', ng-if="evacuationLevel == 1")
+                                img(src='/images/evacZone/green_lv2.png', height='50px', ng-if="evacuationLevel == 2")
                               td(ng-repeat='i in range(4)', ng-dblclick='delete_victim(i)', ng-swipe-left='delete_victim(i)')
-                                div(ng-if="victim_list[i].zoneType == 'RED'")
+                                div(ng-if="victim_list[i].zoneType == 'GREEN'")
                                   img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
                                   img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
                                   img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
                                   img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==2")
                             tr
                               td
-                                img(src='/images/evacZone/green_lv1.png', height='50px', ng-if="evacuationLevel == 1")
-                                img(src='/images/evacZone/green_lv2.png', height='50px', ng-if="evacuationLevel == 2")
+                                img(src='/images/evacZone/red_lv1.png', height='50px', ng-if="evacuationLevel == 1")
+                                img(src='/images/evacZone/red_lv2.png', height='50px', ng-if="evacuationLevel == 2")
                               td(ng-repeat='i in range(4)', ng-dblclick='delete_victim(i)', ng-swipe-left='delete_victim(i)')
-                                div(ng-if="victim_list[i].zoneType == 'GREEN'")
+                                div(ng-if="victim_list[i].zoneType == 'RED'")
                                   img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
                                   img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
                                   img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
