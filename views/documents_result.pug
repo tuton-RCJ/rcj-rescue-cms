@@ -88,18 +88,18 @@ block content
                   | {{"common.totalScore" | translate}}
                 
           tbody
-              tr(ng-repeat='team in teams | filter:list_filter')
-                td(ng-bind='team.teamCode')
-                td
+              tr(ng-repeat-start='team in teams | filter:list_filter')
+                td(rowspan="2" ng-bind='team.teamCode')
+                td(rowspan="2" )
                   a(ng-click="go('/document/reviewed/' + team._id + '?return=/admin/' + competitionId + '/documents/' + leagueId + '/results')" ng-bind='team.name' style="color: #006699;") 
-                td(ng-bind='team.country')
-                td(ng-bind='team.reviewerNum')
-                td(ng-repeat="b in team.details" ng-style="{backgroundColor: activeSortKey == b.blockId ? '#f6e58d':'#dff9fb'}")
-                  span {{b.score}} &nbsp;
-                  i.fas.fa-exclamation-triangle(style='color: #ffaa00;' ng-show="b.warning || team.reviewerNum != b.reviewerNum")
-                  br
-                  i.fa.fa-chart-bar(style="font-size: 10px;") &nbsp;
-                  span(style="font-size: 10px;") {{b.normalizedScore}}
-                td(ng-if="team.details.length>0" ng-style="{backgroundColor: activeSortKey == -1 ? '#f6e58d':'#ff7979'}")
-                  i.fa.fa-chart-bar &nbsp;
-                  span {{team.score}}
+                td(rowspan="2" ng-bind='team.country')
+                td(rowspan="2" ng-bind='team.reviewerNum')
+                td(ng-repeat="b in team.details" style="border-bottom: none;padding-bottom: 0;" ng-style="{backgroundColor: activeSortKey == b.blockId ? '#f6e58d':'#dff9fb'}")
+                  span {{b.score}}
+                  i.fas.fa-exclamation-triangle(style='margin-left:5px; color: #ffaa00;' ng-show="b.warning || team.reviewerNum != b.reviewerNum")
+                td(rowspan="2" ng-if="team.details.length>0" ng-style="{backgroundColor: activeSortKey == -1 ? '#f6e58d':'#ff7979'}")
+                  i.fa.fa-chart-bar &nbsp; {{team.score}}
+              tr(ng-repeat-end)
+                td(ng-repeat="b in team.details" style="border-top: none;padding-top: 0;" ng-style="{backgroundColor: activeSortKey == b.blockId ? '#f6e58d':'#dff9fb'}")
+                  i.fa.fa-chart-bar(style="font-size: 10px;") &nbsp;{{b.normalizedScore}}
+
