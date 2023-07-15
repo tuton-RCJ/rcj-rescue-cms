@@ -68,6 +68,7 @@ adminRouter.post('/', function (req, res) {
           checkpoint: cell.tile.checkpoint,
           speedbump: cell.tile.speedbump,
           black: cell.tile.black,
+          blue: cell.tile.blue,
           ramp: cell.tile.ramp,
           steps: cell.tile.steps,
           changeFloorTo: cell.tile.changeFloorTo,
