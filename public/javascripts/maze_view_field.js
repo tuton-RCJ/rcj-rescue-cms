@@ -155,6 +155,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.refas_sig = response.data.sign.referee_as;
 
             // Scoring elements of the tiles
+            $scope.tiles = [];
             for (let i = 0; i < response.data.tiles.length; i++) {
                 $scope.tiles[response.data.tiles[i].x + ',' +
                     response.data.tiles[i].y + ',' +
