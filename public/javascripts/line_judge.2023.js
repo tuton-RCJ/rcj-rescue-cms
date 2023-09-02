@@ -164,7 +164,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
   function upload_run(data) {
     let tmp = {
       map: {
-        tiles: db_mtile
+        tiles: db_mtile,
+        victims: {
+          live: $scope.maxLiveVictims,
+          dead: $scope.maxDeadVictims
+        }
       },
       tiles: $scope.stiles,
       LoPs: $scope.LoPs,
@@ -330,8 +334,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         $scope.mtiles = {};
 
         // Get max victim count
-        $scope.maxLiveVictims = 2;
-        $scope.maxDeadVictims = 1;
+        $scope.maxLiveVictims = response.data.victims.live;
+        $scope.maxDeadVictims = response.data.victims.dead;
 
 
         $scope.mapIndexCount = response.data.indexCount;
@@ -528,7 +532,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         let v = $scope.victim_list[i]
         if (v.victimType == "LIVE") liveCount ++;
       }
-      if (liveCount != 2) return 1.0;
+      if (liveCount != $scope.maxLiveVictims) return 1.0;
     }
     
     return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);    

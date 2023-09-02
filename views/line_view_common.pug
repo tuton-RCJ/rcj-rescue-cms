@@ -234,31 +234,31 @@ div(ng-if="league!='LineNL'")
               tbody
                 tr
                   th Zone
-                  th(style='text-align:center;', ng-repeat='i in range(4)') {{i+1}}
+                  th(style='text-align:center;', ng-repeat='i in range(4)') {{j*4 + (i+1)}}
                 tr
                   td
                     img(src='/images/evacZone/red_lv1.png', height='50px', ng-if="evacuationLevel == 1")
                     img(src='/images/evacZone/red_lv2.png', height='50px', ng-if="evacuationLevel == 2")
-                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color($index, 'RED')}")
-                    div(ng-if="victim_list[i].zoneType == 'RED'")
-                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
-                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
-                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
-                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==2")
+                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'RED')}")
+                    div(ng-if="victim_list[j*4+i].zoneType == 'RED'")
+                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
+                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
+                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==1")
+                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==2")
                       br
-                      span(ng-if="calc_victim_multipliers($index)!=0") x{{calc_victim_multipliers($index)}}
+                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
                 tr
                   td
                     img(src='/images/evacZone/green_lv1.png', height='50px', ng-if="evacuationLevel == 1")
                     img(src='/images/evacZone/green_lv2.png', height='50px', ng-if="evacuationLevel == 2")
-                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color($index, 'GREEN')}")
-                    div(ng-if="victim_list[i].zoneType == 'GREEN'")
-                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[i].victimType == 'LIVE'")
-                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[i].victimType == 'DEAD'")
-                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==1")
-                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[i].victimType == 'KIT' && kitLevel==2")
+                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'GREEN')}")
+                    div(ng-if="victim_list[j*4+i].zoneType == 'GREEN'")
+                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
+                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
+                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==1")
+                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==2")
                       br
-                      span(ng-if="calc_victim_multipliers($index)!=0") x{{calc_victim_multipliers($index)}}
+                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
     .col-lg-4
       .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')
         h2 {{'common.multipliers' | translate}}

@@ -74,7 +74,7 @@ module.exports.calculateLineScore = function (run) {
             continue;
         }
 
-        if (victim.victimType == "DEAD" && liveCount != 2) continue;
+        if (victim.victimType == "DEAD" && liveCount != run.map.victims.live) continue;
 
         if (run.evacuationLevel == 1) multiplier *= Math.max(1200-(25*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);
         else multiplier *= Math.max(1400-(50*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);

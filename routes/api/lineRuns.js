@@ -437,10 +437,10 @@ privateRouter.put('/:runid', function (req, res, next) {
       {
         path: 'map',
         populate: {
-          select: 'indexCount',
+          select: 'indexCount, victims',
           path: 'tiles.tileType',
-        },
-      },
+        }
+      }
     ])
     .populate('competition.rule')
     .exec(function (err, dbRun) {

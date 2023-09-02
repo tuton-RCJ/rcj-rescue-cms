@@ -342,7 +342,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             let v = $scope.victim_list[i]
             if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
           }
-          if (liveCount != 2) return 1.0;
+          if (liveCount != $scope.maxLiveVictims) return 1.0;
         }
         
         return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
