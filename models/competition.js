@@ -39,7 +39,7 @@ if(cluster.isMaster){
   logger.debug("Available other leagues : " + OTHER_LEAGUES);
 }
 
-const SUPPORT_RULES = ["2023"];
+const SUPPORT_RULES = ["2023", "2024"];
 
 const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, SIM_LEAGUES, OTHER_LEAGUES);
 
