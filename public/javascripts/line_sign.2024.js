@@ -362,7 +362,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             point += 10 * victim.found + 20 * victim.identified;
         }
         for (let victim of $scope.victimNL_Dead) {
-            point += 10 * victim.found + 5 * victim.identified;
+            point += 10 * victim.found + 10 * victim.identified;
         }
         return point;
     }

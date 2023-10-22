@@ -303,7 +303,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
     'round',
     { path: 'team', select: 'name league teamCode' },
     'field',
-    { path: 'competition', select: 'name ranking preparation' }
+    { path: 'competition', select: 'name ranking preparation rule' }
   ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);

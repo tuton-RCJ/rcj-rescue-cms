@@ -166,6 +166,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.league = response.data.team.league;
             $scope.competition = response.data.competition.name;
             $scope.competition_id = response.data.competition._id;
+            $scope.rule = response.data.competition.rule;
             $scope.retired = response.data.retired;
             // Verified time by timekeeper
             $scope.minutes = response.data.time.minutes;
@@ -281,7 +282,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             point += 10 * victim.found + 20 * victim.identified;
         }
         for (let victim of $scope.victimNL_Dead) {
-            point += 10 * victim.found + 5 * victim.identified;
+            // TEMP IMPL
+            if ($scope.rule == "2024") {
+                point += 10 * victim.found + 10 * victim.identified;
+            } else {
+                point += 10 * victim.found + 5 * victim.identified;
+            }
         }
         return point;
     }
