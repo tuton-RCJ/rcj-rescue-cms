@@ -174,10 +174,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
         
-        // Set to virtual wall around the black tile
+        // Set to virtual wall around the black tile and start tile
+        let startTilePosition = $scope.startTile.x + "," + $scope.startTile.y + "," + $scope.startTile.z;
         for (var index in $scope.cells) {
             if($scope.cells[index].tile){
-                if($scope.cells[index].tile.black){
+                if($scope.cells[index].tile.black || index == startTilePosition){
                     var x = Number(index.split(',')[0]);
                     var y = Number(index.split(',')[1]);
                     var z = Number(index.split(',')[2]);
