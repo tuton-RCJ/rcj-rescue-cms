@@ -221,7 +221,7 @@ backupQueue.on('failed', function(job, err) {
 backupQueue.process('restore', function(job, done){
   job.progress(1);
   const {folder, user} = job.data;
-  const maxCount = 15;
+  const maxCount = 17;
 
   const extract = onezip.extract(`./tmp/uploads/${folder}.zip`, `./tmp/uploads/${folder}`);
 
@@ -400,7 +400,13 @@ backupQueue.process('restore', function(job, done){
               if (err) {
                 logger.error(err);
               }else{
-
+                updated ++;
+                jobProgress += 50/maxCount;
+                job.progress(Math.floor(jobProgress));
+                if(updated == maxCount){
+                  job.progress(100);
+                  done();
+                }
               }
             });
           }else{
@@ -414,7 +420,13 @@ backupQueue.process('restore', function(job, done){
               if (err) {
                 logger.error(err);
               }else{
-
+                updated ++;
+                jobProgress += 50/maxCount;
+                job.progress(Math.floor(jobProgress));
+                if(updated == maxCount){
+                  job.progress(100);
+                  done();
+                }
               }
             });
           }
