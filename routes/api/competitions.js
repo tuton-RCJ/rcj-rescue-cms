@@ -53,10 +53,6 @@ publicRouter.get('/', function (req, res) {
     });
 });
 
-publicRouter.get('/rules', function (req, res) {
-  res.send(competitiondb.competition.schema.path('rule').enumValues);
-});
-
 publicRouter.get('/leagues', async function (req, res, next) {
   res.send(LEAGUES_JSON);
 });
@@ -222,7 +218,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
       });
     } else if (dbCompetition) {
       if (data.name != null) dbCompetition.name = data.name;
-      if (data.rule != null) dbCompetition.rule = data.rule;
+      if (data.rules != null) dbCompetition.rules = data.rules;
       if (data.logo != null) dbCompetition.logo = data.logo;
       if (data.bkColor != null) dbCompetition.bkColor = data.bkColor;
       if (data.color != null) dbCompetition.color = data.color;
@@ -231,18 +227,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
         dbCompetition.description = data.description;
       if (data.preparation != null) dbCompetition.preparation = data.preparation;
 
-      if (data.ranking != null) {
-        dbCompetition.ranking = [];
-        for (const i in data.ranking) {
-          const tmp = {
-            league: data.ranking[i].id,
-            num: data.ranking[i].count,
-            disclose: data.ranking[i].disclose,
-            mode: data.ranking[i].mode
-          };
-          dbCompetition.ranking.push(tmp);
-        }
-      }
+      if (data.leagues != null) dbCompetition.leagues = data.leagues;
       if (data.documents != null) {
         if (data.documents.enable != null)
           dbCompetition.documents.enable = data.documents.enable;
@@ -858,10 +843,17 @@ publicRouter.get('/:competition/:league/rounds', function (req, res, next) {
 
 adminRouter.post('/', function (req, res) {
   const competition = req.body;
+  let leagues = [];
+  LEAGUES_JSON.forEach((e) => {
+    leagues.push({
+      league: e.id,
+      rule: e.rules[e.rules.length - 1]
+    });
+  });
 
   new competitiondb.competition({
     name: competition.name,
-    rule: competition.rule,
+    leagues: leagues
   }).save(function (err, data) {
     if (err) {
       logger.error(err);

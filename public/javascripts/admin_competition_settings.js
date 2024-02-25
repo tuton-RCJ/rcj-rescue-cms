@@ -12,43 +12,17 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
     $scope.logo = response.data.logo;
     $scope.competitonUseRule = response.data.rule;
     $scope.preparation = response.data.preparation;
-    let ranking  = response.data.ranking;
-    $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
-      let leagues = response.data;
-      $scope.ranking = [];
-      for(let i in leagues){
-        let index = -1;
-        for(let j in ranking){
-          if(ranking[j].league == leagues[i].id){
-            index = j;
-            break;
-          }
-        }
-        if (index == -1) {
-          $scope.ranking.push({
-            'id': leagues[i].id,
-            'name': leagues[i].name,
-            'count': 20,
-            'disclose': false,
-            'mode': "SUM_OF_BEST_N_GAMES"
-          });
-        } else {
-          console.log(ranking[index])
-          $scope.ranking.push({
-            'id': leagues[i].id,
-            'name': leagues[i].name,
-            'count': ranking[index].num,
-            'disclose': ranking[index].disclose,
-            'mode': ranking[index].mode
-          });
-        }
-      }
-      console.log($scope.ranking)
-    })
+    $scope.leagues  = response.data.leagues;
   })
 
-  $http.get("/api/competitions/rules").then(function (response) {
-    $scope.rules = response.data;
+  $http.get("/api/competitions/leagues").then(function (response) {
+    $scope.allLeagues = [];
+    for (let e of response.data) {
+      $scope.allLeagues[e.id] = {
+        name: e.name,
+        rules: e.rules
+      };
+    }
   })
 
   $scope.updateAuthority = function (userid, acLevel) {
@@ -74,7 +48,7 @@ app.controller("AdminSettingsController", ['$scope', '$http', function ($scope, 
       color: $scope.cColor,
       message: $scope.message,
       description: $scope.description,
-      ranking: $scope.ranking,
+      leagues: $scope.leagues,
       preparation: $scope.preparation
     }
 

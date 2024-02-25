@@ -40,11 +40,6 @@ block content
       br
       .row
         .col-md-4
-          .input-group(style="width:100%;margin 0 auto;")
-            .input-group-prepend
-              span.input-group-text {{"admin.settings.rule" | translate}}:
-            select.custom-select(ng-model='competitonUseRule' ng-options='rule for rule in rules')
-          hr
           .row
             .col-6
               .input-group(style="width:100%;margin 0 auto;")
@@ -85,23 +80,25 @@ block content
       .row
         .col-10
           br
-          div(ng-repeat="rank in ranking track by $index" style="margin-top:10px;")
-            span(style="font-size:30px;") {{rank.name}} &nbsp;
-            span ID: {{rank.name}}
+          div(ng-repeat="league in leagues track by $index" style="margin-top:10px;")
+            span(style="font-size:30px;") {{allLeagues[league.league].name}} &nbsp;
             div(style="display: flex;margin-top:10px;")
               span(style="margin-top:5px;") {{"admin.settings.discloseRanking" | translate}} &nbsp;
               label.toggle-button-001
-                input(type='checkbox' ng-model="rank.disclose")
+                input(type='checkbox' ng-model="league.disclose")
             .input-group(style="width:100%;margin 0 auto;")
               .input-group-prepend
                 span.input-group-text {{"admin.settings.rankingMode" | translate}}
-              select.custom-select(ng-model='rank.mode')
+              select.custom-select(ng-model='league.mode')
                 option(value="SUM_OF_BEST_N_GAMES") SUM OF BEST N GAMES
                 option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES") MEAN OF NORMALIZED BEST N GAMES
                 option(value="MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") 0.8 * MEAN OF NORMALIZED BEST N GAMES + 0.2 * NORMALIZED DOCUMENT SCORE
               .input-group-prepend
                 span.input-group-text {{"admin.settings.num" | translate}}
-              input.form-control(type='number', ng-model='rank.count' style="max-width:100px;")
+              input.form-control(type='number', ng-model='league.num' style="max-width:100px;")
+              .input-group-prepend 
+                span.input-group-text {{"common.rule" | translate}}
+              select.custom-select(ng-model='league.rule' ng-options='rule for rule in allLeagues[league.league].rules' style="max-width: 100px;")
         .col-2(style="text-align:right;")
           button.btn.btn-success(type='button', ng-click='set()')
             i.fas.fa-check &nbsp;{{"admin.settings.set" | translate}}

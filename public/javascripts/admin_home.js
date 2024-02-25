@@ -4,11 +4,6 @@ app.controller("AdminHomeController", ['$scope', '$http', function ($scope, $htt
 
     updateCompetitionList()
 
-    $http.get("/api/competitions/rules").then(function (response) {
-        $scope.rules = response.data
-        $scope.competitonUseRule = $scope.rules[$scope.rules.length-1];
-    })
-
     $scope.go = function (path) {
         window.location = path
     }
@@ -19,8 +14,7 @@ app.controller("AdminHomeController", ['$scope', '$http', function ($scope, $htt
 
     $scope.addCompetition = function () {
         var competition = {
-            name: $scope.competitionName,
-            rule: $scope.competitonUseRule
+            name: $scope.competitionName
         }
 
         $http.post("/api/competitions", competition).then(function (response) {

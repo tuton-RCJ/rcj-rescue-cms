@@ -26,14 +26,11 @@ block content
             thead
                 tr
                   th {{"common.name" | translate}}
-                  th {{'common.rule' | translate}}
                   th {{"common.operation" | translate}}
             tbody
                 tr
                   td
-                    input(ng-model='competitionName')
-                  td
-                    select(ng-model='competitonUseRule' ng-options='rule for rule in rules')
+                    input(ng-model='competitionName' style="width:100%;")
                   td
                     button(ng-click='addCompetition()') {{"admin.home.add_c" | translate}}
           br
@@ -42,14 +39,12 @@ block content
             thead
                 tr
                   th {{"common.name" | translate}}
-                  th {{'common.rule' | translate}}
                   th {{"common.operation" | translate}}
             tbody
                 tr(ng-repeat='competition in competitions')
                   td
                     a(ng-if='competition.authLevel >= 10' ng-bind='competition.name' ng-href="/admin/{{competition._id}}")
                     span(ng-if='competition.authLevel < 10' ng-bind='competition.name')
-                  td(ng-bind='competition.rule')
                   td
                     a(ng-if='competition.authLevel >= 10' href="" ng-click='removeCompetition(competition)')
                       i.far.fa-trash-alt &nbsp;{{"common.delete" | translate}}

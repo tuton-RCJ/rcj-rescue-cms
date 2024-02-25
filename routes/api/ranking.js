@@ -31,7 +31,7 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   }
 
   let competitionDb = await competitiondb.competition.findById(competition).lean().exec();
-  let rankingSettings = competitionDb.ranking.find(r => r.league == league);
+  let rankingSettings = competitionDb.leagues.find(r => r.league == league);
   if (!rankingSettings) {
     rankingSettings = {
       mode: competitiondb.SUM_OF_BEST_N_GAMES,
@@ -217,14 +217,7 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   }
 
   let competitionDb = await competitiondb.competition.findById(competition).lean().exec();
-  let rankingSettings = competitionDb.ranking.find(r => r.league == league);
-  if (!rankingSettings) {
-    rankingSettings = {
-      mode: competitiondb.SUM_OF_BEST_N_GAMES,
-      disclose: false,
-      num: 20
-    }
-  }
+  let rankingSettings = competitionDb.leagues.find(r => r.league == league);
   if (!rankingSettings.disclose && !auth.authCompetition(
     req.user,
     competition,
@@ -397,14 +390,7 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   }
 
   let competitionDb = await competitiondb.competition.findById(competition).lean().exec();
-  let rankingSettings = competitionDb.ranking.find(r => r.league == league);
-  if (!rankingSettings) {
-    rankingSettings = {
-      mode: competitiondb.SUM_OF_BEST_N_GAMES,
-      disclose: false,
-      num: 20
-    }
-  }
+  let rankingSettings = competitionDb.leagues.find(r => r.league == league);
   if (!rankingSettings.disclose && !auth.authCompetition(
     req.user,
     competition,
