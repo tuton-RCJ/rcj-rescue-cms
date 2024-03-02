@@ -16,8 +16,7 @@ app.controller("RoundAdminController", ['$scope', '$http', function ($scope, $ht
     $scope.addRound = function () {
         var round = {
             name: $scope.roundName,
-            competition: competitionId,
-            league: $scope.roundLeague
+            competition: competitionId
         }
 
         $http.post("/api/rounds", round).then(function (response) {

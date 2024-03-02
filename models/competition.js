@@ -260,8 +260,7 @@ const roundSchema = new Schema({
     required: true,
     index   : true
   },
-  name       : {type: String, required: true},
-  league     : {type: String, enum: LEAGUES, required: true, index: true}
+  name       : {type: String, required: true}
 })
 
 roundSchema.pre('save', function (next) {
@@ -345,8 +344,7 @@ const fieldSchema = new Schema({
     required: true,
     index   : true
   },
-  name       : {type: String, required: true},
-  league     : {type: String, enum: LEAGUES, required: true, index: true}
+  name       : {type: String, required: true}
 })
 
 fieldSchema.pre('save', function (next) {

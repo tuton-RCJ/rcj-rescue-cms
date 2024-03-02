@@ -630,7 +630,7 @@ router.get('/:competitionid/rounds', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('round_admin', { id, user: req.user });
+    res.render('admin/round', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -666,7 +666,7 @@ router.get('/:competitionid/fields', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('field_admin', { id, user: req.user });
+    res.render('admin/field', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 

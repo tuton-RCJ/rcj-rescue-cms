@@ -15,8 +15,7 @@ app.controller("FieldAdminController", ['$scope', '$http', function ($scope, $ht
     $scope.addField = function () {
         var field = {
             name: $scope.fieldName,
-            competition: competitionId,
-            league: $scope.fieldLeague
+            competition: competitionId
         }
 
         $http.post("/api/fields", field).then(function (response) {
