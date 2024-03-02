@@ -27,13 +27,10 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
         // = translationId;
     });
 
-
     $http.get("/api/competitions/").then(function (response) {
         $scope.competitions = response.data
         //console.log($scope.competitions)
     })
-
-
 
     var tileCountDb={};
 
@@ -75,7 +72,8 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
                 $scope.competitionId = response.data.competition;
                 $http.get("/api/competitions/" +
                   $scope.competitionId).then(function (response) {
-                    $scope.competition = response.data.name;
+                    $scope.competition = response.data;
+                    $scope.league = response.data.leagues.find((l) => l.league == leagueId);
                 })
 
                 for(let t of $scope.tileSets){
@@ -105,7 +103,8 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
         } else {
             $http.get("/api/competitions/" +
               $scope.competitionId).then(function (response) {
-                $scope.competition = response.data.name;
+                $scope.competition = response.data;
+                $scope.league = response.data.leagues.find((l) => l.league == leagueId);
             })
         }
     }, function (response) {
@@ -257,7 +256,8 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
             startTile: $scope.startTile,
             startTile2: $scope.startTile2,
             tiles: $scope.tiles,
-            victims: victims
+            victims: victims,
+            league: leagueId
         };
 
         $http.post("/api/maps/line", map).then(function (response) {
@@ -266,7 +266,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
                 title: "Created map!"
             })
             //console.log(response.data);
-            window.location.replace("/admin/" + $scope.se_competition + "/line/editor/" + response.data.id)
+            window.location.replace("/admin/" + $scope.se_competition + "/" + leagueId + "/mapEditor/" + response.data.id)
         }, function (response) {
             console.log(response);
             console.log("Error: " + response.statusText);
@@ -372,7 +372,8 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
             startTile2: $scope.startTile2,
             tiles: $scope.tiles,
             victims: victims,
-            image: $scope.imgData
+            image: $scope.imgData,
+            league: leagueId
         };
 
         console.log(map);
@@ -399,7 +400,7 @@ app.controller('LineEditorController', ['$scope', '$uibModal', '$log', '$http', 
                     type: 'success',
                     title: "Created map"
                 })
-                window.location.replace("/admin/" + competitionId + "/line/editor/" + response.data.id)
+                window.location.replace("/admin/" + competitionId + "/" + leagueId + "/mapEditor/" + response.data.id)
             }, function (response) {
                 console.log(response);
                 console.log("Error: " + response.statusText);

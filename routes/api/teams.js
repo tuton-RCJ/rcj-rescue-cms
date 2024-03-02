@@ -52,7 +52,15 @@ publicRouter.get('/leagues/:league/:competitionId', async function (req, res) {
   ]);
 
   let teamLeagues = result.map(r => r._id);
-  let ret = LEAGUES_JSON.filter(l => teamLeagues.includes(l.id) && (l.type == league || league == 'all'));
+  let ret = structuredClone(LEAGUES_JSON.filter(l => teamLeagues.includes(l.id) && (l.type == league || league == 'all')));
+
+  // Get league setting of the competition
+  const competition = await competitiondb.competition.findById(id);
+
+  ret.map( r => {
+    r.rule = competition.leagues.find(c => c.league == r.id).rule;
+    delete r.rules;
+  });
   res.send(ret);
 });
 

@@ -13,6 +13,8 @@ const pathFinder = require('../helper/pathFinder')
 
 const LineRun = require('./lineRun')
 
+const LINE_LEAGUES = require('./competition').LINE_LEAGUES
+
 /**
  *
  *@constructor
@@ -29,6 +31,7 @@ const lineMapSchema = new Schema({
     required: true,
     index   : true
   },
+  league     : {type: String, enum: LINE_LEAGUES, required: true, index: true},
   tileSet      : {
     type    : ObjectId,
     ref     : 'TileSet',

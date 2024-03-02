@@ -623,7 +623,7 @@
             "line": "Line",
             "maze": "Maze",
             "simulation": "Simulation",
-            "maps": "Maps(Field layout)",
+            "maps": "Maps",
             "runs": "Runs",
             "backup": "Backup",
             "tools": "Tools"
@@ -643,7 +643,7 @@
             "add": "Add field"
         },
         "lineMapAdmin": {
-            "title": "Line Map(Field layout)",
+            "title": "Map",
             "create": "Create a new map"
         },
         "lineRun": {
@@ -683,7 +683,7 @@
             "complete": "Registration completed"
         },
         "lineMapEditor": {
-            "title": "Rescue Line map editor",
+            "title": "Map Editor",
             "desc": "Drag and drop tiles from the tile set area on the left onto the map area on the right. Right-click on a tile in the map area to set score item such as gaps and obstacles and ramps etc...",
             "save": "Save map",
             "saveAs": "Save map as",
@@ -732,11 +732,11 @@
             "headerError": "There is a problem in specifying the data type."
         },
         "mazeMapAdmin": {
-            "title": "Maze Map(Field layout)",
+            "title": "Map",
             "create": "@:admin.lineMapAdmin.create"
         },
         "mazeMapEditor": {
-            "title": "Rescue Maze map editor",
+            "title": "Map Editor",
             "desc": "Click on the wall to create a maze. Click on the floor of the maze to set items such as victims, checkpoints, bumps and others.",
             "save": "@:admin.lineMapEditor.save",
             "saveAs": "@:admin.lineMapEditor.saveAs",

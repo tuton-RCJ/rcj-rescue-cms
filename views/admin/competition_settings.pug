@@ -1,5 +1,5 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../includes/layout
 
 block vars
   - var ngAppDef = 'AdminSettings'
@@ -7,7 +7,7 @@ block vars
 append scripts
   script.
     var competitionId = "#{competition_id}"
-  script(src='/javascripts/admin_competition_settings.js')
+  script(src='/javascripts/admin/competition_settings.js')
   link(rel='stylesheet', href='/components/angular-color-picker/dist/angularjs-color-picker.min.css')
   //link(rel='stylesheet', href='/components/angular-color-picker/dist/themes/angularjs-color-picker-bootstrap.min.css')
   script(src='/components/tinycolor/dist/tinycolor-min.js')

@@ -14,10 +14,9 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
     if(!pubService){
         $http.get("/api/competitions/").then(function (response) {
             $scope.competitions = response.data
-            console.log($scope.competitions)
             $scope.se_competition = competitionId
         })
-        $http.get("/api/competitions/" + $scope.competitionId + "/maze/maps").then(function (response) {
+        $http.get("/api/competitions/" + $scope.competitionId + "/" + leagueId + "/maps").then(function (response) {
             $scope.maps = {}
             for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].parent == mapId || response.data[i]._id == mapId) {
@@ -47,7 +46,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
     if(!pubService){
         $http.get("/api/competitions/" +
           $scope.competitionId).then(function (response) {
-            $scope.competition = response.data.name;
+            $scope.competition = response.data;
+            $scope.league = response.data.leagues.find((l) => l.league == leagueId);
         })
     }
 
@@ -300,7 +300,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells,
-            leagueType: $scope.leagueType
+            leagueType: $scope.leagueType,
+            league: leagueId
         };
         console.log(map);
         console.log("Update map", mapId);
@@ -340,7 +341,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             finished: $scope.finished,
             startTile: $scope.startTile,
             cells: $scope.cells,
-            leagueType: $scope.leagueType
+            leagueType: $scope.leagueType,
+            league: leagueId
         };
         $http.post("/api/maps/maze", map).then(function (response) {
             console.log(response.data);
@@ -583,12 +585,13 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             leagueType: $scope.leagueType,
             finished: $scope.finished,
             startTile: $scope.startTile,
-            cells: $scope.cells
+            cells: $scope.cells,
+            league: leagueId
         };
         $http.post("/api/maps/maze", map).then(function (response) {
             alert("Created map!");
             console.log(response.data);
-            window.location.replace("/admin/" + $scope.se_competition + "/maze/editor/" + response.data.id)
+            window.location.replace("/admin/" + $scope.se_competition + "/" + leagueId + "/mapEditor/" + response.data.id)
         }, function (response) {
             console.log(response);
             console.log("Error: " + response.statusText);
@@ -612,13 +615,14 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             leagueType: $scope.leagueType,
             finished: $scope.finished,
             startTile: $scope.startTile,
-            cells: $scope.cells
+            cells: $scope.cells,
+            league: leagueId
         };
         if (mapId) {
             $http.put("/api/maps/maze/" + mapId, map).then(function (response) {
                 if (!loc) alert("Updated map");
                 console.log(response.data);
-                if (loc) window.location.replace("/admin/" + competitionId + "/maze/editor/" + loc)
+                if (loc) window.location.replace("/admin/" + competitionId + "/" + leagueId + "/mapEditor/" + loc)
             }, function (response) {
                 console.log(response);
                 console.log("Error: " + response.statusText);
@@ -628,8 +632,8 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             $http.post("/api/maps/maze", map).then(function (response) {
                 alert("Created map!");
                 console.log(response.data);
-                if (loc) window.location.replace("/admin/" + competitionId + "/maze/editor/" + loc)
-                else window.location.replace("/admin/" + competitionId + "/maze/editor/" + response.data.id)
+                if (loc) window.location.replace("/admin/" + competitionId + "/" + leagueId + "/mapEditor/" + loc)
+                else window.location.replace("/admin/" + competitionId + "/" + leagueId + "/mapEditor/" + response.data.id)
 
             }, function (response) {
                 console.log(response);

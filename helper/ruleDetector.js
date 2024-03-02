@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const logger = require('../config/logger').mainLogger;
 const { lineRun } = require('../models/lineRun');
 const { mazeRun } = require('../models/mazeRun');
-const { competition } = require('../models/competition');
+const { competition, LEAGUES_JSON } = require('../models/competition');
 
 const async = require('async');
 
@@ -46,3 +46,18 @@ module.exports.getRuleFromCompetitionId = async function (id) {
     return '0';
   }
 };
+
+module.exports.getLeagueTypeAndRule = async function (competitionId, leagueId) {
+  const comp = await competition.findById(competitionId, '-__v').exec();
+  if (comp) {
+    const league = comp.leagues.find((l) => l.league == leagueId);
+    const type = LEAGUES_JSON.find((l) => l.id == leagueId).type;
+    if (league) {
+      return {
+        type: type,
+        rule: league.rule
+      };
+    }
+  }
+  return null;
+}

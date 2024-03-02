@@ -1,5 +1,5 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../includes/layout
 
 block vars
   - var ngAppDef = 'CompetitionAdmin'
@@ -7,7 +7,7 @@ block vars
 append scripts
   script.
     var competitionId = "#{id}"
-  script(src='/javascripts/competition_admin.js')
+  script(src='/javascripts/admin/competition.js')
 
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
@@ -24,13 +24,39 @@ block content
       h3 {{"admin.competition.common" | translate}}
       .row 
         .col-md-4
-          button(ng-click="go('/admin/' + competitionId + '/teams')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.teams" | translate}}
+          button(ng-click="go('/admin/' + competitionId + '/teams')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;")
+            i.fas.fa-user-friends.fa-2x 
+            br
+            span {{"admin.competition.teams" | translate}}
         .col-md-4
-          button(ng-click="go('/admin/' + competitionId + '/rounds')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.rounds" | translate}}
+          button(ng-click="go('/admin/' + competitionId + '/rounds')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;")
+            i.fas.fa-list-ol.fa-2x 
+            br
+            span {{"admin.competition.rounds" | translate}}
         .col-md-4
-          button(ng-click="go('/admin/' + competitionId + '/fields')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.fields" | translate}}
+          button(ng-click="go('/admin/' + competitionId + '/fields')" class='btn btn-outline-dark btn-lg btn-block' style="margin-bottom:10px;")
+            i.fas.fa-map-pin.fa-2x 
+            br
+            span {{"admin.competition.fields" | translate}}
 
       hr
+      .row
+        div(ng-repeat="league in availableLeagues" class="col-md-6 col-lg-4")
+          .card(style='width: 100%;margin-bottom:20px;')
+              a
+                img.card-img-top(ng-src="/images/leagues/{{leagueImage(league)}}.png" style="width:100%; height:auto;")
+              .card-body(style="z-index: 2;")
+                h3.card-title {{league.name}}
+                button(ng-click="go('/admin/' + competitionId + '/' + league.id + '/maps')" class='btn btn-dark btn-lg btn-block' style="margin-bottom:10px;")
+                  i.fas.fa-ruler-combined.fa-2x
+                  br
+                  span {{"admin.competition.maps" | translate}}
+                button(ng-click="go('/admin/' + competitionId + '/line/runs')" class='btn btn-dark btn-lg btn-block' style="margin-bottom:10px;")
+                  i.fas.fa-clipboard-list.fa-2x
+                  br
+                  span {{"admin.competition.runs" | translate}}
+              .card-img-overlay.text-right
+                span.badge.badge-info(style="font-size: 15px;") {{league.rule}}
       .row 
         .col-md-5
           h3 {{"admin.competition.line" | translate}}

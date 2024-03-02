@@ -1,17 +1,19 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../../includes/layout
 
 block vars
   - var ngAppDef = 'LineEditor'
 
 append scripts
   script.
-    var mapId = "#{mapid}"
-    var competitionId = "#{compid}"
+    var mapId = "#{mapId}"
+    var competitionId = "#{competitionId}"
     var pubService = "#{pubService}"
+    var leagueId = "#{leagueId}"
+
+  script(src="/javascripts/admin/mapEditor/line_2024.js")
 
   script(src="/javascripts/lvl-uuid.js")
-  script(src="/javascripts/line_editor.js")
   script(src="/javascripts/pathFinder.js")
   //script(src="/components/bootstrap-fileinput/js/plugins/piexif.min.js")
   //script(src="/components/bootstrap-fileinput/js/plugins/sortable.min.js")
@@ -30,15 +32,17 @@ block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     if !pubService
         a.breadcrumb-item(ng-click="go('/admin')") Admin
-        a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition}}
-        a.breadcrumb-item(ng-click="go('/admin/'+competitionId + '/line/maps')") Line maps
-        span.breadcrumb-item.active Line editor
+        a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition.name}}
+        a.breadcrumb-item(ng-click="go('/admin/'+competitionId + '/' + league.league + '/maps')") #{leagueId} maps
+        span.breadcrumb-item.active Editor
     else
         a.breadcrumb-item(ng-click="go('/service')") Public services
-        span.breadcrumb-item.active Line editor
+        span.breadcrumb-item.active #{leagueId} editor
 
 block content
-    h1 {{"admin.lineMapEditor.title" | translate}} 2023
+    if !pubService
+        h3 {{competition.name}}
+    h1 {{league.name}} {{"admin.lineMapEditor.title" | translate}} 2024
     p {{"admin.lineMapEditor.desc" | translate}}
     div(style='margin-top:50px;')
         .row

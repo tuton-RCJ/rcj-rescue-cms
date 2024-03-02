@@ -2,14 +2,16 @@ var app = angular.module("MapAdmin", ['ngTouch','pascalprecht.translate', 'ngCoo
 app.controller("MapAdminController", ['$scope', '$http', function ($scope, $http) {
     $scope.competitionId = competitionId
 
-    updateMapList()
+    
 
     $http.get("/api/competitions/" + competitionId).then(function (response) {
         $scope.competition = response.data
+        $scope.league = response.data.leagues.find((l) => l.league == leagueId);
+        updateMapList()
     })
     $scope.removeMap = function (map) {
         if (confirm("Are you sure you want to remove the map: " + map.name + '?')) {
-            $http.delete("/api/maps/line/" + map._id).then(function (response) {
+            $http.delete("/api/maps/" + $scope.league.type + "/" + map._id).then(function (response) {
                 console.log(response)
                 updateMapList()
             }, function (error) {
@@ -20,8 +22,7 @@ app.controller("MapAdminController", ['$scope', '$http', function ($scope, $http
 
     function updateMapList() {
         $http.get("/api/competitions/" + competitionId +
-            "/line/maps").then(function (response) {
-            console.log(response)
+            "/" + $scope.league.league + "/maps").then(function (response) {
             $scope.maps = response.data
         })
     }

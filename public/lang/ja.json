@@ -621,7 +621,7 @@
             "line": "Line",
             "maze": "Maze",
             "simulation": "Simulation",
-            "maps": "マップ（フィールドレイアウト）管理",
+            "maps": "マップ管理",
             "runs": "競技管理",
             "backup": "バックアップ",
             "tools": "ツール"
@@ -641,7 +641,7 @@
             "add": "フィールドを追加"
         },
         "lineMapAdmin": {
-            "title": "Line マップ（フィールドレイアウト）管理",
+            "title": "マップ管理",
             "create": "新しいマップを作る"
         },
         "lineRun": {
@@ -681,7 +681,7 @@
             "complete": "件登録完了"
         },
         "lineMapEditor": {
-            "title": "Line マップエディター",
+            "title": "マップエディター",
             "desc": "タイルを左のタイルセットエリアから右のマップエリア上にドラッグアンドドロップします．マップエリア上のタイルの上で右クリックをすると，ギャップや障害物などのスコアアイテムや坂を設定できます．",
             "save": "マップを（上書き）保存",
             "saveAs": "マップを別名で保存",
@@ -730,11 +730,11 @@
             "headerError": "データタイプの指定に問題があります．"
         },
         "mazeMapAdmin": {
-            "title": "Maze マップ（フィールドレイアウト）管理",
+            "title": "マップ管理",
             "create": "@:admin.lineMapAdmin.create"
         },
         "mazeMapEditor": {
-            "title": "Maze マップエディター",
+            "title": "マップエディター",
             "desc": "壁の部分をクリックして，迷路を作成します．迷路の床部分をクリックすると，被災者やチェックポイント，バンプなどの項目が設定できます．",
             "save": "@:admin.lineMapEditor.save",
             "saveAs": "@:admin.lineMapEditor.saveAs",

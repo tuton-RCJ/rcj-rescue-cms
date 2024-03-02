@@ -12,7 +12,7 @@ const { LEAGUES } = competitiondb;
 
 /* GET home page. */
 router.get('/', function (req, res) {
-  res.render('admin_home', { user: req.user });
+  res.render('admin/home', { user: req.user });
 });
 
 router.get('/user', function (req, res) {
@@ -48,7 +48,7 @@ router.get('/:competitionid', function (req, res, next) {
     return next();
   }
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('competition_admin', {
+    res.render('admin/competition', {
       id,
       user: req.user,
       mailEnable: process.env.MAIL_SMTP,
@@ -100,7 +100,7 @@ router.get('/:competitionid/teams', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('team_admin', { id, user: req.user });
+    res.render('admin/team', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -136,7 +136,7 @@ router.get('/:competitionid/settings', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('admin_competition_settings', {
+    res.render('admin/competition_settings', {
       competition_id: id,
       user: req.user,
     });
@@ -512,15 +512,52 @@ router.get('/:competitionid/maze/runs/bulk', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
-router.get('/:competitionid/line/maps', function (req, res, next) {
+router.get('/:competitionid/:leagueId/maps', function (req, res, next) {
   const id = req.params.competitionid;
+  const leagueId = req.params.leagueId;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('line_map_admin', { id, user: req.user });
+    res.render('admin/maps', { id, user: req.user, leagueId});
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/:leagueId/mapEditor', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const leagueId = req.params.leagueId;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  const ruleInfo = await ruleDetector.getLeagueTypeAndRule(competitionId, leagueId);
+  if (ruleInfo == null) return next();
+
+  if (auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN))
+    res.render(`admin/mapEditor/${ruleInfo.type}_${ruleInfo.rule}`, { competitionId, user: req.user, leagueId });
+  else res.render('access_denied', { user: req.user });
+});
+
+router.get('/:competitionid/:leagueId/mapEditor/:mapid', async function (req, res, next) {
+  const mapId = req.params.mapid;
+  const competitionId = req.params.competitionid;
+  const leagueId = req.params.leagueId;
+
+  if (!ObjectId.isValid(mapId)) {
+    return next();
+  }
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  const ruleInfo = await ruleDetector.getLeagueTypeAndRule(competitionId, leagueId);
+  if (ruleInfo == null) return next();
+
+  if (auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN))
+    res.render(`admin/mapEditor/${ruleInfo.type}_${ruleInfo.rule}`, { competitionId, mapId, user: req.user, leagueId });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -585,43 +622,6 @@ router.get('/:competitionid/maze/maps', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
-router.get('/:competitionid/maze/editor', async function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  const rule = await ruleDetector.getRuleFromCompetitionId(id);
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('maze_editor', { compid: id, user: req.user, rule });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get(
-  '/:competitionid/maze/editor/:mapid',
-  async function (req, res, next) {
-    const id = req.params.mapid;
-    const cid = req.params.competitionid;
-
-    if (!ObjectId.isValid(id)) {
-      return next();
-    }
-
-    const rule = await ruleDetector.getRuleFromCompetitionId(cid);
-
-    if (auth.authCompetition(req.user, cid, ACCESSLEVELS.ADMIN))
-      res.render('maze_editor', {
-        compid: cid,
-        mapid: id,
-        user: req.user,
-        rule,
-      });
-    else res.render('access_denied', { user: req.user });
-  }
-);
-
 router.get('/:competitionid/rounds', function (req, res, next) {
   const id = req.params.competitionid;
 
@@ -631,30 +631,6 @@ router.get('/:competitionid/rounds', function (req, res, next) {
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
     res.render('admin/round', { id, user: req.user });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get('/:competitionid/line/editor', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('line_editor', { compid: id, user: req.user });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get('/:competitionid/line/editor/:mapid', function (req, res, next) {
-  const id = req.params.mapid;
-  const cid = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  if (auth.authCompetition(req.user, cid, ACCESSLEVELS.ADMIN))
-    res.render('line_editor', { compid: cid, mapid: id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 

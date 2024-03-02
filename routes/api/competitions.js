@@ -104,6 +104,11 @@ publicRouter.get('/:competition', function (req, res, next) {
         if (!data.description) data.description = '';
         if (!data.logo) data.logo = '/images/noLogo.png';
         if (data.documents) delete data.documents.leagues;
+        for (let l of data.leagues) {
+          let leagueDetails = LEAGUES_JSON.find((j) => j.id == l.league);
+          l.name = leagueDetails.name;
+          l.type = leagueDetails.type;
+        }
         res.status(200).send(data);
       }
     });
@@ -625,26 +630,6 @@ privateRouter.get('/:competition/:league/maps', function (req, res, next) {
   }
 
   return next();
-});
-
-privateRouter.get('/:competition/line/maps', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  return lineMapsApi.getLineMaps(req, res, next);
-});
-
-privateRouter.get('/:competition/maze/maps', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  return mazeMapsApi.getMazeMaps(req, res, next);
 });
 
 publicRouter.get('/:competition/fields', function (req, res, next) {

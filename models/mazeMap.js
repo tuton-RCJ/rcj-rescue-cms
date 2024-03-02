@@ -13,6 +13,8 @@ const VICTIMS = ['H', 'S', 'U', "Red", "Yellow", "Green", "None"];
 
 const MazeRun = require('./mazeRun')
 
+const MAZE_LEAGUES = require('./competition').MAZE_LEAGUES
+
 module.exports.VICTIMS = VICTIMS
 
 function isOdd(n) {
@@ -77,6 +79,7 @@ const mazeMapSchema = new Schema({
     required: true,
     index   : true
   },
+  league     : {type: String, enum: MAZE_LEAGUES, required: true, index: true},
   name       : {type: String, required: true},
   parent     : {type: ObjectId},
   dice       : [

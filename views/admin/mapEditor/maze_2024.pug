@@ -1,17 +1,19 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../../includes/layout
 
 block vars
   - var ngAppDef = 'MazeEditor'
 
 append scripts
   script.
-    var mapId = "#{mapid}"
-    var competitionId = "#{compid}"
+    var mapId = "#{mapId}"
+    var competitionId = "#{competitionId}"
     var pubService = "#{pubService}"
+    var leagueId = "#{leagueId}"
 
+  script(src="/javascripts/admin/mapEditor/maze_2024.js")
+  
   script(src="/javascripts/lvl-uuid.js")
-  script(src="/javascripts/maze_editor."+rule+".js")
   script(src="/components/bootstrap-fileinput/js/fileinput.min.js")
   script(src="/components/bootstrap-fileinput/themes/fa/theme.min.js")
   script(src="/components/bootstrap-fileinput/js/locales/ja.js")
@@ -25,15 +27,17 @@ block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     if !pubService
         a.breadcrumb-item(ng-click="go('/admin')") Admin
-        a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition}}
-        a.breadcrumb-item(ng-click="go('/admin/'+competitionId + '/maze/maps')") Maze maps
-        span.breadcrumb-item.active Maze editor
+        a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition.name}}
+        a.breadcrumb-item(ng-click="go('/admin/'+competitionId + '/' + league.league + '/maps')") #{leagueId} maps
+        span.breadcrumb-item.active Editor
     else
         a.breadcrumb-item(ng-click="go('/service')") Public services
-        span.breadcrumb-item.active Maze editor
+        span.breadcrumb-item.active #{leagueId} editor
 
 block content
-    h1 {{"admin.mazeMapEditor.title" | translate}} 2023
+    if !pubService
+        h3 {{competition.name}}
+    h1 {{league.name}} {{"admin.mazeMapEditor.title" | translate}} 2024
     p {{"admin.mazeMapEditor.desc" | translate}}
     h2(ng-if='parent') {{"admin.mazeMapEditor.parent" | translate}}
     button.btn.btn-info(type='button', ng-click='saveMap(parent)', ng-if='parent') {{"admin.mazeMapEditor.backToParent" | translate}}
