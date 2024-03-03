@@ -612,7 +612,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo',
+      select: 'name rule logo leagues',
     },
     {
       path: 'round',
