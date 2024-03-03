@@ -41,7 +41,7 @@ block content
 
       hr
       .row
-        div(ng-repeat="league in availableLeagues" class="col-md-6 col-lg-4")
+        div(ng-repeat="league in leagues" class="col-md-6 col-lg-4")
           .card(style='width: 100%;margin-bottom:20px;')
               a
                 img.card-img-top(ng-src="/images/leagues/{{leagueImage(league)}}.png" style="width:100%; height:auto;")

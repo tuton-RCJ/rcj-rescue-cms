@@ -8,8 +8,8 @@ app.controller("CompetitionAdminController", ['$scope', '$http', function ($scop
         $scope.competition = response.data
     })
 
-    $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
-        $scope.availableLeagues = response.data;
+    $http.get("/api/competitions/leagues").then(function (response) {
+        $scope.leagues = response.data;
     });
 
     $scope.leagueImage = function (league) {
