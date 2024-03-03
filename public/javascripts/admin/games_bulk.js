@@ -2,30 +2,33 @@ var xmlHttp;
 
 var app = angular.module("RunAdmin", ['ngTouch','pascalprecht.translate', 'ngCookies']);
 app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http) {
-    $scope.competitionId = competitionId
+    $scope.competitionId = competitionId;
+    $scope.leagueId = leagueId;
 
-    $http.get("/api/competitions/" + competitionId).then(function (response) {
-        $scope.competition = response.data
+    $http.get(`/api/competitions/${competitionId}`).then(function (response) {
+        $scope.competition = response.data;
+        $scope.league = response.data.leagues.find((l) => l.league == leagueId);
     })
 
-    $http.get("/api/competitions/" + competitionId +
-        "/line/teams").then(function (response) {
+    $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
         $scope.teams = response.data
     })
     
-    $http.get("/api/competitions/" + competitionId +
-        "/line/rounds").then(function (response) {
+    $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
         $scope.rounds = response.data
     })
     
-    $http.get("/api/competitions/" + competitionId +
-        "/line/fields").then(function (response) {
+    $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
         $scope.fields = response.data
     })
     
-    $http.get("/api/competitions/" + competitionId +
-        "/Line/maps").then(function (response) {
-        $scope.maps = response.data
+    $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
+        $scope.maps = []
+        for (let i = 0; i < response.data.length; i++) {
+            if (!response.data[i].parent) {
+                $scope.maps.push(response.data[i]);
+            }
+        }
     })
     
     function find(array,key){
@@ -93,7 +96,7 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
         }
         console.log(run)
 
-        $http.post("/api/runs/line", run).then(function (response) {
+        $http.post(`/api/runs/${$scope.league.type}`, run).then(function (response) {
             next_add();
         }, function (error) {
             console.log(error)

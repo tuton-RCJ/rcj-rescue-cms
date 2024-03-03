@@ -1,15 +1,16 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../includes/layout
 
 block vars
   - var ngAppDef = 'RunAdmin'
 
 append scripts
   script.
-    var competitionId = "#{id}"
+    var competitionId = "#{competitionId}"
+    var leagueId = "#{leagueId}"
   script(src = '/components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js')
   script(src = '/components/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js')
-  script(src='/javascripts/maze_run_admin.js')
+  script(src='/javascripts/admin/games.js')
   script(src='/components/ng-file-upload/ng-file-upload-all.min.js')
 
 append css
@@ -32,14 +33,15 @@ block location
   a.breadcrumb-item(ng-click="go('/home')") Home
   a.breadcrumb-item(ng-click="go('/admin')") Admin
   a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition.name}}
-  span.breadcrumb-item.active Maze runs
+  span.breadcrumb-item.active #{leagueId} Games
 
 block content
   .row
     .col-md-1
     .col-md-10
-      h1 {{competition.name}} - {{"admin.mazeRun.title" | translate}}
-      table.custom
+      h3 {{competition.name}}
+      h2 {{league.name}} - {{"admin.lineRun.title" | translate}}
+      table(class="custom")
         thead
           tr
             th {{"common.round" | translate}}
@@ -65,13 +67,13 @@ block content
                   button.btn.btn-info(type="button" ng-click="openStartDate()")
                     i.fa.fa-calendar(aria-hidden='true')
                 input.form-control(type="text" uib-datepicker-popup ng-model="startDate" ng-change="updateStartTime()" is-open="startDatePopup.opened" datepicker-options="startDateOptions" close-text="Close")
-              div(uib-timepicker ng-model="startTime" ng-change="updateStartTime()" hour-step="1" minute-step="5" show-meridian="false" show-spinners='true')
+              div(uib-timepicker ng-model="startTime" ng-change="updateStartTime()" hour-step="1" minute-step="5" show-meridian="false" show-spinners='true' style="border-bottom:0px;border-left:0px;")
             td
-              input(ng-model='run.normalizationGroup' style="width:100%;")
+                  input(ng-model='run.normalizationGroup' style="width:100%;")
             td
-              button(ng-click='addRun()') {{"admin.mazeRun.add" | translate}}
-      a(ng-href='/admin/{{competitionId}}/maze/runs/bulk') {{"admin.mazeRun.bulk" | translate}}
-      
+              button(ng-click='addRun()') {{"admin.lineRun.add" | translate}}
+      a(ng-href='/admin/{{competitionId}}/{{league.league}}/games/bulk') {{"admin.lineRun.bulk" | translate}}
+
       .refine
         .card.border-dark.mb-3(style='width:100%;')
           .card-header.bg-transparent.border-dark.fa-2x
@@ -93,7 +95,7 @@ block content
                 span.input-group-text
                   i.fas.fa-users(aria-hidden='true')
               input.form-control(type='text', placeholder='Team name', aria-label='Username', aria-describedby='basic-addon1' ng-model='teamName')
-
+              
       .row
         .col-md-10
           h3 Scoresheets
@@ -118,19 +120,18 @@ block content
           button(ng-click="go_scoreSheetInTimeRange2()" class='btn btn-primary' target="_blank" style="margin: 5px 5px 5px 5px;") {{"common.generateSheet" | translate}}
 
       div
-          button(ng-click="selectAll()" class='btn btn-primary' style="margin: 5px 5px 5px 5px;") {{"admin.mazeRun.selectAll" | translate}}
-          button(ng-click="removeSelectedRun()" class='btn btn-danger' style="margin: 5px 5px 5px 5px;") {{"admin.mazeRun.delS" | translate}}
-          button(ng-click="go('/signage/display/'+ competitionId +'/run')" class='btn btn-success' style="margin: 5px 5px 5px 5px; text-align:right;") {{"admin.mazeRun.monitor" | translate}}
-          button(ng-click="go('/admin/' + competitionId +'/maze/runs/print')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
-            i.fas.fa-print &nbsp;{{"admin.lineRun.printRuns" | translate}}
-          button(ng-click="go('/admin/' + competition._id + '/maze/runs/print/ranking/' + league.id)" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;" ng-repeat="league in leagues")
-            i.fas.fa-print(aria-hidden='true') &nbsp;[{{league.name}}]&nbsp;{{'admin.lineRun.printRanking' | translate}}
-
+        button(ng-click="selectAll()" class='btn btn-primary' style="margin: 5px 5px 5px 5px;") {{"admin.lineRun.selectAll" | translate}}
+        button(ng-click="removeSelectedRun()" class='btn btn-danger' style="margin: 5px 5px 5px 5px;") {{"admin.lineRun.delS" | translate}}
+        button(ng-click="go('/signage/display/'+ competitionId +'/run')" class='btn btn-success' style="margin: 5px 5px 5px 5px; text-align:right;") {{"admin.lineRun.monitor" | translate}}
+        button(ng-click="go('/admin/' + competitionId +'/line/runs/print')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
+          i.fas.fa-print &nbsp;{{"admin.lineRun.printRuns" | translate}}
+        button(ng-click="go('/admin/' + competition._id + '/line/runs/print/ranking/' + league.id)" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
+          i.fas.fa-print(aria-hidden='true') &nbsp;[{{league.name}}]&nbsp;{{'admin.lineRun.printRanking' | translate}}
       center
         .loader
           img(src="/images/loader2.gif")
           p Now Loading...
-      table.custom(style="margin-bottom:100px;")
+      table(class="custom" style="margin-bottom:100px;")
         thead
           tr
             th
@@ -142,10 +143,10 @@ block content
             th {{"common.map" | translate}}
             th {{"admin.common.normalization_group_id" | translate}}
             th {{"common.score" | translate}}
+            th(ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'") {{"common.normalizedScore" | translate}}
             th {{"common.time" | translate}}
-            th {{"admin.mazeRun.status" | translate}}
+            th {{"admin.lineRun.status" | translate}}
             th {{"common.comment" | translate}}
-            //th
             th {{"common.operation" | translate}}
         tbody
           tr(ng-repeat='run in runs | filter:list_filter | orderBy:"[startTime,round.name,field.name,team.name]"' runs-read-finished='')
@@ -159,29 +160,29 @@ block content
             td(ng-bind='run.map.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.normalizationGroup' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.score' ng-style="{'background-color':statusColor(run.status)}")
+            td(ng-bind='run.normalizedScore' ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'" ng-style="{'background-color':statusColor(run.status)}") 
             td(ng-bind="run.time.minutes*60*1000+run.time.seconds*1000 | date:'mm:ss'" ng-style="{'background-color':statusColor(run.status)}")
             td(ng-style="{'background-color':statusColor(run.status)}")
-              span(ng-if="run.status==0") {{"admin.mazeRun.st0" | translate}}
-              span(ng-if="run.status==1") {{"admin.mazeRun.st1" | translate}}
-              span(ng-if="run.status==2") {{"admin.mazeRun.st2" | translate}}
-              span(ng-if="run.status==3") {{"admin.mazeRun.st3" | translate}}
-              span(ng-if="run.status==4") {{"admin.mazeRun.st4" | translate}}
-              span(ng-if="run.status==5") {{"admin.mazeRun.st5" | translate}}
-              span(ng-if="run.status==6") {{"admin.mazeRun.st6" | translate}}
+              span(ng-if="run.status==-1") Not yet set check points
+              span(ng-if="run.status==0") {{"admin.lineRun.st0" | translate}}
+              span(ng-if="run.status==1") {{"admin.lineRun.st1" | translate}}
+              span(ng-if="run.status==2") {{"admin.lineRun.st2" | translate}}
+              span(ng-if="run.status==3") {{"admin.lineRun.st3" | translate}}
+              span(ng-if="run.status==4") {{"admin.lineRun.st4" | translate}}
+              span(ng-if="run.status==5") {{"admin.lineRun.st5" | translate}}
+              span(ng-if="run.status==6") {{"admin.lineRun.st6" | translate}}
             td(ng-style="{'background-color':statusColor(run.status)}")
-              button.btn.btn-light(uib-popover="{{run.comment}}" popover-trigger="'outsideClick'" type="button" ng-disabled="run.comment==''") {{"common.comment" | translate}}
-            
+              button.btn.btn-light(uib-popover="{{run.comment}}" popover-trigger="'outsideClick'"  type="button" ng-disabled="run.comment==''") {{"common.comment" | translate}}
             td(ng-style="{'background-color':statusColor(run.status)}")
               //a(href="" ng-click='removeRun(run._id)') {{"common.delete" | translate}}
               .dropdown
                   button#dropdownMenu.btn.btn-secondary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') {{"common.action" | translate}}
                   .dropdown-menu(aria-labelledby='dropdownMenu')
                     button.dropdown-item(type='button' ng-click="go_scoreSheet2(run._id)") {{"common.generateSheet" | translate}}
-                    button.dropdown-item(type='button' ng-click="go('/maze/view/' + run._id)") {{"common.view" | translate}}
+                    button.dropdown-item(type='button' ng-click="go('/line/view/' + run._id)") {{"common.view" | translate}}
                     button.dropdown-item(type='button' ng-click="go_judge(run._id)") {{"common.judge" | translate}}
                     button.dropdown-item(type='button' ng-click="go_sign(run._id)") {{"common.sign" | translate}}
                     .dropdown-divider
                     button.dropdown-item(type='button' ng-click="go_input(run._id)") Manual input
                     button.dropdown-item(type='button' ng-click='statusReset(run._id)') {{"admin.lineRun.statusReset" | translate}}
                     button.dropdown-item(type='button' ng-click='removeRun(run._id)') {{"common.delete" | translate}}
-

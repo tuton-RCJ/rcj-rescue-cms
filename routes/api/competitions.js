@@ -657,50 +657,6 @@ publicRouter.get('/:competition/fields', function (req, res, next) {
     });
 });
 
-publicRouter.get('/:competition/:league/fields', function (req, res, next) {
-  const id = req.params.competition;
-  const { league } = req.params;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  let leagueArr = [];
-  if (league == 'line') {
-    leagueArr = LINE_LEAGUES;
-  } else if (league == 'maze') {
-    leagueArr = MAZE_LEAGUES;
-  } else if (league == 'simulation') {
-    leagueArr = SIM_LEAGUES;
-  } else if (
-    LEAGUES.filter(function (elm) {
-      return elm.indexOf(league) != -1;
-    }).length == 0
-  ) {
-    return next();
-  } else {
-    leagueArr.push(league);
-  }
-
-  competitiondb.field
-    .find({
-      competition: id,
-      league: { $in: leagueArr },
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get fields',
-          err: err.message,
-        });
-      } else {
-        res.status(200).send(data);
-      }
-    });
-});
-
 publicRouter.get('/:competitionid/fields/:name', function (req, res, next) {
   const id = req.params.competitionid;
   const { name } = req.params;
@@ -780,50 +736,6 @@ publicRouter.get('/:competitionid/rounds/:name', function (req, res, next) {
       }
     )
     .select('_id');
-});
-
-publicRouter.get('/:competition/:league/rounds', function (req, res, next) {
-  const id = req.params.competition;
-  const { league } = req.params;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  let leagueArr = [];
-  if (league == 'line') {
-    leagueArr = LINE_LEAGUES;
-  } else if (league == 'maze') {
-    leagueArr = MAZE_LEAGUES;
-  } else if (league == 'simulation') {
-    leagueArr = SIM_LEAGUES;
-  } else if (
-    LEAGUES.filter(function (elm) {
-      return elm.indexOf(league) != -1;
-    }).length == 0
-  ) {
-    return next();
-  } else {
-    leagueArr.push(league);
-  }
-
-  competitiondb.round
-    .find({
-      competition: id,
-      league: { $in: leagueArr },
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get rounds',
-          err: err.message,
-        });
-      } else {
-        res.status(200).send(data);
-      }
-    });
 });
 
 adminRouter.post('/', function (req, res) {

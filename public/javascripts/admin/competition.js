@@ -10,7 +10,6 @@ app.controller("CompetitionAdminController", ['$scope', '$http', function ($scop
 
     $http.get("/api/teams/leagues/all/" + competitionId).then(function (response) {
         $scope.availableLeagues = response.data;
-        console.log($scope.availableLeagues);
     });
 
     $scope.leagueImage = function (league) {

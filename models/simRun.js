@@ -110,17 +110,9 @@ simRunSchema.pre('save', function (next) {
                 if (results.round.competition != competitionId) {
                   return next(new Error("Round does not match competition!"))
                 }
-                if (SIM_LEAGUES.indexOf(results.round.league) == -1) {
-                  return next(new Error("Round does not match league!"))
-                }
-
                 if (results.team.competition != competitionId) {
                   return next(new Error("Team does not match competition!"))
                 }
-                if (SIM_LEAGUES.indexOf(results.team.league) == -1) {
-                  return next(new Error("Team does not match league!"))
-                }
-
                 if (results.field.competition != competitionId) {
                   return next(new Error("Field does not match competition!"))
                 }
@@ -177,17 +169,9 @@ simRunSchema.pre('save', function (next) {
           if (results.round.competition != competitionId) {
             return next(new Error("Round does not match competition!"))
           }
-          if (SIM_LEAGUES.indexOf(results.round.league) == -1) {
-            return next(new Error("Round does not match league!"))
-          }
-
           if (results.field.competition != competitionId) {
             return next(new Error("Field does not match competition!"))
           }
-          if (SIM_LEAGUES.indexOf(results.field.league) == -1) {
-            return next(new Error("Field does not match league!"))
-          }
-
           return next()
         }
       })

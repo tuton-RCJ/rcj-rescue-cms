@@ -647,7 +647,7 @@
             "create": "Create a new map"
         },
         "lineRun": {
-            "title": "Line Runs",
+            "title": "Games",
             "add": "Add run",
             "bulk": "@:admin.teams.bulk",
             "monitor": "Runs monitor",
@@ -778,7 +778,7 @@
             "leagueType": "League type"
         },
         "mazeRun": {
-            "title": "Maze Runs",
+            "title": "Games",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "monitor": "@:admin.lineRun.monitor",
@@ -795,7 +795,7 @@
             "statusReset": "@:admin.lineRun.statusReset"
         },
         "simRun": {
-            "title": "Simulation Runs",
+            "title": "Games",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "status": "@:admin.lineRun.status",

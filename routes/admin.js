@@ -439,15 +439,16 @@ router.get('/handover', function (req, res, next) {
   res.render('runs_handover', { user: req.user });
 });
 
-router.get('/:competitionid/line/runs', function (req, res, next) {
-  const id = req.params.competitionid;
+router.get('/:competitionid/:leagueId/games', function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const leagueId = req.params.leagueId;
 
-  if (!ObjectId.isValid(id)) {
+  if (!ObjectId.isValid(competitionId)) {
     return next();
   }
 
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('line_run_admin', { id, user: req.user });
+  if (auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN))
+    res.render('admin/games', { competitionId, user: req.user, leagueId });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -488,27 +489,16 @@ router.get('/:competitionid/line/runs/print', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
-router.get('/:competitionid/line/runs/bulk', function (req, res, next) {
-  const id = req.params.competitionid;
+router.get('/:competitionid/:leagueId/games/bulk', function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const leagueId = req.params.leagueId;
 
-  if (!ObjectId.isValid(id)) {
+  if (!ObjectId.isValid(competitionId)) {
     return next();
   }
 
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('line_run_bulk', { id, user: req.user });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get('/:competitionid/maze/runs/bulk', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('maze_run_bulk', { id, user: req.user });
+  if (auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN))
+    res.render('admin/games_bulk', { competitionId, user: req.user, leagueId });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -558,18 +548,6 @@ router.get('/:competitionid/:leagueId/mapEditor/:mapid', async function (req, re
 
   if (auth.authCompetition(req.user, competitionId, ACCESSLEVELS.ADMIN))
     res.render(`admin/mapEditor/${ruleInfo.type}_${ruleInfo.rule}`, { competitionId, mapId, user: req.user, leagueId });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get('/:competitionid/maze/runs', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('maze_run_admin', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -657,18 +635,6 @@ router.get('/kiosk/:kioskNum', function (req, res, next) {
 });
 
 // Simulation
-router.get('/:competitionid/simulation/runs', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('simulation_run_admin', { id, user: req.user });
-  else res.render('access_denied', { user: req.user });
-});
-
 router.get('/:competitionid/simulation/runs/print/ranking/:league',
   function (req, res, next) {
     const id = req.params.competitionid;
@@ -700,18 +666,6 @@ router.get('/:competitionid/simulation/runs/print', function (req, res, next) {
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
     res.render('simulation_run_admin_print', { id, user: req.user });
-  else res.render('access_denied', { user: req.user });
-});
-
-router.get('/:competitionid/simulation/runs/bulk', function (req, res, next) {
-  const id = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  if (auth.authCompetition(req.user, id, ACCESSLEVELS.ADMIN))
-    res.render('simulation_run_bulk', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 

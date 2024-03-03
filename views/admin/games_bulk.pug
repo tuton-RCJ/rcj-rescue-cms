@@ -1,19 +1,20 @@
 //- -*- tab-width: 2 -*-
-extends includes/layout
+extends ../includes/layout
 
 block vars
   - var ngAppDef = 'RunAdmin'
 
 append scripts
   script.
-    var competitionId = "#{id}"
-  script(src='/javascripts/line_run_bulk.js')
+    var competitionId = "#{competitionId}"
+    var leagueId = "#{leagueId}"
+  script(src='/javascripts/admin/games_bulk.js')
 
 block location
     a.breadcrumb-item(ng-click="go('/home')") Home
     a.breadcrumb-item(ng-click="go('/admin')") Admin
     a.breadcrumb-item(ng-click="go('/admin/'+competitionId)") {{competition.name}}
-    a.breadcrumb-item(ng-click="go('/admin/'+competitionId+'/line/runs')") Line runs
+    a.breadcrumb-item(ng-click="go('/admin/'+competitionId+'/' + leagueId + '/games')") {{leagueId}} Games
     span.breadcrumb-item.active Bulk Registration
 
 
@@ -21,7 +22,8 @@ block content
   .row
     .col-md-1
     .col-md-10
-      h1 {{competition.name}} - {{"admin.lineRunBulk.title" | translate}}
+      h3 {{competition.name}}
+      h2 {{league.name}} - {{"admin.lineRunBulk.title" | translate}}
       br
       br
       h3 {{"admin.lineRunBulk.s1T" | translate}}

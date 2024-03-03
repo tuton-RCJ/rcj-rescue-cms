@@ -4,8 +4,13 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
         $scope.competitionId = competitionId
         $scope.showTeam = true;
 
-        updateRunList();
-        launchSocketIo();
+        $http.get(`/api/competitions/${competitionId}`).then(function (response) {
+            $scope.competition = response.data
+            $scope.topComment = $scope.competition.name;
+            $scope.league = response.data.leagues.find((l) => l.league == leagueId);
+            launchSocketIo();
+            updateRunList();
+        })
 
         var runListTimer = null;
         var runListChanged = false;
@@ -28,7 +33,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 transports: ['websocket']
             }).connect(window.location.origin)
             socket.on('connect', function () {
-                socket.emit('subscribe', 'runs/line/' + competitionId)
+                socket.emit('subscribe', `runs/${$scope.league.type}/${competitionId}`)
             })
             socket.on('changed', function () {
                 runListChanged = true;
@@ -39,33 +44,27 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 }
             })
         }
-        $http.get("/api/competitions/" + competitionId).then(function (response) {
-            $scope.competition = response.data
-            $scope.topComment = $scope.competition.name;
-        })
+        
 
-        $http.get("/api/competitions/" + competitionId +
-            "/line/teams").then(function (response) {
+        $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
             $scope.teams = response.data
         })
 
-        $http.get("/api/competitions/" + competitionId +
-            "/line/rounds").then(function (response) {
+        $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
             $scope.rounds = response.data
         })
 
-        $http.get("/api/competitions/" + competitionId +
-            "/line/fields").then(function (response) {
+        $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
             $scope.fields = response.data
         })
 
-        $http.get("/api/competitions/" + competitionId +
-            "/Line/maps").then(function (response) {
-            $scope.maps = response.data
-        })
-
-        $http.get("/api/teams/leagues/line/" + competitionId).then(function (response) {
-            $scope.leagues = response.data
+        $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
+            $scope.maps = {}
+            for (let i = 0; i < response.data.length; i++) {
+                if (!response.data[i].parent) {
+                    $scope.maps[i] = response.data[i]
+                }
+            }
         })
 
         $scope.range = function (n) {
@@ -95,10 +94,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 normalizationGroup: $scope.run.normalizationGroup
             }
 
-            //console.log(run)
-
-            $http.post("/api/runs/line", run).then(function (response) {
-                console.log(response)
+            $http.post(`/api/runs/${$scope.league.type}`, run).then(function (response) {
                 updateRunList()
             }, function (error) {
                 console.log(error)
@@ -138,15 +134,12 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             })
 
             if (operation) {
-                $http.delete("/api/runs/line/" + runIds).then(function (response) {
-                    console.log(response)
+                $http.delete(`/api/runs/${$scope.league.type}/${runIds}`).then(function (response) {
                     updateRunList()
                 }, function (error) {
                     console.log(error)
                 })
             }
-
-
         }
         
         $scope.statusReset = async function (runIds) {
@@ -167,8 +160,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             })
 
             if (operation) {
-                $http.put("/api/runs/line/" + runIds,{status: 0}).then(function (response) {
-                    console.log(response)
+                $http.put(`/api/runs/${$scope.league.type}/${runIds}`,{status: 0}).then(function (response) {
                     updateRunList()
                 }, function (error) {
                     console.log(error)
@@ -227,7 +219,6 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             }
         }
         arr.sort();
-        //arr.reverse();
 
         for (var i = 0; i < arr.length; i++) {
             sorted[arr[i]] = object[arr[i]];
@@ -237,8 +228,8 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
 
         function updateRunList() {
-            $http.get(`/api/runs/line/competition/${competitionId}?normalized=true`).then(function (response) {
-                var runs = response.data;
+            $http.get(`/api/runs/${$scope.league.type}/competition/${competitionId}?normalized=true`).then(function (response) {
+                var runs = response.data.filter(r => r.team.league == leagueId);
                 for (let run of runs) {
                     if (!run.team) {
                         run.team = {
@@ -269,14 +260,12 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                         } catch (e) {
 
                         }
-                        $scope.runs[i].nlLiveVictimCount = $scope.runs[i].nl.liveVictim.filter(victim => victim.identified).length;
-                        $scope.runs[i].nlDeadVictimCount = $scope.runs[i].nl.deadVictim.filter(victim => victim.identified).length;
-                        $scope.runs[i].nlUnknownVictimCount = $scope.runs[i].nl.liveVictim.filter(victim => victim.found && !victim.identified).length + $scope.runs[i].nl.deadVictim.filter(victim => victim.found && !victim.identified).length;
                     }
 
                     $scope.Rrounds = objectSort(rounds)
                     $scope.Rfields = objectSort(fields)
                 }
+                $('.loader').remove();
             })
         }
 
@@ -290,14 +279,14 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 confirmButtonColor: "#ec6c62"
             }).then((result) => {
                 if (result.value) {
-                    $scope.go('/line/sign/' + runid + '/');
+                    $scope.go(`/${$scope.league.type}/sign/${runid}`);
                 }
             })
         }
 
 
         $scope.go_scoreSheet2 = function (runId) {
-          window.open(`/api/runs/line/scoresheet2?run=${runId}&offset=${timeOffset}`,"_blank");
+          window.open(`/api/runs/${$scope.league.type}/scoresheet2?run=${runId}&offset=${timeOffset}`,"_blank");
         };
 
         $scope.go_judge = function (runid) {
@@ -310,13 +299,13 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 confirmButtonColor: "#ec6c62"
             }).then((result) => {
                 if (result.value) {
-                    $scope.go('/line/judge/' + runid + '/');
+                    $scope.go(`/${$scope.league.type}/judge/${runid}`);
                 }
             })
         }
 
         $scope.go_input = function (runid) {
-            $scope.go('/line/input/' + runid + '/');
+            $scope.go(`/${$scope.league.type}/input/${runid}`);
         }
 
         $scope.statusColor = function(status){
@@ -335,24 +324,6 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
               return "";
           }
         }
-
-        
-        $scope.set_kiosk = function (runid){
-            $http.get("/api/kiosk/1/line_checkpoint/"+runid).then(function (response) {
-                        
-            }, function (response) {
-                console.log("Error: " + response.statusText);
-            });
-        }
-        
-        $scope.reset_kiosk = function (runid){
-            $http.get("/api/kiosk/1/NA").then(function (response) {
-                        
-            }, function (response) {
-                console.log("Error: " + response.statusText);
-            });
-        }
-
 
         $scope.go = function (path) {
             path = path + '?return=' + window.location.pathname;
@@ -423,7 +394,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
 
 
         $scope.go_scoreSheetInTimeRange2 = function () {
-          window.open(`/api/runs/line/scoresheet2?competition=${$scope.competitionId}&startTime=${$scope.scoreSheetStartDateTime.getTime()}&endTime=${ $scope.scoreSheetEndDateTime.getTime()}&offset=${timeOffset}`, "_blank")
+          window.open(`/api/runs/${$scope.league.type}/scoresheet2?competition=${$scope.competitionId}&startTime=${$scope.scoreSheetStartDateTime.getTime()}&endTime=${ $scope.scoreSheetEndDateTime.getTime()}&offset=${timeOffset}`, "_blank")
         };
         
         $scope.total = function (lops) {
@@ -433,50 +404,6 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
           }
           return count;
         }
-
-        $scope.active_victim = function (victims, index){
-            let victim = victims[index];
-            if (victim == undefined) return false;
-        
-            // Effective check
-            if(victim.victimType == "LIVE" && victim.zoneType == "RED") return false;
-            if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return false;
-            if(victim.victimType == "KIT" && victim.zoneType == "RED") return false;
-        
-            // Effective check for dead victim
-            if (victim.victimType == "DEAD") {
-              let liveCount = 0;
-              for (i of $scope.range(index)) {
-                let v = victims[i]
-                if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount ++;
-              }
-              if (liveCount != 2) return false;
-            }
-            
-            return true;    
-        };
-
-        $scope.victimImgPath = function(victim) {
-            switch(victim.victimType) {
-                case 'LIVE':
-                    return 'liveVictim.png';
-                case 'DEAD':
-                    return 'deadVictim.png';
-                case 'KIT':
-                    return 'rescueKit.png';
-            }
-        }
-    
-        $scope.evacZoneColor = function(victim) {
-            switch(victim.zoneType) {
-                case 'GREEN':
-                    return "#1dd1a1";
-                case 'RED':
-                    return "#e55039";
-            }
-        }
-          
-
 }])
     .directive("runsReadFinished", ['$timeout', function ($timeout) {
         return function (scope, element, attrs) {

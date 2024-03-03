@@ -645,7 +645,7 @@
             "create": "新しいマップを作る"
         },
         "lineRun": {
-            "title": "Line 競技管理",
+            "title": "競技管理",
             "add": "競技を追加",
             "bulk": "@:admin.teams.bulk",
             "monitor": "競技モニター",
@@ -664,7 +664,7 @@
             "printRanking": "ランキングを印刷"
         },
         "lineRunBulk": {
-            "title": "Line 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "STEP1 テンプレートファイルをダウンロードする",
             "s1D": "下のリンクから，テンプレートファイルをダウンロードします．",
             "s2T": "STEP2 ファイルを編集",
@@ -776,7 +776,7 @@
             "leagueType": "リーグタイプ"
         },
         "mazeRun": {
-            "title": "Maze 競技管理",
+            "title": "競技管理",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "monitor": "@:admin.lineRun.monitor",
@@ -793,7 +793,7 @@
             "statusReset": "@:admin.lineRun.statusReset"
         },
         "simRun": {
-            "title": "Simulation 競技管理",
+            "title": "競技管理",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "status": "@:admin.lineRun.status",
@@ -809,7 +809,7 @@
             "statusReset": "@:admin.lineRun.statusReset"
         },
         "mazeRunBulk": {
-            "title": "Maze 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",
@@ -826,7 +826,7 @@
             "complete": "@:admin.lineRunBulk.complete"
         },
         "simRunBulk": {
-            "title": "Simulation 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",
