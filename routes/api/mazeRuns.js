@@ -612,7 +612,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo leagues',
+      select: 'name rule logo',
     },
     {
       path: 'round',
@@ -786,6 +786,7 @@ privateRouter.put('/map/:runid', function (req, res, next) {
       }
 
       dbRun.map = run.map;
+      dbRun.diceNumber = run.diceNumber;
 
       dbRun.save(function (err) {
         if (err) {

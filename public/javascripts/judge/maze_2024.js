@@ -154,6 +154,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.competition = response.data.competition;
             $scope.LoPs = response.data.LoPs;
             $scope.MisIdent = response.data.misidentification;
+            $scope.diceSelect = response.data.diceNumber;
 
             // Verified time by timekeeper
             $scope.minutes = response.data.time.minutes;
@@ -212,10 +213,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.changeMap = function(n){
         $scope.sync++;
         $http.put("/api/runs/maze/map/" + runId, {
-            map: $scope.dice[n]
+            map: $scope.dice[n],
+            diceNumber: n
         }).then(function (response) {
             $scope.loadMap(response.data.map._id);
             $scope.sync--;
+            $scope.diceSelect = n;
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
