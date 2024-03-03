@@ -8,26 +8,28 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
     $http.get(`/api/competitions/${competitionId}`).then(function (response) {
         $scope.competition = response.data;
         $scope.league = response.data.leagues.find((l) => l.league == leagueId);
-    })
 
-    $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
-        $scope.teams = response.data
-    })
-    
-    $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
-        $scope.rounds = response.data
-    })
-    
-    $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
-        $scope.fields = response.data
-    })
-    
-    $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
-        $scope.maps = []
-        for (let i = 0; i < response.data.length; i++) {
-            if (!response.data[i].parent) {
-                $scope.maps.push(response.data[i]);
-            }
+        $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
+            $scope.teams = response.data
+        })
+        
+        $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
+            $scope.rounds = response.data
+        })
+        
+        $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
+            $scope.fields = response.data
+        })
+        
+        if ($scope.league.type != 'simulation') {
+            $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
+                $scope.maps = []
+                for (let i = 0; i < response.data.length; i++) {
+                    if (!response.data[i].parent) {
+                        $scope.maps.push(response.data[i]);
+                    }
+                }
+            })
         }
     })
     
@@ -89,12 +91,15 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
             team: findT($scope.teams,obj[$scope.now][1]),
             group: findTG($scope.teams,obj[$scope.now][1]),
             field: find($scope.fields,obj[$scope.now][3]),
-            map: find($scope.maps,obj[$scope.now][2]),
             competition: competitionId,
             startTime: time.getTime(),
             normalizationGroup: obj[$scope.now][5]
         }
-        console.log(run)
+
+        if ($scope.league.type != 'simulation') {
+            run['map'] = find($scope.maps,obj[$scope.now][2]);
+        }
+        
 
         $http.post(`/api/runs/${$scope.league.type}`, run).then(function (response) {
             next_add();
@@ -152,7 +157,12 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
                     console.log(obj)
 
                     // tableで出力
-                    var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th><th>Map name</th><th>Field name</th><th>Start Time</th><th>Normalization Group ID</th></tr></thead><tbody>';
+                    var insert = '<table class="custom"><thead><tr><th>Round</th><th>Team name</th>';
+                    if ($scope.league.type != 'simulation') {
+                        insert += '<th>Map name</th>';
+                    }
+                    insert += '<th>Field name</th><th>Start Time</th><th>Normalization Group ID</th></tr></thead><tbody>';
+                    
                     for (var i = 1; i < obj.length; i++) {
                         insert += '<tr>';
                         insert += '<td>';
@@ -163,9 +173,11 @@ app.controller("RunAdminController", ['$scope', '$http', function ($scope, $http
                         insert += obj[i][1];
                         insert += '</td>';
 
-                        insert += '<td>';
-                        insert += obj[i][2];
-                        insert += '</td>';
+                        if ($scope.league.type != 'simulation') {
+                            insert += '<td>';
+                            insert += obj[i][2];
+                            insert += '</td>';
+                        }
 
                         insert += '<td>';
                         insert += obj[i][3];

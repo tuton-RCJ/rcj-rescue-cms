@@ -116,9 +116,6 @@ simRunSchema.pre('save', function (next) {
                 if (results.field.competition != competitionId) {
                   return next(new Error("Field does not match competition!"))
                 }
-                if (SIM_LEAGUES.indexOf(results.field.league) == -1) {
-                  return next(new Error("Field does not match league!"))
-                }
                 return next()
               }
             })

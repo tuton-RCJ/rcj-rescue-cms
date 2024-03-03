@@ -46,7 +46,7 @@ block content
           tr
             th {{"common.round" | translate}}
             th {{"common.team" | translate}}
-            th {{"common.map" | translate}}
+            th(ng-hide="league.type == 'simulation'") {{"common.map" | translate}}
             th {{"common.field" | translate}}
             th {{"common.starttime" | translate}}
             th {{"admin.common.normalization_group_id" | translate}}
@@ -57,7 +57,7 @@ block content
               select(ng-model='run.round' ng-options='round as round.name for round in rounds')
             td
               select(ng-model='run.team' ng-options='team as team.name for team in teams')
-            td
+            td(ng-hide="league.type == 'simulation'")
               select(ng-model='run.map' ng-options='map as map.name for map in maps')
             td
               select(ng-model='run.field' ng-options='field as field.name for field in fields')
@@ -96,10 +96,10 @@ block content
                   i.fas.fa-users(aria-hidden='true')
               input.form-control(type='text', placeholder='Team name', aria-label='Username', aria-describedby='basic-addon1' ng-model='teamName')
               
-      .row
+      .row(ng-show="league.league == 'Line' || league.league == 'Maze'")
         .col-md-10
           h3 Scoresheets
-      .row
+      .row(ng-show="league.league == 'Line' || league.league == 'Maze'")
         .col-md-2
           div
             p.input-group
@@ -122,10 +122,10 @@ block content
       div
         button(ng-click="selectAll()" class='btn btn-primary' style="margin: 5px 5px 5px 5px;") {{"admin.lineRun.selectAll" | translate}}
         button(ng-click="removeSelectedRun()" class='btn btn-danger' style="margin: 5px 5px 5px 5px;") {{"admin.lineRun.delS" | translate}}
-        button(ng-click="go('/signage/display/'+ competitionId +'/run')" class='btn btn-success' style="margin: 5px 5px 5px 5px; text-align:right;") {{"admin.lineRun.monitor" | translate}}
-        button(ng-click="go('/admin/' + competitionId +'/line/runs/print')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
+        button(ng-hide="league.type == 'simulation'" ng-click="go('/signage/display/'+ competitionId +'/run')" class='btn btn-success' style="margin: 5px 5px 5px 5px; text-align:right;") {{"admin.lineRun.monitor" | translate}}
+        button(ng-click="go('/admin/' + competitionId +'/' + league.league + '/games/print')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
           i.fas.fa-print &nbsp;{{"admin.lineRun.printRuns" | translate}}
-        button(ng-click="go('/admin/' + competition._id + '/line/runs/print/ranking/' + league.id)" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
+        button(ng-click="go('/admin/' + competition._id + '/' + league.league + '/games/ranking/')" class='btn btn-info' style="margin: 5px 5px 5px 5px; text-align:right;")
           i.fas.fa-print(aria-hidden='true') &nbsp;[{{league.name}}]&nbsp;{{'admin.lineRun.printRanking' | translate}}
       center
         .loader
@@ -140,7 +140,7 @@ block content
             th {{"common.teamCode" | translate}}
             th {{"common.team" | translate}}
             th {{"common.field" | translate}}
-            th {{"common.map" | translate}}
+            th(ng-hide="league.type == 'simulation'") {{"common.map" | translate}}
             th {{"admin.common.normalization_group_id" | translate}}
             th {{"common.score" | translate}}
             th(ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'") {{"common.normalizedScore" | translate}}
@@ -157,7 +157,7 @@ block content
             td(ng-bind='run.team.teamCode' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.team.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.field.name' ng-style="{'background-color':statusColor(run.status)}")
-            td(ng-bind='run.map.name' ng-style="{'background-color':statusColor(run.status)}")
+            td(ng-hide="league.type == 'simulation'" ng-bind='run.map.name' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.normalizationGroup' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.score' ng-style="{'background-color':statusColor(run.status)}")
             td(ng-bind='run.normalizedScore' ng-if="competition.rankingMode == 'SUM_OF_NORMALIZED_BEST_N_GAMES'" ng-style="{'background-color':statusColor(run.status)}") 
@@ -178,11 +178,11 @@ block content
               .dropdown
                   button#dropdownMenu.btn.btn-secondary.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') {{"common.action" | translate}}
                   .dropdown-menu(aria-labelledby='dropdownMenu')
-                    button.dropdown-item(type='button' ng-click="go_scoreSheet2(run._id)") {{"common.generateSheet" | translate}}
-                    button.dropdown-item(type='button' ng-click="go('/line/view/' + run._id)") {{"common.view" | translate}}
+                    button.dropdown-item(ng-hide="league.type == 'simulation'" type='button' ng-click="go_scoreSheet2(run._id)") {{"common.generateSheet" | translate}}
+                    button.dropdown-item(type='button' ng-click="go('/' + league.type + '/view/' + run._id)") {{"common.view" | translate}}
                     button.dropdown-item(type='button' ng-click="go_judge(run._id)") {{"common.judge" | translate}}
                     button.dropdown-item(type='button' ng-click="go_sign(run._id)") {{"common.sign" | translate}}
                     .dropdown-divider
-                    button.dropdown-item(type='button' ng-click="go_input(run._id)") Manual input
+                    button.dropdown-item(ng-hide="league.type == 'simulation'" type='button' ng-click="go_input(run._id)") Manual input
                     button.dropdown-item(type='button' ng-click='statusReset(run._id)') {{"admin.lineRun.statusReset" | translate}}
                     button.dropdown-item(type='button' ng-click='removeRun(run._id)') {{"common.delete" | translate}}

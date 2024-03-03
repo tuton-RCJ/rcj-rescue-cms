@@ -5,6 +5,7 @@ const { mazeRun } = require('../models/mazeRun');
 const { competition, LEAGUES_JSON } = require('../models/competition');
 
 const async = require('async');
+const { simRun } = require('../models/simRun');
 
 const { ObjectId } = require('mongoose').Types;
 
@@ -15,9 +16,14 @@ async function _fromRunId(model, id) {
   try {
     const result = await model
       .findById(id, '-__v')
-      .populate(['competition'])
+      .populate(['team', 'competition'])
       .exec();
-    return result.competition.rule;
+    const type = LEAGUES_JSON.find((l) => l.id == result.team.league).type;
+    const league = result.competition.leagues.find((l) => l.league == result.team.league);
+    return {
+      type: type,
+      rule: league.rule
+    };
   } catch (err) {
     return '0';
   }
@@ -25,13 +31,19 @@ async function _fromRunId(model, id) {
 
 module.exports.getRuleFromLineRunId = async function (id) {
   let rule = await _fromRunId(lineRun, id);
-  if (!rule) rule = 2018;
+  if (!rule) return null;
   return rule;
 };
 
 module.exports.getRuleFromMazeRunId = async function (id) {
   let rule = await _fromRunId(mazeRun, id);
-  if (!rule) rule = 2018;
+  if (!rule) return null;
+  return rule;
+};
+
+module.exports.getRuleFromSimulationRunId = async function (id) {
+  let rule = await _fromRunId(simRun, id);
+  if (!rule) return null;
   return rule;
 };
 

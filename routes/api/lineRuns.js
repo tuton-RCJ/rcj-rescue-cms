@@ -437,7 +437,7 @@ privateRouter.put('/:runid', function (req, res, next) {
         }
       }
     ])
-    .populate('competition.rule')
+    .populate(['competition', 'team'])
     .exec(function (err, dbRun) {
       if (err) {
         logger.error(err);
@@ -531,7 +531,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
         if (prevStatus != dbRun.status) statusUpdate = 1;
 
-        const cal = scoreCalculator.calculateLineScore(dbRun);
+        const cal = scoreCalculator.calculateScore(dbRun);
         if (!cal) {
           logger.error('Value Error');
           return res.status(202).send({
@@ -639,7 +639,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo',
+      select: 'name rule logo leagues',
     },
     {
       path: 'round',

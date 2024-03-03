@@ -47,7 +47,7 @@ block content
                 img.card-img-top(ng-src="/images/leagues/{{leagueImage(league)}}.png" style="width:100%; height:auto;")
               .card-body(style="z-index: 2;")
                 h3.card-title {{league.name}}
-                button(ng-click="go('/admin/' + competitionId + '/' + league.id + '/maps')" class='btn btn-dark btn-lg btn-block' style="margin-bottom:10px;")
+                button(ng-disabled="league.type == 'simulation'" ng-click="go('/admin/' + competitionId + '/' + league.id + '/maps')" class='btn btn-dark btn-lg btn-block' style="margin-bottom:10px;")
                   i.fas.fa-ruler-combined.fa-2x
                   br
                   span {{"admin.competition.maps" | translate}}
@@ -57,26 +57,6 @@ block content
                   span {{"admin.competition.runs" | translate}}
               .card-img-overlay.text-right
                 span.badge.badge-info(style="font-size: 15px;") {{league.rule}}
-      .row 
-        .col-md-5
-          h3 {{"admin.competition.line" | translate}}
-          .row 
-            .col-md-6
-              button(ng-click="go('/admin/' + competitionId + '/line/maps')" class='btn btn-outline-primary btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.maps" | translate}}
-            .col-md-6 
-              button(ng-click="go('/admin/' + competitionId + '/line/runs')" class='btn btn-outline-primary btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
-        .col-md-5
-          h3 {{"admin.competition.maze" | translate}}
-          .row 
-            .col-md-6
-              button(ng-click="go('/admin/' + competitionId + '/maze/maps')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.maps" | translate}}
-            .col-md-6 
-              button(ng-click="go('/admin/' + competitionId + '/maze/runs')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
-        .col-md-2
-          h3 {{"admin.competition.simulation" | translate}}
-          .row 
-            .col-md-12
-              button(ng-click="go('/admin/' + competitionId + '/simulation/runs')" class='btn btn-outline-warning btn-lg btn-block' style="margin-bottom:10px;") {{"admin.competition.runs" | translate}}
       hr
       h3 {{"admin.competition.tools" | translate}}
       .row

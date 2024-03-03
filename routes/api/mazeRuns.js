@@ -403,8 +403,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
   mazeRun
     .findById(id)
-    // .select("-_id -__v -competition -round -team -field -score")
-    .populate(['map', 'competition'])
+    .populate(['map', 'competition', 'team'])
     .exec(function (err, dbRun) {
       if (err) {
         logger.error(err);
@@ -515,7 +514,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
         if (prevStatus != dbRun.status) statusUpdate = 1;
 
-        let retScoreCals = scoreCalculator.calculateMazeScore(dbRun);
+        let retScoreCals = scoreCalculator.calculateScore(dbRun);
 
         if (!retScoreCals) {
           logger.error('Value Error');
@@ -613,7 +612,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo',
+      select: 'name rule logo leagues',
     },
     {
       path: 'round',

@@ -10,6 +10,29 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             $scope.league = response.data.leagues.find((l) => l.league == leagueId);
             launchSocketIo();
             updateRunList();
+
+            $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
+                $scope.teams = response.data
+            })
+    
+            $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
+                $scope.rounds = response.data
+            })
+    
+            $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
+                $scope.fields = response.data
+            })
+    
+            if ($scope.league.type != 'simulation') {
+                $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
+                    $scope.maps = {}
+                    for (let i = 0; i < response.data.length; i++) {
+                        if (!response.data[i].parent) {
+                            $scope.maps[i] = response.data[i]
+                        }
+                    }
+                })
+            }
         })
 
         var runListTimer = null;
@@ -45,28 +68,6 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             })
         }
         
-
-        $http.get(`/api/competitions/${competitionId}/${leagueId}/teams`).then(function (response) {
-            $scope.teams = response.data
-        })
-
-        $http.get(`/api/competitions/${competitionId}/rounds`).then(function (response) {
-            $scope.rounds = response.data
-        })
-
-        $http.get(`/api/competitions/${competitionId}/fields`).then(function (response) {
-            $scope.fields = response.data
-        })
-
-        $http.get(`/api/competitions/${competitionId}/${leagueId}/maps`).then(function (response) {
-            $scope.maps = {}
-            for (let i = 0; i < response.data.length; i++) {
-                if (!response.data[i].parent) {
-                    $scope.maps[i] = response.data[i]
-                }
-            }
-        })
-
         $scope.range = function (n) {
             arr = [];
             for (var i = 0; i < n; i++) {
@@ -79,7 +80,7 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
             if ($scope.run === undefined ||
                 $scope.run.round === undefined ||
                 $scope.run.team === undefined ||
-                $scope.run.map === undefined ||
+                ($scope.run.map === undefined && $scope.league.type != 'simulation') ||
                 $scope.run.field === undefined) {
                 return
             }
@@ -88,10 +89,13 @@ app.controller('RunAdminController', ['$scope', '$http', '$log', '$location', 'U
                 round: $scope.run.round._id,
                 team: $scope.run.team._id,
                 field: $scope.run.field._id,
-                map: $scope.run.map._id,
                 competition: competitionId,
                 startTime: $scope.startTime.getTime(),
                 normalizationGroup: $scope.run.normalizationGroup
+            }
+
+            if ($scope.league.type != 'simulation') {
+                run['map'] = $scope.run.map._id
             }
 
             $http.post(`/api/runs/${$scope.league.type}`, run).then(function (response) {

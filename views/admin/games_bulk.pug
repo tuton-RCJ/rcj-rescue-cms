@@ -51,15 +51,16 @@ block content
             tr(ng-repeat='team in teams')
               td(ng-bind='team.name')
       hr
-      p {{"admin.lineRunBulk.s2D4" | translate}}
-      table.custom
-        thead
-            tr
-              th {{"common.map" | translate}}
-        tbody
-            tr(ng-repeat='map in maps')
-              td(ng-bind='map.name')
-      hr
+      div(ng-hide="league.type == 'simulation'")
+        p {{"admin.lineRunBulk.s2D4" | translate}}
+        table.custom
+          thead
+              tr
+                th {{"common.map" | translate}}
+          tbody
+              tr(ng-repeat='map in maps')
+                td(ng-bind='map.name')
+        hr
       p {{"admin.lineRunBulk.s2D5" | translate}}
       table.custom
         thead

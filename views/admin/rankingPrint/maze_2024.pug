@@ -1,0 +1,136 @@
+//- -*- tab-width: 2 -*-
+//- -*- tab-width: 2 -*-
+html(ng-app="MazeScore")
+  head
+    title Rescue Maze Score Print
+    script.
+      var runId = "#{id}"
+
+    include ../../includes/common_component
+    script.
+      var competitionId = "#{competitionId}"
+      var leagueId = "#{leagueId}"
+    
+    script(src='/javascripts/ranking/maze_2024.js')
+    script(src = '/components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js')
+    script(src = '/components/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js')
+    script(src = '/components/datatables/media/js/jquery.dataTables.min.js')
+    script(src = '/components/angular-datatables/demo/src/archives/dist/angular-datatables.min.js')
+    script(src='/components/ng-file-upload/ng-file-upload-all.min.js')
+    script(src="/javascripts/translate_config.js")
+    style(type='text/css').
+      .uib-time input {
+        padding-left: 0;
+        padding-right: 0;
+        width: 2.5em;
+        margin-right: 0;
+      }
+
+      .uib-timepicker .btn {
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
+      @media print {
+        .no_print {
+          display: none;
+        }
+
+        @page {
+          margin: 10mm;
+        }
+
+        body{
+          overflow-y: visible;
+          overflow-x: visible;
+        }
+
+        thead {
+          display: table-header-group;
+          break-inside: avoid;
+        }
+      }
+
+  body(ng-controller="MazeScoreController")
+    .row
+      .col-12
+        .refine.no_print
+          .card.border-dark.mb-3(style='width:100%;')
+            .card-header.bg-transparent.border-dark.fa-2x
+              .row 
+                .col-md-6
+                  i.fas.fa-cog(aria-hidden='true') Config
+                .col-md-6(style="text-align:right;")
+                  button(onclick="window.print();" class='btn btn-info')
+                    i.fas.fa-print &nbsp;{{"common.print" | translate}}
+            .card-body.text-dark
+              h6.card-title Display items
+                br
+                br
+                input(type='checkbox' ng-model='showCode' id="showCode" ng-show="showMode.teamCode")
+                label.checkbox(for="showCode") Code
+                input(type='checkbox' ng-model='showTeam' id="showTeam")
+                label.checkbox(for="showTeam") Team
+              hr
+              h6.card-title Comment
+              p Top
+              input(ng-model="comment.top" style="width:100%")
+              p Bottom
+              input(ng-model="comment.bottom" style="width:100%")
+        center
+          .loader(ng-if="ranking==null")
+            img(src="/images/loader2.gif")
+            p {{'common.loading' | translate}}
+        div(ng-if="ranking!=null")
+          .row
+            .col-md-12
+              .row#rank
+                .col-md-12
+                  .row(style="margin-bottom:10px;")
+                    .col-10
+                      h3
+                        i.fas.fa-award &nbsp;[Ranking] {{comment.top}}
+                    .col-2(style="text-align:right;")
+                      img(ng-src="{{competition.logo}}" style="max-height:40px;")
+                  table.custom(style="overflow: scroll;")
+                    thead
+                      tr
+                        th.text-center(rowspan="3") {{'common.rank' | translate}}
+                        th.text-center(rowspan="3" ng-show="showMode.teamCode && showCode") {{'common.teamCode' | translate}}
+                        th.text-center(rowspan="3" ng-show="showTeam") {{'common.team' | translate}}
+                        th.text-center(rowspan="3") {{'line.score.finalScore' | translate}}
+                        th.text-center(colspan="{{maxGameNum + 4}}") {{'line.score.game' | translate}}
+                        th.text-center(colspan="{{documentBlock.length + 1}}" ng-show="showMode.documentScore") {{'line.score.document' | translate}}
+                      tr
+                        th.text-center(rowspan="2") {{'common.time' | translate}}
+                        th.text-center(rowspan="2") {{'common.rescued' | translate}}
+                        th.text-center(rowspan="2") {{'common.lops' | translate}}
+                        th.text-center(ng-show="showMode.normalGameScore", colspan="{{maxGameNum}}") {{'common.gamesScore' | translate}}
+                        th.text-center(rowspan="2" ng-show="showMode.normalGameScore") {{'common.sum' | translate}}
+                        th.text-center(ng-show="showMode.normalizedGameScore", colspan="{{maxGameNum}}") {{'common.normalizedScore' | translate}}
+                        th.text-center(rowspan="2" ng-show="showMode.normalizedGameScore") {{'common.mean' | translate}}
+                        th.text-center(rowspan="2" ng-show="showMode.documentScore", ng-repeat="block in documentBlock") {{langContent(block.i18n, 'title')}}
+                        th.text-center(rowspan="2" ng-show="showMode.documentScore") {{'common.weightedSum' | translate}}
+                      tr
+                        th.text-center(ng-repeat="grp in runGroups") {{grp}}
+                    tbody
+                      tr(ng-repeat='team in ranking track by $index')
+                        td.text-center(ng-bind='$index + 1')
+                        td.text-center(ng-show="showCode", ng-bind='team.team.teamCode')
+                        td.text-center(ng-show="showTeam", ng-bind='team.team.name')
+                        td.text-center(ng-bind='team.finalScore')
+                        td.text-center {{("00"+team.gameSum.time.minutes).slice(-2)}}:{{("00"+team.gameSum.time.seconds).slice(-2)}}
+                        td.text-center
+                          .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in team.gameSum.victims")
+                            img(ng-src="/images/{{victim.type}}.png", style="height:20px;")
+                            span(style="font-size:15px;") ×{{victim.count}}
+                        td.text-center(ng-bind='team.gameSum.lops')
+                        td.text-center(ng-show="showMode.normalGameScore", ng-repeat="grp in runGroups" ng-bind="team.games[grp].score" ng-click="openRunDetails(team.games[grp]._id)" ng-style="{backgroundColor: team.games[grp].used ? '':'#ccc'}")
+                        td.text-center(ng-show="showMode.normalGameScore", ng-bind='team.gameSum.score')
+                        td.text-center(ng-show="showMode.normalizedGameScore", ng-repeat="grp in runGroups" ng-bind="team.games[grp].normalizedScore.toFixed(4)" ng-click="openRunDetails(team.games[grp]._id)" ng-style="{backgroundColor: team.games[grp].used ? '':'#ccc'}")
+                        td.text-center(ng-show="showMode.normalizedGameScore", ng-bind='team.gameSum.normalizedScoreMean.toFixed(4)')
+                        
+                        td.text-center(ng-show="showMode.documentScore", ng-repeat="block in team.document.details", ng-bind='block.normalizedScore.toFixed(4)')
+                        td.text-center(ng-show="showMode.documentScore", ng-bind='team.document.score.toFixed(4)')
+        h6(style="text-align:center;margin-top:10px;", ng-if="comment.bottom")
+          i.fas.fa-info-circle &nbsp;{{comment.bottom}}

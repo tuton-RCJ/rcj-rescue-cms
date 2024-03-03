@@ -32,24 +32,20 @@ publicRouter.get('/:competitionid/:league', function (req, res, next) {
   else res.render('line_competition', { id, user: req.user, judge: 0 , league});
 });
 
-publicRouter.get('/:competitionid/:league/score', function (req, res, next) {
-  const id = req.params.competitionid;
-  const { league } = req.params;
+publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const { leagueId } = req.params;
 
-  if (!ObjectId.isValid(id)) {
+  if (!ObjectId.isValid(competitionId)) {
     return next();
   }
 
-  if (!LINE_LEAGUES.includes(league)) {
+  if (!LINE_LEAGUES.includes(leagueId)) {
     return next();
   }
-
-  return res.render('line_score', {
-    id,
-    user: req.user,
-    league,
-    get: req.query,
-  });
+  
+  const rule = await ruleDetector.getLeagueTypeAndRule(competitionId, leagueId);
+  res.render(`ranking/${rule.type}_${rule.rule}`, { competitionId, leagueId, user: req.user });
 });
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
@@ -60,7 +56,7 @@ publicRouter.get('/view/:runid', async function (req, res, next) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_view', { id, user: req.user, rule, iframe });
+  res.render(`view/${rule.type}_${rule.rule}`, { id, iframe, rule: rule.rule });
 });
 
 publicRouter.get('/view/field/:competitionid/:fieldid', function (req, res) {
@@ -87,7 +83,7 @@ privateRouter.get('/judge/:runid', async function (req, res, next) {
   }
 
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_judge', { id, rule });
+  res.render(`judge/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/input/:runid', async function (req, res, next) {
@@ -97,7 +93,7 @@ privateRouter.get('/input/:runid', async function (req, res, next) {
   }
 
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_input', { id, rule });
+  res.render(`manual/input/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/check/:runid', async function (req, res, next) {
@@ -107,7 +103,7 @@ privateRouter.get('/check/:runid', async function (req, res, next) {
   }
 
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_check', { id, rule });
+  res.render(`manual/check/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/sign/:runid', async function (req, res) {
@@ -117,7 +113,7 @@ privateRouter.get('/sign/:runid', async function (req, res) {
   }
 
   const rule = await ruleDetector.getRuleFromLineRunId(id);
-  res.render('line_sign', { id, rule });
+  res.render(`sign/${rule.type}_${rule.rule}`, { id });
 });
 
 publicRouter.all('*', function (req, res, next) {
