@@ -718,10 +718,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             var mapTable = $('#mapTable');
 
             let areaTopLeftX = document.getElementById("mapTopLeft").getBoundingClientRect().left + window.pageXOffset;
-            let areaTopLeftY = document.getElementById("mapTopLeft").getBoundingClientRect().top + window.pageYOffset;
 
             let scaleX = (window.innerWidth - areaTopLeftX - 10) / mapTable.width();
-            let scaleY = (window.innerHeight - areaTopLeftY - 10) / mapTable.height();
+            let scaleY = (window.innerHeight - 200) / mapTable.height();
             let scale = Math.min(scaleX, scaleY);
 
             if (scaleX > scaleY) {
@@ -731,7 +730,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             }
 
             $('#wrapTile').css('transform', `scale(${scale})`);
-            $('.tilearea').css('height', mapTable.height() * scale + areaTopLeftY - 50);
+            $('.tilearea').css('height', mapTable.height() * scale + 120);
         } catch (e) {
             $timeout($scope.tile_size, 500);
         }
