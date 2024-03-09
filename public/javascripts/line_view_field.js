@@ -23,7 +23,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.victim_list = [];
     $scope.LoPs = [];
 
+    $scope.victimImgPath = function(victim) {
+        switch(victim.victimType) {
+            case 'LIVE':
+                return 'liveVictim.png';
+            case 'DEAD':
+                return 'deadVictim.png';
+            case 'KIT':
+                return 'rescueKit.png';
+        }
+    }
 
+    $scope.evacZoneColor = function(victim) {
+        switch(victim.zoneType) {
+            case 'GREEN':
+                return "#d6ffd6";
+            case 'RED':
+                return "#ffd6d6";
+        }
+    }
 
     setInterval(function () {
         $scope.get_field();
@@ -45,7 +63,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
           pName = "ERROR";
           pStatus = 0;
         }
-        $scope.updateRun(pRunId,pName,pStatus);
+        if(pRunId == -1 && pName=='No Team'){
+            $scope.get_waiting_teams();
+            $scope.updateRun(pRunId,pName,pStatus);
+        } else{
+            $scope.nextGame = null;
+            $scope.updateRun(pRunId,pName,pStatus);
+        }
       })
   }
 
@@ -67,11 +91,23 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
           pStatus = 0;
         }
         if(pRunId == -1 && pName=='No Team') $scope.get_field_signing();
-        else $scope.updateRun(pRunId,pName,pStatus);
-
+        else{
+            $scope.nextGame = null;
+            $scope.updateRun(pRunId,pName,pStatus);
+        }
       })
   }
-
+  
+  $scope.get_waiting_teams = function () {
+        $http.get("/api/runs/line/find/" + competitionId + "/" +
+                fieldId + "/0").then(function (response) {
+            if (response.data.length > 0) {
+                $scope.nextGame = response.data[0];
+            } else {
+                $scope.nextGame = null;
+            }
+        })
+    }
 
   $scope.updateRun = function (pRunId,pName,pStatus){
       $scope.runId = pRunId;

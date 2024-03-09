@@ -37,6 +37,16 @@ html(ng-app="ddApp")
         .alert.alert-dark(role='alert')
           h2 現在，このフィールドでは競技が行われていません
           h4 No games are currently being happened on this field.
+        .row(style="margin-top:100px;text-align:center;" ng-show="nextGame")
+          .col-12
+            h1 NEXT...
+          .col-12 
+            i.far.fa-clock.fa-4x &nbsp;{{nextGame.startTime | date:"HH:mm"}} ~
+          .col-12
+            br
+            br
+            h2 {{nextGame.team.teamCode}}
+            h1 {{nextGame.team.name}}
     br
     .alert.alert-info(role='alert', ng-show='exist')
       .row
@@ -46,11 +56,9 @@ html(ng-app="ddApp")
           i.fas.fa-ambulance(aria-hidden='true' style="color:#e74c3c;") &nbsp;
           span.badge.badge-warning(ng-show='evacuationLevel == 1') Level 1
           span.badge.badge-danger(ng-show='evacuationLevel == 2') Level 2
-          span(ng-repeat='victim in victim_list', style='margin-left:5px;')
-            img(src='/images/liveVictim.png', width='20px', ng-if="victim.type == 'L'")
-            img(src='/images/deadVictim.png', width='20px', ng-if="victim.type == 'D'")
-            img(src='/images/rescuekit-1.png', width='20px', ng-if="victim.type == 'K' && kitLevel==1")
-            img(src='/images/rescuekit-2.png', width='20px', ng-if="victim.type == 'K' && kitLevel==2")
+          span &nbsp;
+          .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in victim_list" ng-style="{backgroundColor: evacZoneColor(victim)}")
+            img(ng-src='/images/{{victimImgPath(victim)}}', style="height:20px;")             
           span &nbsp;【 ×{{multiplier}} 】
         .col-8(ng-if="league == 'LineNL'")
           i.fas.fa-ambulance(aria-hidden='true' style="color:#e74c3c;") &nbsp;

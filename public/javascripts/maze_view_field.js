@@ -41,7 +41,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 pName = "ERROR";
                 pStatus = 0;
             }
-            $scope.updateRun(pRunId, pName, pStatus);
+            if(pRunId == -1 && pName=='No Team'){
+                $scope.get_waiting_teams();
+                $scope.updateRun(pRunId,pName,pStatus);
+            } else{
+                $scope.nextGame = null;
+                $scope.updateRun(pRunId,pName,pStatus);
+            }
         })
     }
 
@@ -62,11 +68,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 pName = "ERROR";
                 pStatus = 0;
             }
-            if (pRunId == -1 && pName == 'No Team') $scope.get_field_signing();
-            else $scope.updateRun(pRunId, pName, pStatus);
-
+            if(pRunId == -1 && pName=='No Team') $scope.get_field_signing();
+            else{
+                $scope.nextGame = null;
+                $scope.updateRun(pRunId,pName,pStatus);
+            }
         })
     }
+
+    $scope.get_waiting_teams = function () {
+        $http.get("/api/runs/maze/find/" + competitionId + "/" +
+                fieldId + "/0").then(function (response) {
+            if (response.data.length > 0) {
+                $scope.nextGame = response.data[0];
+            } else {
+                $scope.nextGame = null;
+            }
+        })
+    }
+
 
     $scope.updateRun = function (pRunId, pName, pStatus) {
         $scope.runId = pRunId;
@@ -605,12 +625,8 @@ function tile_size() {
             var b = $('.tilearea');
             //console.log('コンテンツ本体：' + b.height() + '×' + b.width());
             //console.log('window：' + window.innerHeight);
-            var tilesize_w = (b.width() - (10*(height-1)) -10*(width+1 * height) ) /
-                ((width * height) + (width+1 * height)/4);
-            var tilesize_h = (window.innerHeight - (200 + 12 * (length + 1))) /
-                length;
-            console.log(width + 'tilesize_w:' + tilesize_w);
-            console.log('tilesize_h:' + tilesize_h);
+            var tilesize_w = b.width() / (width*1.3)
+            var tilesize_h = b.height() / (length*1.3);
             if (tilesize_h > tilesize_w) var tilesize = tilesize_w;
             else var tilesize = tilesize_h;
 
