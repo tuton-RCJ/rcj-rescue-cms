@@ -1380,7 +1380,25 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
                 roomNum = checkRoomNumber(x,y,0)
                 if(thisCell.tile){
-                    walls[(y-1)/2][(x-1)/2] = [u2f(thisCell.reachable), arWall, u2f(thisCell.tile.checkpoint), u2f(thisCell.tile.black), x == $scope.startTile.x && y == $scope.startTile.y, u2f(thisCell.tile.swamp), humanType, humanPlace, u2f(thisCell.isLinear), u2f(thisCell.tile.obstacle), halfWallOutVar, halfWallInVar, curveWallVar, thisCell.tile.halfWallVic, floorColor, halfWallOutInfo, roomNum];
+                    walls[(y-1)/2][(x-1)/2] = [
+                        u2f(thisCell.reachable),
+                        arWall,
+                        u2f(thisCell.tile.checkpoint),
+                        u2f(thisCell.tile.black),
+                        x == $scope.startTile.x && y == $scope.startTile.y,
+                        u2f(thisCell.tile.swamp),
+                        humanType,
+                        humanPlace,
+                        u2f(thisCell.isLinear),
+                        u2f(thisCell.tile.obstacle),
+                        halfWallOutVar,
+                        halfWallInVar,
+                        curveWallVar,
+                        thisCell.tile.halfWallVic,
+                        floorColor,
+                        halfWallOutInfo,
+                        roomNum
+                    ];
                 }
             }
         }
@@ -1781,7 +1799,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     let t2w = [walls[z][x][10][0] == 2 ? walls[z][x][15][0] : 0, walls[z][x][10][1] == 2 ? walls[z][x][15][1] : 0, walls[z][x][11][1], 0]; 
                     let t3w = [0, walls[z][x][11][2], walls[z][x][10][2] == 1 ? walls[z][x][15][2] : 0, walls[z][x][10][3] == 1 ? walls[z][x][15][3] : 0];
                     let t4w = [0, walls[z][x][10][1] == 1 ? walls[z][x][15][1] : 0, walls[z][x][10][2] == 2 ? walls[z][x][15][2] : 0, 0];
-                    console.log("b", walls[z][x][10]);
                     
                     let t1e = [externals[0], false, false, externals[3]];
                     let t2e = [externals[0], externals[1], false, false];
@@ -1829,14 +1846,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 //Increment id counter
                 tileId = tileId + 1
 
-                //Human
+                //Humans and hazards
                 if(walls[z][x][6] != 0){
                     //Position of tile
                     let humanPos = [(x * 0.3 * tileScale[0]) + startX , (z * 0.3 * tileScale[2]) + startZ]
                     let humanRot = humanRotation[walls[z][x][7]]
                     //Randomly move human left and right on wall
                     let randomOffset = [0, 0]
-                    if ((inBounds(z-1, x) && walls[z-1][x][6] == 0) &&  // ensure no adjacent tile victims (random offset can place too close)
+                    /*if ((inBounds(z-1, x) && walls[z-1][x][6] == 0) &&  // ensure no adjacent tile victims (random offset can place too close)
                         (inBounds(z+1, x) && walls[z+1][x][6] == 0) && 
                         (inBounds(z, x-1) && walls[z][x-1][6] == 0) && 
                         (inBounds(z, x+1) && walls[z][x+1][6] == 0)) {
@@ -1847,6 +1864,33 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             //Z offset for left and right
                             randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
                         }
+                    }*/
+                    if(walls[z][x][7] == 0 || walls[z][x][7] == 2){
+                        //X offset for top and bottom
+
+                        // if area 1, minimum offset distance
+                        if (walls[z][x][16] == 1) {
+                            let posOffset = (getRandomArbitrary(0, 1) < 0.5)
+                            if (posOffset)
+                                randomOffset = [orgRound(getRandomArbitrary(-0.1 * (0.3 * tileScale[0]) + 0.25 * (0.3 * tileScale[0]), 0.1 * (0.3 * tileScale[0]) + 0.25 * (0.3 * tileScale[0])), 0.001), 0]
+                            else
+                                randomOffset = [orgRound(getRandomArbitrary(-0.1 * (0.3 * tileScale[0]) - 0.25 * (0.3 * tileScale[0]), 0.1 * (0.3 * tileScale[0]) - 0.25 * (0.3 * tileScale[0])), 0.001), 0]
+                        }
+                        else
+                            randomOffset = [orgRound(getRandomArbitrary(-0.1 * tileScale[0], 0.1 * tileScale[0]), 0.001), 0]
+                    }else{
+                        //Z offset for left and right
+
+                        // if area 1, minimum offset distance
+                        if (walls[z][x][16] == 1) {
+                            let posOffset = (getRandomArbitrary(0, 1) < 0.5)
+                            if (posOffset)
+                                randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * (0.3 * tileScale[0]) + 0.25 * (0.3 * tileScale[0]), 0.1 * (0.3 * tileScale[0]) + 0.25 * (0.3 * tileScale[0])), 0.001)]
+                            else
+                                randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * (0.3 * tileScale[0]) - 0.25 * (0.3 * tileScale[0]), 0.1 * (0.3 * tileScale[0]) - 0.25 * (0.3 * tileScale[0])), 0.001)]
+                        }
+                        else
+                            randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
                     }
 
                     if (walls[z][x][6] >= 5 && walls[z][x][6] <= 8){ //hazards
@@ -1881,22 +1925,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                                 let ind = parseInt(i / 4) * 4 + curveDir;
                                 // if victim is on inside or outside of curve
                                 if (!(curveDir == (parseInt(i) + 2) % 4 || curveDir == (parseInt(i) + 1) % 4)) {
-                                    console.log("outside");
                                     inside = 1;
                                     curveDir = (curveDir + 2) % 4;
                                 }
-                                else {
-                                    console.log("inside");
-                                }
                                 if (humanType >= 0 && humanType <= 3) {
-                                    console.log("HP: " + humanPos);
-                                    console.log("Curve Offset: " + curveWallVicPos[ind] + " " + ind + " " + i);
-                                    console.log("Curvedir: " + curveDir);
-                                    console.log("Inside: " + inside);
-                                    console.log("In/Out X: " + humanOffsetCurve[curveDir][0] * inside);
-                                    console.log("In/Out Z: " + humanOffsetCurve[curveDir][1] * inside);
-                                    console.log("X: " + humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside);
-                                    console.log("Z: " + humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside);
                                     score = score / 2;
                                     //allHumans = allHumans + visualHumanPart({x: humanPos[0], z: humanPos[1], rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
                                     allHumans = allHumans + visualHumanPart({x: humanPos[0] + curveWallVicPos[ind][0] + humanOffsetCurve[curveDir][0] * inside, z: humanPos[1] + curveWallVicPos[ind][1] + humanOffsetCurve[curveDir][1] * inside, rot: humanRotationCurve[curveDir], id: humanId, type: humanTypesVisual[walls[z][x][13][i] - 1], score: score})
@@ -2573,12 +2605,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     if ($scope.selectRoom == 0) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#359ef4");
                         $scope.cells[x+','+y+','+z].tile.halfTile = 1;
-                        console.log('a')
                     }
                     else if ($scope.selectRoom == 1) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#ed9aef");
                         $scope.cells[x+','+y+','+z].tile.halfTile = 1;
-                        console.log('b')
                     }
                     else if ($scope.selectRoom == 2)
                         $(".tile").get(i).style.setProperty("--tileColor", "#7500FF");
