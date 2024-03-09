@@ -13,7 +13,7 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
     var runListTimer = null;
     var runListChanged = false;
     $scope.nowR = 4;
-    $scope.top3 = true;
+    $scope.showFrom = 0;
     $scope.time = 10;
     var inter;
     launchSocketIo()
@@ -41,17 +41,13 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
     function updateTime(){
         $scope.time--;
         if($scope.time == 0){
-            if($scope.top3){
-                $scope.top3 = !$scope.top3;
+            if ($scope.showFrom == 0) {
+                window.parent.iframeEnd();
+                clearInterval(inter);
+            } else {
+                $scope.showFrom -= 6;
+                if ($scope.showFrom < 0) $scope.showFrom = 0;
                 $scope.time = 10;
-            }else{
-                if($scope.nowR + 5 < $scope.RunsTop.length){
-                    $scope.nowR += 6;
-                    $scope.time = 10;
-                }else{
-                    window.parent.iframeEnd();
-                    clearInterval(inter);
-                }
             }
         }
         $scope.$apply();
@@ -87,6 +83,12 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
             }
             var now = new Date();
             $scope.updateTime = now.toLocaleString();
+            if ($scope.ranking.length >= 4) {
+                $scope.showFrom = Math.floor($scope.ranking.length - 4) / 6 * 6 + 3;
+                $scope.showFrom = 3;
+            } else {
+                $scope.showFrom = 0;
+            }
         }, function (response) {
             console.log("Error: " + response.statusText);
             if (response.status == 401) {
