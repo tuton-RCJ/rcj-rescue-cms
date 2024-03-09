@@ -232,8 +232,8 @@ publicRouter.get(
         field: field_id,
         status,
       },
-      'field team competition status'
-    );
+      'field team competition status startTime'
+    ).sort('startTime');
     query.populate([{ path: 'team', select: 'name league teamCode' }]);
     query.exec(function (err, data) {
       if (err) {

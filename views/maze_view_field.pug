@@ -29,7 +29,7 @@ html(ng-app="ddApp")
         i.fas.fa-stopwatch.fa-2x(aria-hidden='true') &nbsp;
         li.navbar-brand(href='#')  {{time*1000 | date:'mm:ss'}}
     .row.nav-cont
-      .col-md-12.tilearea.mx-auto(ng-if='exist', style="text-align:center;")
+      .col-md-12.tilearea.mx-auto(ng-if='exist', style="text-align:center;height:80vh;")
         div(ng-repeat='z in range(height) track by $index', style='display: inline-block;')
           table.map
             tbody
@@ -74,6 +74,16 @@ html(ng-app="ddApp")
         .alert.alert-dark(role='alert')
           h2 現在，このフィールドでは競技が行われていません
           h4 No games are currently being happened on this field.
+        .row(style="margin-top:100px;text-align:center;" ng-show="nextGame")
+          .col-12
+            h1 NEXT...
+          .col-12 
+            i.far.fa-clock.fa-4x &nbsp;{{nextGame.startTime | date:"HH:mm"}} ~
+          .col-12
+            br
+            br
+            h2 {{nextGame.team.teamCode}}
+            h1 {{nextGame.team.name}}
     br
     .alert.alert-info(role='alert', ng-show='exist')
       .row
