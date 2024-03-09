@@ -46,6 +46,9 @@
               i.fas.fa-check.fa-fw.fa-5x(ng-show='exitBonus && !exitBonusP', style='color:#27ae60; opacity:0.9;')
               i.fas.fa-times.fa-fw.fa-5x(ng-show='!exitBonus && !exitBonusP', style='padding-top:4px; color:#e74c3c; opacity:0.9;')
   .col-md-8.col-lg-9.tilearea(style='margin-top:-45px;')
+    .alert.alert-primary(style='margin-bottom:5px;text-align:center;', role='alert')
+      h2(style='text-align:center;')
+        | {{'common.stotal' | translate}} : {{allItemScore()}} {{'common.point' |translate}}
     div(style='text-align:left;float:left;')
       .btn-group
         .input-group-prepend
@@ -58,10 +61,10 @@
           i.fas.fa-undo(aria-hidden='true')
         button.btn.btn-outline-dark(type='button', ng-click='tileRot(90)')
           i.fas.fa-redo(aria-hidden='true')
-    div(style='clear:both;')
-    #wrapTile(style='margin-top:5px;')
+    div(style='clear:both;')#mapTopLeft
+    #wrapTile(style='margin-top:5px;transform-origin: top left;')
       h2(ng-show='!(length&&width)', style='text-align:center') {{'common.loading' | translate}}
-      table.map(ng-if='sRotate == 0')
+      table.map(ng-if='sRotate == 0')#mapTable
         tbody
           tr(ng-repeat='r in range(2*length + 1)')
             td.cell(ng-repeat='c in range(2*width + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z,0)")
@@ -100,7 +103,7 @@
                 i.fas.fa-check.fa-fw.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'done'", style='padding-top:4px; color:#27ae60; opacity:0.9;')
                 i.fas.fa-play.fa-fw.fa-rotate-270.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'halfdone'", style='padding-top:4px; color:#f4d03f; opacity:0.9;')
                 i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(c,r,z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')
-      table.map(ng-if='sRotate == 90')
+      table.map(ng-if='sRotate == 90')#mapTable
         tbody
           tr(ng-repeat='r in range(2*width + 1)')
             td.cell(ng-repeat='c in range(2*length + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[r+','+(2*length - c)+','+z].isWall, 'checkpoint': cells[r+','+(2*length - c)+','+z].tile.checkpoint, 'black': cells[r+','+(2*length - c)+','+z].tile.black, 'blue': cells[r+','+(2*length - c)+','+z].tile.blue, 'linear': cells[r+','+(2*length - c)+','+z].isLinear}", ng-click='cellClick(r, (2*length - c), z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(r,2*length - c,z,90)")
@@ -139,7 +142,7 @@
                 i.fas.fa-check.fa-fw.tile-image.tile-font(ng-show="tileStatus(r,(2*length - c),z,$odd && $parent.$odd) == 'done'", style='padding-top:4px; color:#27ae60; opacity:0.9;')
                 i.fas.fa-play.fa-fw.fa-rotate-270.tile-image.tile-font(ng-show="tileStatus(r,(2*length - c),z,$odd && $parent.$odd) == 'halfdone'", style='padding-top:4px; color:#f4d03f; opacity:0.9;')
                 i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(r,(2*length - c),z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')
-      table.map(ng-if='sRotate == 180')
+      table.map(ng-if='sRotate == 180')#mapTable
         tbody
           tr(ng-repeat='r in range(2*length + 1)')
             td.cell(ng-repeat='c in range(2*width + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[2*width - c+','+(2*length - r)+','+z].isWall, 'checkpoint': cells[2*width - c+','+(2*length - r)+','+z].tile.checkpoint, 'black': cells[2*width - c+','+(2*length - r)+','+z].tile.black, 'blue': cells[2*width - c+','+(2*length - r)+','+z].tile.blue, 'linear': cells[2*width - c+','+(2*length - r)+','+z].isLinear}", ng-click='cellClick(2*width - c, 2*length - r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(2*width - c, 2*length - r, z,180)")
@@ -178,7 +181,7 @@
                 i.fas.fa-check.fa-fw.tile-image.tile-font(ng-show="tileStatus(2*width - c,2*length - r,z,$odd && $parent.$odd) == 'done'", style='padding-top:4px; color:#27ae60; opacity:0.9;')
                 i.fas.fa-play.fa-fw.fa-rotate-270.tile-image.tile-font(ng-show="tileStatus(2*width - c,2*length - r,z,$odd && $parent.$odd) == 'halfdone'", style='padding-top:4px; color:#f4d03f; opacity:0.9;')
                 i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(2*width - c,2*length - r,z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')
-      table.map(ng-if='sRotate == 270')
+      table.map(ng-if='sRotate == 270')#mapTable
         tbody
           tr(ng-repeat='r in range(2*width + 1)')
             td.cell(ng-repeat='c in range(2*length + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[2*width - r+','+c+','+z].isWall, 'checkpoint': cells[2*width - r+','+c+','+z].tile.checkpoint, 'black': cells[2*width - r+','+c+','+z].tile.black, 'blue': cells[2*width - r+','+c+','+z].tile.blue, 'linear': cells[2*width - r+','+c+','+z].isLinear}", ng-click='cellClick(2*width - r, c, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(2*width - r, c, z,270)")
@@ -216,11 +219,7 @@
                 img.tile-image(ng-src='/images/green_floor.png', ng-show="cells[2*width - r+','+c+','+z].tile.victims.floor == 'Green'")
                 i.fas.fa-check.fa-fw.tile-image.tile-font(ng-show="tileStatus(2*width - r,c,z,$odd && $parent.$odd) == 'done'", style='padding-top:4px; color:#27ae60; opacity:0.9;')
                 i.fas.fa-play.fa-fw.fa-rotate-270.tile-image.tile-font(ng-show="tileStatus(2*width - r,c,z,$odd && $parent.$odd) == 'halfdone'", style='padding-top:4px; color:#f4d03f; opacity:0.9;')
-                i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(2*width - r,c,z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')
-    hr
-    .alert.alert-primary(style='margin-bottom:50px;text-align:center;', role='alert')
-      h2(style='text-align:center;')
-        | {{'common.stotal' | translate}} : {{allItemScore()}} {{'common.point' |translate}}
+                i.fas.fa-times.fa-fw.tile-image.tile-font(ng-show="tileStatus(2*width - r,c,z,$odd && $parent.$odd) == 'undone'", style='padding-top:6px; color:#e74c3c; opacity:0.9;')    
 hr
 h2 {{'maze.sign.reliability' | translate}}
 .alert.alert-info(style='margin-bottom:30px;text-align:center;', role='alert', ng-if="leagueType=='standard'")

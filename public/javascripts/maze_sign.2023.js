@@ -715,37 +715,23 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.tile_size = function () {
         try {
-            var b = $('.tilearea');
+            var mapTable = $('#mapTable');
 
-            if($scope.sRotate%180 == 0){
-                var tilesize_w = (b.width()-2*(width+1)) / (width+1 + (width+1)/12);
-                var tilesize_h = (window.innerHeight - 130) /(length + length/12*(length+1));
-            }else{
-                var tilesize_w = (b.width() - (20 + 11 * (length + 1))) / length;
-                var tilesize_h = (window.innerHeight - (130 + 11 * (width + 1))) /width;
+            let areaTopLeftX = document.getElementById("mapTopLeft").getBoundingClientRect().left + window.pageXOffset;
+            let areaTopLeftY = document.getElementById("mapTopLeft").getBoundingClientRect().top + window.pageYOffset;
+
+            let scaleX = (window.innerWidth - areaTopLeftX - 10) / mapTable.width();
+            let scaleY = (window.innerHeight - areaTopLeftY - 10) / mapTable.height();
+            let scale = Math.min(scaleX, scaleY);
+
+            if (scaleX > scaleY) {
+                $('#wrapTile').css('transform-origin', 'top center');
+            } else {
+                $('#wrapTile').css('transform-origin', 'top left');
             }
 
-
-            if (tilesize_h > tilesize_w) var tilesize = tilesize_w;
-            else var tilesize = tilesize_h;
-
-            $('.tile-image-container').css('height', tilesize);
-            $('.tile-image-container').css('width', tilesize);
-            $('.tile-image').css('height', tilesize);
-            $('.tile-image').css('width', tilesize);
-            $('.tile').css('height', tilesize);
-            $('.tile').css('width', tilesize);
-            $('.tile-font').css('font-size', tilesize - 10);
-            $('.cell').css('padding', tilesize/12);
-            $('.tile-point').css('font-size', tilesize/2 + "px");
-            $('.tile-point').css('line-height', tilesize + "px");
-            if (b.height() == 0) $timeout($scope.tile_size, 500);
-
-            if($scope.sRotate%180 == 0){
-                $('#wrapTile').css('width', (tilesize+10)*width+11);
-            }else{
-                $('#wrapTile').css('width', (tilesize+10)*length+11);
-            }
+            $('#wrapTile').css('transform', `scale(${scale})`);
+            $('.tilearea').css('height', mapTable.height() * scale + areaTopLeftY - 50);
         } catch (e) {
             $timeout($scope.tile_size, 500);
         }
