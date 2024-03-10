@@ -5,15 +5,12 @@ app.controller("CompetitionAdminController", ['$scope', '$http', function ($scop
         window.location = path
     }
     $http.get("/api/competitions/" + competitionId).then(function (response) {
-        $scope.competition = response.data
+        $scope.competition = response.data;
+        $scope.leagues = response.data.leagues;
     })
 
-    $http.get("/api/competitions/leagues").then(function (response) {
-        $scope.leagues = response.data;
-    });
-
     $scope.leagueImage = function (league) {
-        switch (league.id) {
+        switch (league.league) {
             case 'LineNL':
                 return "LineNL";
             case 'MazeNL':
