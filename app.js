@@ -244,6 +244,11 @@ async function bootstrap(){
     //                          Error handling
     //========================================================================
 
+    process.on('uncaughtException', function(err) {
+        console.log("SERVER ERROR");
+        console.log(err);
+    });
+
     app.use(function (err, req, res, next) {
         // is at base, send to login
         if (req.originalUrl === "/") {
