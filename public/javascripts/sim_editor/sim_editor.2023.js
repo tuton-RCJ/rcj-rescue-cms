@@ -2250,6 +2250,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             let tileStr = $scope.roomTiles[2][i];
             let x = tileStr.slice(0, tileStr.indexOf(","));
             let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            x = parseInt(x);
+            y = parseInt(y);
             if (x < minX || minX == -1)
                 minX = x;
             if (x > maxX)
@@ -2742,6 +2744,8 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 let tileStr = $scope.roomTiles[2][i];
                 let x = tileStr.slice(0, tileStr.indexOf(","));
                 let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+                x = parseInt(x);
+                y = parseInt(y);
                 if (x < minX || minX == -1)
                     minX = x;
                 if (x > maxX)
@@ -2989,6 +2993,8 @@ app.directive("drawing", function(){
             let tileStr = $scope.$parent.roomTiles[2][i];
             let x = tileStr.slice(0, tileStr.indexOf(","));
             let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            x = parseInt(x);
+            y = parseInt(y);
             if (x < minX || minX == -1)
                 minX = x;
             if (x > maxX)
