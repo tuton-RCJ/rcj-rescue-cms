@@ -49,13 +49,22 @@ publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, 
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
-  const iframe = req.query.iframe;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render(`view/${rule.type}_${rule.rule}`, { id, iframe, rule: rule.rule });
+  res.render(`view/${rule.type}_${rule.rule}`, { id, rule: rule.rule });
+});
+
+publicRouter.get('/view/:runid/iframe', async function (req, res, next) {
+  const id = req.params.runid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  const rule = await ruleDetector.getRuleFromMazeRunId(id);
+  res.render(`view_iframe/${rule.type}_${rule.rule}`, { id, rule: rule.rule });
 });
 
 publicRouter.get('/viewcurrent', function (req, res) {
