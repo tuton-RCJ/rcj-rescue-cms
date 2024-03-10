@@ -67,10 +67,6 @@ publicRouter.get('/view/:runid/iframe', async function (req, res, next) {
   res.render(`view_iframe/${rule.type}_${rule.rule}`, { id, rule: rule.rule });
 });
 
-publicRouter.get('/viewcurrent', function (req, res) {
-  res.render('maze_view_current');
-});
-
 privateRouter.get('/judge/:runid', async function (req, res, next) {
   const id = req.params.runid;
 

@@ -682,66 +682,6 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   });
 });
 
-adminRouter.get('/apteam/:cid/:teamid/:group', function (req, res, next) {
-  const { cid } = req.params;
-  const team = req.params.teamid;
-  const { group } = req.params;
-  if (!ObjectId.isValid(cid)) {
-    return next();
-  }
-  if (!ObjectId.isValid(team)) {
-    return next();
-  }
-
-  if (!auth.authCompetition(req.user, cid, ACCESSLEVELS.ADMIN)) {
-    return res.status(401).send({
-      msg: 'You have no authority to access this api!!',
-    });
-  }
-
-  mazeRun
-    .find({
-      competition: cid,
-      group,
-    })
-    .exec(function (err, dbRun) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get run',
-          err: err.message,
-        });
-      } else if (dbRun) {
-        const resp = [];
-        for (const run of dbRun) {
-          run.team = team;
-          run.group = null;
-          run.save(function (err) {
-            if (err) {
-              logger.error(err);
-              return res.status(400).send({
-                err: err.message,
-                msg: 'Could not save run',
-              });
-            }
-          });
-          const col = {
-            time: run.startTime,
-            field: run.field,
-          };
-          resp.push(col);
-        }
-        // res.send(dbRun);
-        // logger.debug(dbRun);
-
-        return res.status(200).send({
-          msg: 'Saved change',
-          data: resp,
-        });
-      }
-    });
-});
-
 privateRouter.put('/map/:runid', function (req, res, next) {
   const id = req.params.runid;
   if (!ObjectId.isValid(id)) {
