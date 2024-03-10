@@ -1,6 +1,5 @@
 var app = angular.module('ddApp', ['ngTouch','ngAnimate', 'ui.bootstrap', 'pascalprecht.translate', 'ngCookies']);
 var scp;
-var allFieldOpen = 0;
 
 // function referenced by the drop target
 app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$http', '$cookies', function ($scope, $uibModal, $log, $timeout, $http, $cookies) {
@@ -9,11 +8,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return "/signage/display/" + sigId + "/" + grpId + "/" + competitionId;
     }
     $scope.selectfield = [];
-    if(sigId){
-        $scope.flagSignage = true;
-    }else{
-        $scope.flagSignage = false;
-    }
 
     $scope.vet = 1;
 
@@ -26,17 +20,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     }
 
     $http.get("/api/competitions/" + competitionId +
-        "/line/fields").then(function (response) {
+        "/fields").then(function (response) {
         $scope.fields = response.data
-        $http.get("/api/competitions/" + competitionId +
-            "/maze/fields").then(function (response) {
-            $scope.fields = $scope.fields.concat(response.data)
-            console.log($scope.fields);
-        })
     })
 
     $scope.getIframeSrc = function (field) {
-        return `/${getLeagueType(field.league)}/view/field/${competitionId}/${field._id}`;
+        return `/signage/field/${competitionId}/${field._id}`;
     };
 
     $scope.range = function (n) {
@@ -51,34 +40,43 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         window.open(path)
     }
 
-    function getFieldOpen(field, level = 2) {
-        $http.get(`/api/runs/${getLeagueType(field.league)}/find/${competitionId}/${field._id}/${level}`).then(function (response) {
-            if (response.data.length != 1) {
-                if (level == 2) {
-                    getFieldOpen(field, 3);
-                } else {
-                    allFieldOpen *= 1;
-                }
-            } else {
-                allFieldOpen *= 0;
-            }
+    function getGameList(league, fieldId, status) {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", `/api/runs/${league}/find/${competitionId}/${fieldId}/${status}`, false);
+        xhr.send();
+        let json = JSON.parse(xhr.response);
+        json.map((j) => {
+            j.league = league;
         })
+        return json;
+    }
+
+    function getFieldOpen(field) {
+        let gameList = getGameList('line', field._id, 2);
+        gameList = gameList.concat(getGameList('maze', field._id, 2));
+        gameList = gameList.concat(getGameList('line', field._id, 3));
+        gameList = gameList.concat(getGameList('maze', field._id, 3));
+
+        return gameList.length;
     }
 
     function check_selected_field() {
+        let inProgressGames = 0;
         for (let i = 0; i < $scope.num; i++) {
             if (!$scope.selectfield[i]) return;
-            allFieldOpen = 1;
-            getFieldOpen($scope.selectfield[i]);
+            inProgressGames += getFieldOpen($scope.selectfield[i]);
+            if (inProgressGames != 0) break;
         }
-        setTimeout(changeShowItem, 5000);
+        if (inProgressGames == 0) {
+            setTimeout(function () {
+                $scope.showSignage = true;
+                $scope.$apply();
+            }, 5000);
+        } else {
+            $scope.showSignage = false;
+            $scope.$apply();
+        }
     }
 
-    function changeShowItem() {
-        if (allFieldOpen) $scope.showSignage = true;
-        else $scope.showSignage = false;
-    }
     setInterval(check_selected_field, 10000);
-
-
 }]);

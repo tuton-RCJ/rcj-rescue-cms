@@ -1,17 +1,16 @@
 //- -*- tab-width: 2 -*-
-extends includes/signage_layout
+extends ../../includes/signage_layout
 
 block vars
-  - var ngAppDef = 'MazeScore'
+  - var ngAppDef = 'LineScore'
 
 append scripts
   script.
     var competitionId = "#{id}"
-    var get = !{JSON.stringify(get)}
-    var league = "#{league}"
+    var leagueId = "#{leagueId}"
   script(src = '/components/datatables/media/js/jquery.dataTables.min.js')
   script(src = '/components/angular-datatables/demo/src/archives/dist/angular-datatables.min.js')
-  script(src = '/javascripts/maze_score.js')
+  script(src = '/javascripts/ranking/line_2024.js')
 
 block content
   style.
@@ -39,7 +38,7 @@ block content
                       i.fas.fa-ambulance.fa-fw(style="margin-right:10px;")
                       .img-thumbnail(style="padding:0;display: inline-block;margin:1px;" ng-repeat="victim in team.gameSum.victims" ng-style="{backgroundColor: evacZoneColor(victim)}")
                         div(style="display: flex; flex-direction: column;")
-                          img(ng-src='/images/{{victim.type}}.png', style="height:3vh")
+                          img(ng-src='/images/{{victimImgPath(victim)}}', style="height:3vh")
                           span(style="font-size:1vh; color: #000; text-align:center;") ×{{victim.count}}
                     li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                       i.fas.fa-step-forward.fa-fw &nbsp;{{team.gameSum.lops}}
@@ -64,7 +63,7 @@ block content
                   i.fas.fa-ambulance.fa-fw(style="margin-right:10px;")
                   .img-thumbnail(style="padding:0;display: inline-block;margin:1px;" ng-repeat="victim in team.gameSum.victims" ng-style="{backgroundColor: evacZoneColor(victim)}")
                     div(style="display: flex; flex-direction: column;")
-                      img(ng-src='/images/{{victim.type}}.png', style="height:3vh")
+                      img(ng-src='/images/{{victimImgPath(victim)}}', style="height:3vh")
                       span(style="font-size:1vh; color: #000; text-align:center;") ×{{victim.count}}
                 li.list-group-item(style="border:3px solid #636e72;padding:1vh;border-top:0px;color:#222f3e")
                   i.fas.fa-step-forward.fa-fw &nbsp;{{team.gameSum.lops}}

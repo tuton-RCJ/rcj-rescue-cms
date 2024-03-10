@@ -71,19 +71,6 @@ publicRouter.get('/viewcurrent', function (req, res) {
   res.render('maze_view_current');
 });
 
-publicRouter.get('/view/field/:competitionid/:fieldid', function (req, res) {
-  const id = req.params.fieldid;
-  const cid = req.params.competitionid;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-  res.render('maze_view_field', {
-    id,
-    cid,
-  });
-});
-
 privateRouter.get('/judge/:runid', async function (req, res, next) {
   const id = req.params.runid;
 

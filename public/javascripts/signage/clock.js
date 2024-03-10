@@ -10,11 +10,11 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
     var mr=[];
    
     function tick() {
-            date = new Date();
-            $scope.time = Number(date.getTime()) + Number($scope.timeDep);
+        date = new Date();
+        $scope.time = Number(date.getTime()) + Number($scope.timeDep);
 
-            $timeout(tick, 200);
-        }
+        $timeout(tick, 200);
+    }
 
 
     tick();
@@ -46,22 +46,8 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
         });
     }
     
-    $http.get("/api/competitions/" + competitionId +
-        "/LineNL/fields").then(function (response) {
+    $http.get("/api/competitions/" + competitionId + "/fields").then(function (response) {
         $scope.fields = response.data
-        $http.get("/api/competitions/" + competitionId +
-            "/LineWL/fields").then(function (response) {
-            $scope.fields = $scope.fields.concat(response.data)
-            $http.get("/api/competitions/" + competitionId +
-                "/Maze/fields").then(function (response) {
-                $scope.fields = $scope.fields.concat(response.data)
-                $http.get("/api/competitions/" + competitionId +
-                "/MazeNL/fields").then(function (response) {
-                $scope.fields = $scope.fields.concat(response.data)
-                
-            })
-            })
-        })
     })
     
     
@@ -144,10 +130,6 @@ app.controller("ClockController", ['$scope', '$http', '$translate', '$timeout', 
     
     update_line_list();
     update_maze_list();
-
-
-    
-
 }]);
 
 
