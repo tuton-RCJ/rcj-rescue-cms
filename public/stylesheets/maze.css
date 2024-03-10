@@ -49,6 +49,21 @@ table tr:nth-child(even) {
 .tile {
     background-color: #b4ffd5;
     padding: 0px!important;
+    height: 120px;
+    width: 120px;
+}
+
+.tile-font {
+    font-size: 110px;
+}
+
+.cell {
+    padding: 10px;
+}
+
+.tile-point {
+    font-size: 60px;
+    line-height: 120px;
 }
 
 .tile.linear {
@@ -77,13 +92,13 @@ table tr:nth-child(even) {
 
 .tile-image-container {
     position: relative;
-    height: 40px;
-    width: 40px;
+    height: 120px;
+    width: 120px;
 }
 
 .tile-image {
-    width: 40px;
-    height: 40px;
+    width: 120px;
+    height: 120px;
     z-index: 1;
     position: absolute;
     top: 0;

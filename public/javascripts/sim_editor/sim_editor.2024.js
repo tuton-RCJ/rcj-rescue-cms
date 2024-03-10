@@ -39,8 +39,89 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     $scope.saveasname ="";
     $scope.finished = true;
     $scope.selectRoom = -1;
-    $scope.roomTiles = [[], []];
+    $scope.roomTiles = [[], [], []];
     $scope.roomColors = ["red", "green", "blue"]
+    $scope.area4Room = 0
+    $scope.room4VicTypes = [];
+    $scope.area4 = [
+        {value: "None", type: 0},
+        {value: "Custom Room", type: 1},
+        {
+            value: "Option 1 (7x5)", 
+            type: 2,
+            width: 7,
+            height: 5,
+            room1Tile: [0, -1],
+            room3Tile: [6, -1],
+            humans: [
+                {
+                    x: 0.01,
+                    z: 0.238,
+                    rot: 1.5708,
+                    type: "harmed",
+                    score: 15,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.548,
+                    z: 0.193396,
+                    rot: 1.05,
+                    type: "P",
+                    score: 30,
+                }
+            ],
+        },
+        {
+            value: "Option 2 (6x6)", 
+            type: 3,
+            width: 6,
+            height: 6,
+            room1Tile: [-1, 0],
+            room3Tile: [2, 6],
+            humans: [
+                {
+                    x: 0.33,
+                    z: 0.3,
+                    rot: 0,
+                    type: "unharmed",
+                    score: 15,
+                },
+                {
+                    x: 0.4991,
+                    z: 0.27366,
+                    rot: 2.0944,
+                    type: "harmed",
+                    score: 15,
+                }
+            ],
+            hazards: [
+                {
+                    x: 0.14,
+                    z: 0.299,
+                    rot: 0,
+                    type: "C",
+                    score: 30,
+                },
+                {
+                    x: 0.564142,
+                    z: 0.474142,
+                    rot: 0.785398,
+                    type: "P",
+                    score: 30,
+                }
+            ],
+        },
+    ]
+
+    // Custom room 4 setup
+    let useCustomRoom4 = document.getElementById("showRoom4Canvas");
+    $scope.room4Img = new Image;
+    /*let imgElement = document.getElementById("inputImg");
+    let inputElement = document.getElementById("selectImg");
+    inputElement.addEventListener("change", (e) => {
+        imgElement.src = URL.createObjectURL(e.target.files[0]);
+    }, false);*/
 
     $scope.range = function (n) {
         arr = [];
@@ -93,10 +174,11 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
         
-        // Set to virtual wall around the black tile
+        // Set to virtual wall around the black tile and start tile
+        let startTilePosition = $scope.startTile.x + "," + $scope.startTile.y + "," + $scope.startTile.z;
         for (var index in $scope.cells) {
             if($scope.cells[index].tile){
-                if($scope.cells[index].tile.black){
+                if($scope.cells[index].tile.black || index == startTilePosition){
                     var x = Number(index.split(',')[0]);
                     var y = Number(index.split(',')[1]);
                     var z = Number(index.split(',')[2]);
@@ -829,6 +911,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }else if(roomNumber === 3){
                 css['border-color'] = '#ed9aef';
                 css['border-width'] = '3px';
+            }else if(roomNumber === 4){
+                css['border-color'] = '#7500FF';
+                css['border-width'] = '3px';
             }
             if(!cell.reachable) css['background-color'] = '#636e72';
             return css;
@@ -838,7 +923,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     };
 
     function checkRoomNumber(x,y,z){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === `${x},${y},${z}`)){
                 return i + 2;
             }
@@ -847,7 +932,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
     }
 
     function checkRoomNumberKey(key){
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < $scope.roomTiles.length; i++) {
             if($scope.roomTiles[i].find(cord => cord === key)){
                 return i + 2;
             }
@@ -857,7 +942,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
 
 
     $scope.export = function(){
+        /*let canvas = document.getElementById('room4canvas');
+        let ctx = canvas.getContext('2d');
+        let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let src = cv.matFromImageData(imgData);
+        cv.imshow('outputCanvas', src);*/
+
         $scope.recalculateLinear();
+        if ($scope.area4Room.value == "Custom Room") {
+            createArea4Solid();
+            createArea4Victims(0, 0);
+        }
         var map = {
             name: $scope.name,
             length: $scope.length,
@@ -867,7 +962,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             startTile: $scope.startTile,
             cells: $scope.cells,
             roomTiles: $scope.roomTiles,
-            time: $scope.time
+            time: $scope.time,
+            area4Room: $scope.area4Room,
+            room4CanvasSave: $scope.room4CanvasSave,
+            room4VicTypes: $scope.room4VicTypes,
         };
          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(map))
          var downloadLink = document.createElement('a')
@@ -884,6 +982,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 type: 'error',
                 title: 'Oops...',
                 text: trans['startTileError'],
+            });
+            return;
+        }
+        if($scope.area4Room.value == "Custom Room" && !room4CorrectSize()) {
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: 'For input image for custom room 4: width:height ratio of image does not match width:height ratio of room 4 in maze'
             });
             return;
         }
@@ -1260,6 +1366,10 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
                 if (thisCell.tile && thisCell.tile.color) {
                     floorColor = '';
+                    if (thisCell.tile.color == '#08D508') // area 1 <-> 4
+                        $scope.connect14 = [x, y];
+                    else if (thisCell.tile.color == '#e71a1a') // area 3 <-> 4
+                        $scope.connect34 = [x, y]
                     for (i = 1; i < 7; i += 2)
                         floorColor += String(parseInt('0x' + thisCell.tile.color.substring(i, i + 2)) / 255.0) + ' ';
                 }
@@ -1273,6 +1383,22 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     walls[(y-1)/2][(x-1)/2] = [u2f(thisCell.reachable), arWall, u2f(thisCell.tile.checkpoint), u2f(thisCell.tile.black), x == $scope.startTile.x && y == $scope.startTile.y, u2f(thisCell.tile.swamp), humanType, humanPlace, u2f(thisCell.isLinear), u2f(thisCell.tile.obstacle), halfWallOutVar, halfWallInVar, curveWallVar, thisCell.tile.halfWallVic, floorColor, halfWallOutInfo, roomNum];
                 }
             }
+        }
+
+        function vectorRotate(vector, dir) {
+            if (dir == 0) // N
+                return [vector[0], vector[1]]
+            else if (dir == 1) // E
+                return [-1 * vector[1], vector[0]]
+            else if (dir == 2) // S
+                return [-1 * vector[0], -1 * vector[1]]
+            else if (dir == 3) // W
+                return [vector[1], -1 * vector[0]]
+
+        }
+
+        function inBounds(z, x) {
+            return (z >= 0) && (z < $scope.length) && (x >= 0) && (x < $scope.width);
         }
 
 
@@ -1292,7 +1418,19 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         let allObstacles = "";
 
         //
-        const fileHeader = ({y, z}) => `#VRML_SIM R2021a utf8
+        const fileHeader = ({y, z}) => `#VRML_SIM R2022b utf8
+        EXTERNPROTO "../protos/TexturedBackgroundLight.proto"
+        EXTERNPROTO "../protos/TexturedBackground.proto"
+        EXTERNPROTO "../protos/curvedWall.proto"
+        EXTERNPROTO "../protos/halfTile.proto"
+        EXTERNPROTO "../protos/HazardMap.proto"
+        EXTERNPROTO "../protos/obstacle.proto"
+        EXTERNPROTO "../protos/Victim.proto"
+        EXTERNPROTO "../protos/worldTile.proto"
+        EXTERNPROTO "../protos/Area4_1.proto"
+        EXTERNPROTO "../protos/Area4_2.proto"
+        IMPORTABLE EXTERNPROTO "../protos/custom_robot.proto"
+
         WorldInfo {
           basicTimeStep 16
           coordinateSystem "NUE"
@@ -1309,7 +1447,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           ]
         }
         DEF Viewpoint Viewpoint {
-          orientation -1 0 0 0.85
+          orientation -0.683263 0.683263 0.257493 2.63756
           position -0.08 ${y} ${z}
         }
         TexturedBackground {
@@ -1391,6 +1529,21 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
           }
         `;
 
+        const area4Part = ({roomNum, x, y, rot, width, height, xScale, yScale, zScale, area4Width, area4Height}) => `
+        Area4_${roomNum-1} {
+            X ${x}
+            Y ${y}
+            DIR ${rot}
+            width ${width}
+            height ${height}
+            xScale ${xScale}
+            zScale ${zScale}
+            yScale ${yScale}
+            area4Width ${area4Width}
+            area4Height ${area4Height}
+        }
+        `;
+
         const visualHumanPart = ({x, z, rot, id, type, score}) => `
         Victim {
             translation ${x} 0 ${z}
@@ -1457,7 +1610,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             controller "MainSupervisor"
             customData "${time}"
             window "MainSupervisorWindow"
-            showWindow TRUE
           }
         `;
 
@@ -1476,7 +1628,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             [0.075, -0.136], [0.136, -0.075], [0.075, -0.014], [0.014, -0.074], 
                             [-0.075, 0.014], [-0.014, 0.075], [-0.075, 0.136], [-0.136, 0.075],
                             [0.075, 0.014], [0.136, 0.075], [0.075, 0.136], [0.014, 0.075]];
-        //***let curveWallVicPos = [[-0.042, -0.042], [0.042, -0.042], [0.042, 0.042], [-0.042, 0.042]];
         let curveWallVicPos = [[-0.022, -0.039], [-0.022, -0.022], [-0.039, -0.023], [-0.038, -0.038],
                             [0.038, -0.039], [0.038, -0.022], [0.021, -0.023], [0.022, -0.038],
                             [-0.022, 0.021], [-0.022, 0.038], [-0.039, 0.037], [-0.038, 0.022],
@@ -1685,12 +1836,17 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     let humanRot = humanRotation[walls[z][x][7]]
                     //Randomly move human left and right on wall
                     let randomOffset = [0, 0]
-                    if(walls[z][x][7] == 0 || walls[z][x][7] == 2){
-                        //X offset for top and bottom
-                        randomOffset = [orgRound(getRandomArbitrary(-0.1 * tileScale[0], 0.1 * tileScale[0]), 0.001), 0]
-                    }else{
-                        //Z offset for left and right
-                        randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
+                    if ((inBounds(z-1, x) && walls[z-1][x][6] == 0) &&  // ensure no adjacent tile victims (random offset can place too close)
+                        (inBounds(z+1, x) && walls[z+1][x][6] == 0) && 
+                        (inBounds(z, x-1) && walls[z][x-1][6] == 0) && 
+                        (inBounds(z, x+1) && walls[z][x+1][6] == 0)) {
+                        if(walls[z][x][7] == 0 || walls[z][x][7] == 2){
+                            //X offset for top and bottom
+                            randomOffset = [orgRound(getRandomArbitrary(-0.1 * tileScale[0], 0.1 * tileScale[0]), 0.001), 0]
+                        }else{
+                            //Z offset for left and right
+                            randomOffset = [0, orgRound(getRandomArbitrary(-0.1 * tileScale[2], 0.1 * tileScale[2]), 0.001)]
+                        }
                     }
 
                     if (walls[z][x][6] >= 5 && walls[z][x][6] <= 8){ //hazards
@@ -1718,7 +1874,6 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             let j = 0
                             if(walls[z][x][8]) score = 10
                             //Curved Wall Humans
-                            // ****===============================================linear vs floating curved walls
                             let curveWallArr = JSON.parse(walls[z][x][12]);
                             if (curveWallArr[parseInt(i / 4)]) {
                                 let curveDir = curveWallArr[parseInt(i / 4)] - 1;
@@ -1808,6 +1963,84 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
             }
         }
 
+        // area 4 positioning
+        if ($scope.area4Room.value == "Custom Room") {
+            allTiles = allTiles + createArea4Solid();
+            let scoringElements = createArea4Victims(humanId, hazardId);
+            allHumans += scoringElements[0];
+            allHazards += scoringElements[1];
+        }
+        else {
+            N = 0
+            E = 1
+            S = 2
+            W = 3
+            room4 = $scope.area4[$scope.area4Room.type]
+            if ($scope.area4Room.type != 0 && $scope.connect14 && $scope.connect34) {
+                connect14 = [($scope.connect14[0] - 1) / 2, ($scope.connect14[1] - 1) / 2]
+                connect34 = [($scope.connect34[0] - 1) / 2, ($scope.connect34[1] - 1) / 2]
+                area4X = 0
+                area4Y = 0
+                area4Rot = 0
+
+                area4X = connect14[0]
+                area4Y = connect14[1]
+                if (connect34[0] - connect14[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                    connect34[1] - connect14[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                    area4Rot = N
+                else if (connect14[0] - connect34[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                    connect34[1] - connect14[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                    area4Rot = E
+                else if (connect14[0] - connect34[0] == room4.room3Tile[0] - room4.room1Tile[0] &&
+                    connect14[1] - connect34[1] == room4.room3Tile[1] - room4.room1Tile[1])
+                    area4Rot = S
+                else if (connect34[0] - connect14[0] == room4.room3Tile[1] - room4.room1Tile[1] &&
+                    connect14[1] - connect34[1] == room4.room3Tile[0] - room4.room1Tile[0])
+                    area4Rot = W
+                startTrans = vectorRotate(room4.room1Tile, area4Rot)
+                area4X -= startTrans[0]
+                area4Y -= startTrans[1]
+                allTiles = allTiles + area4Part({roomNum: $scope.area4Room.type, x: area4X, y: area4Y, rot: area4Rot, width: width, height: height, xScale: tileScale[0], yScale: tileScale[1], zScale: tileScale[2], area4Width: room4.width, area4Height: room4.height})
+
+                area4Width = room4.width
+                area4Height = room4.height
+                if (area4Rot == E || area4Rot == W) {
+                    area4Width = room4.height
+                    area4Height = room4.width
+                }
+                xOffset = -(width * 0.3 * tileScale[0] / 2.0) + area4X * 0.3 * tileScale[0]
+                zOffset = -(height * 0.3 * tileScale[1] / 2.0) + area4Y * 0.3 * tileScale[1]
+                area4Humans = room4.humans
+                for (i = 0; i < area4Humans.length; i++) {
+                    vicPosTrans = vectorRotate([area4Humans[i].x, area4Humans[i].z], area4Rot)
+                    thisHuman = {
+                        x: vicPosTrans[0] + xOffset,
+                        z: vicPosTrans[1] + zOffset,
+                        rot: area4Humans[i].rot + area4Rot * -1.57,
+                        id: humanId,
+                        type: area4Humans[i].type,
+                        score: area4Humans[i].score,
+                    }
+                    allHumans += visualHumanPart(thisHuman)
+                    humanId += 1
+                }
+                area4Hazards = room4.hazards
+                for (i = 0; i < area4Hazards.length; i++) {
+                    hazPosTrans = vectorRotate([area4Hazards[i].x, area4Hazards[i].z], area4Rot)
+                    thisHazard = {
+                        x: hazPosTrans[0] + xOffset,
+                        z: hazPosTrans[1] + zOffset,
+                        rot: area4Hazards[i].rot + area4Rot * -1.57,
+                        id: hazardId,
+                        type: area4Hazards[i].type,
+                        score: area4Hazards[i].score,
+                    }
+                    allHazards += hazardPart(thisHazard)
+                    hazardId += 1
+                }
+            }
+        }
+
         //Add the data pieces to the file data
         fileData = fileData + groupPart({data: allTiles, name: "WALLTILES"})
         fileData = fileData + groupPart({data: allCheckpointBounds, name: "CHECKPOINTBOUNDS"})
@@ -1850,8 +2083,15 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     $scope.name = data.name;
                     $scope.time = data.time;
                     $scope.finished = data.finished;
+
                     $scope.roomTiles = data.roomTiles;
-                    console.log($scope.roomTiles)
+                    $scope.area4Room = data.area4Room;
+                    $scope.room4CanvasSave = data.room4CanvasSave;
+                    $scope.room4Img.src = $scope.room4CanvasSave;
+                    if (data.room4VicTypes != undefined)
+                        $scope.room4VicTypes = data.room4VicTypes;
+
+                    $scope.updateRoom4Pick();
 
                     if(data.startTile) $scope.cells[data.startTile.x + ',' + data.startTile.y + ',' + data.startTile.z].tile.checkpoint = false;
 
@@ -1881,8 +2121,374 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
     }
 
-    $scope.cellClick = function (x, y, z, isWall, isTile) {
+    $scope.selectRoom4 = function() {
+        if ($scope.selectRoom != 2) {
+            $scope.selectRoom = 2;
+        }
+        else {
+            $scope.selectRoom = -1;
+        }
+    }
 
+    $scope.updateRoom4Pick = function() {
+        if ($scope.area4Room.value == "Custom Room") {
+            //inputElement.style.display = "inline";
+            useCustomRoom4.style.display = "inline";
+        }
+        else {
+            //inputElement.style.display = "none";
+            useCustomRoom4.style.display = "none";
+        }
+    }
+
+    function room4CorrectSize() {
+        return true;
+        //let img = cv.imread(imgElement);
+
+        let context = room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, canvasWidth, canvasHeight);
+        let img = cv.matFromImageData(imgData); 
+
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        let width = 0;
+        let height = 0;
+        
+        for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+            let tileStr = $scope.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+
+        width = (maxX - minX) / 2 + 1;
+        height = (maxY - minY) / 2 + 1;
+        if (width / height != img.size().width / img.size().height)
+            return false;
+        return true;
+    }
+
+    function has(contPoints, x, y) {
+        for (let i = 0; i < contPoints.length; i++) {
+        let compX = contPoints[i][0];
+        let compY = contPoints[i][1];
+
+        // Complete equality
+        /* if (compX == x && compY == y)
+            return true; */
+
+        // proximity
+        let dist = 0.002;
+        if (Math.pow(compX - x, 2) + Math.pow(compY - y, 2) < Math.pow(dist, 2))
+            return true;
+
+        // single-axis proximity
+        /* let dist = 0.0005;
+        if (Math.abs(compX - x) < dist || Math.abs(compY - y) < dist)
+            return true; */
+        }
+        return false;
+    }
+
+    let room4xOffset = 0;
+    let room4zOffset = 0;
+    let fullContPoints = [];
+    let imgWidth = 0;
+    let imgHeight = 0;
+    let room4Width = 0;
+    let room4Height = 0;
+    let roundDigits = 5;
+
+    function createArea4Solid() {
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        
+        for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+            let tileStr = $scope.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            x = parseInt(x);
+            y = parseInt(y);
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+        let x = (minX - 1) / 2;
+        let y = (minY - 1) / 2;
+        room4Width = (maxX - minX) / 2 + 1;
+        room4Height = (maxY - minY) / 2 + 1;
+
+        //let src = cv.imread(imgElement);
+        /*let context = $scope.room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+        let src = cv.matFromImageData(imgData);*/
+        let src = cv.imread($scope.room4Img);
+
+        let im = new cv.Mat();
+
+        let blackLow = new cv.Mat(src.rows, src.cols, src.type(), [0, 0, 0, 0]);
+        let blackHigh = new cv.Mat(src.rows, src.cols, src.type(), [50, 50, 50, 255]);
+        cv.inRange(src, blackLow, blackHigh, im);
+
+        let contours = new cv.MatVector();
+        let hierarchy = new cv.Mat();
+        cv.findContours(
+            im,
+            contours,
+            hierarchy,
+            cv.RETR_EXTERNAL,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+
+        let mazeWidthScale = 0.4;
+        let mazeHeightScale = 0.4;
+        let wallHeight = 0.06;
+        let outputStr = "";
+        imgWidth = src.size().width;
+        imgHeight = src.size().height;
+        room4Width *= 0.3 * mazeWidthScale;
+        room4Height *= 0.3 * mazeHeightScale;
+
+        let xStart = -(($scope.width / 2.0) + 0.5) * (0.3 * mazeWidthScale);
+        let zStart = -(($scope.length / 2.0) + 0.5) * (0.3 * mazeHeightScale);
+        let xRelPos = x * 0.3 * mazeWidthScale;
+        let zRelPos = y * 0.3 * mazeHeightScale;
+        let xCoord = xRelPos + xStart;
+        let zCoord = zRelPos + zStart;
+        zCoord -= 0.005;
+
+        room4xOffset = xCoord;
+        room4zOffset = zCoord;
+        outputStr += `Solid {\n
+                translation ` + xCoord.toString() + ' -0.03 ' + zCoord.toString() + `\n
+                rotation 0 1 0 0\n
+                name "Area4"\n
+                children [\n
+            `;
+
+        fullContPoints = [];
+        for (let i = 0; i < contours.size(); i++) {
+            outputStr +=
+                "Solid {\n children [\n DEF CURVED" + String(i) + " Shape { \nappearance Appearance { \nmaterial Material { \ndiffuseColor 0.2 0.47 0.52 \n} \n}\ngeometry IndexedFaceSet { \ncoord Coordinate { \npoint [\n";
+
+            let contour = contours.get(i);
+            let points = contour.data32S;
+            let contPoints = [];
+            fullContPoints.push([]);
+
+            for (let j = 0; j < points.length; j += 2) {
+                let row = points[j + 1];
+                let col = points[j];
+                let x = ((col / imgWidth) * room4Width).toFixed(roundDigits);
+                let y = ((row / imgHeight) * room4Height).toFixed(roundDigits);
+
+                if (!has(contPoints, x, y)) {
+                    outputStr += x.toString() + " " + "0" + " " + y.toString() + ",";
+                    outputStr +=
+                        x.toString() + " " + wallHeight + " " + y.toString() + ",";
+                    contPoints.push([x, y]);
+                    fullContPoints[i].push([row, col]);
+                }
+            }
+
+            outputStr += "\n]\n}\ncoordIndex [\n";
+            for (let j = 0; j < contPoints.length - 1; j++) {
+                outputStr +=
+                (j * 2).toString() + "," +
+                ((j + 1) * 2).toString() + "," +
+                ((j + 1) * 2 + 1).toString() + "," +
+                (j * 2 + 1).toString() + "," +
+                "-1,";
+            }
+            let tmp = contPoints.length - 1;
+            outputStr +=
+                (tmp * 2).toString() + "," +
+                "0" + "," +
+                "1" + "," +
+                (tmp * 2 + 1).toString() + "," +
+                "-1,";
+            for (let j = 0; j < contPoints.length; j++)
+                outputStr += (j * 2 + 1).toString() + ",";
+            outputStr += "-1,\n]\n}\n}\n]\n" +
+                            "boundingObject USE CURVED" + String(i) + 
+                            "\nname \"curved" + String(i) + "\"\n}";
+        }
+        outputStr += '\n]\n}\n';
+
+        return outputStr;
+    }
+
+    function dist(point1, point2) {
+        return Math.sqrt(Math.pow(point1[0] - point2[0], 2) + Math.pow(point1[1] - point2[1], 2));
+    }
+
+
+    function createArea4Victims(startHumanId, startHazardId) {
+        let outputStrVic = "";
+        let outputStrHaz = "";
+        const scoringElem = ["harmed", "stable", "unharmed", "P", "O", "F", "C"];
+        
+        // let src = cv.imread(imgElement);
+        /*let context = $scope.room4CanvasSave.getContext('2d');
+        let imgData = context.getImageData(0, 0, $scope.canvasWidth, $scope.canvasHeight);
+        let src = cv.matFromImageData(imgData);*/
+        let src = cv.imread($scope.room4Img);
+
+        let vicIm = new cv.Mat()
+        let low = new cv.Mat(src.rows, src.cols, src.type(), [100, 0, 0, 0]);
+        let high = new cv.Mat(src.rows, src.cols, src.type(), [255, 50, 50, 255]);
+        cv.inRange(src, low, high, vicIm);
+
+        let vicContours = new cv.MatVector();
+        let vicHierarchy = new cv.Mat();
+        cv.findContours(
+            vicIm,
+            vicContours,
+            vicHierarchy,
+            cv.RETR_EXTERNAL,
+            cv.CHAIN_APPROX_SIMPLE
+        );
+
+        $scope.area4VicScore = 0;
+        if ($scope.room4VicTypes.length != vicContours.size())
+            $scope.room4VicTypes = []
+        for (let x = 0; x < vicContours.size(); x++) {
+            let M = cv.moments(vicContours.get(x), false);
+            let cx = M.m10/M.m00;
+            let cy = M.m01/M.m00;
+            let point = [cy, cx];
+
+            let closePoint = [0, 0];
+            let closeDist = -1;
+            let closeIndex = [0, 0];
+
+            for (let i = 0; i < fullContPoints.length; i++) {
+                for (let j = 0; j < fullContPoints[i].length; j++) {
+                    let curDist = dist(fullContPoints[i][j], point);
+                    if (curDist < closeDist || closeDist == -1) {
+                        closePoint = fullContPoints[i][j];
+                        closeDist = curDist;
+                        closeIndex = [i, j];
+                    }
+                }
+            }
+
+            let vicWidth = 0.016;
+            let angle = 0;
+            let nextPoint = 0;
+            let prevPoint = 0;
+
+            let npInd = [closeIndex[0], closeIndex[1]];
+            let ppInd = [closeIndex[0], closeIndex[1]];
+            vicWidth = vicWidth * imgWidth / room4Width;
+            while (dist(fullContPoints[npInd[0]][npInd[1]], fullContPoints[ppInd[0]][ppInd[1]]) < vicWidth) {
+                if (ppInd[1] == 0) {
+                    ppInd[1] = fullContPoints[ppInd[0]].length - 1;
+                    npInd[1] += 1;
+                }
+                else if (npInd[1] == fullContPoints[npInd[0]].length - 1) {
+                    ppInd[1] -= 1;
+                    npInd[1] = 0;
+                }
+                else {
+                    ppInd[1] -= 1;
+                    npInd[1] += 1;
+                }
+            }
+            
+            let midPoint = [(fullContPoints[ppInd[0]][ppInd[1]][0] + fullContPoints[npInd[0]][npInd[1]][0]) / 2,
+                            (fullContPoints[ppInd[0]][ppInd[1]][1] + fullContPoints[npInd[0]][npInd[1]][1]) / 2]
+            if (dist(midPoint, point) > dist(closePoint, point)) { // convex wall
+                if (closeIndex[1] == 0) {
+                    nextPoint = fullContPoints[closeIndex[0]][closeIndex[1]+1];
+                    prevPoint = fullContPoints[closeIndex[0]][fullContPoints[closeIndex[0]].length-1];
+                }
+                else if (closeIndex[1] == fullContPoints[closeIndex[0]].length-1) {
+                    nextPoint = fullContPoints[closeIndex[0]][0];
+                    prevPoint = fullContPoints[closeIndex[0]][closeIndex[1]-1];
+                }
+                else {
+                    nextPoint = fullContPoints[closeIndex[0]][closeIndex[1]+1];
+                    prevPoint = fullContPoints[closeIndex[0]][closeIndex[1]-1];
+                }
+            }
+            else { // concave wall
+                nextPoint = fullContPoints[npInd[0]][npInd[1]] // (y, x), i.e. (row, col)
+                prevPoint = fullContPoints[ppInd[0]][ppInd[1]]
+                closePoint = midPoint;
+            }
+
+            angle = Math.atan(-1*(prevPoint[0] - nextPoint[0]) / (prevPoint[1] - nextPoint[1])); // times -1 because axis different
+            if (prevPoint[1] - nextPoint[1] < 0)
+                angle = 3.14 + angle
+
+            let vicX = parseFloat(((closePoint[1] / imgWidth) * room4Width).toFixed(roundDigits)) + room4xOffset;
+            let vicY = parseFloat(((closePoint[0] / imgHeight) * room4Height).toFixed(roundDigits)) + room4zOffset;
+
+            let rand = 0;
+            if ($scope.room4VicTypes.length != vicContours.size()) {
+                rand = parseInt(Math.random() * scoringElem.length);
+                $scope.room4VicTypes.push(rand);
+            }
+            else
+                rand = $scope.room4VicTypes[x];
+            if (rand <= 2) { // victim
+                outputStrVic += `
+                    Victim {
+                        translation `;
+                    outputStrVic += vicX.toString() + ' 0 ' + vicY.toString();
+                    outputStrVic += `
+                        rotation 0 1 0 `;
+                    outputStrVic += angle.toString() + `
+                        name "Victim` + startHumanId.toString() + `"
+                        type "` + scoringElem[rand] + `"
+                        scoreWorth 15
+                    }
+                    `;
+                startHumanId += 1;
+            }
+            else { // hazard
+                outputStrHaz += `
+                    HazardMap {
+                        translation `;
+                    outputStrHaz += vicX.toString() + ' 0 ' + vicY.toString();
+                    outputStrHaz += `
+                        rotation 0 1 0 `;
+                    outputStrHaz += angle.toString() + `
+                        name "Hazard` + startHazardId.toString() + `"
+                        type "` + scoringElem[rand] + `"
+                        scoreWorth 30
+                    }
+                    `;
+                startHazardId += 1;
+            }
+
+            /*cv.circle(src, new cv.Point(cx, cy), 3, new cv.Scalar(0, 255, 0, 255), 5);
+            cv.circle(src, new cv.Point(nextPoint[1], nextPoint[0]), 5, new cv.Scalar(0, 255, 255, 255), 5);
+            cv.circle(src, new cv.Point(prevPoint[1], prevPoint[0]), 5, new cv.Scalar(0, 255, 255, 255), 5);
+            //cv.circle(src, new cv.Point(closePoint[1], closePoint[0]), 5, new cv.Scalar(0, 0, 255, 255), 5);
+            showImg(src);*/
+        }
+        return [outputStrVic, outputStrHaz];
+    }
+
+    $scope.cellClick = function (x, y, z, isWall, isTile) {
         var cell = $scope.cells[x + ',' + y + ',' + z];
         var halfWallTile;
         var intx = parseInt(x), inty = parseInt(y);
@@ -1947,11 +2553,9 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                     }
                 };
             }
-            console.log(cell)
             if ($scope.selectRoom != -1 && cell) {
                 let undo = false
-                console.log($scope.roomTiles)
-                for (a = 0; a < 2; a++) {
+                for (a = 0; a < $scope.roomTiles.length; a++) {
                     if ($scope.roomTiles[a]) {
                         for (b = 0; b < $scope.roomTiles[a].length; b++) {
                             if ($scope.roomTiles[a][b] == x+','+y+','+z) {
@@ -1968,11 +2572,18 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 if (!undo) {
                     $scope.roomTiles[$scope.selectRoom].push(x+','+y+','+z);
                     var i = (parseInt(y - 1) / 2 * $scope.width + (parseInt(x - 1) / 2));
-                    if ($scope.selectRoom == 0)
+                    if ($scope.selectRoom == 0) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#359ef4");
-                    else
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('a')
+                    }
+                    else if ($scope.selectRoom == 1) {
                         $(".tile").get(i).style.setProperty("--tileColor", "#ed9aef");
-                    $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        $scope.cells[x+','+y+','+z].tile.halfTile = 1;
+                        console.log('b')
+                    }
+                    else if ($scope.selectRoom == 2)
+                        $(".tile").get(i).style.setProperty("--tileColor", "#7500FF");
                 }
             }
             $scope.open(x, y, z);
@@ -1984,7 +2595,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         if ($scope.selectRoom == -1) {
             var modalInstance = $uibModal.open({
                 animation: true,
-                templateUrl: '/templates/sim_editor/sim_editor_modal.2021.html',
+                templateUrl: '/templates/sim_editor/sim_editor_modal.2024.html',
                 controller: 'ModalInstanceCtrl',
                 size: 'lg',
                 scope: $scope,
@@ -2003,13 +2614,14 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         }
     };
 
+
     $scope.openMaxScore = function(){
         let victimScore = 0;
         let checkpointScore = 0;
         let exitBonus = 0;
         const victims = ["H", "S", "U"];
         const hazards = ["P", "O", "F", "C"];
-        const areaMultiplier = [0, 1, 1.25, 1.5];
+        const areaMultiplier = [0, 1, 1.25, 1.5, 2];
         Object.keys($scope.cells).map(function(key){
             let cell = $scope.cells[key];
             if(cell.isTile){
@@ -2020,7 +2632,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(hazards.includes(cell.tile.victims[dir])){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     });
                 }
@@ -2033,7 +2645,7 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                             victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
                         }else if(v >= 5 && v <= 8){
                             victimScore += (cell.isLinear ? 10 : 30) * areaMultiplier[checkRoomNumberKey(key)];
-                            victimScore += 10 * areaMultiplier[checkRoomNumberKey(key)];
+                            victimScore += 20 * areaMultiplier[checkRoomNumberKey(key)];
                         }
                     }
                 }
@@ -2043,9 +2655,25 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
                 }
             }
         });
+        if ($scope.area4Room.value == "Custom Room") {
+            createArea4Solid();
+            createArea4Victims(0, 0);
+            for (let i = 0; i < $scope.room4VicTypes.length; i++) {
+                if ($scope.room4VicTypes[i] <= 3)
+                    victimScore += (15 + 10) * areaMultiplier[4];
+                else
+                    victimScore += (30 + 20) * areaMultiplier[4];
+            }
+        }
+        else if ($scope.area4Room.value != "None") {
+            for (let i = 0; i < $scope.area4Room.humans.length; i++)
+                victimScore += $scope.area4Room.humans[i].score * areaMultiplier[4];
+            for (let i = 0; i < $scope.area4Room.hazards.length; i++)
+                victimScore += $scope.area4Room.hazards[i].score * areaMultiplier[4];
+        }
+        
 
         if(victimScore > 0) exitBonus += (victimScore + checkpointScore) * 0.1
-
 
         let html = `
             <div class='text-center'>
@@ -2074,6 +2702,50 @@ app.controller('SimEditorController', ['$scope', '$uibModal', '$log', '$http','$
         })
 
     }
+
+    $scope.openCustomRoom4 = function() {
+        if ($scope.roomTiles[2].length > 0) {
+            let minX = -1;
+            let maxX = 0;
+            let minY = -1;
+            let maxY = 0;
+            
+            for (let i = 0; i < $scope.roomTiles[2].length; i++) {
+                let tileStr = $scope.roomTiles[2][i];
+                let x = tileStr.slice(0, tileStr.indexOf(","));
+                let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+                x = parseInt(x);
+                y = parseInt(y);
+                if (x < minX || minX == -1)
+                    minX = x;
+                if (x > maxX)
+                    maxX = x;
+                if (y < minY || minY == -1)
+                    minY = y;
+                if (y > maxY)
+                    maxY = y;
+            }
+            let x = (minX - 1) / 2;
+            let y = (minY - 1) / 2;
+            room4Width = (maxX - minX) / 2 + 1;
+            room4Height = (maxY - minY) / 2 + 1;
+            $scope.canvasWidth = 600;
+            $scope.canvasHeight = $scope.canvasWidth / room4Width * room4Height;
+
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: '/templates/sim_editor/custom_room_4_modal.html',
+                controller: 'CustomRoom4ModalCtrl',
+                size: 'lg',
+                scope: $scope,
+                resolve: {
+                    x: function() {
+                        return 3;
+                    }
+                }
+            });
+        }
+    };
 }]);
 
 
@@ -2145,4 +2817,269 @@ app.controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', 'x', 'y', 'z'
         $scope.$parent.recalculateLinear();
         $uibModalInstance.close();
     };
+
 }]);
+
+app.controller('CustomRoom4ModalCtrl',['$scope', '$uibModalInstance', function ($scope, $uibModalInstance){
+
+    let canvas;
+    $scope.importImg = null;
+
+    $scope.downloadCanvas = function downloadCanvas() {
+        if (!canvas)
+            canvas = document.getElementById('room4Canvas');
+
+        let imgData = canvas.toDataURL();
+        var link = document.createElement("a");
+        link.download = 'custom_room_4_pic.png';
+        link.href = imgData;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        delete link;
+    }
+
+    $scope.clearCanvas = function() {
+        if (!canvas)
+            canvas = document.getElementById('room4Canvas');
+        let context = canvas.getContext('2d');
+        
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        //$scope.$parent.room4CanvasSave = canvas.toDataURL("image/png");
+        $scope.$parent.room4CanvasSave = null;
+        $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
+        $scope.$parent.drawBlueBox();
+    }
+
+    $scope.click = function() {
+        let canvas = document.getElementById('room4Canvas');
+        let imgElem = document.getElementById('img');
+        let context = canvas.getContext('2d');
+        context.drawImage(imgElem, 0, 0);
+
+        var select = document.getElementById('select');
+
+        select.addEventListener('change', function (e) {
+            var fileData = e.target.files[0];
+            imgElem.src = URL.createObjectURL(fileData);
+            $scope.click();
+        });
+    }
+
+    $scope.closeRoom4 = function() {
+        $uibModalInstance.close();
+    }
+}]);
+
+app.directive("drawing", function(){
+    return {
+        restrict: "A",
+        link: function($scope, element){
+        var ctx = element[0].getContext('2d');
+        
+        // variable that decides if something should be drawn on mousemove
+        var drawing = false;
+        
+        // the last coordinates before the current move
+        var lastX;
+        var lastY;
+        
+        // modal initialization
+        let room4Canvas = element[0];
+        let context = ctx;
+        if ($scope.$parent.room4CanvasSave != null) {
+            canvasImg = new Image;
+            canvasImg.onload = function() {
+                context.drawImage(canvasImg, 0, 0);
+            };
+            canvasImg.src = $scope.$parent.room4CanvasSave;
+        }
+        room4Canvas.width = $scope.$parent.canvasWidth;
+        room4Canvas.height = $scope.$parent.canvasHeight;
+        context.fillStyle = "white";
+        context.fillRect(0, 0, room4Canvas.width, room4Canvas.height);
+
+        let black = '#000000';
+        let red = '#FF0000';
+        let white = '#FFFFFF';
+        let blue = '#0000FF';
+        let canvasColor = black;
+        let wallCheckbox = document.getElementById("drawWall");
+        let vicCheckbox = document.getElementById("drawVic");
+        let eraseCheckbox = document.getElementById("erase");
+        wallCheckbox.checked = 1;
+        vicCheckbox.checked = 0;
+        eraseCheckbox.checked = 0;
+        wallCheckbox.addEventListener('change', function (e) {
+            let checked = !e.target.checked;
+            if (!checked) {
+                vicCheckbox.checked = false;
+                eraseCheckbox.checked = false;
+                canvasColor = black;
+            }
+            else
+                e.target.checked = true;
+        });
+        vicCheckbox.addEventListener('change', function (e) {
+            let checked = !e.target.checked;
+            if (!checked) {
+                wallCheckbox.checked = false;
+                eraseCheckbox.checked = false;
+                canvasColor = red;
+            }
+            else
+                e.target.checked = true;
+        });
+        eraseCheckbox.addEventListener('change', function (e) {
+            let checked = !e.target.checked;
+            if (!checked) {
+                wallCheckbox.checked = false;
+                vicCheckbox.checked = false;
+                canvasColor = white;
+            }
+            else
+                e.target.checked = true;
+        });
+
+        let inputFile = document.getElementById("importCanvas");
+        let img = new Image;
+        img.onload = function() {
+            context.drawImage(img, 0, 0, room4Canvas.width, room4Canvas.height);
+            $scope.$parent.drawBlueBox();
+            $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
+            $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
+        }
+        inputFile.addEventListener('change', function (e) {
+            img.src = URL.createObjectURL(e.target.files[0]);
+        });
+
+        // cover tiles in canvas that are not actually room 4
+        let minX = -1;
+        let maxX = 0;
+        let minY = -1;
+        let maxY = 0;
+        for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+            let tileStr = $scope.$parent.roomTiles[2][i];
+            let x = tileStr.slice(0, tileStr.indexOf(","));
+            let y = tileStr.slice(tileStr.indexOf(",")+1, tileStr.lastIndexOf(","));
+            x = parseInt(x);
+            y = parseInt(y);
+            if (x < minX || minX == -1)
+                minX = x;
+            if (x > maxX)
+                maxX = x;
+            if (y < minY || minY == -1)
+                minY = y;
+            if (y > maxY)
+                maxY = y;
+        }
+        room4Width = (maxX - minX) / 2 + 1;
+        room4Height = (maxY - minY) / 2 + 1;
+
+        let blockWidth = room4Canvas.width / room4Width;
+        
+        $scope.$parent.drawBlueBox = function () {
+            for (let x = minX; x <= maxX; x = parseInt(x) + 2) {
+                for (let y = minY; y <= maxY; y = parseInt(y) + 2) {
+                    let found = false;
+                    for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+                        if ($scope.$parent.roomTiles[2][i] == x+','+y+',0') {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        let startX = (x - minX) / 2 * blockWidth;
+                        let startY = (y - minY) / 2 * blockWidth;
+                        context.fillStyle = blue;
+                        context.fillRect(startX, startY, blockWidth, blockWidth);
+                        context.fillStyle = white;
+                    }
+                }
+            }
+        }
+
+        $scope.$parent.drawBlueBox();
+
+        element.bind('mousedown', function(event){
+            if(event.offsetX!==undefined){
+            lastX = event.offsetX;
+            lastY = event.offsetY;
+            } else {
+            /*lastX = event.layerX - event.currentTarget.offsetLeft;
+            lastY = event.layerY - event.currentTarget.offsetTop;*/
+            }
+            
+            // begins new line
+            ctx.beginPath();
+            
+            drawing = true;
+        });
+        element.bind('mousemove', function(event){
+            if(drawing){
+            // get current mouse position
+            if(event.offsetX!==undefined){
+                currentX = event.offsetX;
+                currentY = event.offsetY;
+            } else {
+                /*currentX = event.layerX - event.currentTarget.offsetLeft;
+                currentY = event.layerY - event.currentTarget.offsetTop;*/
+            }
+            
+            draw(lastX, lastY, currentX, currentY);
+            
+            // set current coordinates to last one
+            lastX = currentX;
+            lastY = currentY;
+            }
+            
+        });
+        element.bind('mouseup', function(event){
+            // stop drawing
+            drawing = false;
+            $scope.$parent.room4CanvasSave = room4Canvas.toDataURL("image/png");
+            $scope.$parent.room4Img.src = $scope.$parent.room4CanvasSave;
+        });
+            
+        // canvas reset
+        function reset(){
+        element[0].width = element[0].width; 
+        }
+        
+        function draw(lX, lY, cX, cY){
+            // make sure drawing in a room4 tile
+            let gridX1 = (parseInt(cX / blockWidth) * 2) + parseInt(minX);
+            let gridY1 = (parseInt(cY / blockWidth) * 2) + parseInt(minY);
+            let gridX2 = (parseInt(lX / blockWidth) * 2) + parseInt(minX);
+            let gridY2 = (parseInt(lY / blockWidth) * 2) + parseInt(minY);
+            let found = false;
+            for (let i = 0; i < $scope.$parent.roomTiles[2].length; i++) {
+                if ($scope.$parent.roomTiles[2][i] == gridX1+','+gridY1+',0' ||
+                    $scope.$parent.roomTiles[2][i] == gridX2+','+gridY2+',0') {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                // line from
+                ctx.moveTo(lX,lY);
+                // to
+                ctx.lineTo(cX,cY);
+                // color
+                ctx.strokeStyle = canvasColor;
+                // width
+                if (canvasColor == white)
+                    ctx.lineWidth = 20;
+                else
+                    ctx.lineWidth = 2;
+                // draw it
+                ctx.stroke();
+
+                $scope.$parent.drawBlueBox();
+            }
+        }
+        }
+    };
+});
+

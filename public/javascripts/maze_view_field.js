@@ -622,30 +622,27 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 function tile_size() {
     $(function () {
         try {
-            var b = $('.tilearea');
-            //console.log('コンテンツ本体：' + b.height() + '×' + b.width());
-            //console.log('window：' + window.innerHeight);
-            var tilesize_w = b.width() / (width*1.3)
-            var tilesize_h = b.height() / (length*1.3);
-            if (tilesize_h > tilesize_w) var tilesize = tilesize_w;
-            else var tilesize = tilesize_h;
+            var mapTable = $('#mapTable');
+            let bottomBox = $('#bottomBox')
 
-            $('.tile-image-container').css('height', tilesize);
-            $('.tile-image-container').css('width', tilesize);
-            $('.tile-image').css('height', tilesize);
-            $('.tile-image').css('width', tilesize);
-            $('.tile').css('height', tilesize);
-            $('.tile').css('width', tilesize);
-            $('.tile-font').css('font-size', tilesize - 10);
-            $('.cell').css('padding', tilesize / 12);
-            $('.tile-point').css('font-size', tilesize/2 + "px");
-            $('.tile-point').css('line-height', tilesize + "px");
-            if (b.height() == 0) setTimeout("tile_size()", 500);
+            let areaTopLeftX = document.getElementById("mapTopLeft").getBoundingClientRect().left + window.pageXOffset;
+            let areaTopLeftY = document.getElementById("mapTopLeft").getBoundingClientRect().top + window.pageYOffset;
+
+            let scaleX = (window.innerWidth - areaTopLeftX - 10) / mapTable.width();
+            let scaleY = (window.innerHeight - areaTopLeftY - bottomBox.outerHeight(true) - 10) / mapTable.height();
+            let scale = Math.min(scaleX, scaleY);
+
+            if (scaleX > scaleY) {
+                $('#wrapTile').css('transform-origin', 'top center');
+            } else {
+                $('#wrapTile').css('transform-origin', 'top left');
+            }
+
+            $('#wrapTile').css('transform', `scale(${scale})`);
+            $('.tilearea').css('height', mapTable.height() * scale + 10);
         } catch (e) {
             setTimeout("tile_size()", 500);
         }
-
-
     });
 }
 
