@@ -9,7 +9,7 @@ const { ObjectId } = require('mongoose').Types;
 const auth = require('../helper/authLevels');
 const competitiondb = require('../models/competition');
 const { ACCESSLEVELS } = require('../models/user');
-const { LINE_LEAGUES, MAZE_LEAGUES } = competitiondb;
+const ruleDetector = require('../helper/ruleDetector');
 
 
 /* GET home page. */
@@ -27,7 +27,7 @@ adminRouter.get('/setting/editor/:id', function (req, res) {
   res.render('signage_editor', { user: req.user, id });
 });
 
-privateRouter.get('/display/:competitionid/run', function (req, res, next) {
+privateRouter.get('/games/:competitionid/', function (req, res, next) {
   const id = req.params.competitionid;
 
   if (!ObjectId.isValid(id)) {
@@ -35,7 +35,7 @@ privateRouter.get('/display/:competitionid/run', function (req, res, next) {
   }
 
   if (auth.authCompetition(req.user, id, ACCESSLEVELS.VIEW))
-    res.render('runs_monitor', { id, user: req.user });
+    res.render('signage/game_monitor', { id, user: req.user });
   else res.render('access_denied', { user: req.user });
 });
 
@@ -80,7 +80,7 @@ privateRouter.get(
 );
 
 privateRouter.get(
-  '/display/:competitionid/run/:sigId/:grpId',
+  '/games/:competitionid/:sigId/:grpId',
   function (req, res, next) {
     const id = req.params.competitionid;
     const { sigId, grpId } = req.params;
@@ -90,16 +90,16 @@ privateRouter.get(
     }
 
     if (auth.authCompetition(req.user, id, ACCESSLEVELS.VIEW))
-      res.render('runs_monitor', { id, user: req.user, sigId, grpId });
+      res.render('signage/game_monitor', { id, user: req.user, sigId, grpId });
     else res.render('access_denied', { user: req.user });
   }
 );
 
 privateRouter.get(
-  '/display/:competitionid/score/:league',
+  '/display/:competitionid/score/:leagueId',
   function (req, res, next) {
     const id = req.params.competitionid;
-    const { league } = req.params;
+    const { leagueId } = req.params;
     if (!ObjectId.isValid(id)) {
       return next();
     }
@@ -109,7 +109,7 @@ privateRouter.get(
         _id: id,
       })
       .lean()
-      .exec(function (err, data) {
+      .exec(async function (err, data) {
         if (err) {
           logger.error(err);
           res.status(400).send({
@@ -117,103 +117,33 @@ privateRouter.get(
             err: err.message,
           });
         } else {
-          let num = 20;
-          if (data) {
-            for (const i in data.ranking) {
-              if (data.ranking[i].league == league) {
-                num = data.ranking[i].num;
-                break;
-              }
-            }
-          }
-          if (LINE_LEAGUES.includes(league)) {
-            res.render('line_score_signage', {
-              id,
-              user: req.user,
-              league,
-              num,
-              get: req.query,
-            });
-          } else {
-            res.render('maze_score_signage', {
-              id,
-              user: req.user,
-              league,
-              num,
-              get: req.query,
-            });
-          }
-        }
-      });
-  }
-);
-
-privateRouter.get(
-  '/display/:competitionid/score/:league/international',
-  function (req, res, next) {
-    const id = req.params.competitionid;
-    const { league } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return next();
-    }
-
-    competitiondb.competition
-      .findOne({
-        _id: id,
-      })
-      .lean()
-      .exec(function (err, data) {
-        if (err) {
-          logger.error(err);
-          res.status(400).send({
-            msg: 'Could not get competition',
-            err: err.message,
-          });
-        } else {
-          let num = 20;
-          for (const i in data.ranking) {
-            if (data.ranking[i].league == league) {
-              num = data.ranking[i].num;
-              break;
-            }
-          }
-          res.render('line_score_signage_international', {
+          const ruleInfo = await ruleDetector.getLeagueTypeAndRule(id, leagueId);
+          res.render(`signage/ranking/${ruleInfo.type}_${ruleInfo.rule}`, {
             id,
             user: req.user,
-            league,
-            num,
-            get: req.query,
+            leagueId
           });
         }
       });
-  }
-);
-
-privateRouter.get(
-  '/display/:competitionid/timetable/:league/:round',
-  function (req, res, next) {
-    const id = req.params.competitionid;
-    const { league } = req.params;
-    const { round } = req.params;
-    if (!ObjectId.isValid(id)) {
-      return next();
-    }
-    if (!ObjectId.isValid(round)) {
-      return next();
-    }
-
-    res.render('signage_timetable', {
-      id,
-      user: req.user,
-      league,
-      round,
-    });
   }
 );
 
 privateRouter.get('/clock/:competitionid', function (req, res, next) {
   const id = req.params.competitionid;
-  res.render('clock', { id, user: req.user });
+  res.render('signage/clock', { id, user: req.user });
+});
+
+privateRouter.get('/field/:competitionid/:fieldid', function (req, res) {
+  const id = req.params.fieldid;
+  const cid = req.params.competitionid;
+
+  if (!ObjectId.isValid(id)) {
+    return next();
+  }
+  res.render('signage/field_view', {
+    id,
+    cid,
+  });
 });
 
 module.exports.public = publicRouter;

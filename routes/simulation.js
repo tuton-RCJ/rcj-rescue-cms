@@ -8,6 +8,7 @@ const { ObjectId } = require('mongoose').Types;
 const auth = require('../helper/authLevels');
 const { ACCESSLEVELS } = require('../models/user');
 const competitiondb = require('../models/competition');
+const ruleDetector = require('../helper/ruleDetector');
 
 const { SIM_LEAGUES } = competitiondb;
 
@@ -29,24 +30,20 @@ publicRouter.get('/:competitionid/:league', function (req, res, next) {
   else res.render('simulation_competition', { id, user: req.user, judge: 0, league});
 });
 
-publicRouter.get('/:competitionid/:league/score', function (req, res, next) {
-  const id = req.params.competitionid;
-  const { league } = req.params;
+publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const { leagueId } = req.params;
 
-  if (!ObjectId.isValid(id)) {
+  if (!ObjectId.isValid(competitionId)) {
     return next();
   }
 
-  if (!SIM_LEAGUES.includes(league)) {
+  if (!SIM_LEAGUES.includes(leagueId)) {
     return next();
   }
-
-  return res.render('simulation_score', {
-    id,
-    user: req.user,
-    league,
-    get: req.query,
-  });
+  
+  const rule = await ruleDetector.getLeagueTypeAndRule(competitionId, leagueId);
+  res.render(`ranking/${rule.type}_${rule.rule}`, { competitionId, leagueId, user: req.user });
 });
 
 privateRouter.get('/judge/:runid', async function (req, res, next) {
@@ -55,10 +52,8 @@ privateRouter.get('/judge/:runid', async function (req, res, next) {
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  res.render('simulation_judge', {
-    id,
-    user: req.user
-  });
+  const rule = await ruleDetector.getRuleFromSimulationRunId(id);
+  res.render(`judge/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/sign/:runid', async function (req, res) {
@@ -67,9 +62,8 @@ privateRouter.get('/sign/:runid', async function (req, res) {
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  res.render('simulation_sign', {
-    id
-  });
+  const rule = await ruleDetector.getRuleFromSimulationRunId(id);
+  res.render(`sign/${rule.type}_${rule.rule}`, { id });
 });
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
@@ -79,11 +73,8 @@ publicRouter.get('/view/:runid', async function (req, res, next) {
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  res.render('simulation_view', {
-    id,
-    user: req.user,
-    iframe
-  });
+  const rule = await ruleDetector.getRuleFromSimulationRunId(id);
+  res.render(`view/${rule.type}_${rule.rule}`, { id, iframe, rule: rule.rule });
 });
 
 publicRouter.all('*', function (req, res, next) {

@@ -39,8 +39,6 @@ if(cluster.isMaster){
   logger.debug("Available other leagues : " + OTHER_LEAGUES);
 }
 
-const SUPPORT_RULES = ["2023", "2024"];
-
 const LEAGUES = [].concat(LINE_LEAGUES, MAZE_LEAGUES, SIM_LEAGUES, OTHER_LEAGUES);
 
 module.exports.LINE_LEAGUES = LINE_LEAGUES;
@@ -81,18 +79,18 @@ module.exports.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT = MEAN_OF_NOR
 
 const competitionSchema = new Schema({
   name: {type: String, unique: true},
-  rule: {type: String, enum: SUPPORT_RULES},
   logo: {type: String, default: "/images/noLogo.png"},
   bkColor: {type: String, default: "#fff"},
   color: {type: String, default: "#000"},
   message: {type: String, default: ""},
   description: {type: String, default: ""},
   preparation: {type: Boolean, default: true},
-  ranking: [{
+  leagues: [{
     'league': {type: String, enum: LEAGUES},
     'num': {type: Number, default: 20},
     'mode': {type: String, enum: RANKING_MODE, default: RANKING_MODE[0]},
-    'disclose': {type: Boolean, default: false}
+    'disclose': {type: Boolean, default: false},
+    'rule': {type: String}
   }],
   publicToken: {type: String, default: function(){
     return crypto.randomBytes(16).reduce((p, i) => p + (i % 32).toString(32), '')
@@ -262,8 +260,7 @@ const roundSchema = new Schema({
     required: true,
     index   : true
   },
-  name       : {type: String, required: true},
-  league     : {type: String, enum: LEAGUES, required: true, index: true}
+  name       : {type: String, required: true}
 })
 
 roundSchema.pre('save', function (next) {
@@ -347,8 +344,7 @@ const fieldSchema = new Schema({
     required: true,
     index   : true
   },
-  name       : {type: String, required: true},
-  league     : {type: String, enum: LEAGUES, required: true, index: true}
+  name       : {type: String, required: true}
 })
 
 fieldSchema.pre('save', function (next) {

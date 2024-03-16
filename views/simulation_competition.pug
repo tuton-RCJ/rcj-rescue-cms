@@ -28,7 +28,7 @@ block content
         h4.alert-heading {{'common.message' | translate}}
         p(ng-bind-html="competition.message")
       br
-      button(ng-click="go('/simulation/' + competition._id + '/' + league.id + '/score')" class='btn btn-outline-danger btn-lg btn-block' style="margin-bottom:20px;" ng-show="rankingOpen[league.id]")
+      button(ng-click="go('/simulation/' + competition._id + '/' + league.id + '/ranking')" class='btn btn-outline-danger btn-lg btn-block' style="margin-bottom:20px;" ng-show="rankingOpen[league.id]")
         i.fas.fa-trophy.fa-3x(aria-hidden='true')
         p [{{league.name}}]
         p(style="font-size: 30px; margin:0;") {{'common.rank' | translate}}

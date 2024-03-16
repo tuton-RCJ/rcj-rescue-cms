@@ -52,7 +52,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name ranking preparation',
+      select: 'name leagues preparation',
     },
     {
       path: 'round',
@@ -95,12 +95,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
         ACCESSLEVELS.ADMIN
       )) {
         dbRuns.map(run => {
-          let rankingSettings = run.competition.ranking.find(r => r.league == run.team.league);
-          if (!rankingSettings) {
-            rankingSettings = {
-              mode: competitiondb.SUM_OF_BEST_N_GAMES
-            };
-          }
+          let rankingSettings = run.competition.leagues.find(r => r.league == run.team.league);
           if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
             let maxScore = getMaxScoreWithCache(dbRuns, run.team.league, run.normalizationGroup, maxScoreCache);
             if (maxScore == 0) run.normalizedScore = 0;
@@ -140,7 +135,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
     'round',
     { path: 'team', select: 'name league teamCode' },
     'field',
-    { path: 'competition', select: 'name ranking preparation' }
+    { path: 'competition', select: 'name leagues preparation' }
   ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
@@ -166,14 +161,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
       dbRun = dbRun.toObject();
 
       // return normalized value
-      let rankingSettings = dbRun.competition.ranking.find(r => r.league == dbRun.team.league);
-      if (!rankingSettings) {
-        rankingSettings = {
-          mode: competitiondb.SUM_OF_BEST_N_GAMES,
-          disclose: false,
-          num: 20
-        }
-      }
+      let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);
       if (normalized && competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
         // disclose ranking enabled OR the user is ADMIN of the competition
         if (rankingSettings.disclose || auth.authCompetition(

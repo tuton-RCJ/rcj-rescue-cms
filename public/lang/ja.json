@@ -136,7 +136,6 @@
         "edit": "編集",
         "copy": "コピー",
         "inspection": "検査",
-        "checkin": "チェックイン",
         "totalScore": "合計得点",
         "sort": "ソート",
         "deleted": "正常に削除しました",
@@ -621,7 +620,7 @@
             "line": "Line",
             "maze": "Maze",
             "simulation": "Simulation",
-            "maps": "マップ（フィールドレイアウト）管理",
+            "maps": "マップ管理",
             "runs": "競技管理",
             "backup": "バックアップ",
             "tools": "ツール"
@@ -641,11 +640,11 @@
             "add": "フィールドを追加"
         },
         "lineMapAdmin": {
-            "title": "Line マップ（フィールドレイアウト）管理",
+            "title": "マップ管理",
             "create": "新しいマップを作る"
         },
         "lineRun": {
-            "title": "Line 競技管理",
+            "title": "競技管理",
             "add": "競技を追加",
             "bulk": "@:admin.teams.bulk",
             "monitor": "競技モニター",
@@ -664,7 +663,7 @@
             "printRanking": "ランキングを印刷"
         },
         "lineRunBulk": {
-            "title": "Line 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "STEP1 テンプレートファイルをダウンロードする",
             "s1D": "下のリンクから，テンプレートファイルをダウンロードします．",
             "s2T": "STEP2 ファイルを編集",
@@ -681,7 +680,7 @@
             "complete": "件登録完了"
         },
         "lineMapEditor": {
-            "title": "Line マップエディター",
+            "title": "マップエディター",
             "desc": "タイルを左のタイルセットエリアから右のマップエリア上にドラッグアンドドロップします．マップエリア上のタイルの上で右クリックをすると，ギャップや障害物などのスコアアイテムや坂を設定できます．",
             "save": "マップを（上書き）保存",
             "saveAs": "マップを別名で保存",
@@ -730,11 +729,11 @@
             "headerError": "データタイプの指定に問題があります．"
         },
         "mazeMapAdmin": {
-            "title": "Maze マップ（フィールドレイアウト）管理",
+            "title": "マップ管理",
             "create": "@:admin.lineMapAdmin.create"
         },
         "mazeMapEditor": {
-            "title": "Maze マップエディター",
+            "title": "マップエディター",
             "desc": "壁の部分をクリックして，迷路を作成します．迷路の床部分をクリックすると，被災者やチェックポイント，バンプなどの項目が設定できます．",
             "save": "@:admin.lineMapEditor.save",
             "saveAs": "@:admin.lineMapEditor.saveAs",
@@ -776,7 +775,7 @@
             "leagueType": "リーグタイプ"
         },
         "mazeRun": {
-            "title": "Maze 競技管理",
+            "title": "競技管理",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "monitor": "@:admin.lineRun.monitor",
@@ -793,7 +792,7 @@
             "statusReset": "@:admin.lineRun.statusReset"
         },
         "simRun": {
-            "title": "Simulation 競技管理",
+            "title": "競技管理",
             "add": "@:admin.lineRun.add",
             "bulk": "@:admin.teams.bulk",
             "status": "@:admin.lineRun.status",
@@ -809,7 +808,7 @@
             "statusReset": "@:admin.lineRun.statusReset"
         },
         "mazeRunBulk": {
-            "title": "Maze 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",
@@ -826,7 +825,7 @@
             "complete": "@:admin.lineRunBulk.complete"
         },
         "simRunBulk": {
-            "title": "Simulation 競技一括登録",
+            "title": "競技一括登録",
             "s1T": "@:admin.lineRunBulk.s1T",
             "s1D": "@:admin.lineRunBulk.s1D",
             "s2T": "@:admin.lineRunBulk.s2T",

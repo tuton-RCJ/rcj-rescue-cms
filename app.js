@@ -71,7 +71,6 @@ async function bootstrap(){
     var localesRoute = require('./routes/locales')
     var signageRoute = require('./routes/signage')
     var shortRoute = require('./routes/shortURL')
-    var kioskRoute = require('./routes/kiosk')
     var serviceRoute = require('./routes/service')
     var documentRoute = require('./routes/document')
     var registrationRoute = require('./routes/registration')
@@ -95,7 +94,6 @@ async function bootstrap(){
     var apiCompetitionsRoute = require('./routes/api/competitions')
     var apiUserRoute = require('./routes/api/users')
     var apiSignageRoute = require('./routes/api/signage')
-    var apiKioskRoute = require('./routes/api/kiosk')
     var apiBackupRoute = require('./routes/api/backup')
     var apiShortURL = require('./routes/api/shortURL')
     var apiDocumentRoute = require('./routes/api/document')
@@ -189,7 +187,6 @@ async function bootstrap(){
     app.use('/api/competitions', [apiCompetitionsRoute.public, pass.ensureLoginApi, apiCompetitionsRoute.private, pass.ensureAdminApi, apiCompetitionsRoute.admin])
     app.use('/api/users', [pass.ensureLoginApi, apiUserRoute.admin, pass.ensureSuperApi , apiUserRoute.super])
     app.use('/api/signage', [pass.ensureLoginApi, apiSignageRoute.private, pass.ensureAdminApi, apiSignageRoute.admin])
-    app.use('/api/kiosk', [pass.ensureAdminApi, apiKioskRoute.admin])
     app.use('/api/backup', [pass.ensureAdminApi, apiBackupRoute.admin])
     app.use('/api/short', [pass.ensureSuperApi , apiShortURL.super])
     app.use('/api/document', [apiDocumentRoute.public, pass.ensureLoginApi, apiDocumentRoute.private, pass.ensureAdminApi, apiDocumentRoute.admin])
@@ -246,6 +243,11 @@ async function bootstrap(){
     //========================================================================
     //                          Error handling
     //========================================================================
+
+    process.on('uncaughtException', function(err) {
+        console.log("SERVER ERROR");
+        console.log(err);
+    });
 
     app.use(function (err, req, res, next) {
         // is at base, send to login

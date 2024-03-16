@@ -77,7 +77,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name ranking preparation',
+      select: 'name leagues preparation',
     },
     {
       path: 'round',
@@ -132,7 +132,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
         ACCESSLEVELS.ADMIN
       )) {
         dbRuns.map(run => {
-          let rankingSettings = run.competition.ranking.find(r => r.league == run.team.league);
+          let rankingSettings = run.competition.leagues.find(r => r.league == run.team.league);
           if (!rankingSettings) {
             rankingSettings = {
               mode: competitiondb.SUM_OF_BEST_N_GAMES
@@ -299,7 +299,7 @@ publicRouter.get('/:runid', function (req, res, next) {
       'round',
       { path: 'team', select: 'name league teamCode' },
       'field',
-      { path: 'competition', select: 'name ranking preparation' }
+      { path: 'competition', select: 'name leagues preparation' }
     ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
@@ -324,14 +324,7 @@ publicRouter.get('/:runid', function (req, res, next) {
     dbRun = dbRun.toObject();
 
     // return normalized value
-    let rankingSettings = dbRun.competition.ranking.find(r => r.league == dbRun.team.league);
-    if (!rankingSettings) {
-      rankingSettings = {
-        mode: competitiondb.SUM_OF_BEST_N_GAMES,
-        disclose: false,
-        num: 20
-      }
-    }
+    let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);
     if (normalized && competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
       // disclose runking enabled OR the user is ADMIN of the competition
       if (rankingSettings.disclose || auth.authCompetition(
@@ -410,8 +403,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
   mazeRun
     .findById(id)
-    // .select("-_id -__v -competition -round -team -field -score")
-    .populate(['map', 'competition'])
+    .populate(['map', 'competition', 'team'])
     .exec(function (err, dbRun) {
       if (err) {
         logger.error(err);
@@ -522,7 +514,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
         if (prevStatus != dbRun.status) statusUpdate = 1;
 
-        let retScoreCals = scoreCalculator.calculateMazeScore(dbRun);
+        let retScoreCals = scoreCalculator.calculateScore(dbRun);
 
         if (!retScoreCals) {
           logger.error('Value Error');
@@ -620,7 +612,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo',
+      select: 'name rule logo leagues',
     },
     {
       path: 'round',
@@ -690,66 +682,6 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   });
 });
 
-adminRouter.get('/apteam/:cid/:teamid/:group', function (req, res, next) {
-  const { cid } = req.params;
-  const team = req.params.teamid;
-  const { group } = req.params;
-  if (!ObjectId.isValid(cid)) {
-    return next();
-  }
-  if (!ObjectId.isValid(team)) {
-    return next();
-  }
-
-  if (!auth.authCompetition(req.user, cid, ACCESSLEVELS.ADMIN)) {
-    return res.status(401).send({
-      msg: 'You have no authority to access this api!!',
-    });
-  }
-
-  mazeRun
-    .find({
-      competition: cid,
-      group,
-    })
-    .exec(function (err, dbRun) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get run',
-          err: err.message,
-        });
-      } else if (dbRun) {
-        const resp = [];
-        for (const run of dbRun) {
-          run.team = team;
-          run.group = null;
-          run.save(function (err) {
-            if (err) {
-              logger.error(err);
-              return res.status(400).send({
-                err: err.message,
-                msg: 'Could not save run',
-              });
-            }
-          });
-          const col = {
-            time: run.startTime,
-            field: run.field,
-          };
-          resp.push(col);
-        }
-        // res.send(dbRun);
-        // logger.debug(dbRun);
-
-        return res.status(200).send({
-          msg: 'Saved change',
-          data: resp,
-        });
-      }
-    });
-});
-
 privateRouter.put('/map/:runid', function (req, res, next) {
   const id = req.params.runid;
   if (!ObjectId.isValid(id)) {
@@ -794,6 +726,7 @@ privateRouter.put('/map/:runid', function (req, res, next) {
       }
 
       dbRun.map = run.map;
+      dbRun.diceNumber = run.diceNumber;
 
       dbRun.save(function (err) {
         if (err) {

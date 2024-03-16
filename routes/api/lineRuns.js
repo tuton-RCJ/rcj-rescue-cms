@@ -80,7 +80,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name ranking preparation',
+      select: 'name leagues preparation',
     },
     {
       path: 'round',
@@ -136,12 +136,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
         ACCESSLEVELS.ADMIN
       )) {
         dbRuns.map(run => {
-          let rankingSettings = run.competition.ranking.find(r => r.league == run.team.league);
-          if (!rankingSettings) {
-            rankingSettings = {
-              mode: competitiondb.SUM_OF_BEST_N_GAMES
-            };
-          }
+          let rankingSettings = run.competition.leagues.find(r => r.league == run.team.league);
           if (competitiondb.NORMALIZED_RANKING_MODE.includes(rankingSettings.mode)) {
             let maxScore = getMaxScoreWithCache(dbRuns, run.team.league, run.normalizationGroup, maxScoreCache);
             if (maxScore == 0) run.normalizedScore = 0;
@@ -303,7 +298,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
     'round',
     { path: 'team', select: 'name league teamCode' },
     'field',
-    { path: 'competition', select: 'name ranking preparation rule' }
+    { path: 'competition', select: 'name leagues preparation rule' }
   ]).exec(async function (err, dbRun) {
     if (err) {
       logger.error(err);
@@ -347,7 +342,7 @@ publicRouter.get('/:runid', async function (req, res, next) {
       dbRun = dbRun.toObject();
 
       // return normalized value
-      let rankingSettings = dbRun.competition.ranking.find(r => r.league == dbRun.team.league);
+      let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);
       if (!rankingSettings) {
         rankingSettings = {
           mode: competitiondb.SUM_OF_BEST_N_GAMES,
@@ -442,7 +437,7 @@ privateRouter.put('/:runid', function (req, res, next) {
         }
       }
     ])
-    .populate('competition.rule')
+    .populate(['competition', 'team'])
     .exec(function (err, dbRun) {
       if (err) {
         logger.error(err);
@@ -536,7 +531,7 @@ privateRouter.put('/:runid', function (req, res, next) {
 
         if (prevStatus != dbRun.status) statusUpdate = 1;
 
-        const cal = scoreCalculator.calculateLineScore(dbRun);
+        const cal = scoreCalculator.calculateScore(dbRun);
         if (!cal) {
           logger.error('Value Error');
           return res.status(202).send({
@@ -644,7 +639,7 @@ adminRouter.get('/scoresheet2', function (req, res, next) {
   query.populate([
     {
       path: 'competition',
-      select: 'name rule logo',
+      select: 'name rule logo leagues',
     },
     {
       path: 'round',
@@ -864,66 +859,6 @@ privateRouter.post('/pre_recorded', function (req, res) {
       }
     }
   });
-});
-
-adminRouter.get('/apteam/:cid/:teamid/:group', function (req, res, next) {
-  const { cid } = req.params;
-  const team = req.params.teamid;
-  const { group } = req.params;
-  if (!ObjectId.isValid(cid)) {
-    return next();
-  }
-  if (!ObjectId.isValid(team)) {
-    return next();
-  }
-
-  if (!auth.authCompetition(req.user, cid, ACCESSLEVELS.ADMIN)) {
-    return res.status(401).send({
-      msg: 'You have no authority to access this api!!',
-    });
-  }
-
-  lineRun
-    .find({
-      competition: cid,
-      group,
-    })
-    .exec(function (err, dbRun) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get run',
-          err: err.message,
-        });
-      } else if (dbRun) {
-        const resp = [];
-        for (const run of dbRun) {
-          run.team = team;
-          run.group = null;
-          run.save(function (err) {
-            if (err) {
-              logger.error(err);
-              return res.status(400).send({
-                err: err.message,
-                msg: 'Could not save run',
-              });
-            }
-          });
-          const col = {
-            time: run.startTime,
-            field: run.field,
-          };
-          resp.push(col);
-        }
-        // res.send(dbRun);
-        // logger.debug(dbRun);
-
-        return res.status(200).send({
-          msg: 'Saved change',
-          data: resp,
-        });
-      }
-    });
 });
 
 publicRouter.all('*', function (req, res, next) {

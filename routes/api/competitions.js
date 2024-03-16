@@ -53,10 +53,6 @@ publicRouter.get('/', function (req, res) {
     });
 });
 
-publicRouter.get('/rules', function (req, res) {
-  res.send(competitiondb.competition.schema.path('rule').enumValues);
-});
-
 publicRouter.get('/leagues', async function (req, res, next) {
   res.send(LEAGUES_JSON);
 });
@@ -108,6 +104,11 @@ publicRouter.get('/:competition', function (req, res, next) {
         if (!data.description) data.description = '';
         if (!data.logo) data.logo = '/images/noLogo.png';
         if (data.documents) delete data.documents.leagues;
+        for (let l of data.leagues) {
+          let leagueDetails = LEAGUES_JSON.find((j) => j.id == l.league);
+          l.name = leagueDetails.name;
+          l.type = leagueDetails.type;
+        }
         res.status(200).send(data);
       }
     });
@@ -222,7 +223,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
       });
     } else if (dbCompetition) {
       if (data.name != null) dbCompetition.name = data.name;
-      if (data.rule != null) dbCompetition.rule = data.rule;
+      if (data.rules != null) dbCompetition.rules = data.rules;
       if (data.logo != null) dbCompetition.logo = data.logo;
       if (data.bkColor != null) dbCompetition.bkColor = data.bkColor;
       if (data.color != null) dbCompetition.color = data.color;
@@ -231,18 +232,7 @@ adminRouter.put('/:competitionid', function (req, res, next) {
         dbCompetition.description = data.description;
       if (data.preparation != null) dbCompetition.preparation = data.preparation;
 
-      if (data.ranking != null) {
-        dbCompetition.ranking = [];
-        for (const i in data.ranking) {
-          const tmp = {
-            league: data.ranking[i].id,
-            num: data.ranking[i].count,
-            disclose: data.ranking[i].disclose,
-            mode: data.ranking[i].mode
-          };
-          dbCompetition.ranking.push(tmp);
-        }
-      }
+      if (data.leagues != null) dbCompetition.leagues = data.leagues;
       if (data.documents != null) {
         if (data.documents.enable != null)
           dbCompetition.documents.enable = data.documents.enable;
@@ -642,26 +632,6 @@ privateRouter.get('/:competition/:league/maps', function (req, res, next) {
   return next();
 });
 
-privateRouter.get('/:competition/line/maps', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  return lineMapsApi.getLineMaps(req, res, next);
-});
-
-privateRouter.get('/:competition/maze/maps', function (req, res, next) {
-  const id = req.params.competition;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  return mazeMapsApi.getMazeMaps(req, res, next);
-});
-
 publicRouter.get('/:competition/fields', function (req, res, next) {
   const id = req.params.competition;
 
@@ -672,50 +642,6 @@ publicRouter.get('/:competition/fields', function (req, res, next) {
   competitiondb.field
     .find({
       competition: id,
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get fields',
-          err: err.message,
-        });
-      } else {
-        res.status(200).send(data);
-      }
-    });
-});
-
-publicRouter.get('/:competition/:league/fields', function (req, res, next) {
-  const id = req.params.competition;
-  const { league } = req.params;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  let leagueArr = [];
-  if (league == 'line') {
-    leagueArr = LINE_LEAGUES;
-  } else if (league == 'maze') {
-    leagueArr = MAZE_LEAGUES;
-  } else if (league == 'simulation') {
-    leagueArr = SIM_LEAGUES;
-  } else if (
-    LEAGUES.filter(function (elm) {
-      return elm.indexOf(league) != -1;
-    }).length == 0
-  ) {
-    return next();
-  } else {
-    leagueArr.push(league);
-  }
-
-  competitiondb.field
-    .find({
-      competition: id,
-      league: { $in: leagueArr },
     })
     .lean()
     .exec(function (err, data) {
@@ -812,56 +738,19 @@ publicRouter.get('/:competitionid/rounds/:name', function (req, res, next) {
     .select('_id');
 });
 
-publicRouter.get('/:competition/:league/rounds', function (req, res, next) {
-  const id = req.params.competition;
-  const { league } = req.params;
-
-  if (!ObjectId.isValid(id)) {
-    return next();
-  }
-
-  let leagueArr = [];
-  if (league == 'line') {
-    leagueArr = LINE_LEAGUES;
-  } else if (league == 'maze') {
-    leagueArr = MAZE_LEAGUES;
-  } else if (league == 'simulation') {
-    leagueArr = SIM_LEAGUES;
-  } else if (
-    LEAGUES.filter(function (elm) {
-      return elm.indexOf(league) != -1;
-    }).length == 0
-  ) {
-    return next();
-  } else {
-    leagueArr.push(league);
-  }
-
-  competitiondb.round
-    .find({
-      competition: id,
-      league: { $in: leagueArr },
-    })
-    .lean()
-    .exec(function (err, data) {
-      if (err) {
-        logger.error(err);
-        res.status(400).send({
-          msg: 'Could not get rounds',
-          err: err.message,
-        });
-      } else {
-        res.status(200).send(data);
-      }
-    });
-});
-
 adminRouter.post('/', function (req, res) {
   const competition = req.body;
+  let leagues = [];
+  LEAGUES_JSON.forEach((e) => {
+    leagues.push({
+      league: e.id,
+      rule: e.rules[e.rules.length - 1]
+    });
+  });
 
   new competitiondb.competition({
     name: competition.name,
-    rule: competition.rule,
+    leagues: leagues
   }).save(function (err, data) {
     if (err) {
       logger.error(err);

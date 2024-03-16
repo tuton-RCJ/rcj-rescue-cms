@@ -68,8 +68,7 @@ adminRouter.post('/', function (req, res) {
 
   const newField = new competitiondb.field({
     name: field.name,
-    competition: field.competition,
-    league: field.league,
+    competition: field.competition
   });
 
   newField.save(function (err, data) {

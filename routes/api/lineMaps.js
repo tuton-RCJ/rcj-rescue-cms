@@ -16,6 +16,7 @@ privateRouter.get('/', getLineMaps);
 
 function getLineMaps(req, res) {
   const competition = req.query.competition || req.params.competition;
+  const league = req.params.league;
 
   let query;
   if (competition != null && competition.constructor === String) {
@@ -32,7 +33,7 @@ function getLineMaps(req, res) {
     query = lineMap.find({});
   }
 
-  query.select('competition name');
+  query.select('competition name league');
 
   query.lean().exec(function (err, data) {
     if (err) {
@@ -41,6 +42,7 @@ function getLineMaps(req, res) {
         msg: 'Could not get maps',
       });
     }
+    if (league) data = data.filter((m) => m.league == league);
     return res.status(200).send(data);
   });
 }
@@ -109,6 +111,7 @@ adminRouter.post('/', function (req, res) {
     },
     finished: map.finished,
     victims: map.victims,
+    league: map.league
   });
 
   // logger.debug(newMap)

@@ -36,7 +36,7 @@ app.controller("SimulationCompetitionController", ['$scope', '$http', '$translat
 
         $http.get("/api/competitions/" + competitionId).then(function (response) {
             $scope.competition = response.data;
-            $scope.rankingOpen = $scope.competition.ranking.reduce((result, current) => {
+            $scope.rankingOpen = $scope.competition.leagues.reduce((result, current) => {
                 result[current.league] = current.disclose;
                 return result;
             }, {})

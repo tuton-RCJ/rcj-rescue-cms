@@ -30,57 +30,41 @@ publicRouter.get('/:competitionid/:league', function (req, res, next) {
   else res.render('maze_competition', { id, user: req.user, judge: 0, league});
 });
 
-publicRouter.get('/:competitionid/:league/score', function (req, res, next) {
-  const id = req.params.competitionid;
-  const { league } = req.params;
+publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const { leagueId } = req.params;
 
-  if (!ObjectId.isValid(id)) {
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (!MAZE_LEAGUES.includes(leagueId)) {
     return next();
   }
   
-  if (!MAZE_LEAGUES.includes(league)) {
-    return next();
-  }
-
-  return res.render('maze_score', {
-    id,
-    user: req.user,
-    league,
-    get: req.query,
-  });
+  const rule = await ruleDetector.getLeagueTypeAndRule(competitionId, leagueId);
+  res.render(`ranking/${rule.type}_${rule.rule}`, { competitionId, leagueId, user: req.user });
 });
+
 
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
-  const iframe = req.query.iframe;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_view', {
-    id,
-    user: req.user,
-    rule,
-    iframe
-  });
+  res.render(`view/${rule.type}_${rule.rule}`, { id, rule: rule.rule });
 });
 
-publicRouter.get('/viewcurrent', function (req, res) {
-  res.render('maze_view_current');
-});
-
-publicRouter.get('/view/field/:competitionid/:fieldid', function (req, res) {
-  const id = req.params.fieldid;
-  const cid = req.params.competitionid;
+publicRouter.get('/view/:runid/iframe', async function (req, res, next) {
+  const id = req.params.runid;
 
   if (!ObjectId.isValid(id)) {
     return next();
   }
-  res.render('maze_view_field', {
-    id,
-    cid,
-  });
+  const rule = await ruleDetector.getRuleFromMazeRunId(id);
+  res.render(`view_iframe/${rule.type}_${rule.rule}`, { id, rule: rule.rule });
 });
 
 privateRouter.get('/judge/:runid', async function (req, res, next) {
@@ -90,11 +74,7 @@ privateRouter.get('/judge/:runid', async function (req, res, next) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_judge', {
-    id,
-    user: req.user,
-    rule,
-  });
+  res.render(`judge/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/input/:runid', async function (req, res, next) {
@@ -104,11 +84,7 @@ privateRouter.get('/input/:runid', async function (req, res, next) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_input', {
-    id,
-    user: req.user,
-    rule,
-  });
+  res.render(`manual/input/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/check/:runid', async function (req, res, next) {
@@ -118,11 +94,7 @@ privateRouter.get('/check/:runid', async function (req, res, next) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_check', {
-    id,
-    user: req.user,
-    rule,
-  });
+  res.render(`manual/check/${rule.type}_${rule.rule}`, { id });
 });
 
 privateRouter.get('/sign/:runid', async function (req, res) {
@@ -132,10 +104,7 @@ privateRouter.get('/sign/:runid', async function (req, res) {
     return next();
   }
   const rule = await ruleDetector.getRuleFromMazeRunId(id);
-  res.render('maze_sign', {
-    id,
-    rule,
-  });
+  res.render(`sign/${rule.type}_${rule.rule}`, { id });
 });
 
 publicRouter.all('*', function (req, res, next) {

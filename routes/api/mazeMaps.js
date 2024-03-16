@@ -12,6 +12,7 @@ publicRouter.get('/', getMazeMaps);
 
 function getMazeMaps(req, res) {
   const competition = req.query.competition || req.params.competition;
+  const league = req.params.league;
 
   let query;
   if (competition != null && competition.constructor === String) {
@@ -28,7 +29,7 @@ function getMazeMaps(req, res) {
     query = mazeMap.find({});
   }
 
-  query.select('competition name parent');
+  query.select('competition name parent league');
 
   query.lean().exec(function (err, data) {
     if (err) {
@@ -38,6 +39,7 @@ function getMazeMaps(req, res) {
         err: err.message,
       });
     }
+    if (league) data = data.filter((m) => m.league == league);
     return res.status(200).send(data);
   });
 }
@@ -115,6 +117,7 @@ adminRouter.post('/', function (req, res) {
       z: map.startTile.z,
     },
     finished: map.finished,
+    league: map.league
   });
 
   // logger.debug(newMap)
