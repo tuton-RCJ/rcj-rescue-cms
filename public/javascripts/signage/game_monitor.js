@@ -67,7 +67,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             inProgressGames += getFieldOpen($scope.selectfield[i]);
             if (inProgressGames != 0) break;
         }
-        if (inProgressGames == 0) {
+        if (inProgressGames == 0 && sigId && grpId) {
             setTimeout(function () {
                 $scope.showSignage = true;
                 $scope.$apply();
