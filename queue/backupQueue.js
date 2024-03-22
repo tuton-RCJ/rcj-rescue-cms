@@ -19,7 +19,7 @@ const { ACCESSLEVELS } = require('../models/user');
 const logger = require('../config/logger').mainLogger;
 const glob = require('glob');
 
-const Bversion = "21.4";
+const Bversion = "24.0";
 
 const backupQueue = new Queue('backup', {
   redis: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST},
@@ -109,7 +109,7 @@ backupQueue.process('backup', function(job, done){
   //Competition data
   competitiondb.competition
   .find({'_id': competitionId})
-  .select('name rule logo bkColor color message description ranking documents registration consentForm')
+  .select('name rule logo bkColor color message description ranking documents registration consentForm leagues')
   .lean()
   .exec(function (err, data) {
     if (err) {
@@ -243,7 +243,7 @@ backupQueue.process('restore', function(job, done){
         'utf8'
       )
     );
-    if (version.version != "21.4") {
+    if (version.version != Bversion) {
       done(new Error(`It is expected that the backup data is Version: ${Bversion}, but the file entered is Version: ${version.version}.`));
     }else{
       let updated = 0;
