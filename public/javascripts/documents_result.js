@@ -201,7 +201,7 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                                 sheet.getRow(row).getCell(col).value = d.innerText;
                                 break;
                             case 'select':
-                                let val = question.i18n.find(i=>i.language == $scope.displayLang).options.find(o=>o.value == cc).text;
+                                let val = q.i18n.find(i=>i.language == $scope.displayLang).options.find(o=>o.value == cc).text;
                                 if(isNaN(Number(val))) sheet.getRow(row).getCell(col).value = val;
                                 else sheet.getRow(row).getCell(col).value = Number(val);
                                 break;
