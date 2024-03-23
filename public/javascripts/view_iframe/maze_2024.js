@@ -99,6 +99,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$http', function ($scope
     }
 
     launchSocketIo();
+    setInterval(launchSocketIo, 15000);
     loadNewRun();
 
     $scope.getMap = function (mapId) {

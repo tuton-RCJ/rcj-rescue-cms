@@ -114,11 +114,10 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         loadNewRun();
     }
 
-    (function launchSocketIo() {
-        // launch socket.io
-        socket = io(window.location.origin, {
-            transports: ['websocket']
-        });
+    socket = io(window.location.origin, {
+        transports: ['websocket']
+    });
+    function launchSocketIo() {        
         if (typeof runId !== 'undefined') {
             socket.emit('subscribe', 'runs/' + runId);
 
@@ -176,10 +175,10 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             });
         }
 
-    })();
+    }
 
-
-
+    launchSocketIo();
+    setInterval(launchSocketIo, 15000);
 
     function loadNewRun() {
         $http.get("/api/runs/line/" + runId +
