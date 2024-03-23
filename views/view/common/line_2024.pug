@@ -127,7 +127,7 @@ div(ng-if="league=='LineNL'")
                     i.fas.fa-check.fa-fw(ng-if='victimNL_Dead[i].identified' style='color:#27ae60;')
                     i.fas.fa-times.fa-fw(ng-if='!victimNL_Dead[i].identified' style='color:#e74c3c;')
               span.badge.badge-secondary(style='margin-top:10px;')
-                span(style='font-size:25px;') {{10 * victimNL_Dead[i].found + 5 * victimNL_Dead[i].identified}} {{'common.point' | translate}}
+                span(style='font-size:25px;') {{10 * victimNL_Dead[i].found + 10 * victimNL_Dead[i].identified}} {{'common.point' | translate}}
     .col-md-3.col-lg-2
       .alert.alert-primary(style='height: calc(100% - 30px); text-align:center; min-height: 130px;', role='alert')
         h3 {{'common.stotal' | translate}}
