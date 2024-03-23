@@ -85,7 +85,6 @@ app.controller("LineScoreController", ['$scope', '$http', '$sce', '$translate', 
             $scope.updateTime = now.toLocaleString();
             if ($scope.ranking.length >= 4) {
                 $scope.showFrom = Math.floor($scope.ranking.length - 4) / 6 * 6 + 3;
-                $scope.showFrom = 3;
             } else {
                 $scope.showFrom = 0;
             }
