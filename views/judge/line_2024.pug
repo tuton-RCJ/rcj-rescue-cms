@@ -156,8 +156,8 @@ html(ng-app="ddApp")
                     
                     div(ng-if="$index == EvacuationAreaLoPIndex", style="border: solid 4px #e74c3c;border-radius:calc(0.5rem - 1px);margin-top:15px;")
                       h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;")  {{'line.judge.rescue' | translate}}
-                        span.badge.badge-danger {{evacuationLevel-1?'line.judge.high':'line.judge.low' | translate}}
                       .row(style="padding:10px;")
+                        .col-2
                         .col-4(ng-click="addVictimTmp('LIVE')")
                           span Max : {{maxLiveVictims}}
                           br
