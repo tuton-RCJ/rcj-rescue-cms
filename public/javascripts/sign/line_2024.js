@@ -163,7 +163,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.checkPointDistance.push({
                     dis: finalDis,
                     status: $scope.exitBonus,
-                    point: finalDis * $scope.LoPsCountPoint($scope.LoPs[j])
+                    point: finalDis * $scope.exitBonus * $scope.LoPsCountPoint($scope.LoPs[j])
                 });
                 $scope.$apply();
                 console.log("Updated view from socket.io");
@@ -242,7 +242,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.checkPointDistance.push({
                     dis: finalDis,
                     status: $scope.exitBonus,
-                    point: finalDis * $scope.LoPsCountPoint($scope.LoPs[j])
+                    point: finalDis * $scope.exitBonus * $scope.LoPsCountPoint($scope.LoPs[j])
                 });
 
                 $scope.victim_list = response.data.rescueOrder;
