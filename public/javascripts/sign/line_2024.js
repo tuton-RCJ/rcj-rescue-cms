@@ -869,22 +869,22 @@ app.directive('tile', function () {
                     for (let j = 0; j < $scope.$parent.stiles[tile.index[i]].scoredItems.length; j++) {
                         switch ($scope.$parent.stiles[tile.index[i]].scoredItems[j].item) {
                             case "gap":
-                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored;
                                 break;
                             case "intersection":
                                 successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "obstacle":
-                                successfully += 15 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 20 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "speedbump":
-                                successfully += 5 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored;
                                 break;
                             case "ramp":
                                 successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "seesaw":
-                                successfully += 15 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 20 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                         }
 
