@@ -173,7 +173,7 @@ html(ng-app="ddApp")
                           table(border='1', style='width:100%; text-align: center; margin-top: 10px;')
                             tbody
                               tr
-                                td(ng-repeat='i in range(4)', ng-dblclick='delete_victim_tmp(i)', ng-swipe-left='delete_victim_tmp(i)')
+                                td(ng-repeat='i in range(3)', ng-dblclick='delete_victim_tmp(i)', ng-swipe-left='delete_victim_tmp(i)')
                                   img(src='/images/liveVictim.png', width='30px', ng-if="victim_tmp[i] == 'LIVE'")
                                   img(src='/images/deadVictim.png', width='30px', ng-if="victim_tmp[i] == 'DEAD'")
                                   span(style='width:30px;', ng-hide='victim_tmp[i]') ---
@@ -191,29 +191,29 @@ html(ng-app="ddApp")
                             hr
                             h6 {{'line.judge.rescuedVictims' | translate}}
                             span(style='font-size:9px;') {{'line.judge.rescuedVictimsMes' | translate}}
-                            table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-repeat='j in range(6)', ng-if='victim_list.length > j*4')
+                            table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-repeat='j in range(6)', ng-if='victim_list.length > j*3')
                               tbody
                                 tr
                                   th Zone
-                                  th(style='text-align:center;', ng-repeat='i in range(4)') {{j*4 + (i+1)}}
+                                  th(style='text-align:center;', ng-repeat='i in range(3)') {{j*3 + (i+1)}}
                                 tr
                                   td
                                     img(src='/images/evacZone/red_lv2.png', height='50px')
-                                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'RED')}", ng-dblclick='delete_victim(j*4+i)', ng-swipe-left='delete_victim(j*4+i)')
-                                    div(ng-if="victim_list[j*4+i].zoneType == 'RED'")
-                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
-                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
+                                  td(ng-repeat='i in range(3)', ng-style="{'background-color': victim_bk_color(j*3+i, 'RED')}", ng-dblclick='delete_victim(j*3+i)', ng-swipe-left='delete_victim(j*3+i)')
+                                    div(ng-if="victim_list[j*3+i].zoneType == 'RED'")
+                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'LIVE'")
+                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'DEAD'")
                                       br
-                                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
+                                      span(ng-if="calc_victim_multipliers(j*3+i)!=0") x{{calc_victim_multipliers(j*3+i)}}
                                 tr
                                   td
                                     img(src='/images/evacZone/green_lv2.png', height='50px')
-                                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'GREEN')}", ng-dblclick='delete_victim(j*4+i)', ng-swipe-left='delete_victim(j*4+i)')
-                                    div(ng-if="victim_list[j*4+i].zoneType == 'GREEN'")
-                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
-                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
+                                  td(ng-repeat='i in range(3)', ng-style="{'background-color': victim_bk_color(j*3+i, 'GREEN')}", ng-dblclick='delete_victim(j*3+i)', ng-swipe-left='delete_victim(j*3+i)')
+                                    div(ng-if="victim_list[j*3+i].zoneType == 'GREEN'")
+                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'LIVE'")
+                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'DEAD'")
                                       br
-                                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
+                                      span(ng-if="calc_victim_multipliers(j*3+i)!=0") x{{calc_victim_multipliers(j*3+i)}}
                     hr(ng-show='!$last')
                   
                 h3.card-header
