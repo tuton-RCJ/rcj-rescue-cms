@@ -6,7 +6,7 @@ html(ng-app="ddApp")
       var iframe = "#{iframe}"
 
     include ../includes/common_component
-    script(src="/javascripts/sign/maze_2024.js")
+    script(src="/javascripts/sign/maze_2024E.js")
 
     script(src="/javascripts/translate_config.js")
     script(src='/components/jSignature/libs/jSignature.min.js')
@@ -34,7 +34,7 @@ html(ng-app="ddApp")
         .col-md12
           button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="go('/maze/judge/' + runId + '?return=' + getParam('return'))")
             i.fas.fa-edit(aria-hidden='true')  {{'maze.sign.to_judge' | translate}}
-      include ../view/common/maze_2024
+      include ../view/common/maze_2024E
       .alert.alert-success(style='margin:30 0 0 0;', role='alert')
         .row
           .col-md-6

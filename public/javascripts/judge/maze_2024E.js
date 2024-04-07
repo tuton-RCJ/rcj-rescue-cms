@@ -240,15 +240,22 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             $scope.length = response.data.length;
             $scope.duration = response.data.duration || 480;
             $scope.leagueType = response.data.leagueType;
-            
-            maxKit={
-                'H': 2,
-                'S': 1,
-                'U': 0,
-                'Red': 2,
-                'Yellow': 1,
-                'Green': 0
-            };
+            if (response.data.leagueType == "entry") {
+                // Identification bonus
+                maxKit={
+                    'Red': 1,
+                    'Green': 1
+                };
+            } else {
+                maxKit={
+                    'H': 3,
+                    'S': 2,
+                    'U': 0,
+                    'Red': 1,
+                    'Yellow': 1,
+                    'Green': 0
+                };
+            }
 
             if(response.data.parent){
                 if(!$scope.dice){
@@ -489,13 +496,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -556,6 +565,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible += maxKit[cell.tile.victims.bottom];
             current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
         }
+        if(cell.tile.victims.floor != "None"){
+            possible++;
+            current += tile.scoredItems.victims.floor;
+            console.log(current)
+            possible += maxKit[cell.tile.victims.floor];
+            current += Math.min(tile.scoredItems.rescueKits.floor,maxKit[cell.tile.victims.floor]);
+        }
+
+
 
         if (tile.processing)
             return "processing";
@@ -589,13 +607,15 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false
+                        bottom: false,
+                        floor: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0
+                        left: 0,
+                        floor: 0
                     }
                 }
             };
@@ -605,7 +625,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var hasVictims = (cell.tile.victims.top != "None") ||
             (cell.tile.victims.right != "None") ||
             (cell.tile.victims.bottom != "None") ||
-            (cell.tile.victims.left != "None");
+            (cell.tile.victims.left != "None") ||
+            (cell.tile.victims.floor != "None");
 
         // Total number of scorable things on this tile
         var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + !!cell.tile.ramp + hasVictims;
@@ -850,7 +871,8 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
         (cell.tile.victims.right != "None") ||
         (cell.tile.victims.bottom != "None") ||
-        (cell.tile.victims.left != "None");
+        (cell.tile.victims.left != "None") ||
+        (cell.tile.victims.floor != "None");
     $scope.clickSound = function(){
         playSound(sClick);
     };
@@ -887,6 +909,14 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
         playSound(sClick);
         $scope.tile.scoredItems.steps = !$scope.tile.scoredItems.steps;
     };
+
+    $scope.applyEntryVictimRestriction= function(direction) {
+        playSound(sClick);
+        if (!$scope.tile.scoredItems.victims[direction]) {
+            $scope.tile.scoredItems.rescueKits[direction] = 0;
+        }
+    }
+
 
     $scope.lightStatus = function(light, kit){
         if(light) return true;

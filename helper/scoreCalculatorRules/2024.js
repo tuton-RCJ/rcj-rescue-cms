@@ -131,10 +131,10 @@ module.exports.calculateMazeScore = function (run) {
     }
 
     const maxKits = {
-      H: 3,
-      S: 2,
+      H: 2,
+      S: 1,
       U: 0,
-      Red: 1,
+      Red: 2,
       Yellow: 1,
       Green: 0,
     };
