@@ -322,6 +322,7 @@
         "view": {
             "info": "基本情報",
             "start": "スタート",
+            "goal": "ゴール",
             "evacuation": "避難ゾーン",
             "Lexit": "脱出",
             "rescue": "被災者救助",

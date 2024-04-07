@@ -72,6 +72,8 @@ module.exports.calculateLineScore = function (run) {
 
     if (run.exitBonus) {
       score += Math.max(60 - 5 * total_lops, 0);
+      const tileCount = run.tiles.length - lastCheckPointTile - 1;
+      score += Math.max(tileCount * (5 - 2 * run.LoPs[checkPointCount]), 0)
     }
 
     // 5 points for placing robot on first droptile (start)

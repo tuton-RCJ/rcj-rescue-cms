@@ -74,9 +74,13 @@ h2 {{'line.sign.checkPointScore' | translate}}
   .col-md-3.col-lg-2(ng-repeat='cp in checkPointDistance track by $index')
     .alert(ng-class="{'alert-success': cp.status , 'alert-danger': !cp.status}", style='margin-bottom:30px;text-align:center;', role='alert')
       div(style='min-height:100px')
-        h6(style='text-align:center;')
-          | {{$index==0?'line.sign.start':'line.sign.checkpoint'|translate}}
+        h6(style='text-align:center;' ng-show="$first")
+          | {{'line.view.start'|translate}}
+        h6(style='text-align:center;' ng-show="!$first && !$last")
+          | {{'line.view.checkpoint'|translate}}
           b(style='font-size:20px;color:#FF8300;') {{$index==0?'':$index}}
+        h6(style='text-align:center;' ng-show="$last")
+          | {{'line.view.goal'|translate}}
         i.fas.fa-road.fa-2x  {{cp.dis}}
         |  {{'common.tile' | translate}}
         br
