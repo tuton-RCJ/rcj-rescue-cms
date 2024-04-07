@@ -1,6 +1,6 @@
 
 .row
-  .col-md-4.col-lg-3(style='margin-bottom:70px;')
+  .col-md-4.col-lg-3(style='margin-bottom:30px;')
     #card_area
       .card
         h3.card-header
@@ -45,22 +45,26 @@
             div(style='position:absolute; top:30px; left:25px;')
               i.fas.fa-check.fa-fw.fa-5x(ng-show='exitBonus && !exitBonusP', style='color:#27ae60; opacity:0.9;')
               i.fas.fa-times.fa-fw.fa-5x(ng-show='!exitBonus && !exitBonusP', style='padding-top:4px; color:#e74c3c; opacity:0.9;')
-  .col-md-8.col-lg-9.tilearea(style='margin-top:-45px;')
-    .alert.alert-primary(style='margin-bottom:5px;text-align:center;', role='alert')
-      h2(style='text-align:center;')
-        | {{'common.stotal' | translate}} : {{allItemScore()}} {{'common.point' |translate}}
-    div(style='text-align:left;float:left;')
-      .btn-group
-        .input-group-prepend
-          span.input-group-text
-            i.fas.fa-arrows-alt-v(aria-hidden='true')
-        button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
-    div(style='text-align:right;float:right;')
-      .btn-group
-        button.btn.btn-outline-dark(type='button', ng-click='tileRot(-90)')
-          i.fas.fa-undo(aria-hidden='true')
-        button.btn.btn-outline-dark(type='button', ng-click='tileRot(90)')
-          i.fas.fa-redo(aria-hidden='true')
+  .col-md-8.col-lg-9.tilearea
+    .row(style="margin-bottom: 5px;")
+      .col-3(style="margin-bottom: 5px;")
+        div(style='text-align:left;float:left;')
+          .btn-group
+            .input-group-prepend
+              span.input-group-text
+                i.fas.fa-arrows-alt-v(aria-hidden='true')
+            button.btn.btn-outline-dark(type='button', ng-click='changeFloor(zz)', ng-repeat='zz in range(height)', ng-class='{active: zz == z}')  {{zz}} 
+      .col-6(style="margin-bottom: 5px;")
+        .alert.alert-primary(style='padding: 0;margin: 0;text-align:center;', role='alert')
+          h3(style='text-align:center;margin: 0;')
+            | {{'common.stotal' | translate}} : {{allItemScore()}} {{'common.point' |translate}}
+      .col-3(style="margin-bottom: 5px;")
+        div(style='text-align:right;float:right;')
+          .btn-group
+            button.btn.btn-outline-dark(type='button', ng-click='tileRot(-90)')
+              i.fas.fa-undo(aria-hidden='true')
+            button.btn.btn-outline-dark(type='button', ng-click='tileRot(90)')
+              i.fas.fa-redo(aria-hidden='true')
     div(style='clear:both;')#mapTopLeft
     #wrapTile(style='margin-top:5px;transform-origin: top left;')
       h2(ng-show='!(length&&width)', style='text-align:center') {{'common.loading' | translate}}
