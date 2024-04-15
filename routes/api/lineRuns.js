@@ -334,12 +334,11 @@ publicRouter.get('/:runid', async function (req, res, next) {
         });
       }
       
+      dbRun = dbRun.toObject();
       if (authResult == 2) {
         delete dbRun.comment;
         delete dbRun.sign;
       }
-
-      dbRun = dbRun.toObject();
 
       // return normalized value
       let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);
