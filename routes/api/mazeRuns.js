@@ -105,6 +105,7 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
         err: err.message,
       });
     } else if (dbRuns) {
+      console.log("ABCD")
       // Hide map and field from public
       dbRuns.map(run => {
         switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {
@@ -316,12 +317,12 @@ publicRouter.get('/:runid', function (req, res, next) {
         msg: 'You have no authority to access this api!!',
       });
     }
+
+    dbRun = dbRun.toObject();
     if (authResult == 2) {
       delete dbRun.comment;
       delete dbRun.sign;
     }
-
-    dbRun = dbRun.toObject();
 
     // return normalized value
     let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);

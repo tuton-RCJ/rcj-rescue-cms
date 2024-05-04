@@ -152,13 +152,13 @@ publicRouter.get('/:runid', async function (req, res, next) {
         ACCESSLEVELS.NONE + 1,
         dbRun.competition.preparation
       );
+
+      dbRun = dbRun.toObject();
       if (authResult == 0) return res.status(401).send();
       if (authResult == 2) {
         delete dbRun.comment;
         delete dbRun.sign;
       }
-
-      dbRun = dbRun.toObject();
 
       // return normalized value
       let rankingSettings = dbRun.competition.leagues.find(r => r.league == dbRun.team.league);

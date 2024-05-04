@@ -88,31 +88,32 @@ html(ng-app="ddApp")
             .d-sm-none
               i.fas.fa-stopwatch.fa-2x(aria-hidden='true')
                 | : {{minutes}} {{'common.min' | translate}} {{seconds}} {{'common.sec' | translate}}
-      .row(style='margin:0 0 30 0;')
-        .col-md-12
-          #sign.card
-            h3.card-header
-              i.fas.fa-comment(aria-hidden='true')
-              |  {{'line.view.comment' | translate}}
-            .card-body
-              p.card-text.text-info
-                | {{'line.view.comment_e' | translate}}
-              .form-group
-                textarea.form-control(ng-model='comment', rows='3', disabled='')
-            h3.card-header
-              i.fas.fa-pencil-alt(aria-hidden='true')
-              |  {{'line.view.sign' | translate}}
-            .card-body
-              p.card-text.text-warning(translate='line.view.sign_e')
-              .sign-box.sign-box-cap
-                p.sign-box-title.sign-box-title-cap(translate='line.view.cap_sign')
-                img(ng-src='{{cap_sig}}', style='max-width: 100%;height: auto;')
-              hr
-              .sign-box.sign-box-ref
-                p.sign-box-title.sign-box-title-ref(translate='line.view.ref_sign')
-                img(ng-src='{{ref_sig}}', style='max-width: 100%;height: auto;')
-              hr
-              .sign-box.sign-box-ref
-                p.sign-box-title.sign-box-title-ref(translate='line.view.cref_sign')
-                img(ng-src='{{refas_sig}}', style='max-width: 100%;height: auto;')
+      if user
+        .row(style='margin:0 0 30 0;')
+          .col-md-12
+            #sign.card
+              h3.card-header
+                i.fas.fa-comment(aria-hidden='true')
+                |  {{'line.view.comment' | translate}}
+              .card-body
+                p.card-text.text-info
+                  | {{'line.view.comment_e' | translate}}
+                .form-group
+                  textarea.form-control(ng-model='comment', rows='3', disabled='')
+              h3.card-header
+                i.fas.fa-pencil-alt(aria-hidden='true')
+                |  {{'line.view.sign' | translate}}
+              .card-body
+                p.card-text.text-warning(translate='line.view.sign_e')
+                .sign-box.sign-box-cap
+                  p.sign-box-title.sign-box-title-cap(translate='line.view.cap_sign')
+                  img(ng-src='{{cap_sig}}', style='max-width: 100%;height: auto;')
+                hr
+                .sign-box.sign-box-ref
+                  p.sign-box-title.sign-box-title-ref(translate='line.view.ref_sign')
+                  img(ng-src='{{ref_sig}}', style='max-width: 100%;height: auto;')
+                hr
+                .sign-box.sign-box-ref
+                  p.sign-box-title.sign-box-title-ref(translate='line.view.cref_sign')
+                  img(ng-src='{{refas_sig}}', style='max-width: 100%;height: auto;')
     include ../includes/footer
