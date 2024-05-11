@@ -66,6 +66,21 @@ privateRouter.get('/sign/:runid', async function (req, res) {
   res.render(`sign/${rule.type}_${rule.rule}`, { id });
 });
 
+privateRouter.get('/:competitionid/:leagueId/technicalChallenge', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const { leagueId } = req.params;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (!competitiondb.LEAGUES.includes(leagueId)) {
+    return next();
+  }
+  
+  res.render(`technicalChallenge/scoring`, { competitionId, leagueId, user: req.user });
+});
+
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
   const iframe = req.query.iframe;

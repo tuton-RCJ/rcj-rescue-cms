@@ -48,7 +48,7 @@ publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, 
   res.render(`ranking/${rule.type}_${rule.rule}`, { competitionId, leagueId, user: req.user });
 });
 
-publicRouter.get('/:competitionid/:leagueId/technicalChallenge', async function (req, res, next) {
+privateRouter.get('/:competitionid/:leagueId/technicalChallenge', async function (req, res, next) {
   const competitionId = req.params.competitionid;
   const { leagueId } = req.params;
 

@@ -37,6 +37,11 @@ app.controller("LineCompetitionController", ['$scope', '$http', '$translate', fu
             result[current.league] = current.disclose;
             return result;
         }, {})
+
+        $scope.rankingMode = $scope.competition.leagues.reduce((result, current) => {
+            result[current.league] = current.mode;
+            return result;
+        }, {})
     })
 
     $http.get("/api/competitions/leagues/" + league).then(function (response) {
