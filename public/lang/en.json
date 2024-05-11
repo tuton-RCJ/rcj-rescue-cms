@@ -141,6 +141,9 @@
         "deleted": "Successfully deleted!",
         "mypage": "Personal page"
     },
+    "technicalChallenge": {
+        "technicalChallenge": "Technical Challenge"
+    },
     "accessDenied":{
         "title" : "Access denied",
         "description1" : "You do not have permission to access this page. Please login with authorized account.",

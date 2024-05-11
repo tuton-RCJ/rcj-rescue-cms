@@ -4,7 +4,6 @@ const publicRouter = express.Router();
 const privateRouter = express.Router();
 const adminRouter = express.Router();
 const { ObjectId } = require('mongoose').Types;
-const logger = require('../../config/logger').mainLogger;
 const { lineRun } = require('../../models/lineRun');
 const { mazeRun } = require('../../models/mazeRun');
 const { simRun } = require('../../models/simRun');
@@ -12,7 +11,6 @@ const auth = require('../../helper/authLevels');
 const { ACCESSLEVELS } = require('../../models/user');
 const competitiondb = require('../../models/competition');
 const { review } = require('../../models/document');
-const { template } = require('lodash');
 const { VICTIMS } = require('../../models/mazeMap');
 
 const MINIMUM_REVIEWER = 5
@@ -121,12 +119,6 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
         unknown: sum(bestRuns.map(run => run.nl.liveVictim.filter(l => l.found && !l.identified).length + run.nl.deadVictim.filter(l => l.found && !l.identified).length))
       };
     } else { // WL
-      teamRuns[e].gameSum.victims = {
-        live: sum(bestRuns.map(run => run.rescueOrder.filter(v => v.victimType == "LIVE").length)),
-        dead: sum(bestRuns.map(run => run.rescueOrder.filter(v => v.victimType == "DEAD").length)),
-        kit: sum(bestRuns.map(run => run.rescueOrder.filter(v => v.victimType == "KIT").length))
-      }
-
       teamRuns[e].gameSum.victims = bestRuns.flatMap(run => run.rescueOrder).reduce(function (result, current) {
         var element = result.find(p => p.victimType == current.victimType && p.zoneType == current.zoneType);
         if (element) {
@@ -144,13 +136,22 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the LoPs
     teamRuns[e].gameSum.lops = sum(bestRuns.map(run => sum(run.LoPs)));
+
+    // Set default score
+    teamRuns[e].technicalChallenge = 0;
   })
 
   let result = {
-    mode: rankingMode
+    mode: rankingMode,
+    modeDetails: {
+      nonNormalized: competitiondb.NON_NORMALIZED_RANKING_MODE.includes(rankingMode),
+      normalized: competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode),
+      document: competitiondb.DOCUMENT_RANKING_MODE.includes(rankingMode),
+      technicalChallenge: competitiondb.TECHNICAL_CHALLENGE_RANKING_MODE.includes(rankingMode)
+    }
   };
 
-  if (competitiondb.DOCUMENT_RANKING.includes(rankingMode)) {
+  if (result.modeDetails.document) {
     let documentResult = await getDocumentScore(competition, league);
     let documentScore = documentResult.result;
     result.documentBlockTitles = documentResult.blockTitles;
@@ -162,6 +163,15 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
         };
       }
       
+    }
+  }
+
+  if (result.modeDetails.technicalChallenge) {
+    let tcResult = await getTechnicalChallengeScore(competition, league);
+    for (let tc of tcResult) {
+      if (teamRuns[tc.teamId]) {
+        teamRuns[tc.teamId].technicalChallenge = tc.score;
+      }
     }
   }
 
@@ -190,6 +200,10 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
       break;
     case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT:
       ranking.map(r => r.finalScore = 0.8* r.gameSum.normalizedScoreMean + 0.2 * r.document.score);
+      break;
+    case competitiondb.GAMES_DOCUMENT_CHALLENGE:
+      ranking.map(r => r.finalScore = 0.7* r.gameSum.normalizedScoreMean + 0.2 * r.document.score + 0.1 * r.technicalChallenge);
+      break;
   }
 
   ranking.sort(sortFinalScore);
@@ -318,13 +332,22 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
 
     // Sum of the exitBonus
     teamRuns[e].gameSum.exitBonus = sum(bestRuns.map(run => run.exitBonus ? 1:0));
+
+    // Set default score
+    teamRuns[e].technicalChallenge = 0;
   })
 
   let result = {
-    mode: rankingMode
+    mode: rankingMode,
+    modeDetails: {
+      nonNormalized: competitiondb.NON_NORMALIZED_RANKING_MODE.includes(rankingMode),
+      normalized: competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode),
+      document: competitiondb.DOCUMENT_RANKING_MODE.includes(rankingMode),
+      technicalChallenge: competitiondb.TECHNICAL_CHALLENGE_RANKING_MODE.includes(rankingMode)
+    }
   };
 
-  if (competitiondb.DOCUMENT_RANKING.includes(rankingMode)) {
+  if (result.modeDetails.document) {
     let documentResult = await getDocumentScore(competition, league);
     let documentScore = documentResult.result;
     result.documentBlockTitles = documentResult.blockTitles;
@@ -334,6 +357,15 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
           details: d.details,
           score: d.score
         };
+      }
+    }
+  }
+
+  if (result.modeDetails.technicalChallenge) {
+    let tcResult = await getTechnicalChallengeScore(competition, league);
+    for (let tc of tcResult) {
+      if (teamRuns[tc.team._id]) {
+        teamRuns[tc.team._id].technicalChallenge = tc.score;
       }
     }
   }
@@ -363,6 +395,10 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
       break;
     case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT:
       ranking.map(r => r.finalScore = 0.8* r.gameSum.normalizedScoreMean + 0.2 * r.document.score);
+      break;
+    case competitiondb.GAMES_DOCUMENT_CHALLENGE:
+      ranking.map(r => r.finalScore = 0.7* r.gameSum.normalizedScoreMean + 0.2 * r.document.score + 0.1 * r.technicalChallenge);
+      break;
   }
 
   ranking.sort(sortFinalScore);
@@ -464,13 +500,22 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
     teamRuns[e].gameSum.time.seconds = sum(bestRuns.map(run => run.time.seconds));
     teamRuns[e].gameSum.time.minutes += Math.floor(teamRuns[e].gameSum.time.seconds / 60);
     teamRuns[e].gameSum.time.seconds %= 60;
+
+    // Set default score
+    teamRuns[e].technicalChallenge = 0;
   })
 
   let result = {
-    mode: rankingMode
+    mode: rankingMode,
+    modeDetails: {
+      nonNormalized: competitiondb.NON_NORMALIZED_RANKING_MODE.includes(rankingMode),
+      normalized: competitiondb.NORMALIZED_RANKING_MODE.includes(rankingMode),
+      document: competitiondb.DOCUMENT_RANKING_MODE.includes(rankingMode),
+      technicalChallenge: competitiondb.TECHNICAL_CHALLENGE_RANKING_MODE.includes(rankingMode)
+    }
   };
 
-  if (competitiondb.DOCUMENT_RANKING.includes(rankingMode)) {
+  if (result.modeDetails.document) {
     let documentResult = await getDocumentScore(competition, league);
     let documentScore = documentResult.result;
     result.documentBlockTitles = documentResult.blockTitles;
@@ -480,6 +525,15 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
           details: d.details,
           score: d.score
         };
+      }
+    }
+  }
+
+  if (result.modeDetails.technicalChallenge) {
+    let tcResult = await getTechnicalChallengeScore(competition, league);
+    for (let tc of tcResult) {
+      if (teamRuns[tc.team._id]) {
+        teamRuns[tc.team._id].technicalChallenge = tc.score;
       }
     }
   }
@@ -509,6 +563,10 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
       break;
     case competitiondb.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT:
       ranking.map(r => r.finalScore = 0.8* r.gameSum.normalizedScoreMean + 0.2 * r.document.score);
+      break;
+    case competitiondb.GAMES_DOCUMENT_CHALLENGE:
+      ranking.map(r => r.finalScore = 0.7* r.gameSum.normalizedScoreMean + 0.2 * r.document.score + 0.1 * r.technicalChallenge);
+      break;
   }
 
   ranking.sort(sortFinalScore);
@@ -711,6 +769,25 @@ async function getDocumentScore(competitionId, leagueId) {
     result,
     blockTitles
   }
+}
+
+async function getTechnicalChallengeScore(competitionId, leagueId) {
+  let data = (await competitiondb.technicalChallenge
+    .find({
+      competition: competitionId
+    })
+    .populate({
+      path:'team',
+      match: {'league': {$eq: leagueId}}
+     })
+    .exec()).filter(d => d.team != null);
+  let maxScore = Math.max(...data.map(d => d.score));
+
+  return data.map((d) => ({
+      teamId: d.team._id,
+      rawScore: d.score,
+      score: d.score / maxScore
+  }));
 }
 
 publicRouter.all('*', function (req, res, next) {

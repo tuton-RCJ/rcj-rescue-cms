@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const validator = require('validator')
 const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 const crypto = require('crypto')
@@ -52,19 +51,23 @@ const QUESTION_TYPES = ['input', 'select', 'scale', 'picture', 'movie', 'pdf', '
 const SUM_OF_BEST_N_GAMES = "SUM_OF_BEST_N_GAMES"
 const MEAN_OF_NORMALIZED_BEST_N_GAMES = "MEAN_OF_NORMALIZED_BEST_N_GAMES"
 const MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT = "MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT"
+const GAMES_DOCUMENT_CHALLENGE = "GAMES_DOCUMENT_CHALLENGE"
 
 const NON_NORMALIZED_RANKING_MODE = [SUM_OF_BEST_N_GAMES];
-const NORMALIZED_RANKING_MODE = [MEAN_OF_NORMALIZED_BEST_N_GAMES, MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT];
+const NORMALIZED_RANKING_MODE = [MEAN_OF_NORMALIZED_BEST_N_GAMES, MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT, GAMES_DOCUMENT_CHALLENGE];
 const RANKING_MODE = [].concat(NON_NORMALIZED_RANKING_MODE, NORMALIZED_RANKING_MODE);
-const DOCUMENT_RANKING = [MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT];
+const DOCUMENT_RANKING_MODE = [MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT, GAMES_DOCUMENT_CHALLENGE];
+const TECHNICAL_CHALLENGE_RANKING_MODE = [GAMES_DOCUMENT_CHALLENGE];
 
 module.exports.NON_NORMALIZED_RANKING_MODE = NON_NORMALIZED_RANKING_MODE;
 module.exports.NORMALIZED_RANKING_MODE = NORMALIZED_RANKING_MODE;
 module.exports.RANKING_MODE = RANKING_MODE;
-module.exports.DOCUMENT_RANKING = DOCUMENT_RANKING;
+module.exports.DOCUMENT_RANKING_MODE = DOCUMENT_RANKING_MODE;
+module.exports.TECHNICAL_CHALLENGE_RANKING_MODE = TECHNICAL_CHALLENGE_RANKING_MODE;
 module.exports.SUM_OF_BEST_N_GAMES = SUM_OF_BEST_N_GAMES;
 module.exports.MEAN_OF_NORMALIZED_BEST_N_GAMES = MEAN_OF_NORMALIZED_BEST_N_GAMES;
 module.exports.MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT = MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT;
+module.exports.GAMES_DOCUMENT_CHALLENGE = GAMES_DOCUMENT_CHALLENGE;
 
 /**
  *
@@ -219,6 +222,7 @@ competitionSchema.pre('deleteOne', function (next) {
   require('./reservation').reservation.deleteMany({ competition: this._id }, next);
   require('./survey').survey.deleteMany({ competition: this._id }, next);
   require('./survey').surveyAnswer.deleteMany({ competition: this._id }, next);
+  TechnicalChallenge.deleteMany({ team: this._id }, next);
 });
 
 const signageSchema = new Schema({
@@ -285,6 +289,23 @@ roundSchema.pre('save', function (next) {
   }
 })
 
+const technicalChallengeSchema = new Schema({
+  challengeId: {type: ObjectId, required: false},
+  competition: {
+    type    : ObjectId,
+    ref     : 'Competition',
+    required: true,
+    index   : true
+  },
+  team: {
+    type    : ObjectId,
+    ref     : 'Team',
+    required: true,
+    index   : true
+  },
+  score: {type: Number, default: 0},
+})
+
 const teamSchema = new Schema({
   competition: {
     type    : ObjectId,
@@ -326,6 +347,7 @@ teamSchema.pre('deleteOne', function (next) {
   require('./mazeRun').mazeRun.deleteMany({ team: this._id }, next);
   require('./mail').mail.deleteMany({ team: this._id }, next);
   require('./survey').surveyAnswer.deleteMany({ team: this._id }, next);
+  TechnicalChallenge.deleteMany({ team: this._id }, next);
 });
 
 teamSchema.pre('deleteMany', function (next) {
@@ -334,6 +356,7 @@ teamSchema.pre('deleteMany', function (next) {
   require('./mazeRun').mazeRun.deleteMany({ team: this._conditions._id }, next);
   require('./mail').mail.deleteMany({ team: this._conditions._id }, next);
   require('./survey').surveyAnswer.deleteMany({ team: this._conditions._id }, next);
+  TechnicalChallenge.deleteMany({ team: this._id }, next);
 });
 
 
@@ -375,6 +398,8 @@ const Signage = mongoose.model('Signage', signageSchema)
 const Round = mongoose.model('Round', roundSchema)
 const Team = mongoose.model('Team', teamSchema)
 const Field = mongoose.model('Field', fieldSchema)
+const TechnicalChallenge = mongoose.model('TechnicalChallenge', technicalChallengeSchema)
+
 
 /** Mongoose model {@link http://mongoosejs.com/docs/models.html} */
 module.exports.competition = Competition
@@ -382,3 +407,4 @@ module.exports.signage = Signage
 module.exports.round = Round
 module.exports.team = Team
 module.exports.field = Field
+module.exports.technicalChallenge = TechnicalChallenge

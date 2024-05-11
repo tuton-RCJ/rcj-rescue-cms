@@ -33,6 +33,9 @@ block content
         i.fas.fa-trophy.fa-3x(aria-hidden='true')
         p [{{league.name}}]
         p(style="font-size: 30px; margin:0;") {{'common.rank' | translate}}
+      button(ng-click="go('/line/' + competition._id + '/' + league.id + '/technicalChallenge')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:20px;" ng-if="isJudge == 1")
+        i.fas.fa-edit.fa-3x(aria-hidden='true')
+        p(style="font-size: 30px; margin:0;") Technical Challenge
 
       br
       .refine

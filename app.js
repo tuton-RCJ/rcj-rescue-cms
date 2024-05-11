@@ -103,6 +103,7 @@ async function bootstrap(){
     var apiCabinetRoute = require('./routes/api/cabinet')
     var apiSurveyRoute = require('./routes/api/survey')
     var apiRankingRoute = require('./routes/api/ranking')
+    var apiTechnicalChallengeRoute = require('./routes/api/technicalChallenge')
 
 
     //========================================================================
@@ -196,6 +197,7 @@ async function bootstrap(){
     app.use('/api/cabinet', [apiCabinetRoute.public, pass.ensureLoginApi, apiCabinetRoute.private, pass.ensureAdminApi, apiCabinetRoute.admin])
     app.use('/api/survey', [apiSurveyRoute.public, pass.ensureLoginApi, apiSurveyRoute.private, pass.ensureAdminApi, apiSurveyRoute.admin])
     app.use('/api/ranking', [apiRankingRoute.public, pass.ensureLoginApi, apiRankingRoute.private, pass.ensureAdminApi, apiRankingRoute.admin])
+    app.use('/api/technicalChallenge', [pass.ensureLoginApi, apiTechnicalChallengeRoute.private, pass.ensureAdminApi, apiTechnicalChallengeRoute.admin])
     app.get('/api/ip', (request, response) => response.send(request.ip))
 
 

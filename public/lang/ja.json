@@ -141,6 +141,9 @@
         "deleted": "正常に削除しました",
         "mypage": "マイページ"
     },
+    "technicalChallenge": {
+        "technicalChallenge": "テクニカルチャレンジ"
+    },
     "accessDenied":{
         "title" : "アクセス拒絶",
         "description1" : "このページにアクセスする権限がありません．権限のあるアカウントでログインしてください．",
