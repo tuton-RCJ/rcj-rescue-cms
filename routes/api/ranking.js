@@ -364,8 +364,9 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   if (result.modeDetails.technicalChallenge) {
     let tcResult = await getTechnicalChallengeScore(competition, league);
     for (let tc of tcResult) {
-      if (teamRuns[tc.team._id]) {
-        teamRuns[tc.team._id].technicalChallenge = tc.score;
+      console.log(tc)
+      if (teamRuns[tc.teamId]) {
+        teamRuns[tc.teamId].technicalChallenge = tc.score;
       }
     }
   }
@@ -532,8 +533,8 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   if (result.modeDetails.technicalChallenge) {
     let tcResult = await getTechnicalChallengeScore(competition, league);
     for (let tc of tcResult) {
-      if (teamRuns[tc.team._id]) {
-        teamRuns[tc.team._id].technicalChallenge = tc.score;
+      if (teamRuns[tc.teamId]) {
+        teamRuns[tc.teamId].technicalChallenge = tc.score;
       }
     }
   }
