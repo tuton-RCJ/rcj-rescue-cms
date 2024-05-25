@@ -135,6 +135,9 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
         for (var index in $scope.cells) {
             $scope.cells[index].isLinear = false;
             $scope.cells[index].virtualWall = false;
+            if ($scope.cells[index].tile) {
+                $scope.cells[index].tile.reachable= false;
+            }       
         }
         
         // Set to virtual wall around the black tile and start tile
@@ -191,10 +194,68 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
                 recurs($scope.cells[index].x-1, $scope.cells[index].y+1, $scope.cells[index].tile.changeFloorTo);
             }
         }
+
+        reachable($scope.startTile.x, $scope.startTile.y, $scope.startTile.z);
     }
 
     function isOdd(num) {
         return num % 2;
+    }
+
+    function reachable(x, y, z) {
+        if (x > $scope.width * 2 + 1 || x < 0 ||
+            y > $scope.length * 2 + 1 || y < 0 ||
+            z > $scope.height || z < 0)
+            return;
+        if ($scope.cells[pos(x,y,z)].tile && $scope.cells[pos(x,y,z)].tile.reachable) return;
+
+        setReachable(x, y, z);
+
+        // Top
+        if (!wallExist(x, y-1, z)) {
+            reachable(x, y-2, z);
+        }
+        // Right
+        if (!wallExist(x+1, y, z)) {
+            reachable(x+2, y, z);
+        }
+        // Left
+        if (!wallExist(x-1, y, z)) {
+            reachable(x-2, y, z);
+        }
+        // Bottom
+        if (!wallExist(x, y+1, z)) {
+            reachable(x, y+2, z);
+        }
+
+        // Elevator
+        if ($scope.cells[pos(x,y,z)].tile.changeFloorTo != undefined && $scope.cells[pos(x,y,z)].tile.changeFloorTo != z) {
+            reachable(x, y, $scope.cells[pos(x,y,z)].tile.changeFloorTo);
+        }
+    }
+
+    function pos(x, y, z) {
+        return `${x},${y},${z}`;
+    }
+
+    function wallExist(x, y, z) {
+        let cell = $scope.cells[pos(x,y,z)];
+        if (!cell) return false;
+        return cell.isWall == true;
+    }
+
+    function setReachable(x, y, z) {
+        if ($scope.cells[pos(x,y,z)]) {
+            $scope.cells[pos(x,y,z)].tile.reachable = true;
+        } else {
+            $scope.cells[pos(x,y,z)] = {
+                isTile: true,
+                isLinear: false,
+                tile: {
+                    reachable: true
+                }
+            };
+        }
     }
 
     function recurs(x, y, z) {
@@ -361,9 +422,11 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
         let count = 0;
         for(let i=1,l=$scope.length*2+1;i<l;i+=2){
             for(let j=1,m=$scope.width*2+1;j<m;j+=2){
-                if(!$scope.cells[j + ',' + i + ',' + z]) continue;
-                if($scope.cells[j + ',' + i + ',' + z].tile[type]) count++;
-                if(x == j && y == i) return count;
+                for(let k=0;k<$scope.height;k++) {
+                    if(!$scope.cells[j + ',' + i + ',' + k]) continue;
+                    if($scope.cells[j + ',' + i + ',' + k].tile[type]) count++;
+                    if(x == j && y == i && z == k) return count;
+                }
             }
         }
         return count;
@@ -374,37 +437,40 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
         let count = 0;
         for(let i=1,l=$scope.length*2+1;i<l;i+=2){
             for(let j=1,m=$scope.width*2+1;j<m;j+=2){
-                if(!$scope.cells[j + ',' + i + ',' + z]) continue;
-                if($scope.cells[j + ',' + i + ',' + z].isLinear == linear){
-                    let victims = $scope.cells[j + ',' + i + ',' + z].tile.victims;
-                    if(victims){
-                        if(victims.top == type) count++;
-                        if(x == j && y == i && place == 'top'){
-                            if(linear) return big[count-1];
-                            else return small[count-1];
-                        }
-                        if(victims.left == type) count++;
-                        if(x == j && y == i && place == 'left'){
-                            if(linear) return big[count-1];
-                            else return small[count-1];
-                        }
-                        if(victims.right == type) count++;
-                        if(x == j && y == i && place == 'right'){
-                            if(linear) return big[count-1];
-                            else return small[count-1];
-                        }
-                        if(victims.bottom == type) count++;
-                        if(x == j && y == i && place == 'bottom'){
-                            if(linear) return big[count-1];
-                            else return small[count-1];
-                        }
-                        if(victims.floor == type) count++;
-                        if(x == j && y == i && place == 'floor'){
-                            if(linear) return big[count-1];
-                            else return small[count-1];
+                for(let k=0;k<$scope.height;k++) {
+                    if(!$scope.cells[j + ',' + i + ',' + k]) continue;
+                    if($scope.cells[j + ',' + i + ',' + k].isLinear == linear){
+                        let victims = $scope.cells[j + ',' + i + ',' + k].tile.victims;
+                        if(victims){
+                            if(victims.top == type) count++;
+                            if(x == j && y == i && z == k && place == 'top'){
+                                if(linear) return big[count-1];
+                                else return small[count-1];
+                            }
+                            if(victims.left == type) count++;
+                            if(x == j && y == i && z == k && place == 'left'){
+                                if(linear) return big[count-1];
+                                else return small[count-1];
+                            }
+                            if(victims.right == type) count++;
+                            if(x == j && y == i && z == k && place == 'right'){
+                                if(linear) return big[count-1];
+                                else return small[count-1];
+                            }
+                            if(victims.bottom == type) count++;
+                            if(x == j && y == i && z == k && place == 'bottom'){
+                                if(linear) return big[count-1];
+                                else return small[count-1];
+                            }
+                            if(victims.floor == type) count++;
+                            if(x == j && y == i && z == k && place == 'floor'){
+                                if(linear) return big[count-1];
+                                else return small[count-1];
+                            }
                         }
                     }
                 }
+                
             }
         }
     };
@@ -773,6 +839,48 @@ app.controller('MazeEditorController', ['$scope', '$uibModal', '$log', '$http','
             }, false);
         }
 
+
+    $scope.showRow = function (r, z) {
+        for (let c of $scope.range(2*$scope.width + 1)) {
+            let cell = $scope.cells[`${c},${r},${z}`];
+            if (!cell) continue;
+            if (cell.isTile) {
+                if (cell.tile.reachable) {
+                    return true;
+                }
+            } else {
+                // Check surrounding tiles
+                if (r % 2 == 1) {
+                    // Check left and right
+                    if (
+                        checkTileReachable(c-1, r, z) ||
+                        checkTileReachable(c+1, r, z)
+                    ) {
+                        return true;
+                    }
+                } else {
+                    // Check up and bottom
+                    if (
+                        checkTileReachable(c, r-1, z) ||
+                        checkTileReachable(c, r+1, z)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    function checkTileReachable(c, r, z) {
+        let cell = $scope.cells[`${c},${r},${z}`];
+        if (!cell) return false;
+        if (!cell.isTile) return false;
+        if (cell.tile.reachable) {
+            return true;
+        }
+        return false;
+    }
 
     $scope.cellClick = function (x, y, z, isWall, isTile) {
 

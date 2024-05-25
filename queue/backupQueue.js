@@ -38,7 +38,7 @@ backupQueue.process('backup', function(job, done){
   fs.mkdirsSync(folderPath);
 
   jobProgress = 0;
-  const maxCount = 17;
+  const maxCount = 18;
   let outputCount = 0;
   job.progress(0);
   job.update({
@@ -158,6 +158,7 @@ backupQueue.process('backup', function(job, done){
   backup('round', competitiondb.round);
   backup('team', competitiondb.team);
   backup('field', competitiondb.field);
+  backup('technicalChallenge', competitiondb.technicalChallenge);
   backup('review', documentDb.review);
   backup('lineMap', lineMapDb.lineMap);
   backup('lineRun', lineRunDb.lineRun);
@@ -221,7 +222,7 @@ backupQueue.on('failed', function(job, err) {
 backupQueue.process('restore', function(job, done){
   job.progress(1);
   const {folder, user} = job.data;
-  const maxCount = 17;
+  const maxCount = 18;
 
   const extract = onezip.extract(`./tmp/uploads/${folder}.zip`, `./tmp/uploads/${folder}`);
 
@@ -315,6 +316,7 @@ backupQueue.process('restore', function(job, done){
       restore('team', competitiondb.team);
       restore('field', competitiondb.field);
       restore('round', competitiondb.round);
+      restore('technicalChallenge', competitiondb.technicalChallenge);
       restore('lineMap', lineMapDb.lineMap);
       restore('lineRun', lineRunDb.lineRun);
       restore('mazeMap', mazeMapDb.mazeMap);

@@ -33,6 +33,10 @@ block content
         p [{{league.name}}]
         p(style="font-size: 30px; margin:0;") {{'common.rank' | translate}}
 
+      button(ng-click="go('/maze/' + competition._id + '/' + league.id + '/technicalChallenge')" class='btn btn-outline-success btn-lg btn-block' style="margin-bottom:20px;" ng-if="isJudge == 1 && rankingMode[league.id] =='GAMES_DOCUMENT_CHALLENGE'")
+        i.fas.fa-edit.fa-3x(aria-hidden='true')
+        p(style="font-size: 30px; margin:0;") {{'technicalChallenge.technicalChallenge' | translate}}
+
       br
       .refine
         .card.border-dark.mb-3(style='width:100%;')

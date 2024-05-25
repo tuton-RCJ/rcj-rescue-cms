@@ -20,13 +20,6 @@ app.controller("MazeScoreController", ['$scope', '$http', '$sce', '$translate', 
     $scope.comment = [];
     $scope.comment.bottom = "The scores are based on the sum of all the run (the minimum score is not subtracted yet).";
 
-    $scope.showMode = {
-        normalGameScore: false,
-        normalizedGameScore: false,
-        documentScore: false,
-        teamCode: false
-    }
-
     const currentLang = $translate.proposedLanguage() || $translate.use();
     $scope.displayLang = currentLang;
 
@@ -62,17 +55,8 @@ app.controller("MazeScoreController", ['$scope', '$http', '$sce', '$translate', 
             $scope.ranking = rankingInfo.ranking;
             $scope.runGroups = rankingInfo.runGroups;
             
+            $scope.showMode = rankingInfo.modeDetails;
             $scope.showMode.teamCode = $scope.ranking.some(t => t.team.teamCode);
-
-            if (rankingInfo.mode == "SUM_OF_BEST_N_GAMES") {
-                $scope.showMode.normalGameScore = true;
-            } else {
-                $scope.showMode.normalizedGameScore = true;
-            }
-
-            if (rankingInfo.mode == "MEAN_OF_NORMALIZED_BEST_N_GAMES_NORMALIZED_DOCUMENT") {
-                $scope.showMode.documentScore = true;
-            }
 
             $scope.maxGameNum = $scope.runGroups.length;
 

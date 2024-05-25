@@ -53,7 +53,7 @@ function drawRun(doc, config, scoringRun) {
     doc,
     0,
     0,
-    'scoresheet_generation/maze/base2023.png',
+    'scoresheet_generation/maze/base2024.png',
     841.89,
     595.28,
     'center'
@@ -173,7 +173,7 @@ function drawRun(doc, config, scoringRun) {
     );
 
   // System version
-  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.cms_version}`, 6, 'black');
+  pdf.drawText(doc, 20, 580, `©${process.env.cms_copyright}. This score sheet was generated with RCJ CMS v${process.env.cms_version}`, 8, 'black');
 
   const cells = [];
   for (const cell of scoringRun.map.cells) {
@@ -214,110 +214,112 @@ function drawRun(doc, config, scoringRun) {
   };
   for (let j = 1, l = scoringRun.map.length * 2 + 1; j < l; j += 2) {
     for (let i = 1, m = scoringRun.map.width * 2 + 1; i < m; i += 2) {
-      if (!cells[`${i},${j},0`]) continue
-      const victimLF = cells[`${i},${j},0`].isLinear ? 'linear' : 'floating';
-      const { victims } = cells[`${i},${j},0`].tile;
-      const { tile } = cells[`${i},${j},0`];
-      let victimType = 'None';
+      for (let k = 0; k < scoringRun.map.height; k++) {
+        if (!cells[`${i},${j},${k}`]) continue
+        const victimLF = cells[`${i},${j},${k}`].isLinear ? 'linear' : 'floating';
+        const { victims } = cells[`${i},${j},${k}`].tile;
+        const { tile } = cells[`${i},${j},${k}`];
+        let victimType = 'None';
 
-      victimType = victims.top;
-      if (victimType != 'None') {
-        let name;
-        if (victimLF == 'linear')
-          name = big[itemList[victimType][victimLF].length];
-        else name = small[itemList[victimType][victimLF].length];
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name,
-        };
-        itemList[victimType][victimLF].push(tmp);
-      }
+        victimType = victims.top;
+        if (victimType != 'None') {
+          let name;
+          if (victimLF == 'linear')
+            name = big[itemList[victimType][victimLF].length];
+          else name = small[itemList[victimType][victimLF].length];
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name,
+          };
+          itemList[victimType][victimLF].push(tmp);
+        }
 
-      victimType = victims.left;
-      if (victimType != 'None') {
-        let name;
-        if (victimLF == 'linear')
-          name = big[itemList[victimType][victimLF].length];
-        else name = small[itemList[victimType][victimLF].length];
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name,
-        };
-        itemList[victimType][victimLF].push(tmp);
-      }
+        victimType = victims.left;
+        if (victimType != 'None') {
+          let name;
+          if (victimLF == 'linear')
+            name = big[itemList[victimType][victimLF].length];
+          else name = small[itemList[victimType][victimLF].length];
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name,
+          };
+          itemList[victimType][victimLF].push(tmp);
+        }
 
-      victimType = victims.right;
-      if (victimType != 'None') {
-        let name;
-        if (victimLF == 'linear')
-          name = big[itemList[victimType][victimLF].length];
-        else name = small[itemList[victimType][victimLF].length];
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name,
-        };
-        itemList[victimType][victimLF].push(tmp);
-      }
+        victimType = victims.right;
+        if (victimType != 'None') {
+          let name;
+          if (victimLF == 'linear')
+            name = big[itemList[victimType][victimLF].length];
+          else name = small[itemList[victimType][victimLF].length];
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name,
+          };
+          itemList[victimType][victimLF].push(tmp);
+        }
 
-      victimType = victims.bottom;
-      if (victimType != 'None') {
-        let name;
-        if (victimLF == 'linear')
-          name = big[itemList[victimType][victimLF].length];
-        else name = small[itemList[victimType][victimLF].length];
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name,
-        };
-        itemList[victimType][victimLF].push(tmp);
-      }
+        victimType = victims.bottom;
+        if (victimType != 'None') {
+          let name;
+          if (victimLF == 'linear')
+            name = big[itemList[victimType][victimLF].length];
+          else name = small[itemList[victimType][victimLF].length];
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name,
+          };
+          itemList[victimType][victimLF].push(tmp);
+        }
 
-      if (tile.checkpoint) {
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name: itemList.checkpoint.length + 1,
-        };
-        itemList.checkpoint.push(tmp);
-      }
+        if (tile.checkpoint) {
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name: itemList.checkpoint.length + 1,
+          };
+          itemList.checkpoint.push(tmp);
+        }
 
-      if (tile.speedbump) {
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name: itemList.speedbump.length + 1,
-        };
-        itemList.speedbump.push(tmp);
-      }
+        if (tile.speedbump) {
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name: itemList.speedbump.length + 1,
+          };
+          itemList.speedbump.push(tmp);
+        }
 
-      if (tile.ramp) {
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name: itemList.ramp.length + 1,
-        };
-        itemList.ramp.push(tmp);
-      }
+        if (tile.ramp) {
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name: itemList.ramp.length + 1,
+          };
+          itemList.ramp.push(tmp);
+        }
 
-      if (tile.steps) {
-        const tmp = {
-          x: i,
-          y: j,
-          z: 0,
-          name: itemList.steps.length + 1,
-        };
-        itemList.steps.push(tmp);
+        if (tile.steps) {
+          const tmp = {
+            x: i,
+            y: j,
+            z: k,
+            name: itemList.steps.length + 1,
+          };
+          itemList.steps.push(tmp);
+        }
       }
     }
   }
@@ -335,7 +337,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/l3.png',
+      'scoresheet_generation/maze/l2.png',
       base_size_x,
       50,
       'center'
@@ -372,7 +374,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/f3.png',
+      'scoresheet_generation/maze/f2.png',
       base_size_x,
       50,
       'center'
@@ -412,7 +414,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/l2.png',
+      'scoresheet_generation/maze/l1.png',
       base_size_x,
       50,
       'center'
@@ -449,7 +451,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/f2.png',
+      'scoresheet_generation/maze/f1.png',
       base_size_x,
       50,
       'center'
@@ -566,7 +568,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/l1.png',
+      'scoresheet_generation/maze/l2.png',
       base_size_x,
       50,
       'center'
@@ -603,7 +605,7 @@ function drawRun(doc, config, scoringRun) {
       doc,
       x,
       y,
-      'scoresheet_generation/maze/f1.png',
+      'scoresheet_generation/maze/f2.png',
       base_size_x,
       50,
       'center'

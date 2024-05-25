@@ -5,7 +5,7 @@ html(ng-app="ddApp")
       var runId = "#{id}"
 
     include ../includes/common_component
-    script(src="/javascripts/sign/maze_2024.js")
+    script(src="/javascripts/sign/maze_2024E.js")
     script.
       document.cookie = 'sRotate=0';
       function tile_size() {
@@ -62,8 +62,8 @@ html(ng-app="ddApp")
             table.map.mx-auto#mapTable
               tbody
                 tr(ng-repeat='r in range(2*length + 1)')
-                  td.cell(ng-repeat='c in range(2*width + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z,0)")
-                    .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
+                  td.cell(ng-repeat='c in range(2*width + 1)', ng-class="{'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].tile.reachable && cells[c+','+r+','+z].isLinear, 'floating': cells[c+','+r+','+z].tile.reachable && !cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z,0)")
+                    .tile-image-container(ng-show="$odd && $parent.$odd")
                       img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
                       img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
                       img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")

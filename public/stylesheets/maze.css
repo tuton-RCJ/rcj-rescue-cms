@@ -1,6 +1,7 @@
 table.map {
     border-collapse: collapse;
     width: initial !important;
+    table-layout: fixed;
 }
 
 table.map th {
@@ -47,7 +48,7 @@ table tr:nth-child(even) {
 }
 
 .tile {
-    background-color: #b4ffd5;
+    background-color: #b0b0b0;
     padding: 0px!important;
     height: 120px;
     width: 120px;
@@ -68,6 +69,10 @@ table tr:nth-child(even) {
 
 .tile.linear {
     background-color: #fffdea;
+}
+
+.tile.floating {
+    background-color: #b4ffd5;
 }
 
 .wallspot:hover {

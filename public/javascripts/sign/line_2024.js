@@ -95,9 +95,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.victim_list = [];
     $scope.LoPs = [];
 
-    $scope.victimNL_Live = [];
-    $scope.victimNL_Dead = [];
-
     $scope.enableSign = [false, false, false];
     $scope.signData = [null, null, null];
 
@@ -124,8 +121,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             socket.on('data', function (data) {
                 //console.log(data);
                 $scope.status = data.status;
-                $scope.evacuationLevel = data.evacuationLevel;
-                $scope.kitLevel = data.kitLevel;
                 $scope.exitBonus = data.exitBonus;
                 $scope.stiles = data.tiles;
                 $scope.score = data.score;
@@ -142,12 +137,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 $scope.seconds = data.time.seconds;
 
                 $scope.victim_list = data.rescueOrder;
-
-                if (data.nl) {
-                    $scope.victimNL_Dead = data.nl.deadVictim;
-                    $scope.victimNL_Live = data.nl.liveVictim;
-                }
-
 
                 $scope.checkPointDistance = [];
                 let tmp = {
@@ -170,6 +159,12 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         j++;
                     }
                 }
+                let finalDis = $scope.stiles.length - 1 - prevCheckPoint;
+                $scope.checkPointDistance.push({
+                    dis: finalDis,
+                    status: $scope.exitBonus,
+                    point: finalDis * $scope.exitBonus * $scope.LoPsCountPoint($scope.LoPs[j])
+                });
                 $scope.$apply();
                 console.log("Updated view from socket.io");
             });
@@ -189,8 +184,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 for (var i = 0; i < $scope.LoPs.length; i++) {
                     $scope.LoPs_total += $scope.LoPs[i];
                 }
-                $scope.evacuationLevel = response.data.evacuationLevel;
-                $scope.kitLevel = response.data.kitLevel;
                 $scope.exitBonus = response.data.exitBonus;
                 $scope.field = response.data.field.name;
                 $scope.score = response.data.score;
@@ -245,13 +238,14 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         j++;
                     }
                 }
+                let finalDis = $scope.stiles.length - 1 - prevCheckPoint;
+                $scope.checkPointDistance.push({
+                    dis: finalDis,
+                    status: $scope.exitBonus,
+                    point: finalDis * $scope.exitBonus * $scope.LoPsCountPoint($scope.LoPs[j])
+                });
 
                 $scope.victim_list = response.data.rescueOrder;
-
-                if (response.data.nl) {
-                    $scope.victimNL_Dead = response.data.nl.deadVictim;
-                    $scope.victimNL_Live = response.data.nl.liveVictim;
-                }
 
                 // Get the map
                 $http.get("/api/maps/line/" + response.data.map +
@@ -311,50 +305,33 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         return findItem("checkpoint", tile.scoredItems) != null;
     }
 
-    $scope.calc_victim_type_lop_multiplier = function (type, lop = -1) {
-        if (lop == -1) lop = $scope.LoPs[$scope.EvacuationAreaLoPIndex];
-        let multiplier;
-        if (type == "KIT") {
-            if ($scope.evacuationLevel == 1) {
-                if ($scope.kitLevel == 1) return 1.1;
-                else return 1.3;
-            } else {
-                if ($scope.kitLevel == 1) return 1.2;
-                else return 1.6;
-            }
-        }
-        else if ($scope.evacuationLevel == 1) { // Low Level
-            multiplier = 1200;
-        } else { // High Level
-            multiplier = 1400;
-        }
-
-        if ($scope.evacuationLevel == 1) multiplier = Math.max(multiplier - 25 * lop, 1000);
-        else multiplier = Math.max(multiplier - 50 * lop, 1000);
-        return multiplier / 1000;
-    };
-
-    $scope.calc_victim_multipliers = function (index) {
+    $scope.calc_victim_type_lop_multiplier = function (lop=-1){
+        if(lop == -1) lop = $scope.LoPs[$scope.EvacuationAreaLoPIndex];
+    
+        let multiplier = Math.max(1400 - 50*lop, 1250);
+        return multiplier/1000;
+      };
+    
+      $scope.calc_victim_multipliers = function (index){
         let victim = $scope.victim_list[index];
         if (victim == undefined) return 0;
-
+    
         // Effective check
-        if (victim.victimType == "LIVE" && victim.zoneType == "RED") return 1.0;
-        if (victim.victimType == "DEAD" && victim.zoneType == "GREEN") return 1.0;
-        if (victim.victimType == "KIT" && victim.zoneType == "RED") return 1.0;
-
+        if(victim.victimType == "LIVE" && victim.zoneType == "RED") return 1.0;
+        if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return 1.0;
+    
         // Effective check for dead victim
         if (victim.victimType == "DEAD") {
-            let liveCount = 0;
-            for (i of $scope.range(index)) {
-                let v = $scope.victim_list[i]
-                if (v.victimType == "LIVE" && v.zoneType == "GREEN") liveCount++;
-            }
-            if (liveCount != $scope.maxLiveVictims) return 1.0;
+          let liveCount = 0;
+          for (i of $scope.range(index)) {
+            let v = $scope.victim_list[i]
+            if (v.victimType == "LIVE") liveCount ++;
+          }
+          if (liveCount != $scope.maxLiveVictims) return 1.0;
         }
-
-        return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);
-    };
+        
+        return $scope.calc_victim_type_lop_multiplier($scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
+      };
 
     $scope.victim_bk_color = function (index, zoneType) {
         let m = $scope.calc_victim_multipliers(index);
@@ -363,18 +340,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         if (zoneType == "RED") return '#ffc1ff';
         return '#e0ffc1';
     }
-
-    $scope.nlPoints = function () {
-        let point = 0;
-        for (let victim of $scope.victimNL_Live) {
-            point += 10 * victim.found + 20 * victim.identified;
-        }
-        for (let victim of $scope.victimNL_Dead) {
-            point += 10 * victim.found + 10 * victim.identified;
-        }
-        return point;
-    }
-
 
     $scope.LoPsCountPoint = function (n) {
         if (n == 0) return 5;
@@ -392,11 +357,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     };
 
     $scope.exitBonusPoints = function () {
-        if ($scope.league == "LineNL") {
-            return $scope.exitBonus * 30;
-        } else {
-            return $scope.exitBonus * Math.max(0, 60 - 5 * $scope.sum($scope.LoPs));
-        }
+        return $scope.exitBonus * Math.max(0, 60 - 5 * $scope.sum($scope.LoPs));
     };
 
 
@@ -721,8 +682,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                 return 'liveVictim.png';
             case 'DEAD':
                 return 'deadVictim.png';
-            case 'KIT':
-                return 'rescueKit.png';
         }
     }
 
@@ -922,22 +881,22 @@ app.directive('tile', function () {
                     for (let j = 0; j < $scope.$parent.stiles[tile.index[i]].scoredItems.length; j++) {
                         switch ($scope.$parent.stiles[tile.index[i]].scoredItems[j].item) {
                             case "gap":
-                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored;
                                 break;
                             case "intersection":
                                 successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "obstacle":
-                                successfully += 15 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 20 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "speedbump":
-                                successfully += 5 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored;
                                 break;
                             case "ramp":
                                 successfully += 10 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                             case "seesaw":
-                                successfully += 15 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
+                                successfully += 20 * $scope.$parent.stiles[tile.index[i]].scoredItems[j].scored * $scope.$parent.stiles[tile.index[i]].scoredItems[j].count;
                                 break;
                         }
 

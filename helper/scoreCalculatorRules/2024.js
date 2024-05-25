@@ -32,22 +32,22 @@ module.exports.calculateLineScore = function (run) {
             checkPointCount++;
             break;
           case 'gap':
-            score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
+            score += 10 * tile.scoredItems[j].scored;
             break;
           case 'intersection':
             score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'obstacle':
-            score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
+            score += 20 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'speedbump':
-            score += 5 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
+            score += 10 * tile.scoredItems[j].scored;
             break;
           case 'ramp':
             score += 10 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
           case 'seesaw':
-            score += 15 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
+            score += 20 * tile.scoredItems[j].scored * tile.scoredItems[j].count;
             break;
         }
       }
@@ -59,25 +59,10 @@ module.exports.calculateLineScore = function (run) {
       let liveCount = 0;
       for (let victim of run.rescueOrder) {
         if (victim.victimType == "LIVE" && victim.zoneType == "RED") continue;
-        if (victim.victimType == "KIT" && victim.zoneType == "RED") continue;
         if (victim.victimType == "DEAD" && victim.zoneType == "GREEN") continue;
-
-        if (victim.victimType == "KIT") {
-            if (run.evacuationLevel == 1) {
-                if (run.kitLevel == 1) multiplier *= 1100;
-                else multiplier *= 1300;
-            } else {
-                if (run.kitLevel == 1) multiplier *= 1200;
-                else multiplier *= 1600;
-            }
-            error *= 1000;
-            continue;
-        }
-
         if (victim.victimType == "DEAD" && liveCount != run.map.victims.live) continue;
 
-        if (run.evacuationLevel == 1) multiplier *= Math.max(1200-(25*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);
-        else multiplier *= Math.max(1400-(50*run.LoPs[run.map.EvacuationAreaLoPIndex]),1000);
+        multiplier *= Math.max(1400-(50*run.LoPs[run.map.EvacuationAreaLoPIndex]),1250);
         
         error *= 1000;
         if (victim.victimType == "LIVE") liveCount ++;
@@ -86,22 +71,9 @@ module.exports.calculateLineScore = function (run) {
     }
 
     if (run.exitBonus) {
-      if (run.isNL) {
-        score += 30; //From 2022(NL)
-      }else{
-        score += Math.max(60 - 5 * total_lops, 0);
-      }
-    }
-
-    if (run.nl) {
-      for (let victim of run.nl.liveVictim) {
-        if (victim.found) score += 10
-        if (victim.identified) score += 20
-      }
-      for (let victim of run.nl.deadVictim) {
-        if (victim.found) score += 10
-        if (victim.identified) score += 10
-      }
+      score += Math.max(60 - 5 * total_lops, 0);
+      const tileCount = run.tiles.length - lastCheckPointTile - 1;
+      score += Math.max(tileCount * (5 - 2 * run.LoPs[checkPointCount]), 0)
     }
 
     // 5 points for placing robot on first droptile (start)
@@ -159,10 +131,10 @@ module.exports.calculateMazeScore = function (run) {
     }
 
     const maxKits = {
-      H: 3,
-      S: 2,
+      H: 2,
+      S: 1,
       U: 0,
-      Red: 1,
+      Red: 2,
       Yellow: 1,
       Green: 0,
     };

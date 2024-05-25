@@ -141,6 +141,9 @@
         "deleted": "正常に削除しました",
         "mypage": "マイページ"
     },
+    "technicalChallenge": {
+        "technicalChallenge": "テクニカルチャレンジ"
+    },
     "accessDenied":{
         "title" : "アクセス拒絶",
         "description1" : "このページにアクセスする権限がありません．権限のあるアカウントでログインしてください．",
@@ -322,6 +325,7 @@
         "view": {
             "info": "基本情報",
             "start": "スタート",
+            "goal": "ゴール",
             "evacuation": "避難ゾーン",
             "Lexit": "脱出",
             "rescue": "被災者救助",
@@ -378,7 +382,6 @@
             "m_score_d": "@:line.view.m_score_d",
             "networkError": "ネットワークエラー",
             "networkErrorDescription": "競技データをサーバに保存できませんでした．ネットワーク接続を確認してください．競技記録はこのまま続行できますが，サーバには保存されません．システム管理者を呼んでください！",
-            "handover": "他のデバイスにハンドオーバ",
             "reSend": "再送信",
             "rescuedVictims": "@:line.view.rescuedVictims",
             "rescuedVictimsMes" : "救助済みの被災者を削除するには，ダブルクリック（PC）か左にスワイプ（モバイル）します．",
@@ -517,7 +520,6 @@
             "random": "ランダム抽選（乱数）",
             "networkError": "@:line.judge.networkError",
             "networkErrorDescription": "@:line.judge.networkErrorDescription",
-            "handover": "@:line.judge.handover",
             "reSend": "@:line.judge.reSend",
             "misidentification": "@:maze.view.misidentification",
             "noShow": "@:line.judge.noShow",
@@ -854,19 +856,6 @@
             "doLevel1": "【閲覧】に設定",
             "doLevel5": "【審判】に設定",
             "doLevel10": "【管理】に設定"
-        },
-        "handover": {
-            "title": "ハンドオーバー",
-            "description": "審判操作を実行中に何らかの要因によってデバイスのネットワーク接続が切れてしまった場合，このページより操作を行うと，審判操作をこのページに引き継ぐことができます． このページを利用するためには，サーバーに対してSSLを用いて接続する必要があります．",
-            "step1": "STEP1  審判ページ下部の『他のデバイスにハンドオーバー』というボタンを押してQRコードを表示してください．",
-            "step2": "STEP2  QRコードを読み取ってください．QRコードは十数個に分割されています．全てのQRコードの読み取りに成功するまで，そのままでお待ちください．",
-            "step3": "STEP3   表示された内容を確認して『審判画面に進む』or『記録確認画面に進む』ボタンを押してください．",
-            "front_back": "前面／背面 切り替え",
-            "read": "QRコードを読み取る",
-            "toJudge": "審判画面に進む",
-            "toConfirm": "記録確認画面に進む",
-            "area": "QRコードを枠内に収めてください",
-            "readed": "読み取ったQRコード"
         },
         "backup": {
             "title": "バックアップ",

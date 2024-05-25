@@ -423,10 +423,6 @@ router.get('/:competitionid/survey/answers/:survId', function (req, res, next) {
   else res.render('access_denied', { user: req.user });
 });
 
-router.get('/handover', function (req, res, next) {
-  res.render('runs_handover', { user: req.user });
-});
-
 router.get('/:competitionid/:leagueId/games', function (req, res, next) {
   const competitionId = req.params.competitionid;
   const leagueId = req.params.leagueId;

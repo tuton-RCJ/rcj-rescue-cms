@@ -141,6 +141,9 @@
         "deleted": "Successfully deleted!",
         "mypage": "Personal page"
     },
+    "technicalChallenge": {
+        "technicalChallenge": "Technical Challenge"
+    },
     "accessDenied":{
         "title" : "Access denied",
         "description1" : "You do not have permission to access this page. Please login with authorized account.",
@@ -323,6 +326,7 @@
             "info": "Basic Information",
             "to": "to",
             "start": "Start",
+            "goal": "Goal",
             "evacuation": "Evacuation Zone",
             "Lexit": "Exit",
             "rescue": "Rescue",
@@ -380,7 +384,6 @@
             "m_score_d": "@:line.view.m_score_d",
             "networkError": "Network Error",
             "networkErrorDescription": "Failed to save the scoring-run data on the server. Check the network connection.  The record of scoring run can be continued as it is, but it is not stored in the server.  Please call system manager ASAP!",
-            "handover": "Hand over to another device",
             "reSend": "ReSend",
             "rescuedVictims": "@:line.view.rescuedVictims",
             "rescuedVictimsMes" : "To delete a rescued victim, double click or swipe left (Mobile Device)",
@@ -519,7 +522,6 @@
             "random": "Random drawing",
             "networkError": "@:line.judge.networkError",
             "networkErrorDescription": "@:line.judge.networkErrorDescription",
-            "handover": "@:line.judge.handover",
             "reSend": "@:line.judge.reSend",
             "misidentification": "@:maze.view.misidentification",
             "noShow": "@:line.judge.noShow",
@@ -856,19 +858,6 @@
             "doLevel1": "Set【View】",
             "doLevel5": "Set【Judge】",
             "doLevel10": "Set【Admin】"
-        },
-        "handover": {
-            "title": "Handover",
-            "description": "If the device's network connection has expired due to some reason during the scoring run, you can handover the operation of the scoring. In order to use this page, you need to connect to the server using SSL.",
-            "step1": "STEP1  Please press the button \"handover to other device\" at the bottom of the judge page to display the QR code.",
-            "step2": "STEP2  Please read the QR code. The QR code is divided into more than 10 pieces. Please wait as it is until you have successfully read all the QR codes.",
-            "step3": "STEP3   Confirm the displayed content and click \"Go to Judge Screen\" or \"Go to Record Confirmation Screen\" button.",
-            "front_back": "Front/Rear switching",
-            "read": "Read the QR code",
-            "toJudge": "Go to Judge Screen",
-            "toConfirm": "Go to Record Confirmation Screen",
-            "area": "Please put the QR code within the frame",
-            "readed": "Read QR code"
         },
         "backup": {
             "title": "Back up",

@@ -48,6 +48,21 @@ publicRouter.get('/:competitionid/:leagueId/ranking', async function (req, res, 
   res.render(`ranking/${rule.type}_${rule.rule}`, { competitionId, leagueId, user: req.user });
 });
 
+privateRouter.get('/:competitionid/:leagueId/technicalChallenge', async function (req, res, next) {
+  const competitionId = req.params.competitionid;
+  const { leagueId } = req.params;
+
+  if (!ObjectId.isValid(competitionId)) {
+    return next();
+  }
+
+  if (!competitiondb.LEAGUES.includes(leagueId)) {
+    return next();
+  }
+  
+  res.render(`technicalChallenge/scoring`, { competitionId, leagueId, user: req.user });
+});
+
 publicRouter.get('/view/:runid', async function (req, res, next) {
   const id = req.params.runid;
 

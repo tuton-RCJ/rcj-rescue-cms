@@ -6,12 +6,12 @@ let victimConstant = {};
 let victimTypes = [];
 const victimConstantWL = {
     "H": {
-        "maxKitNum": 3,
+        "maxKitNum": 2,
         "linearPoint": 10,
         "floatingPoint": 30
     },
     "S": {
-        "maxKitNum": 2,
+        "maxKitNum": 1,
         "linearPoint": 10,
         "floatingPoint": 30
     },
@@ -21,7 +21,7 @@ const victimConstantWL = {
         "floatingPoint": 30
     },
     "Red": {
-        "maxKitNum": 1,
+        "maxKitNum": 2,
         "linearPoint": 5,
         "floatingPoint": 15
     },
@@ -34,19 +34,6 @@ const victimConstantWL = {
         "maxKitNum": 0,
         "linearPoint": 5,
         "floatingPoint": 15
-    }
-};
-
-const victimConstantNL = {
-    "Red": {
-        "maxKitNum": 1,
-        "linearPoint": 15,
-        "floatingPoint": 30
-    },
-    "Green": {
-        "maxKitNum": 1,
-        "linearPoint": 15,
-        "floatingPoint": 30
     }
 };
 
@@ -188,11 +175,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         $scope.length = response.data.length;
 
                         $scope.leagueType = response.data.leagueType;
-                        if ($scope.leagueType == "entry") {
-                            victimConstant = victimConstantNL;
-                        } else {
-                            victimConstant = victimConstantWL;
-                        }
+
+                        victimConstant = victimConstantWL;
 
                         for (let i = 0; i < response.data.cells.length; i++) {
                             $scope.cells[response.data.cells[i].x + ',' +
@@ -293,15 +277,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false,
-                        floor: false
+                        bottom: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0,
-                        floor: 0
+                        left: 0
                     }
                 }
             };
@@ -363,12 +345,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible += victimConstant[cell.tile.victims.bottom].maxKitNum;
             current += Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
         }
-        if (cell.tile.victims.floor != "None") {
-            possible++;
-            current += tile.scoredItems.victims.floor;
-            possible += victimConstant[cell.tile.victims.floor].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.floor, victimConstant[cell.tile.victims.floor].maxKitNum);
-        }
 
         if (tile.processing)
             return "processing";
@@ -396,8 +372,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         var hasVictims = (cell.tile.victims.top != "None") ||
             (cell.tile.victims.right != "None") ||
             (cell.tile.victims.bottom != "None") ||
-            (cell.tile.victims.left != "None") ||
-            (cell.tile.victims.floor != "None");
+            (cell.tile.victims.left != "None");
         // Total number of scorable things on this tile
         var total = !!cell.tile.speedbump + !!cell.tile.checkpoint + !!cell.tile.steps + cell.tile.ramp + hasVictims;
 
@@ -427,15 +402,13 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
                         top: false,
                         right: false,
                         left: false,
-                        bottom: false,
-                        floor: false
+                        bottom: false
                     },
                     rescueKits: {
                         top: 0,
                         right: 0,
                         bottom: 0,
-                        left: 0,
-                        floor: 0
+                        left: 0
                     }
                 }
             };
@@ -484,10 +457,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
         if (cell.tile.victims.bottom in victimConstant) {
             current += victimConstant[cell.tile.victims.bottom][wallPointType] * tile.scoredItems.victims.bottom;
             current += 10 * Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
-        }
-        if (cell.tile.victims.floor in victimConstant) {
-            current += victimConstant[cell.tile.victims.floor][wallPointType] * tile.scoredItems.victims.floor;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.floor, victimConstant[cell.tile.victims.floor].maxKitNum);
         }
 
         return current;
@@ -745,8 +714,7 @@ app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'cell', 'til
     $scope.hasVictims = (cell.tile.victims.top != "None") ||
         (cell.tile.victims.right != "None") ||
         (cell.tile.victims.bottom != "None") ||
-        (cell.tile.victims.left != "None") ||
-        (cell.tile.victims.floor != "None");
+        (cell.tile.victims.left != "None");
 
     $scope.lightStatus = function (light, kit) {
         if (light) return true;

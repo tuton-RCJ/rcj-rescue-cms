@@ -108,7 +108,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
   $scope.runNum = $scope.runIds.length;
   $scope.nowRun = 0;
 
-  $scope.startedScoring = false;
   function setRunId(index){
     $scope.runId = $scope.runIds[index];
     runId = $scope.runIds[index];
@@ -202,7 +201,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   if (document.referrer.indexOf('sign') != -1) {
     $scope.checked = true;
-    $scope.startedScoring = true;
     $scope.fromSign = true;
     $timeout($scope.tile_size, 10);
     $timeout($scope.tile_size, 200);
@@ -246,10 +244,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $http.get("/api/runs/line/" + runId + "?populate=true").then(function (response) {
       $scope.LoPs = response.data.LoPs;
       
-      if($scope.nowRun == 0){
-        $scope.kitLevel = response.data.kitLevel;
-        $scope.evacuationLevel = response.data.evacuationLevel;
-      }
       $scope.exitBonus = response.data.exitBonus;
       $scope.field = response.data.field.name;
       $scope.score = response.data.score;
@@ -265,17 +259,9 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       $scope.time = ($scope.minutes * 60 + $scope.seconds) * 1000;
       $scope.status = response.data.status;
 
-      $scope.isNL = response.data.isNL;
-      if($scope.isNL) $scope.startedScoring = true;
-
-
       prevTime = $scope.time;
 
       $scope.victim_list = response.data.rescueOrder;
-
-      $scope.victimNL_Dead = response.data.nl.deadVictim;
-      $scope.victimNL_Live = response.data.nl.liveVictim;
-
 
       // Scoring elements of the tiles
       $scope.stiles = response.data.tiles;
@@ -356,13 +342,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     $scope.saveEverything();
   };
 
-  $scope.toggleScoring = function () {
-    playSound(sClick);
-    // Start/stop scoring
-    $scope.startedScoring = !$scope.startedScoring;
-    $scope.saveEverything();
-  };
-
   $scope.infochecked = function () {
     playSound(sClick);
     $scope.checked = true;
@@ -421,67 +400,10 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   };
 
-  $scope.victimNL = function (type, number, found, identified) {
-    playSound(sClick);
-    if(type == "D"){ // dead
-      if ($scope.victimNL_Dead.length <= number) return;
-      $scope.victimNL_Dead[number].found = found;
-      $scope.victimNL_Dead[number].identified = identified;
-    }else{ // live
-      if ($scope.victimNL_Live.length <= number) return;
-      $scope.victimNL_Live[number].found = found;
-      $scope.victimNL_Live[number].identified = identified;
-    }
-    upload_run({
-      nl:{
-        liveVictim: $scope.victimNL_Live,
-        deadVictim: $scope.victimNL_Dead
-      }
-    });
-  };
-
-  $scope.victimNLActivate = function (type, number, found, identified) {
-    if(type == "D"){ // dead
-      if ($scope.victimNL_Dead.length <= number) return false;
-      return $scope.victimNL_Dead[number].found == found && $scope.victimNL_Dead[number].identified == identified; 
-    }else{ // live
-      if ($scope.victimNL_Live.length <= number) return false;
-      return $scope.victimNL_Live[number].found == found && $scope.victimNL_Live[number].identified == identified;
-    }
-  }
-
-  $scope.misidentNL = function (num) {
-    playSound(sClick);
-    $scope.misidentNL_C += num;
-    if($scope.misidentNL_C < 0) $scope.misidentNL_C = 0;
-    upload_run({
-      nl:{
-        misidentification: $scope.misidentNL_C
-      }
-    });
-  };
-
-
-  $scope.calc_victim_type_lop_multiplier = function (type, lop=-1){
+  $scope.calc_victim_type_lop_multiplier = function (lop=-1){
     if(lop == -1) lop = $scope.LoPs[$scope.EvacuationAreaLoPIndex];
-    let multiplier;
-    if(type == "KIT"){
-        if($scope.evacuationLevel == 1){
-            if($scope.kitLevel == 1) return 1.1;
-            else return 1.3;
-        }else{
-            if($scope.kitLevel == 1) return 1.2;
-            else return 1.6;
-        }
-    }
-    else if ($scope.evacuationLevel == 1) { // Low Level
-        multiplier = 1200;
-    } else { // High Level
-        multiplier = 1400;
-    }
 
-    if($scope.evacuationLevel == 1) multiplier = Math.max(multiplier - 25*lop,1000);
-    else multiplier = Math.max(multiplier - 50*lop,1000);
+    let multiplier = Math.max(1400 - 50*lop, 1250);
     return multiplier/1000;
   };
 
@@ -492,7 +414,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     // Effective check
     if(victim.victimType == "LIVE" && victim.zoneType == "RED") return 1.0;
     if(victim.victimType == "DEAD" && victim.zoneType == "GREEN") return 1.0;
-    if(victim.victimType == "KIT" && victim.zoneType == "RED") return 1.0;
 
     // Effective check for dead victim
     if (victim.victimType == "DEAD") {
@@ -504,7 +425,7 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       if (liveCount != $scope.maxLiveVictims) return 1.0;
     }
     
-    return $scope.calc_victim_type_lop_multiplier(victim.victimType, $scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
+    return $scope.calc_victim_type_lop_multiplier($scope.LoPs[$scope.EvacuationAreaLoPIndex]);    
   };
 
   $scope.victim_bk_color = function (index, zoneType) {
@@ -541,8 +462,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       if ($scope.count_victim_list("LIVE") + $scope.count_victim_tmp("LIVE") >= $scope.maxLiveVictims) return;
     } else if(type == "DEAD") {
       if ($scope.count_victim_list("DEAD") + $scope.count_victim_tmp("DEAD") >= $scope.maxDeadVictims) return;
-    } else{ //Rescue Kit
-      if ($scope.count_victim_list("KIT") + $scope.count_victim_tmp("KKIT") >= 1) return;
     }
     $scope.victim_tmp.push(type);
   };
@@ -556,9 +475,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     } else if(victimType == "DEAD") {
       tmp.victimType = "DEAD";
       if ($scope.count_victim_list("DEAD") >= $scope.maxDeadVictims) return;
-    } else { //Rescue Kit
-      tmp.victimType = "KIT";
-      if ($scope.count_victim_list("KIT") >= 1) return;
     }
     $scope.victim_list.push(tmp);
     console.log(tmp);
@@ -582,14 +498,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     playSound(sClick);
     let live = 0;
     let dead = 0;
-    let kit = 0;
     for (victiml of $scope.victim_tmp) {
       if (!victiml.indexOf("LIVE")) {
         live++;
       } else if (!victiml.indexOf("DEAD")) {
         dead++;
-      } else{
-        kit ++;
       }
     }
     for (let i = 0; i < live; i++) {
@@ -598,8 +511,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     for (let i = 0; i < dead; i++) {
       $scope.addVictim("DEAD", zoneType);
     }
-
-    if(kit) $scope.addVictim("KIT", zoneType);
 
     $scope.victim_tmp_clear();
 
@@ -678,25 +589,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
     $scope.saveEverything();
   };
-  $scope.changeLevel = function (n) {
-    playSound(sClick);
-    $scope.evacuationLevel = n;
-
-    upload_run({
-      evacuationLevel: $scope.evacuationLevel
-    });
-
-  };
-
-  $scope.changeLevelK = function (n) {
-    playSound(sClick);
-    $scope.kitLevel = n;
-
-    upload_run({
-      kitLevel: $scope.kitLevel
-    });
-
-  };
 
   function findItem(item,tile) {
     for(let i=0;i<tile.length;i++){
@@ -731,8 +623,8 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
     }
 
 
-    // If the run is not started, we can place drop pucks on this tile
-    if ($scope.startedScoring) {
+    // If the run is started, allow to score a point
+    if ($scope.time > 0) {
       var total = (mtile.items.obstacles > 0 ||
         mtile.items.speedbumps > 0 ||
         mtile.tileType.gaps > 0 ||
@@ -860,8 +752,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
   $scope.saveEverything = function () {
     var run = {};
     run.LoPs = $scope.LoPs;
-    run.evacuationLevel = $scope.evacuationLevel;
-    run.kitLevel = $scope.kitLevel;
     run.exitBonus = $scope.exitBonus;
     run.rescueOrder = $scope.victim_list;
     run.showedUp = $scope.showedUp;
@@ -891,35 +781,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   };
 
-
-
-  $scope.handover = function () {
-    var run = {};
-    run.id = runId;
-    run.LoPs = $scope.LoPs;
-    run.evacuationLevel = $scope.evacuationLevel;
-    run.kitLevel = $scope.kitLevel;
-    run.exitBonus = $scope.exitBonus;
-    run.rescueOrder = $scope.victim_list;
-    run.showedUp = $scope.showedUp;
-    run.started = $scope.started;
-    run.tiles = $scope.stiles;
-    run.time = {
-      minutes: $scope.minutes,
-      seconds: $scope.seconds
-    };
-    run.status = 3;
-
-    swal({
-      title: 'Scan it !',
-      html: '<div style="text-align: center;"><div id="qr_code_area"></div></div>',
-      showCloseButton: true
-    }).then((result) => {
-      stopMakeQR();
-    });
-    createMultiQR(run, "qr_code_area", 80);
-  };
-
   $scope.confirm = function () {
     if ((!$scope.showedUp || $scope.showedUp == null) && $scope.score > 0) {
       playSound(sError);
@@ -928,15 +789,11 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       playSound(sClick);
       var run = {};
       run.LoPs = $scope.LoPs;
-      run.evacuationLevel = $scope.evacuationLevel;
-      run.kitLevel = $scope.kitLevel;
       run.exitBonus = $scope.exitBonus;
       run.rescueOrder = $scope.victim_list;
       run.showedUp = $scope.showedUp;
       run.started = $scope.started;
       run.tiles = $scope.stiles;
-      //$scope.minutes = Math.floor($scope.time / 60000)
-      //$scope.seconds = Math.floor(($scope.time % 60000) / 1000)
       run.time = {
         minutes: $scope.minutes,
         seconds: $scope.seconds
@@ -959,58 +816,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
       });
     }
   };
-
-  $scope.nextRun = function(flag){
-    if ((!$scope.showedUp || $scope.showedUp == null) && $scope.score > 0) {
-      playSound(sError);
-      swal("Oops!", txt_implicit, "error");
-    } else {
-      playSound(sClick);
-      var run = {};
-      run.LoPs = $scope.LoPs;
-      run.evacuationLevel = $scope.evacuationLevel;
-      run.kitLevel = $scope.kitLevel;
-      run.exitBonus = $scope.exitBonus;
-      run.rescueOrder = $scope.victim_list;
-      run.showedUp = $scope.showedUp;
-      run.started = $scope.started;
-      run.tiles = $scope.stiles;
-      //$scope.minutes = Math.floor($scope.time / 60000)
-      //$scope.seconds = Math.floor(($scope.time % 60000) / 1000)
-      run.time = {
-        minutes: $scope.minutes,
-        seconds: $scope.seconds
-      };
-      run.status = 3;
-
-
-      $scope.sync++;
-      $http.put("/api/runs/line/" + runId, run, http_config).then(function (response) {
-        if(response.statusCode == 202){
-          setTimeout($scope.confirm, 100);
-          return;
-        }
-        $scope.score = response.data.score;
-        $scope.sync--;
-        if(flag){
-          setRunId($scope.nowRun+1);
-          $(window).scrollTop(0);
-        }
-        else{
-          Swal.fire({
-            title: 'Complete!',
-            html: 'Scoring completed! Please close this tab.',
-            type: 'success'
-          }).then((result) => {
-            window.close();
-          })
-        }
-      }, function (response) {
-        console.log("Error: " + response.statusText);
-        $scope.networkError = true;
-      });
-    }
-  }
 
   $scope.getParam = function (key) {
     var str = location.search.split("?");

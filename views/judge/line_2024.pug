@@ -116,66 +116,19 @@ html(ng-app="ddApp")
               button.btn.btn-warning(type='button', ng-click='saveEverything()') {{'line.judge.reSend' | translate}}
         .row
           .col-md-5.col-lg-4
-            button.btn.btn-primary(style='margin:0 10px 10px 0;', type='button', ng-click='toggleScoring()')
-              i.far.fa-clipboard(aria-hidden='true')
-                | {{ startedScoring ? 'line.judge.run_end' : 'line.judge.run_start' | translate }}
             button.btn.btn-success(style='margin:0 10px 10px 0;', type='button', ng-click='toggleTime()')
               i.fas.fa-stopwatch(aria-hidden='true')  {{ startedTime ? 'line.judge.tim_stop' : 'line.judge.tim_start' |translate }}
             button.btn.btn-warning(ng-show='!startedTime && time!=0', style='margin:0 10px 10px 0;', type='button', ng-click='TimeReset()')
               i.fas.fa-stopwatch(aria-hidden='true')  {{'line.judge.tim_reset' | translate}}
-            .alert.alert-info(role='alert', ng-show='numberOfDropTiles - placedDropTiles == 0 && !startedScoring && !fromSign')
-              | {{'line.judge.ready' | translate}}
-              br
-              strong(style='font-size:20px;') {{'line.judge.push_start' | translate}}
-            .card(ng-if="league != 'LineNL'", ng-show='!startedScoring || fromSign')
-              h4.card-header
-                i.fas.fa-ambulance(aria-hidden='true')
-                |  {{'line.judge.select_elevel' | translate}}
-              .card-body
-                br
-                .row
-                  .col-6(style='position: relative;', ng-click='changeLevel(1)')
-                    img.img-thumbnail(src='/images/evacZone/green_lv1.png', width='100%', ng-style="{'background-color': evacuationLevel==1?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==1?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.low' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==1')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-                  .col-6(style='position: relative;', ng-click='changeLevel(2)')
-                    img.img-thumbnail(src='/images/evacZone/green_lv2.png', width='100%', ng-style="{'background-color': evacuationLevel==2?'#2ecc71':'#95a5a6' , 'opacity':evacuationLevel==2?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.high' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='evacuationLevel==2')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-            .card(ng-if="league != 'LineNL'", ng-show='!startedScoring || fromSign' style="margin-top:10px;")
-              h4.card-header
-                i.fas.fa-medkit(aria-hidden='true')
-                |  {{'line.judge.select_klevel' | translate}}
-              .card-body
-                br
-                .row
-                  .col-6(style='position: relative;', ng-click='changeLevelK(1)')
-                    img.img-thumbnail(src='/images/line-kit-1.png', width='100%', ng-style="{'background-color': kitLevel==1?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==1?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.noSearch' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==1')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-                  .col-6(style='position: relative;', ng-click='changeLevelK(2)')
-                    img.img-thumbnail(src='/images/line-kit-2.png', width='100%', ng-style="{'background-color': kitLevel==2?'#2ecc71':'#95a5a6' , 'opacity':kitLevel==2?'1':'0.4' }")
-                    div(style='position:absolute; top:10px; left:30px;') {{'line.judge.search' | translate}}
-                    div(style='position:absolute; bottom:10px; right:25px;', ng-show='kitLevel==2')
-                      i.far.fa-3x.fa-check-circle(aria-hidden='true', style='color:#27ae60;')
-            br
-            //.alert.alert-warning(role='alert', ng-show='!startedScoring')
-              | {{'line.judge.tap_tile' |translate}}
-              br
-              |  {{'line.judge.remaining' | translate}}
-              strong(style='font-size:30px;') {{numberOfDropTiles - placedDropTiles}}
-            .alert.alert-info.blink(role='alert', ng-show='!startedTime && startedScoring && minutes < 8 && !fromSign')
+            .alert.alert-info.blink(role='alert', ng-show='!startedTime && minutes < 8 && !fromSign')
               | {{'line.judge.push_timer' | translate}}
-            #card_area.scrool(style='overflow: scroll;', ng-show='startedScoring')
+            #card_area.scrool(style='overflow: scroll;')
               #lops.card
                 h3.card-header
                   i.fas.fa-step-forward(aria-hidden='true')
                   | {{'common.lops' | translate}}
                 .card-body
-                  div(ng-repeat='cp in range(LoPs.length) track by $index', ng-show='startedScoring')
+                  div(ng-repeat='cp in range(LoPs.length) track by $index')
                     .card-text(style='display:flex;' ng-style="{'background-color': $index == EvacuationAreaLoPIndex?'#ffcccc':''}")
                       div(style='width:40%;font-size:10px;', align='center')
                         | {{$index==0?'line.judge.start':'line.judge.checkpoint'|translate}}
@@ -201,10 +154,10 @@ html(ng-app="ddApp")
                             button.btn.btn-success(type='button', ng-click='increment($index,$last)')
                               i.fas.fa-plus(aria-hidden='true')
                     
-                    div(ng-if="$index == EvacuationAreaLoPIndex && league != 'LineNL'", style="border: solid 4px #e74c3c;border-radius:calc(0.5rem - 1px);margin-top:15px;")
+                    div(ng-if="$index == EvacuationAreaLoPIndex", style="border: solid 4px #e74c3c;border-radius:calc(0.5rem - 1px);margin-top:15px;")
                       h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;")  {{'line.judge.rescue' | translate}}
-                        span.badge.badge-danger {{evacuationLevel-1?'line.judge.high':'line.judge.low' | translate}}
                       .row(style="padding:10px;")
+                        .col-2
                         .col-4(ng-click="addVictimTmp('LIVE')")
                           span Max : {{maxLiveVictims}}
                           br
@@ -216,114 +169,51 @@ html(ng-app="ddApp")
                           br
                           .victim_btn(style='width:100%;position: relative;', ng-style="{'background-color': count_victim_list('D') + count_victim_tmp('D') >= maxDeadVictims?'#ccc':'#E1FFFE'}")
                             img.img-thumbnail(src='/images/deadVictim.png', height='60px')
-                        .col-4(style='', ng-click="addVictimTmp('KIT')")
-                          span Max : 1
-                          br
-                          .victim_btn(style='width:100%;position: relative;', ng-style="{'background-color': count_victim_list('K') + count_victim_tmp('K') >= 1?'#ccc':'#E1FFFE'}")
-                            img.img-thumbnail(src='/images/rescuekit-1.png', height='60px', ng-if="kitLevel==1")
-                            img.img-thumbnail(src='/images/rescuekit-2.png', height='60px', ng-if="kitLevel==2")
                         .col-12(ng-if="victim_tmp.length > 0")
                           table(border='1', style='width:100%; text-align: center; margin-top: 10px;')
                             tbody
                               tr
-                                td(ng-repeat='i in range(4)', ng-dblclick='delete_victim_tmp(i)', ng-swipe-left='delete_victim_tmp(i)')
+                                td(ng-repeat='i in range(3)', ng-dblclick='delete_victim_tmp(i)', ng-swipe-left='delete_victim_tmp(i)')
                                   img(src='/images/liveVictim.png', width='30px', ng-if="victim_tmp[i] == 'LIVE'")
                                   img(src='/images/deadVictim.png', width='30px', ng-if="victim_tmp[i] == 'DEAD'")
-                                  img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_tmp[i] == 'KIT' && kitLevel==1")
-                                  img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_tmp[i] == 'KIT' && kitLevel==2")
                                   span(style='width:30px;', ng-hide='victim_tmp[i]') ---
                                 td(rowspan="6")
                                   button.btn.btn-warning(type='button', ng-click='victim_tmp_clear()')
                                     i.far.fa-trash-alt(aria-hidden='true')
                         .col-6(ng-if="victim_tmp.length > 0", style="margin-top:10px;")
                           .evac_zone_btn_red(style='width:100%;position: relative;', ng-click='victimRegist("RED")')
-                            img.img-thumbnail(src='/images/evacZone/red_lv1_a.png', height='60px', ng-if="evacuationLevel == 1")
-                            img.img-thumbnail(src='/images/evacZone/red_lv2_a.png', height='60px', ng-if="evacuationLevel == 2")
+                            img.img-thumbnail(src='/images/evacZone/red_lv2_a.png', height='60px')
                         .col-6(ng-if="victim_tmp.length > 0", style="margin-top:10px;", ng-click='victimRegist("GREEN")')
                           .evac_zone_btn_green(style='width:100%;position: relative;')
-                            img.img-thumbnail(src='/images/evacZone/green_lv1_a.png', height='60px', ng-if="evacuationLevel == 1")
-                            img.img-thumbnail(src='/images/evacZone/green_lv2_a.png', height='60px', ng-if="evacuationLevel == 2")
+                            img.img-thumbnail(src='/images/evacZone/green_lv2_a.png', height='60px')
                         .col-12
                           div(ng-show="victim_list.length > 0")
                             hr
                             h6 {{'line.judge.rescuedVictims' | translate}}
                             span(style='font-size:9px;') {{'line.judge.rescuedVictimsMes' | translate}}
-                            table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-repeat='j in range(6)', ng-if='victim_list.length > j*4')
+                            table(border='1', style='width:100%; text-align: center; margin-top: 10px;', ng-repeat='j in range(6)', ng-if='victim_list.length > j*3')
                               tbody
                                 tr
                                   th Zone
-                                  th(style='text-align:center;', ng-repeat='i in range(4)') {{j*4 + (i+1)}}
+                                  th(style='text-align:center;', ng-repeat='i in range(3)') {{j*3 + (i+1)}}
                                 tr
                                   td
-                                    img(src='/images/evacZone/red_lv1.png', height='50px', ng-if="evacuationLevel == 1")
-                                    img(src='/images/evacZone/red_lv2.png', height='50px', ng-if="evacuationLevel == 2")
-                                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'RED')}", ng-dblclick='delete_victim(j*4+i)', ng-swipe-left='delete_victim(j*4+i)')
-                                    div(ng-if="victim_list[j*4+i].zoneType == 'RED'")
-                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
-                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
-                                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==1")
-                                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==2")
+                                    img(src='/images/evacZone/red_lv2.png', height='50px')
+                                  td(ng-repeat='i in range(3)', ng-style="{'background-color': victim_bk_color(j*3+i, 'RED')}", ng-dblclick='delete_victim(j*3+i)', ng-swipe-left='delete_victim(j*3+i)')
+                                    div(ng-if="victim_list[j*3+i].zoneType == 'RED'")
+                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'LIVE'")
+                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'DEAD'")
                                       br
-                                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
+                                      span(ng-if="calc_victim_multipliers(j*3+i)!=0") x{{calc_victim_multipliers(j*3+i)}}
                                 tr
                                   td
-                                    img(src='/images/evacZone/green_lv1.png', height='50px', ng-if="evacuationLevel == 1")
-                                    img(src='/images/evacZone/green_lv2.png', height='50px', ng-if="evacuationLevel == 2")
-                                  td(ng-repeat='i in range(4)', ng-style="{'background-color': victim_bk_color(j*4+i, 'GREEN')}", ng-dblclick='delete_victim(j*4+i)', ng-swipe-left='delete_victim(j*4+i)')
-                                    div(ng-if="victim_list[j*4+i].zoneType == 'GREEN'")
-                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'LIVE'")
-                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'DEAD'")
-                                      img(src='/images/rescuekit-1.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==1")
-                                      img(src='/images/rescuekit-2.png', width='30px', ng-if="victim_list[j*4+i].victimType == 'KIT' && kitLevel==2")
+                                    img(src='/images/evacZone/green_lv2.png', height='50px')
+                                  td(ng-repeat='i in range(3)', ng-style="{'background-color': victim_bk_color(j*3+i, 'GREEN')}", ng-dblclick='delete_victim(j*3+i)', ng-swipe-left='delete_victim(j*3+i)')
+                                    div(ng-if="victim_list[j*3+i].zoneType == 'GREEN'")
+                                      img(src='/images/liveVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'LIVE'")
+                                      img(src='/images/deadVictim.png', width='30px', ng-if="victim_list[j*3+i].victimType == 'DEAD'")
                                       br
-                                      span(ng-if="calc_victim_multipliers(j*4+i)!=0") x{{calc_victim_multipliers(j*4+i)}}
-
-                    div(ng-if="$index == EvacuationAreaLoPIndex && league == 'LineNL'", style="border: solid 4px #e74c3c;border-radius:calc(0.5rem - 1px);margin-top:15px;")
-                      h3.card-header(style="background-color: #e74c3c;color: #fff;border-radius:calc(0.2rem - 1px) calc(0.2rem - 1px) 0 0;")  {{'line.judge.rescue' | translate}} (NL)
-                      div(ng-repeat="i in range(maxLiveVictims)")
-                        .row(style="padding-right:5px;margin:10px 0 10px 0;")
-                          div(style='width:20%;font-size:10px;', align='center')
-                            img(src='/images/greenVictim.png', height='30px')
-                            span(style="font-size:30px;") {{i+1}}
-                          div(style='width:80%;position: relative;')
-                            .btn-group.mb-3(style='width:100%; top: calc(50% - 20px);')
-                                button.btn(style="padding-left: 0; padding-right: 0;", type='button', ng-click='victimNL("L", i, false, false)', ng-class="victimNLActivate('L', i, false, false) ? 'btn-secondary':'btn-outline-secondary'")
-                                  i.fas.fa-times
-                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("L", i, true, false)', ng-class="victimNLActivate('L', i, true, false) ? 'btn-info':'btn-outline-info'")
-                                  i.fas.fa-check &nbsp;
-                                  span 発見
-                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("L", i, true, true)', ng-class="victimNLActivate('L', i, true, true) ? 'btn-success':'btn-outline-success'")
-                                  i.fas.fa-check-double &nbsp;
-                                  span 識別
-                      div(ng-repeat="i in range(maxDeadVictims)")
-                        .row(style="padding-right:5px;margin:10px 0 10px 0;")
-                          div(style='width:20%;font-size:10px;', align='center')
-                            img(src='/images/blackVictim.png', height='30px')
-                            span(style="font-size:30px;") {{i+1}}
-                          div(style='width:80%;position: relative;')
-                            .btn-group.mb-3(style='width:100%; top: calc(50% - 20px);')
-                                button.btn(style="padding-left: 0; padding-right: 0;", type='button', ng-click='victimNL("D", i, false, false)', ng-class="victimNLActivate('D', i, false, false) ? 'btn-secondary':'btn-outline-secondary'")
-                                  i.fas.fa-times
-                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("D", i, true, false)', ng-class="victimNLActivate('D', i, true, false) ? 'btn-info':'btn-outline-info'")
-                                  i.fas.fa-check &nbsp;
-                                  span 発見
-                                button.btn(style="padding-left: 0; padding-right: 0;",type='button', ng-click='victimNL("D", i, true, true)', ng-class="victimNLActivate('D', i, true, true) ? 'btn-danger':'btn-outline-danger'")
-                                  i.fas.fa-check-double &nbsp;
-                                  span 識別
-                      //hr
-                      //.row(style="margin-top:10px;padding-bottom:20px;")
-                        div(style='width:40%;font-size:10px;', align='center')
-                          img(src='/images/misidentNL.png', height='40px')
-                        div(style='width:60%;position: relative;')
-                          .input-group.mb-3(style='width:100%; height:40px;position:absolute;margin: auto;top: calc(50% - 20px);')
-                            .input-group-prepend
-                              button.btn.btn-danger(type='button', ng-click='misidentNL(-1)')
-                                i.fas.fa-minus(aria-hidden='true')
-                            div(style='background-color: #F2F2F2; width:40%; text-align: center;')
-                              span.count(style="color: #c0392b;") {{misidentNL_C}}
-                            .input-group-append
-                              button.btn.btn-success(type='button', ng-click='misidentNL(1)')
-                                i.fas.fa-plus(aria-hidden='true')
+                                      span(ng-if="calc_victim_multipliers(j*3+i)!=0") x{{calc_victim_multipliers(j*3+i)}}
                     hr(ng-show='!$last')
                   
                 h3.card-header
@@ -331,8 +221,7 @@ html(ng-app="ddApp")
                   |  {{'line.judge.exit' | translate}}　
                 .card-body
                   .col-md-12(style='position: relative;', ng-click='changeExitBonus()')
-                    img.img-thumbnail(src='/images/line_bonus.png', width='186.3px', height='118px', ng-style="{'background-color': exitBonus?'#2ecc71':'#D91E18'}", ng-if="league != 'LineNL'")
-                    img.img-thumbnail(src='/images/nl_bonus.png', width='186.3px', ng-style="{'background-color': exitBonus?'#2ecc71':'#D91E18'}", ng-if="league == 'LineNL'")
+                    img.img-thumbnail(src='/images/line_bonus.png', width='186.3px', height='118px', ng-style="{'background-color': exitBonus?'#2ecc71':'#D91E18'}")
                     div(style='position:absolute; top:20px; left:65px;')
                       i.fas.fa-check.fa-fw.fa-5x(ng-show='exitBonus', style='color:#27ae60; opacity:0.9;')
                       i.fas.fa-times.fa-fw.fa-5x(ng-show='!exitBonus ', style='padding-top:4px; color:#e74c3c; opacity:0.9;')
@@ -366,9 +255,6 @@ html(ng-app="ddApp")
                   tile(tile="mtiles[r+','+ (length - c-1) +','+z]", ng-click='doScoring(r,length-c-1,z)')
         .row(style='margin:50 0 0 0;')
           .col-sm-12
-            button.btn.btn-primary(style='margin:0 10px 10px 0;', type='button', ng-click='toggleScoring()')
-              i.far.fa-clipboard(aria-hidden='true')
-                | {{ startedScoring ? 'line.judge.run_end' : 'line.judge.run_start' | translate }}
             button.btn.btn-success(style='margin:0 10px 10px 0;', type='button', ng-click='toggleTime()')
               i.fas.fa-stopwatch(aria-hidden='true')  {{ startedTime ? 'line.judge.tim_stop' : 'line.judge.tim_start' |translate }}
           .col-md-12.confirmation
@@ -390,9 +276,8 @@ html(ng-app="ddApp")
                       span.input-group-text {{'common.sec' | translate}}
                 .col-sm-5
                   div(style='text-align:right;')
-                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime', ng-hide='networkError')
+                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime')
                       i.fas.fa-arrow-right.fa-2x(aria-hidden='true')  {{'line.judge.toSign'| translate}}
-                    button.btn.btn-danger(type='button', ng-click='handover()', ng-disabled='startedTime', ng-show='networkError') {{'line.judge.handover' | translate}}
       .row(style='margin:20 0 0 0;')
         .col-md12
           button.btn.btn-secondary(style='margin:0 10px 10px 0;', type='button', ng-click="getParam('return')? go(getParam('return')):go('/line/' + competition._id + '/' + league)")
