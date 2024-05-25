@@ -367,9 +367,8 @@ html(ng-app="ddApp")
                       span.input-group-text {{'common.sec' | translate}}
                 .col-sm-5
                   div(style='text-align:right;')
-                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime', ng-hide='networkError')
+                    button.btn.btn-danger(type='button', ng-click='confirm()', ng-disabled='startedTime', ng-disabled='networkError')
                       i.fas.fa-arrow-right.fa-2x(aria-hidden='true')  {{'line.judge.toSign'| translate}}
-                    button.btn.btn-danger(type='button', ng-click='handover()', ng-disabled='startedTime', ng-show='networkError') {{'maze.judge.handover' | translate}}
             br
             br
       .row(style='margin:20 0 0 0;')

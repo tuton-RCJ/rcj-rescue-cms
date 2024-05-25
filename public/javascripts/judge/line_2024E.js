@@ -891,35 +891,6 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
   };
 
-
-
-  $scope.handover = function () {
-    var run = {};
-    run.id = runId;
-    run.LoPs = $scope.LoPs;
-    run.evacuationLevel = $scope.evacuationLevel;
-    run.kitLevel = $scope.kitLevel;
-    run.exitBonus = $scope.exitBonus;
-    run.rescueOrder = $scope.victim_list;
-    run.showedUp = $scope.showedUp;
-    run.started = $scope.started;
-    run.tiles = $scope.stiles;
-    run.time = {
-      minutes: $scope.minutes,
-      seconds: $scope.seconds
-    };
-    run.status = 3;
-
-    swal({
-      title: 'Scan it !',
-      html: '<div style="text-align: center;"><div id="qr_code_area"></div></div>',
-      showCloseButton: true
-    }).then((result) => {
-      stopMakeQR();
-    });
-    createMultiQR(run, "qr_code_area", 80);
-  };
-
   $scope.confirm = function () {
     if ((!$scope.showedUp || $scope.showedUp == null) && $scope.score > 0) {
       playSound(sError);
