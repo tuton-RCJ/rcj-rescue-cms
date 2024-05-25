@@ -105,7 +105,6 @@ publicRouter.get('/competition/:competitionId', function (req, res, next) {
         err: err.message,
       });
     } else if (dbRuns) {
-      console.log("ABCD")
       // Hide map and field from public
       dbRuns.map(run => {
         switch(auth.authViewRun(req.user, run, ACCESSLEVELS.NONE + 1, run.competition.preparation)) {

@@ -19,7 +19,7 @@ append scripts
   script(src="/javascripts/opencv.js")
 
 append css
-  link(href="/stylesheets/maze_edit.css" rel="stylesheet")
+  link(href="/stylesheets/sim_edit.css" rel="stylesheet")
   link(href="/components/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet")
 
 block location
@@ -98,7 +98,7 @@ block content
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
                             td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="tileColour(c,r,z)")
-                                .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
+                                .tile-image-container(ng-show="$odd && $parent.$odd")
                                     img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
                                     img.tile-image(ng-src='/images/h_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'H' || cells[c+','+r+','+z].tile.halfWallVic[0] == 1 ||  cells[c+','+r+','+z].tile.halfWallVic[4] == 1 || cells[c+','+r+','+z].tile.halfWallVic[1] == 1 || cells[c+','+r+','+z].tile.halfWallVic[7] == 1")
                                     img.tile-image(ng-src='/images/h_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'H' || cells[c+','+r+','+z].tile.halfWallVic[5] == 1 ||  cells[c+','+r+','+z].tile.halfWallVic[13] == 1 || cells[c+','+r+','+z].tile.halfWallVic[6] == 1 || cells[c+','+r+','+z].tile.halfWallVic[12] == 1")
@@ -192,7 +192,7 @@ block content
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
                             td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'linear': cells[c+','+r+','+z].isLinear}" , ng-style="wallColor(c,r,z)")
-                                .tile-image-container(ng-show="cells[c+','+r+','+z].isTile" style="position: relative;")
+                                .tile-image-container(ng-show="$odd && $parent.$odd")
                                     div.maru.size_normal.blue1(style="left:1px;top:1px;position: absolute;border-radius:0%;z-index:3;" ng-if="cells[c+','+r+','+z].tile.checkpoint")
                                         div.letter3(ng-bind="itemNumber('checkpoint',c,r,z)")
                                     img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")

@@ -82,11 +82,10 @@ block content
                             button.btn.btn-secondary(type='button', ng-click='saveMapAs(asname)') {{"admin.mazeMapEditor.saveAs" | translate}}
                     hr
                 .input-group.mb-3
-                    //.input-group-prepend
-                        span.input-group-text {{"admin.mazeMapEditor.height" | translate}}
-                    //input.form-control(type='number', ng-model='height', ng-change='sliderOptions.ceil = height - 1', min='1')
-                    //.input-group-append
                     .input-group-prepend
+                        span.input-group-text {{"admin.mazeMapEditor.height" | translate}}
+                    input.form-control(type='number', ng-model='height', ng-change='sliderOptions.ceil = height - 1', min='1')
+                    .input-group-append
                         span.input-group-text {{"admin.mazeMapEditor.width" | translate}}
                     input.form-control(type='number', ng-model='width', min='1')
                     .input-group-append
@@ -130,7 +129,7 @@ block content
                     .error(ng-if='startNotSet()') {{"admin.mazeMapEditor.noStart" | translate}}
         .row
             .col-11
-                //.btn-group(style='margin-bottom:5px;')
+                .btn-group(style='margin-bottom:5px;')
                     .input-group-prepend
                         span.input-group-text
                             i.fas.fa-arrows-alt-v(aria-hidden='true')
@@ -138,42 +137,37 @@ block content
                 table
                     tbody
                         tr(ng-repeat='r in range(2*length + 1)')
-                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z)")
-                                .tile-image-container(ng-show="cells[c+','+r+','+z].isTile")
+                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].tile.reachable && cells[c+','+r+','+z].isLinear, 'floating': cells[c+','+r+','+z].tile.reachable && !cells[c+','+r+','+z].isLinear}", ng-click='cellClick(c, r, z, $odd != $parent.$odd, $odd && $parent.$odd)', ng-style="wallColor(c,r,z)")
+                                .tile-image-container(ng-show="$odd && $parent.$odd")
                                     img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
                                     img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
-                                    
-                                    div(ng-if="leagueType == 'standard'")
-                                        img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")
-                                        img.tile-image(ng-src='/images/steps.png', ng-show="cells[c+','+r+','+z].tile.steps")
-                                        img.tile-image(ng-src='/images/h_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'H'")
-                                        img.tile-image(ng-src='/images/h_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'H'")
-                                        img.tile-image(ng-src='/images/h_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'H'")
-                                        img.tile-image(ng-src='/images/h_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'H'")
-                                        img.tile-image(ng-src='/images/s_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'S'")
-                                        img.tile-image(ng-src='/images/s_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'S'")
-                                        img.tile-image(ng-src='/images/s_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'S'")
-                                        img.tile-image(ng-src='/images/s_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'S'")
-                                        img.tile-image(ng-src='/images/u_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'U'")
-                                        img.tile-image(ng-src='/images/u_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'U'")
-                                        img.tile-image(ng-src='/images/u_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'U'")
-                                        img.tile-image(ng-src='/images/u_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'U'")
-                                        img.tile-image(ng-src='/images/red_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Red'")
-                                        img.tile-image(ng-src='/images/red_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Red'")
-                                        img.tile-image(ng-src='/images/red_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Red'")
-                                        img.tile-image(ng-src='/images/red_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Red'")
-                                        img.tile-image(ng-src='/images/yellow_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Yellow'")
-                                        img.tile-image(ng-src='/images/yellow_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Yellow'")
-                                        img.tile-image(ng-src='/images/yellow_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Yellow'")
-                                        img.tile-image(ng-src='/images/yellow_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Yellow'")
-                                        img.tile-image(ng-src='/images/green_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Green'")
-                                        img.tile-image(ng-src='/images/green_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Green'")
-                                        img.tile-image(ng-src='/images/green_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Green'")
-                                        img.tile-image(ng-src='/images/green_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Green'")
-                                    
-                                    div(ng-if="leagueType == 'entry'")
-                                        img.tile-image(ng-src='/images/red_floor.png', ng-show="cells[c+','+r+','+z].tile.victims.floor == 'Red'")
-                                        img.tile-image(ng-src='/images/green_floor.png', ng-show="cells[c+','+r+','+z].tile.victims.floor == 'Green'")
+                                    img.tile-image(ng-src='/images/elevator.png', ng-show="!isUndefined(cells[c+','+r+','+z].tile.changeFloorTo) && cells[c+','+r+','+z].tile.changeFloorTo != z")
+                                    img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")
+                                    img.tile-image(ng-src='/images/steps.png', ng-show="cells[c+','+r+','+z].tile.steps")
+                                    img.tile-image(ng-src='/images/h_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'H'")
+                                    img.tile-image(ng-src='/images/h_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'H'")
+                                    img.tile-image(ng-src='/images/h_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'H'")
+                                    img.tile-image(ng-src='/images/h_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'H'")
+                                    img.tile-image(ng-src='/images/s_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'S'")
+                                    img.tile-image(ng-src='/images/s_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'S'")
+                                    img.tile-image(ng-src='/images/s_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'S'")
+                                    img.tile-image(ng-src='/images/s_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'S'")
+                                    img.tile-image(ng-src='/images/u_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'U'")
+                                    img.tile-image(ng-src='/images/u_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'U'")
+                                    img.tile-image(ng-src='/images/u_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'U'")
+                                    img.tile-image(ng-src='/images/u_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'U'")
+                                    img.tile-image(ng-src='/images/red_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Red'")
+                                    img.tile-image(ng-src='/images/red_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Red'")
+                                    img.tile-image(ng-src='/images/red_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Red'")
+                                    img.tile-image(ng-src='/images/red_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Red'")
+                                    img.tile-image(ng-src='/images/yellow_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Yellow'")
+                                    img.tile-image(ng-src='/images/yellow_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Yellow'")
+                                    img.tile-image(ng-src='/images/yellow_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Yellow'")
+                                    img.tile-image(ng-src='/images/yellow_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Yellow'")
+                                    img.tile-image(ng-src='/images/green_top.png', ng-show="cells[c+','+r+','+z].tile.victims.top == 'Green'")
+                                    img.tile-image(ng-src='/images/green_right.png', ng-show="cells[c+','+r+','+z].tile.victims.right == 'Green'")
+                                    img.tile-image(ng-src='/images/green_bottom.png', ng-show="cells[c+','+r+','+z].tile.victims.bottom == 'Green'")
+                                    img.tile-image(ng-src='/images/green_left.png', ng-show="cells[c+','+r+','+z].tile.victims.left == 'Green'")
 
             .col-1 
                 button.btn.btn-info(type='button', ng-click='openMaxScore()')
@@ -214,19 +208,19 @@ block content
                         color: #e84393;
                         background-color: #e84393;
                     }
-                table
-                    tbody
-                        tr(ng-repeat='r in range(2*length + 1)')
-                            td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].isLinear}" , ng-style="wallColor(c,r,z)")
-                                .tile-image-container(ng-show="cells[c+','+r+','+z].isTile" style="position: relative;")
-                                    div.maru.size_normal.blue1(style="left:1px;top:1px;position: absolute;border-radius:0%;z-index:3;" ng-if="cells[c+','+r+','+z].tile.checkpoint")
-                                        div.letter3(ng-bind="itemNumber('checkpoint',c,r,z)")
-                                    img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
-                                    div.maru.size_normal.blue1(style="right:1px;bottom:1px;position: absolute;z-index:3;" ng-if="cells[c+','+r+','+z].tile.speedbump")
-                                        div.letter3(ng-bind="itemNumber('speedbump',c,r,z)")
-                                    img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
-                                    
-                                    div(ng-if="leagueType == 'standard'")
+                div(ng-repeat='z in range(height)')
+                    table
+                        tbody
+                            tr(ng-repeat='r in range(2*length + 1)' ng-show="showRow(r,z)")
+                                td(ng-repeat='c in range(2*width + 1)', ng-class="{'wallspot': $odd != $parent.$odd, 'tile': $odd && $parent.$odd, 'wall': cells[c+','+r+','+z].isWall, 'checkpoint': cells[c+','+r+','+z].tile.checkpoint, 'black': cells[c+','+r+','+z].tile.black, 'blue': cells[c+','+r+','+z].tile.blue, 'linear': cells[c+','+r+','+z].tile.reachable && cells[c+','+r+','+z].isLinear, 'floating': cells[c+','+r+','+z].tile.reachable && !cells[c+','+r+','+z].isLinear}" , ng-style="wallColor(c,r,z)")
+                                    .tile-image-container(ng-show="$odd && $parent.$odd")
+                                        div.maru.size_normal.blue1(style="left:1px;top:1px;position: absolute;border-radius:0%;z-index:3;" ng-if="cells[c+','+r+','+z].tile.checkpoint")
+                                            div.letter3(ng-bind="itemNumber('checkpoint',c,r,z)")
+                                        img.tile-image(ng-src='/images/log.png', ng-show="cells[c+','+r+','+z].tile.speedbump")
+                                        div.maru.size_normal.blue1(style="right:1px;bottom:1px;position: absolute;z-index:3;" ng-if="cells[c+','+r+','+z].tile.speedbump")
+                                            div.letter3(ng-bind="itemNumber('speedbump',c,r,z)")
+                                        img.tile-image(ng-src='/images/start.png', ng-show='startTile.x == c && startTile.y == r && startTile.z == z')
+                                        img.tile-image(ng-src='/images/elevator.png', ng-show="!isUndefined(cells[c+','+r+','+z].tile.changeFloorTo) && cells[c+','+r+','+z].tile.changeFloorTo != z")
                                         img.tile-image(ng-src='/images/ramp.png', ng-show="cells[c+','+r+','+z].tile.ramp")
                                         div.maru.size_normal.blue1(style="right:13px;top:12px;position: absolute;z-index:3;border-radius:25%;" ng-if="cells[c+','+r+','+z].tile.ramp")
                                             div.letter3(ng-bind="itemNumber('ramp',c,r,z)")
@@ -335,15 +329,6 @@ block content
                                             img.tile-image(ng-src='/images/green_bottom.png')
                                             div.maru.size_normal.pink1(style="left:5px;bottom:-10px;position: absolute;z-index:3;")
                                                 div.letter3(ng-bind="victimNumber('Green',c,r,z,'bottom')")
-
-                                    div(ng-if="leagueType == 'entry'")
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.floor == 'Red'")
-                                            img.tile-image(ng-src='/images/red_floor.png')
-                                            div.maru.size_normal.pink1(style="right:5px;top:-10px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Red',c,r,z,'floor')")
-                                        div(ng-if="cells[c+','+r+','+z].tile.victims.floor == 'Green'")
-                                            img.tile-image(ng-src='/images/green_floor.png')
-                                            div.maru.size_normal.pink1(style="left:5px;bottom:-10px;position: absolute;z-index:3;")
-                                                div.letter3(ng-bind="victimNumber('Green',c,r,z,'floor')")
+                    hr(ng-show="!$last" style="border-top: 1px solid black;margin-top:10px;margin-bottom:10px;")
 
 

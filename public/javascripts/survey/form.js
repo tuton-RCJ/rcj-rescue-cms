@@ -121,7 +121,6 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
                             $scope.answers[q.questionId] = '';
                         }
                     }
-                    console.log($scope.answers)
                 }        
             })
             

@@ -32,7 +32,7 @@ tr td:nth-child(even) {
 }
 
 .tile {
-    --tileColor: #b0b0b0;
+    --tileColor: #b4ffd5;
     background-color: var(--tileColor);
 }
 
@@ -42,10 +42,6 @@ tr td:nth-child(even) {
 
 .tile.linear {
     background-color: #fffdea;
-}
-
-.tile.floating {
-    background-color: #b4ffd5;
 }
 
 .wallspot:hover {
@@ -67,6 +63,7 @@ tr td:nth-child(even) {
 .tile.swamp {
     background-color: #CD853F;
 }
+  
 
 .tile-image-container {
     position: relative;

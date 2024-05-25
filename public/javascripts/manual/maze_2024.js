@@ -136,120 +136,119 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
             for(let j=1,l=map.length*2+1;j<l;j+=2) {
                 for (let i = 1, m = map.width * 2 + 1; i < m; i += 2) {
-                    if (!cells[`${i},${j},0`]) continue
-                    let victimLF =  cells[i+','+j+',0'].isLinear?"linear":"floating";
-                    let victims = cells[i+','+j+',0'].tile.victims;
-                    let tile = cells[i+','+j+',0'].tile;
-                    let victimType = "None";
+                    for (let k = 0; k < map.height; k++) {
+                        if (!cells[`${i},${j},${k}`]) continue
+                        let victimLF =  cells[`${i},${j},${k}`].isLinear?"linear":"floating";
+                        let victims = cells[`${i},${j},${k}`].tile.victims;
+                        let tile = cells[`${i},${j},${k}`].tile;
+                        let victimType = "None";
 
-                    victimType = victims.top;
-                    if(victimType != "None"){
-                        let name;
-                        if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
-                        else name = small[$scope.itemList[victimType][victimLF].length];
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: name,
-                            direction: "top"
+                        victimType = victims.top;
+                        if(victimType != "None"){
+                            let name;
+                            if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
+                            else name = small[$scope.itemList[victimType][victimLF].length];
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: name,
+                                direction: "top"
+                            }
+                            $scope.itemList[victimType][victimLF].push(tmp);
                         }
-                        $scope.itemList[victimType][victimLF].push(tmp);
-                    }
 
-                    victimType = victims.left;
-                    if(victimType != "None"){
-                        let name;
-                        if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
-                        else name = small[$scope.itemList[victimType][victimLF].length];
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: name,
-                            direction: "left"
+                        victimType = victims.left;
+                        if(victimType != "None"){
+                            let name;
+                            if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
+                            else name = small[$scope.itemList[victimType][victimLF].length];
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: name,
+                                direction: "left"
+                            }
+                            $scope.itemList[victimType][victimLF].push(tmp);
                         }
-                        $scope.itemList[victimType][victimLF].push(tmp);
-                    }
 
-                    victimType = victims.right;
-                    if(victimType != "None"){
-                        let name;
-                        if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
-                        else name = small[$scope.itemList[victimType][victimLF].length];
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: name,
-                            direction: "right"
+                        victimType = victims.right;
+                        if(victimType != "None"){
+                            let name;
+                            if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
+                            else name = small[$scope.itemList[victimType][victimLF].length];
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: name,
+                                direction: "right"
+                            }
+                            $scope.itemList[victimType][victimLF].push(tmp);
                         }
-                        $scope.itemList[victimType][victimLF].push(tmp);
-                    }
 
-                    victimType = victims.bottom;
-                    if(victimType != "None"){
-                        let name;
-                        if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
-                        else name = small[$scope.itemList[victimType][victimLF].length];
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: name,
-                            direction: "bottom"
+                        victimType = victims.bottom;
+                        if(victimType != "None"){
+                            let name;
+                            if(victimLF == "linear") name = big[$scope.itemList[victimType][victimLF].length];
+                            else name = small[$scope.itemList[victimType][victimLF].length];
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: name,
+                                direction: "bottom"
+                            }
+                            $scope.itemList[victimType][victimLF].push(tmp);
                         }
-                        $scope.itemList[victimType][victimLF].push(tmp);
-                    }
 
-                    if(tile.checkpoint){
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: $scope.itemList.checkpoint.length+1,
-                            type: "checkpoint"
+                        if(tile.checkpoint){
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: $scope.itemList.checkpoint.length+1,
+                                type: "checkpoint"
+                            }
+                            $scope.itemList.checkpoint.push(tmp);
                         }
-                        $scope.itemList.checkpoint.push(tmp);
-                    }
 
-                    if(tile.speedbump){
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: $scope.itemList.speedbump.length+1,
-                            type: "speedbump"
+                        if(tile.speedbump){
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: $scope.itemList.speedbump.length+1,
+                                type: "speedbump"
+                            }
+                            $scope.itemList.speedbump.push(tmp);
                         }
-                        $scope.itemList.speedbump.push(tmp);
-                    }
 
-                    if(tile.ramp){
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: $scope.itemList.ramp.length+1,
-                            type: "ramp"
+                        if(tile.ramp){
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: $scope.itemList.ramp.length+1,
+                                type: "ramp"
+                            }
+                            $scope.itemList.ramp.push(tmp);
                         }
-                        $scope.itemList.ramp.push(tmp);
-                    }
 
-                    if(tile.steps){
-                        let tmp = {
-                            x: i,
-                            y: j,
-                            z: 0,
-                            name: $scope.itemList.steps.length+1,
-                            type: "steps"
+                        if(tile.steps){
+                            let tmp = {
+                                x: i,
+                                y: j,
+                                z: k,
+                                name: $scope.itemList.steps.length+1,
+                                type: "steps"
+                            }
+                            $scope.itemList.steps.push(tmp);
                         }
-                        $scope.itemList.steps.push(tmp);
                     }
                 }
             }
-            console.log($scope.itemList);
-
-
         }, function (response) {
             console.log("Error: " + response.statusText);
         });

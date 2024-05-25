@@ -364,7 +364,6 @@ publicRouter.get('/:competitionId/:leagueId', async function (req, res, next) {
   if (result.modeDetails.technicalChallenge) {
     let tcResult = await getTechnicalChallengeScore(competition, league);
     for (let tc of tcResult) {
-      console.log(tc)
       if (teamRuns[tc.teamId]) {
         teamRuns[tc.teamId].technicalChallenge = tc.score;
       }

@@ -22,6 +22,14 @@
       <li>
         <input type="checkbox" ng-model="cell.tile.steps" id="hasSteps"><label class="checkbox" for="hasSteps">{{"admin.mazeMapEditor.step" | translate}}</label>
       </li>
+      <li ng-show="height > 1">
+        <label>{{"admin.mazeMapEditor.changeF" | translate}}</label><br>
+        <ul>
+          <li ng-repeat="h in range(height)">
+            <input type="radio" ng-model="cell.tile.changeFloorTo" ng-value="h" ng-change="elevatorChanged(cell.tile.changeFloorTo)" id="{{ 'elevator-' + h }}"><label class="radio" for="{{ 'elevator-' + h }}">{{h}}<span ng-show="h == z"> {{"admin.mazeMapEditor.noEle" | translate}}</span></label>
+          </li>
+        </ul>
+      </li>
     </div>
   </ul>
 
