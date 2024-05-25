@@ -42,7 +42,7 @@ async function drawRun(doc, config, scoringRun) {
     doc,
     0,
     0,
-    'scoresheet_generation/line/base2023.png',
+    'scoresheet_generation/line/base2024.png',
     841.89,
     595.28,
     'center'
@@ -140,7 +140,7 @@ async function drawRun(doc, config, scoringRun) {
   }
 
   // System version
-  pdf.drawText(doc, 742, 573, `RoboCupJunior CMS v${process.env.cms_version}`, 6, 'black');
+  pdf.drawText(doc, 20, 580, `©${process.env.cms_copyright}. This score sheet was generated with RCJ CMS v${process.env.cms_version}`, 8, 'black');
 
   let x = 440;
   let y = 35;
