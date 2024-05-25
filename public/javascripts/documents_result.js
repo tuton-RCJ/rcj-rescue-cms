@@ -16,7 +16,7 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
     });
 
     const currentLang = $translate.proposedLanguage() || $translate.use();
-    const availableLangs =  $translate.getAvailableLanguageKeys();
+    $scope.leagueId = leagueId;
 
     $scope.currentLang = currentLang;
     $scope.displayLang = currentLang;
