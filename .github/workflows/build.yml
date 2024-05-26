@@ -13,14 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt-get update && sudo apt-get install -y libpng-dev
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      - uses: actions/checkout@v2
       - name: Use Node.js 18.x
         uses: actions/setup-node@v2
         with:
           node-version: 18.x
+      - run: ls node_modules
       - run: npm install mongo-express --ignore-scripts
       - run: npm install
       - run: npm run minify
