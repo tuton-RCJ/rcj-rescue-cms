@@ -12,6 +12,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - run: apk --no-cache update && apk --no-cache add make bash g++ zlib-dev libpng-dev &&  rm -fr /var/cache/apk/*
       -
         name: Checkout
         uses: actions/checkout@v2
