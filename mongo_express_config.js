@@ -3,7 +3,11 @@
 let mongo = {
   // Setting the connection string will only give access to that database
   // to see more databases you need to set mongodb.admin to true or add databases to the mongodb.auth list
-  connectionString: process.env.DB_CONNECT_STR
+  // It is RECOMMENDED to use connectionString instead of individual params, other options will be removed later.
+  // More info here: https://docs.mongodb.com/manual/reference/connection-string/
+  connectionString: process.env.DB_CONNECT_STR,
+  ssl: false,
+
 };
 
 // Accessing Bluemix variable to get MongoDB info
@@ -49,11 +53,6 @@ function getFileEnv(envVariable) {
   return origVar;
 }
 
-function getBinaryFileEnv(envVariable) {
-  const fileVar = process.env[envVariable];
-  return getFile(fileVar);
-}
-
 const meConfigMongodbServer = process.env.ME_CONFIG_MONGODB_SERVER
   ? process.env.ME_CONFIG_MONGODB_SERVER.split(',')
   : false;
@@ -71,34 +70,35 @@ function getConnectionStringFromEnvVariables() {
     // >>>> If you are using an admin mongodb account, or no admin account exists, fill out section below
     // >>>> Using an admin account allows you to view and edit all databases, and view stats
     // leave username and password empty if no admin account exists
-    username: getFileEnv(adminUsername) || getFileEnv(dbAuthUsername) || mongo.username || dbAuthUsername,
-    password: getFileEnv(adminPassword) || getFileEnv(dbAuthPassword) || mongo.password || dbAuthPassword,
+    username: getFileEnv(adminUsername) || getFileEnv(dbAuthUsername) || mongo.username,
+    password: getFileEnv(adminPassword) || getFileEnv(dbAuthPassword) || mongo.password,
   };
   const login = infos.username ? `${infos.username}:${infos.password}@` : '';
   return `mongodb://${login}${infos.server}:${infos.port}/${infos.dbName}`;
 }
 
-const sslCA = 'ME_CONFIG_MONGODB_CA_FILE';
-const sslCAFromEnv = getBinaryFileEnv(sslCA);
+function getBoolean(str, defaultValue = false) {
+  return str ? str.toLowerCase() === 'true' : defaultValue;
+}
 
 module.exports = {
   mongodb: {
     // if a connection string options such as server/port/etc are ignored
     connectionString: mongo.connectionString || getConnectionStringFromEnvVariables(),
 
+    /** @type {import('mongodb').MongoClientOptions} */
     connectionOptions: {
       // ssl: connect to the server using secure SSL
-      ssl: process.env.ME_CONFIG_MONGODB_SSL || mongo.ssl,
+      ssl: getBoolean(process.env.ME_CONFIG_MONGODB_SSL, mongo.ssl),
 
       // sslValidate: validate mongod server certificate against CA
-      sslValidate: process.env.ME_CONFIG_MONGODB_SSLVALIDATE || true,
+      sslValidate: getBoolean(process.env.ME_CONFIG_MONGODB_SSLVALIDATE, true),
 
-      // sslCA: array of valid CA certificates
-      sslCA: sslCAFromEnv ? [sslCAFromEnv] : [],
+      // sslCA: single PEM file on disk
+      sslCA: process.env.ME_CONFIG_MONGODB_CA_FILE,
 
-      // poolSize: size of connection pool (number of connections to use)
-      poolSize: 4,
-      useUnifiedTopology: true
+      // maxPoolSize: size of connection pool (number of connections to use)
+      maxPoolSize: 4,
     },
 
     // set admin to true if you want to turn on admin features
@@ -119,11 +119,11 @@ module.exports = {
     cookieKeyName: 'mongo-express',
     cookieSecret: process.env.ME_CONFIG_SITE_COOKIESECRET || 'cookiesecret',
     host: process.env.VCAP_APP_HOST || 'localhost',
-    port: process.env.VCAP_APP_PORT || 8081,
+    port: process.env.PORT || 8081,
     requestSizeLimit: process.env.ME_CONFIG_REQUEST_SIZE || '50mb',
     sessionSecret: process.env.ME_CONFIG_SITE_SESSIONSECRET || 'sessionsecret',
     sslCert: process.env.ME_CONFIG_SITE_SSL_CRT_PATH || '',
-    sslEnabled: process.env.ME_CONFIG_SITE_SSL_ENABLED || false,
+    sslEnabled: getBoolean(process.env.ME_CONFIG_SITE_SSL_ENABLED, false),
     sslKey: process.env.ME_CONFIG_SITE_SSL_KEY_PATH || '',
   },
 
@@ -165,9 +165,10 @@ module.exports = {
     subprocessTimeout: 300,
 
     // readOnly: if readOnly is true, components of writing are not visible.
-    readOnly: process.env.ME_CONFIG_OPTIONS_READONLY
-      ? process.env.ME_CONFIG_OPTIONS_READONLY.toLowerCase() === 'true'
-      : false,
+    readOnly: getBoolean(process.env.ME_CONFIG_OPTIONS_READONLY, false),
+
+    // persistEditMode: if set to true, remain on same page after clicked on Save button
+    persistEditMode: getBoolean(process.env.ME_CONFIG_OPTIONS_PERSIST_EDIT_MODE, false),
 
     // collapsibleJSON: if set to true, jsons will be displayed collapsible
     collapsibleJSON: true,
@@ -178,9 +179,7 @@ module.exports = {
 
     // gridFSEnabled: if gridFSEnabled is set to 'true', you will be able to manage uploaded files
     // ( ak. grids, gridFS )
-    gridFSEnabled: process.env.ME_CONFIG_SITE_GRIDFS_ENABLED
-      ? process.env.ME_CONFIG_SITE_GRIDFS_ENABLED.toLowerCase() === 'true'
-      : false,
+    gridFSEnabled: getBoolean(process.env.ME_CONFIG_SITE_GRIDFS_ENABLED, false),
 
     // logger: this object will be used to initialize router logger (morgan)
     logger: {},
@@ -192,8 +191,11 @@ module.exports = {
     // noExport: if noExport is set to true, we won't show export buttons
     noExport: false,
 
+    // fullwidthLayout: if set to true an alternative page layout is used utilizing full window width
+    fullwidthLayout: getBoolean(process.env.ME_CONFIG_OPTIONS_FULLWIDTH_LAYOUT, false),
+
     // noDelete: if noDelete is set to true, we won't show delete buttons
-    noDelete: process.env.ME_CONFIG_OPTIONS_NO_DELETE || false,
+    noDelete: getBoolean(process.env.ME_CONFIG_OPTIONS_NO_DELETE, false),
   },
 
   // Specify the default keyname that should be picked from a document to display in collections list.
