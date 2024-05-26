@@ -21,8 +21,7 @@ jobs:
           node-version: 18.x
       - run: pwd
       - run: ls
-      - run: npm -v
-      - run: npm install mongo-express --ignore-scripts
+      - run: npm i -D
       - run: ls node_modules
       - run: npm install
       - run: ls node_modules/pngquant-bin/vendor
