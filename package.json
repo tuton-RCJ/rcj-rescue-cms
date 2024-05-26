@@ -66,6 +66,7 @@
     "grunt-cli": "^1.4.3",
     "grunt-contrib-cssmin": "4.0.0",
     "grunt-contrib-uglify": "5.0.1",
+    "grunt-image": "^6.4.0",
     "grunt-json-minification": "^0.2.1",
     "prettier": "2.4.1",
     "workbox-cli": "6.5.4"

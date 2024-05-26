@@ -35,11 +35,22 @@ module.exports = function(grunt){
                 dest: 'public/lang'
               }]
             }
+        },
+        image: {
+          dynamic: {
+            files: [{
+              expand: true,
+              cwd: 'public/images/',
+              src: ['**/*.{png,jpg,gif}'],
+              dest: 'public/images/'
+            }]
+          }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-json-minification');
-    grunt.registerTask('default', ['uglify', 'cssmin', 'json_minification']);
+    grunt.loadNpmTasks('grunt-image');
+    grunt.registerTask('default', ['uglify', 'cssmin', 'json_minification', 'image']);
 }
