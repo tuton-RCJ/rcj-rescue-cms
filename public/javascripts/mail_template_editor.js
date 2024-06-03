@@ -89,7 +89,7 @@ app.controller('TemplateEditorController', ['$scope', '$uibModal', '$log', '$htt
     $scope.preview = function(){
         for(let team of $scope.toTeam){
             team.mailData = {
-                "title": $scope.subject,
+                "title": template($scope.subject, team.variable),
                 "content": template($scope.mailContent, team.variable).replace(/<p><br><\/p>/g,"<br>").replace(/<\/p><p>/g,"<br>")
             }
         }

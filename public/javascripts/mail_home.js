@@ -200,7 +200,7 @@ app.controller('MailHomeController', ['$scope', '$uibModal', '$log', '$http', '$
         console.log($scope.mailContent);
         for(let team of $scope.toTeam){
             team.mailData = {
-                "title": $scope.mailTitle,
+                "title": template($scope.mailTitle, team.variable),
                 "content": template($scope.mailContent, team.variable).replace(/<p><br><\/p>/g,"<br>").replace(/<\/p><p>/g,"<br>")
             }
         }
