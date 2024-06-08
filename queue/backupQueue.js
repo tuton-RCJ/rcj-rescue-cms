@@ -21,6 +21,9 @@ const glob = require('glob');
 
 const Bversion = "24.0";
 
+const b_interval = process.env.BACKUP_INTERVAL_HOUR;
+const b_keep = process.env.BACKUP_KEEP_VERSION;
+
 const backupQueue = new Queue('backup', {
   redis: {port: process.env.REDIS_PORT, host: process.env.REDIS_HOST},
   limiter: {
@@ -32,9 +35,11 @@ const backupQueue = new Queue('backup', {
 backupQueue.obliterate({ force: true });
 
 backupQueue.process('backup', function(job, done){
-  const {competitionId} = job.data;
+  const {competitionId, mode} = job.data;
   const folderName = Math.floor( new Date().getTime() / 1000 );
-  const folderPath = `./backup/${competitionId}/${folderName}`;
+  let prefix = "";
+  if (mode == 'auto') prefix = "_";
+  const folderPath = `./backup/${competitionId}/${prefix}${folderName}`;
   fs.mkdirsSync(folderPath);
 
   jobProgress = 0;
@@ -202,6 +207,14 @@ function cleanup(job){
   if(job.name == 'backup'){
     rimraf(`./backup/${job.data.competitionId}/${job.data.folderName}`, (err) => {
     });
+    if (b_keep) {
+      glob.glob(`./backup/${job.data.competitionId}/_*.cms`, function(err, files){
+        files = files.slice(0, b_keep * -1);
+        for(let f of files) {
+          fs.unlinkSync(f);
+        }   
+      });
+    }
   }else if(job.name = 'restore'){
     rimraf(`./tmp/uploads/${job.data.folder}`, function (err) {
     });
@@ -438,6 +451,21 @@ backupQueue.process('restore', function(job, done){
   });
 });
 
-
-
 exports.backupQueue = backupQueue;
+// Backup competitions in interval
+if (b_interval) {
+    setInterval(() => {
+        competitiondb.competition
+          .find()
+          .select("_id")
+          .lean()
+          .exec(async function (err, data) {
+            for (let d of data) {
+              backupQueue.add('backup',{
+                'competitionId': d._id,
+                'mode': 'auto'
+              });
+            }
+          });
+    }, 1000 * 3600 * b_interval);
+}

@@ -50,9 +50,11 @@ adminRouter.get('/list/:competitionId', function (req, res, next) {
       function (er, files) {
         let fl = [];
         for(let f of files){
+          let name = path.basename(f);
           let tmp = {
-            "time": Number(path.basename(f, path.extname(f))),
-            "name": path.basename(f)
+            "time": Number(path.basename(f, path.extname(f)).replace('_', '')),
+            "name": name,
+            "auto": name.indexOf('_') != -1
           }
           fl.push(tmp);
         }

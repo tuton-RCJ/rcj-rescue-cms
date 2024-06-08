@@ -67,8 +67,9 @@ block content
               th {{"admin.backup.time" | translate}}
               th {{"common.operation" | translate}}
         tbody
-            tr(ng-repeat='back in backedup')
+            tr(ng-repeat='back in backedup | orderBy: "time"')
               td
+                i.fas.fa-sync(ng-show="back.auto", style="margin-right: 10px;")
                 a(ng-bind='time(back.time)')
               td
                 button.btn.btn-primary.btn-sm(type='button', ng-click="download(back.name)", style="margin:0 5px;")
