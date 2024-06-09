@@ -149,11 +149,12 @@ module.exports.calculateMazeScore = function (run) {
         )
           score += mapTiles[coord].isLinear ? 5 : 15;
         else score += mapTiles[coord].isLinear ? 10 : 30;
+
+        rescueKits += Math.min(
+          tile.scoredItems.rescueKits.top,
+          maxKits[mapTiles[coord].tile.victims.top]
+        );
       }
-      rescueKits += Math.min(
-        tile.scoredItems.rescueKits.top,
-        maxKits[mapTiles[coord].tile.victims.top]
-      );
     }
     if (mapTiles[coord].tile.victims.right != 'None') {
       if (tile.scoredItems.victims.right) {
@@ -165,11 +166,12 @@ module.exports.calculateMazeScore = function (run) {
         )
           score += mapTiles[coord].isLinear ? 5 : 15;
         else score += mapTiles[coord].isLinear ? 10 : 30;
+
+        rescueKits += Math.min(
+          tile.scoredItems.rescueKits.right,
+          maxKits[mapTiles[coord].tile.victims.right]
+        );
       }
-      rescueKits += Math.min(
-        tile.scoredItems.rescueKits.right,
-        maxKits[mapTiles[coord].tile.victims.right]
-      );
     }
     if (mapTiles[coord].tile.victims.bottom != 'None') {
       if (tile.scoredItems.victims.bottom) {
@@ -181,11 +183,12 @@ module.exports.calculateMazeScore = function (run) {
         )
           score += mapTiles[coord].isLinear ? 5 : 15;
         else score += mapTiles[coord].isLinear ? 10 : 30;
+
+        rescueKits += Math.min(
+          tile.scoredItems.rescueKits.bottom,
+          maxKits[mapTiles[coord].tile.victims.bottom]
+        );
       }
-      rescueKits += Math.min(
-        tile.scoredItems.rescueKits.bottom,
-        maxKits[mapTiles[coord].tile.victims.bottom]
-      );
     }
     if (mapTiles[coord].tile.victims.left != 'None') {
       if (tile.scoredItems.victims.left) {
@@ -197,11 +200,12 @@ module.exports.calculateMazeScore = function (run) {
         )
           score += mapTiles[coord].isLinear ? 5 : 15;
         else score += mapTiles[coord].isLinear ? 10 : 30;
+
+        rescueKits += Math.min(
+          tile.scoredItems.rescueKits.left,
+          maxKits[mapTiles[coord].tile.victims.left]
+        );
       }
-      rescueKits += Math.min(
-        tile.scoredItems.rescueKits.left,
-        maxKits[mapTiles[coord].tile.victims.left]
-      );
     }
   }
 

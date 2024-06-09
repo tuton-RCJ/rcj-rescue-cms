@@ -536,25 +536,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible++;
             current += tile.scoredItems.victims.top;
             possible += maxKit[cell.tile.victims.top];
-            current += Math.min(tile.scoredItems.rescueKits.top,maxKit[cell.tile.victims.top]);
+            if (tile.scoredItems.victims.top) current += Math.min(tile.scoredItems.rescueKits.top,maxKit[cell.tile.victims.top]);
         }
         if(cell.tile.victims.left != "None"){
             possible++;
             current += tile.scoredItems.victims.left;
             possible += maxKit[cell.tile.victims.left];
-            current += Math.min(tile.scoredItems.rescueKits.left,maxKit[cell.tile.victims.left]);
+            if (tile.scoredItems.victims.left) current += Math.min(tile.scoredItems.rescueKits.left,maxKit[cell.tile.victims.left]);
         }
         if(cell.tile.victims.right != "None"){
             possible++;
             current += tile.scoredItems.victims.right;
             possible += maxKit[cell.tile.victims.right];
-            current += Math.min(tile.scoredItems.rescueKits.right,maxKit[cell.tile.victims.right]);
+            if (tile.scoredItems.victims.right) current += Math.min(tile.scoredItems.rescueKits.right,maxKit[cell.tile.victims.right]);
         }
         if(cell.tile.victims.bottom != "None"){
             possible++;
             current += tile.scoredItems.victims.bottom;
             possible += maxKit[cell.tile.victims.bottom];
-            current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
+            if (tile.scoredItems.victims.bottom) current += Math.min(tile.scoredItems.rescueKits.bottom,maxKit[cell.tile.victims.bottom]);
         }
 
         if (tile.processing)
@@ -868,7 +868,7 @@ app.controller('ModalInstanceCtrl', ['$scope','$uibModalInstance','cell','tile',
     };
 
     $scope.kitStatus = function(light, kit, type){
-        return (maxKit[type] <= kit);
+        return (maxKit[type] <= kit && light);
     };
 
     $scope.modalRotate = function(dir){

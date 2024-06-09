@@ -325,25 +325,25 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
             possible++;
             current += tile.scoredItems.victims.top;
             possible += victimConstant[cell.tile.victims.top].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
+            if (tile.scoredItems.victims.top) current += Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
         }
         if (cell.tile.victims.left != "None") {
             possible++;
             current += tile.scoredItems.victims.left;
             possible += victimConstant[cell.tile.victims.left].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
+            if (tile.scoredItems.victims.left) current += Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
         }
         if (cell.tile.victims.right != "None") {
             possible++;
             current += tile.scoredItems.victims.right;
             possible += victimConstant[cell.tile.victims.right].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
+            if (tile.scoredItems.victims.right) current += Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
         }
         if (cell.tile.victims.bottom != "None") {
             possible++;
             current += tile.scoredItems.victims.bottom;
             possible += victimConstant[cell.tile.victims.bottom].maxKitNum;
-            current += Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
+            if (tile.scoredItems.victims.bottom) current += Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
         }
 
         if (tile.processing)
@@ -444,19 +444,19 @@ app.controller('ddController', ['$scope', '$uibModal', '$log', '$timeout', '$htt
 
         if (cell.tile.victims.top in victimConstant) {
             current += victimConstant[cell.tile.victims.top][wallPointType] * tile.scoredItems.victims.top;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
+            if (tile.scoredItems.victims.top) current += 10 * Math.min(tile.scoredItems.rescueKits.top, victimConstant[cell.tile.victims.top].maxKitNum);
         }
         if (cell.tile.victims.right in victimConstant) {
             current += victimConstant[cell.tile.victims.right][wallPointType] * tile.scoredItems.victims.right;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
+            if (tile.scoredItems.victims.right) current += 10 * Math.min(tile.scoredItems.rescueKits.right, victimConstant[cell.tile.victims.right].maxKitNum);
         }
         if (cell.tile.victims.left in victimConstant) {
             current += victimConstant[cell.tile.victims.left][wallPointType] * tile.scoredItems.victims.left;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
+            if (tile.scoredItems.victims.left)  current += 10 * Math.min(tile.scoredItems.rescueKits.left, victimConstant[cell.tile.victims.left].maxKitNum);
         }
         if (cell.tile.victims.bottom in victimConstant) {
             current += victimConstant[cell.tile.victims.bottom][wallPointType] * tile.scoredItems.victims.bottom;
-            current += 10 * Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
+            if (tile.scoredItems.victims.bottom)  current += 10 * Math.min(tile.scoredItems.rescueKits.bottom, victimConstant[cell.tile.victims.bottom].maxKitNum);
         }
 
         return current;
@@ -722,7 +722,7 @@ app.controller('ModalInstanceCtrl', ['$scope', '$uibModalInstance', 'cell', 'til
     };
 
     $scope.kitStatus = function (light, kit, type) {
-        return (victimConstant[type].maxKitNum <= kit);
+        return (victimConstant[type].maxKitNum <= kit && light);
     };
 
     $scope.modalRotate = function (dir) {
