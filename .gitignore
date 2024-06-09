@@ -10,6 +10,7 @@ cabinet/*
 survey/*
 tmp/*
 backup/*
+backupTmp/*
 public/sw.js*
 public/workbox-*
 

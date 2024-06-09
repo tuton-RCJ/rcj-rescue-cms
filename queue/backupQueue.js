@@ -18,6 +18,7 @@ const base_tmp_path = `${__dirname}/../tmp/`;
 const { ACCESSLEVELS } = require('../models/user');
 const logger = require('../config/logger').mainLogger;
 const glob = require('glob');
+const path = require('path')
 
 const Bversion = "24.0";
 
@@ -39,8 +40,10 @@ backupQueue.process('backup', function(job, done){
   const folderName = Math.floor( new Date().getTime() / 1000 );
   let prefix = "";
   if (mode == 'auto') prefix = "_";
-  const folderPath = `./backup/${competitionId}/${prefix}${folderName}`;
-  fs.mkdirsSync(folderPath);
+  const folderPathTmp = `./backupTmp/${prefix}${folderName}`;
+  const dstPath = `./backup/${competitionId}/${prefix}${folderName}.cms`;
+  fs.mkdirsSync(folderPathTmp);
+  fs.mkdirsSync(path.dirname(dstPath));
 
   jobProgress = 0;
   const maxCount = 18;
@@ -51,7 +54,7 @@ backupQueue.process('backup', function(job, done){
     folderName
   });
 
-  fs.writeFile(`${folderPath}/version.json`,JSON.stringify({ version: Bversion }), (err) => {
+  fs.writeFile(`${folderPathTmp}/version.json`,JSON.stringify({ version: Bversion }), (err) => {
     if(err){
       done(new Error(err));
     }else{
@@ -59,17 +62,17 @@ backupQueue.process('backup', function(job, done){
       jobProgress += 50/maxCount;
       job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
-        makeZip(job, done, folderPath);
+        makeZip(job, done, dstPath, folderPathTmp);
       }
     }
   });
 
   // Copy Document Folder
-  fs.copy(`./documents/${competitionId}`, `${folderPath}/documents`, (err) => {
+  fs.copy(`./documents/${competitionId}`, `${folderPathTmp}/documents`, (err) => {
     if(err){
       done(new Error(err));
     }else{
-      glob.glob(`${folderPath}/documents/**/trash/*`, function(err, trash){
+      glob.glob(`${folderPathTmp}/documents/**/trash/*`, function(err, trash){
         trash.forEach(function(file){
           fs.unlinkSync(file);
         });
@@ -77,14 +80,14 @@ backupQueue.process('backup', function(job, done){
         jobProgress += 50/maxCount;
         job.progress(Math.floor(jobProgress));
         if(outputCount == maxCount){
-          makeZip(job, done, folderPath);
+          makeZip(job, done, dstPath, folderPathTmp);
         }
       });
     }
   });
 
   // Copy Cabinet Folder
-  fs.copy(`./cabinet/${competitionId}`, `${folderPath}/cabinet`, (err) => {
+  fs.copy(`./cabinet/${competitionId}`, `${folderPathTmp}/cabinet`, (err) => {
     if(err){
       done(new Error(err));
     }else{
@@ -92,13 +95,13 @@ backupQueue.process('backup', function(job, done){
       jobProgress += 50/maxCount;
       job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
-        makeZip(job, done, folderPath);
+        makeZip(job, done, dstPath, folderPathTmp);
       }
     }
   });
 
   // Copy Suevey Folder
-  fs.copy(`./survey/${competitionId}`, `${folderPath}/survey`, (err) => {
+  fs.copy(`./survey/${competitionId}`, `${folderPathTmp}/survey`, (err) => {
     if(err){
       done(new Error(err));
     }else{
@@ -106,7 +109,7 @@ backupQueue.process('backup', function(job, done){
       jobProgress += 50/maxCount;
       job.progress(Math.floor(jobProgress));
       if(outputCount == maxCount){
-        makeZip(job, done, folderPath);
+        makeZip(job, done, dstPath, folderPathTmp);
       }
     }
   });
@@ -120,7 +123,7 @@ backupQueue.process('backup', function(job, done){
     if (err) {
       done(new Error(err));
     } else {
-      fs.writeFile(`${folderPath}/competition.json`, JSON.stringify(data), (err) => {
+      fs.writeFile(`${folderPathTmp}/competition.json`, JSON.stringify(data), (err) => {
         if(err){
           done(new Error(err));
         }else{
@@ -128,7 +131,7 @@ backupQueue.process('backup', function(job, done){
           jobProgress += 50/maxCount;
           job.progress(Math.floor(jobProgress));
           if(outputCount == maxCount){
-            makeZip(job, done, folderPath);
+            makeZip(job, done, dstPath, folderPathTmp);
           }
         }
       });
@@ -144,7 +147,7 @@ backupQueue.process('backup', function(job, done){
       if (err) {
         done(new Error(err));
       } else {
-        fs.writeFile(`${folderPath}/${file}.json`, JSON.stringify(data), (err) => {
+        fs.writeFile(`${folderPathTmp}/${file}.json`, JSON.stringify(data), (err) => {
           if(err){
             done(new Error(err));
           }else{
@@ -152,7 +155,7 @@ backupQueue.process('backup', function(job, done){
             jobProgress += 50/maxCount;
             job.progress(Math.floor(jobProgress));
             if(outputCount == maxCount){
-              makeZip(job, done, folderPath);
+              makeZip(job, done, dstPath, folderPathTmp);
             }
           }
         });
@@ -175,9 +178,9 @@ backupQueue.process('backup', function(job, done){
   backup('surveyAnswer', surveyDb.surveyAnswer);             
 });
 
-function makeZip(job, done, folderPath) {
+function makeZip(job, done, dstPath, folderPathTmp) {
   let firstProgress = job._progress;
-  const output = fs.createWriteStream(`${folderPath}.cms`);
+  const output = fs.createWriteStream(dstPath);
   const archive = archiver('zip', {
     zlib: { level: 9 }, // Sets the compression level.
   });
@@ -187,7 +190,7 @@ function makeZip(job, done, folderPath) {
   })
 
   output.on('close', function () {
-    rimraf(folderPath, (err) => {
+    rimraf(folderPathTmp, (err) => {
       if(err){
         done(new Error(err));
       }else{
@@ -198,15 +201,13 @@ function makeZip(job, done, folderPath) {
   });
 
   archive.pipe(output);
-  archive.directory(folderPath, false);
+  archive.directory(folderPathTmp, false);
   archive.finalize();
 }
 
 
 function cleanup(job){
   if(job.name == 'backup'){
-    rimraf(`./backup/${job.data.competitionId}/${job.data.folderName}`, (err) => {
-    });
     if (b_keep) {
       glob.glob(`./backup/${job.data.competitionId}/_*.cms`, function(err, files){
         files = files.slice(0, b_keep * -1);
