@@ -30,9 +30,10 @@ function getIP(req) {
 }
 
 function writeLog(req, competitionId, teamId, message) {
-  const output = `[${dateformat(new Date(), 'mm/dd/yy HH:MM:ss')}] ${getIP(
-    req
-  )} : ${message}\n`;
+  let user = req.user;
+  if (user == null) user = getIP(req);
+  else user = user.username;
+  const output = `[${dateformat(new Date(), 'mm/dd/yy HH:MM:ss')}] ${user} : ${message}\n`;
   fs.appendFile(
     `${__dirname}/../documents/${competitionId}/${teamId}/log.txt`,
     output,
@@ -210,10 +211,6 @@ privateRouter.get('/:teamId', function (req, res, next) {
             const teamDeadline = dbTeam.document.deadline;
             let { deadline } = dbTeam.competition.documents;
             if (teamDeadline != null) deadline = teamDeadline;
-
-            const now = new Date();
-            const timestamp = Math.floor(now.getTime() / 1000);
-
             res.render('document_form', {
               deadline,
               editable: true,
