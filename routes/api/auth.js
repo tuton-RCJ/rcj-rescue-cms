@@ -33,7 +33,7 @@ router.post('/login', function (req, res) {
   const { username } = req.body;
   const { password } = req.body;
 
-  if (!validator.isAscii(password) || !validator.isAscii(username)) {
+  if (!validator.isAscii(password)) {
     return res.status(400).send({ msg: 'Invalid characters' });
   }
 
