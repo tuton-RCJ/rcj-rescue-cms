@@ -57,7 +57,7 @@ block content
                   option(ng-value='true') {{"common.enable" | translate}}
                   option(ng-value='false') {{"common.disable" | translate}}
               td 
-                input.form-control(type='datetime-local', ng-model='league.deadlineW', ng-style="{backgroundColor: deadlineColour(league.deadlineW)}")
+                input.form-control(type='datetime-local', step=1, ng-model='league.deadlineW', ng-style="{backgroundColor: deadlineColour(league.deadlineW)}")
               td 
                 input.form-control(type='text', ng-model='league.passCode')              
               td 

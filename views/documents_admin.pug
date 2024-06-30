@@ -40,7 +40,7 @@ block content
           .input-group(style="width:100%;margin 0 auto;")
             .input-group-prepend
               span.input-group-text {{"document.deadline" | translate}}
-            input.form-control(type='datetime-local', ng-model='defaultDeadline', ng-style="{backgroundColor: deadlineColour(defaultDeadline)}")
+            input.form-control(type='datetime-local', step=1, ng-model='defaultDeadline', ng-style="{backgroundColor: deadlineColour(defaultDeadline)}")
         .col-md-2(style="text-align:right;")
           button.btn.btn-success(type='button', ng-click='set()')
             i.fas.fa-check &nbsp;{{"admin.settings.set" | translate}}

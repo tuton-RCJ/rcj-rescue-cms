@@ -125,6 +125,11 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
             $scope.notifications = response.data.notifications;
             $scope.languages = response.data.languages;
             $scope.review = response.data.review;
+            for (let rb of $scope.review) {
+                for (let rq of rb.questions) {
+                    reviewQuestions[rq._id] = rq;
+                }
+            }
             publicToken = response.data.publicToken;
 
             $http.get("/api/document/answer/"+ $scope.team._id + "/" + token).then(function (response) {
@@ -197,8 +202,6 @@ app.controller('DocumentReviewController', ['$scope', '$uibModal', '$log', '$htt
                     
                 })
             }
-
-            console.log($scope.reviewComments)
         })
     }
 

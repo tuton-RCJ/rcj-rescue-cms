@@ -301,7 +301,7 @@ adminRouter.get('/:competition/teams/documents', function (req, res, next) {
       competition: id,
     })
     .select(
-      '_id name competition league country teamCode document.deadline document.enabled document.token document.public'
+      '_id name competition league country teamCode document.deadline document.enabled document.token document.public document.penalty'
     )
     .lean()
     .exec(function (err, data) {
@@ -333,7 +333,7 @@ adminRouter.put('/:competition/teams/documents', function (req, res, next) {
 
   competitiondb.team
     .findById(team._id)
-    .select('document.deadline document.enabled document.public')
+    .select('document.deadline document.enabled document.public document.penalty')
     .exec(function (err, dbTeam) {
       if (err) {
         logger.error(err);
@@ -348,6 +348,8 @@ adminRouter.put('/:competition/teams/documents', function (req, res, next) {
           dbTeam.document.enabled = team.document.enabled;
         if (team.document.public != null)
           dbTeam.document.public = team.document.public;
+        if (team.document.penalty != null)
+          dbTeam.document.penalty = team.document.penalty;
         dbTeam.save(function (err) {
           if (err) {
             logger.error(err);

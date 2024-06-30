@@ -675,7 +675,7 @@ async function getDocumentScore(competitionId, leagueId) {
   let teamsDb = await competitiondb.team.find({
     competition: competitionId,
     league: leagueId
-  }).select("name teamCode country").lean().exec();
+  }).select("name teamCode country document.penalty").lean().exec();
   let teamIds = teamsDb.map(t => t._id);
 
   // Retrieve all review results
@@ -707,6 +707,7 @@ async function getDocumentScore(competitionId, leagueId) {
   let blockScores = {};
   // Calculate team's document score
   for (let team of teamsDb) {
+    let penalty = (100 - team.document.penalty) / 100;
     let reviewTeam = reviewResults.filter(r => r.team.equals(team._id));
     let comments = {};
     for (let review of reviewTeam) {
@@ -736,7 +737,7 @@ async function getDocumentScore(competitionId, leagueId) {
         } else if (numReviewer > 0) {
           score = sum(ratings) / numReviewer;
         }
-        blockScore += score;
+        blockScore += score * penalty;
       }
       team.details.push({
         blockId,

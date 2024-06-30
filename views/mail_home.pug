@@ -144,7 +144,7 @@ block content
               span.input-group-text
                 i.fas.fa-clock &nbsp;
                 | {{"mail.home.reservation" | translate}}
-          input.form-control(type='datetime-local', ng-model='reservation')
+          input.form-control(type='datetime-local', step=1, ng-model='reservation')
         div(style="text-align:center;margin-bottom:20px;")
           button.btn.btn-secondary(type='button', ng-click="back2TeamSelect()", style="margin-right:10px;")
             i.fas.fa-arrow-left &nbsp;

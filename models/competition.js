@@ -333,9 +333,10 @@ const teamSchema = new Schema({
     type: new Schema({
       deadline : {type: String, default: null},
       enabled  : {type: Boolean, default: true},
-      public  : {type: Boolean, default: false},
+      public   : {type: Boolean, default: false},
       token    : {type: String, default: ''},
-      answers  : {type: Map, of: String}
+      answers  : {type: Map, of: String},
+      penalty  : {type: Number, default: 0}
     }),
     select: false
   }

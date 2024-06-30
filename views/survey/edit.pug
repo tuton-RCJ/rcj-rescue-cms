@@ -110,10 +110,10 @@ block content
            
             hr
             h5 {{"survey.openDate" | translate}}
-            input.form-control(type='datetime-local', ng-model='surv.open')
+            input.form-control(type='datetime-local', step=1, ng-model='surv.open')
             br
             h5 {{"survey.deadline" | translate}}
-            input.form-control(type='datetime-local', ng-model='surv.deadline', ng-style="{backgroundColor: deadlineColour(surv.deadline)}")
+            input.form-control(type='datetime-local', step=1, ng-model='surv.deadline', ng-style="{backgroundColor: deadlineColour(surv.deadline)}")
             br
             h5 {{"survey.open" | translate}}
             select.custom-select(ng-model='surv.enable', ng-style="{backgroundColor: surv.enable ? '#bcffbc':'#ffcccc'}")

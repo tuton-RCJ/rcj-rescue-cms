@@ -139,7 +139,6 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
     }
 
     $scope.downloadExcel = function(){
-        console.log($scope.review)
         $http.get("/api/document/reviews/"+ competitionId).then(function (response) {
             let answers = response.data.filter(d => d.team.league == leagueId).sort(teamSort);
             console.log(answers)
@@ -158,12 +157,13 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
             sheet.getRow(3).getCell(1).value = "Code";
             sheet.getRow(3).getCell(2).value = "Name";
             sheet.getRow(3).getCell(3).value = "Region";
-            sheet.getRow(3).getCell(4).value = "Evaluator";
+            sheet.getRow(3).getCell(4).value = "Penalty";
+            sheet.getRow(3).getCell(5).value = "Evaluator";
 
             // Block title & Question title
             let row = 2;
-            let col = 5;
-            lastCol = 5;
+            let col = 6;
+            lastCol = 6;
             for(let b of $scope.review){
                 sheet.getRow(row).getCell(col).value = $sce.valueOf($scope.langContent(b.i18n, 'title'));
                 sheet.getRow(row).getCell(col).fill = {
@@ -186,8 +186,9 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                 sheet.getRow(row).getCell(1).value = a.team.teamCode;
                 sheet.getRow(row).getCell(2).value = a.team.name;
                 sheet.getRow(row).getCell(3).value = a.team.country;
-                sheet.getRow(row).getCell(4).value = a.reviewer?a.reviewer.username:a.name;
-                col = 5;
+                sheet.getRow(row).getCell(4).value = a.team.document.penalty;
+                sheet.getRow(row).getCell(5).value = a.reviewer?a.reviewer.username:a.name;
+                col = 6;
                 for(let b of $scope.review){
                     for(let q of b.questions){
                         let cc = a.comments[q._id];

@@ -969,7 +969,8 @@
             "title": "Individual team settings",
             "access": "Accessible",
             "log": "Log",
-            "public": "Public Access"
+            "public": "Public Access",
+            "penalty": "Penalty"
         },
         "result": {
             "title": "Review results",

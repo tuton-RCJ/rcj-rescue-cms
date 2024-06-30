@@ -43,7 +43,8 @@ app.controller('TeamAdminController', ['$scope', '$uibModal', '$log', '$http', '
             document:{
                 public: data.document.public,
                 deadline: deadline,
-                enabled: data.document.enabled
+                enabled: data.document.enabled,
+                penalty: data.document.penalty
             }
         };
 
@@ -149,6 +150,11 @@ app.controller('TeamAdminController', ['$scope', '$uibModal', '$log', '$http', '
 
         if(deadline > tomorrow) return '#bcffbc';
         if(deadline > today) return '#ffffc6';
+        return '#ffcccc';
+    }
+
+    $scope.penaltyColor = function(penalty){
+        if(penalty == 0) return '';
         return '#ffcccc';
     }
 }]);

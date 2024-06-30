@@ -67,6 +67,7 @@ block content
               th {{"common.league" | translate}}
               th {{'document.teamAdmin.access' | translate}}
               th {{'document.deadline' | translate}}
+              th {{'document.teamAdmin.penalty' | translate}}
               th {{'document.teamAdmin.public' | translate}}
               th {{'common.operation' | translate}}
         tbody
@@ -80,7 +81,12 @@ block content
                   option(ng-value='true') {{'common.enable' | translate}}
                   option(ng-value='false') {{'common.disable' | translate}}
               td
-                input.form-control(type='datetime-local', ng-model='team.document.deadline',style="", ng-blur="save(team)", ng-style="{backgroundColor: deadlineColour(team.document.deadline)}")
+                input.form-control(type='datetime-local', step=1, ng-model='team.document.deadline',style="", ng-blur="save(team)", ng-style="{backgroundColor: deadlineColour(team.document.deadline)}")
+              td
+                .input-group
+                  input.form-control(type="number", ng-model='team.document.penalty', ng-blur="save(team)", style="max-width:70px", ng-style="{backgroundColor: penaltyColor(team.document.penalty)}")
+                  .input-group-append
+                    span#basic-addon2.input-group-text %
               td
                 select.custom-select(ng-model='team.document.public', ng-change="save(team)", ng-style="{backgroundColor: team.document.public ? '#bcffbc':'#ffcccc'}")
                   option(ng-value='true') {{'common.enable' | translate}}

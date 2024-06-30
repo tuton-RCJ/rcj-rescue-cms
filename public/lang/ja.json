@@ -967,7 +967,8 @@
             "title": "チーム個別設定",
             "access": "アクセス可否",
             "log": "ログ",
-            "public": "一般公開"
+            "public": "一般公開",
+            "penalty": "ペナルティ"
         },
         "result": {
             "title": "レビュー結果確認",

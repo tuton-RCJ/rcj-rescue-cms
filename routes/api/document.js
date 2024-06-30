@@ -881,7 +881,7 @@ adminRouter.get('/reviews/:competition', function (req, res, next) {
         team: { $ne: null }
       })
       .populate('reviewer', 'username')
-      .populate('team', 'teamCode name league country')
+      .populate('team', 'teamCode name league country document.penalty')
       .exec(function (err, dbReview) {
         if (err) {
           if (!err) err = { message: 'No review found' };
@@ -933,6 +933,7 @@ privateRouter.put('/review/:teamId', function (req, res, next) {
               });
             } else if (dbReview) {
               dbReview.comments = comments;
+              dbReview.name = req.user.username;
               dbReview.save(function (err) {
                 if (err) {
                   logger.error(err);
@@ -956,6 +957,7 @@ privateRouter.put('/review/:teamId', function (req, res, next) {
                 team: teamId,
                 competition: dbTeam.competition,
                 reviewer: req.user._id,
+                name: req.user.username,
                 comments,
               });
 
