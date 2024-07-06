@@ -182,7 +182,7 @@ function makeZip(job, done, dstPath, folderPathTmp) {
   let firstProgress = job._progress;
   const output = fs.createWriteStream(dstPath);
   const archive = archiver('zip', {
-    zlib: { level: 9 }, // Sets the compression level.
+    zlib: { level: 0 }, // Sets the compression level.
   });
 
   archive.on("progress", (progress) => {
@@ -208,7 +208,7 @@ function makeZip(job, done, dstPath, folderPathTmp) {
 
 function cleanup(job){
   if(job.name == 'backup'){
-    if (b_keep) {
+    if (b_keep && b_keep != 0) {
       glob.glob(`./backup/${job.data.competitionId}/_*.cms`, function(err, files){
         files = files.slice(0, b_keep * -1);
         for(let f of files) {
@@ -454,7 +454,7 @@ backupQueue.process('restore', function(job, done){
 
 exports.backupQueue = backupQueue;
 // Backup competitions in interval
-if (b_interval) {
+if (b_interval && b_interval != 0) {
     setInterval(() => {
         competitiondb.competition
           .find()
