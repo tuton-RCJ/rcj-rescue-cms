@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 const competitiondb = require('./competition');
 const {LEAGUES} = competitiondb;
-const QUESTION_TYPES = ['input', 'select', 'scale', 'file'];
+const QUESTION_TYPES = ['explanationOnly', 'input', 'select', 'scale', 'file', 'teamVote'];
 
 const logger = require('../config/logger').mainLogger
 
@@ -33,6 +33,9 @@ const surveySchema = new Schema({
     scale: {
       least: {type: Number, default: 1},
       most: {type: Number, default: 5}
+    },
+    teamVote: {
+      league: [{type: String, enum: LEAGUES}]
     },
     i18n:[{
       language : {type: String, default: ''},

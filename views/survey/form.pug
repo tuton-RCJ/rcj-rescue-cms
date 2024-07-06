@@ -66,15 +66,27 @@ block content
                     span {{"survey.readOnly" | translate}}
             
             div(ng-repeat="question in survey.questions track by $index")
-                div(style="margin-bottom:10px;font-size:20px;")
-                    strong(ng-bind="langContent(question.i18n, 'title')")
-                div(style="font-size:15px;margin-bottom:10px;")
-                    p(ng-bind-html="langContent(question.i18n, 'description')")
+                div(ng-if="question.type != 'explanationOnly'")
+                    div(style="margin-bottom:10px;font-size:20px;")
+                        strong(ng-bind="langContent(question.i18n, 'title')")
+                    div(style="font-size:15px;margin-bottom:10px;")
+                        p(ng-bind-html="langContent(question.i18n, 'description')")
+                div(ng-if="question.type == 'explanationOnly'")
+                    div(style="margin-bottom:10px;font-size:30px;text-align:center;")
+                        strong(ng-bind="langContent(question.i18n, 'title')")
+                    div(style="font-size:15px;margin-bottom:10px;text-align:center;")
+                        p(ng-bind-html="langContent(question.i18n, 'description')")
+                
                 div(ng-if="question.type=='input'")
                     if editable
                         ng-quill-editor(ng-model="answers[question.questionId]")
                     else
                         div(style="margin-top:10px;padding:10px;border: 1px solid #555", ng-bind-html="answers[question.questionId]")
+                div(ng-if="question.type=='teamVote'")
+                    if editable
+                        select.custom-select(ng-model='answers[question.questionId]', ng-options="team for team in question.teamVote.teamList")
+                    else
+                        select.custom-select(ng-model='answers[question.questionId]', disabled , ng-options="question.teamVote.teamList")
                 div(ng-if="question.type=='select'")
                     if editable
                         select.custom-select(ng-model='answers[question.questionId]', ng-options="option.value as option.text for option in langArray(question.i18n, 'options')")

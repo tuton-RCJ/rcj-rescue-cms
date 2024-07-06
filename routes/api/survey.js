@@ -557,6 +557,48 @@ publicRouter.put('/answer/:teamId/:token/:survId', function (req, res, next) {
   });
 });
 
+publicRouter.get('/teamList/:teamId/:token', function (req, res, next) {
+  const teamId = req.params.teamId;
+  const token = req.params.token;
+
+  if (!ObjectId.isValid(teamId)) {
+    return next();
+  }
+
+  competitiondb.team.findOne({
+    "_id": teamId,
+    "document.token": token
+  })
+  .exec(function (err, team) {
+    if (err || team == null) {
+      return res.status(400).send({
+        msg: 'No team found'
+      });
+    } else if (team) {
+      competitiondb.team
+      .find(
+        {
+          competition: team.competition,
+        },
+        'name teamCode league'
+      )
+      .sort({teamCode: 1, name: 1 })
+      .lean()
+      .exec(function (err, data) {
+        if (err) {
+          logger.error(err);
+          res.status(400).send({
+            msg: 'Could not get teams',
+            err: err.message,
+          });
+        } else {
+          res.status(200).send(data);
+        }
+      });
+    }
+  });
+});
+
 adminRouter.delete('/answer/:competitionId/:answerId', function (req, res, next) {
   const competitionId = req.params.competitionId;
   const answerId = req.params.answerId;

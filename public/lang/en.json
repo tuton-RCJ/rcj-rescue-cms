@@ -1013,7 +1013,9 @@
             "fileName": "File name",
             "extension": "The extension will automatically added by the system, so do not specify it here.",
             "least": "Least",
-            "most": "Most"
+            "most": "Most",
+            "teamVote": "Vote for the team",
+            "explanationOnly": "Only explanation (No question)"
         },
         "review_editor": {
             "title": "Document Review Form Editor",

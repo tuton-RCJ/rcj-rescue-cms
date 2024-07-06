@@ -168,10 +168,12 @@ block content
                                 .input-group-prepend
                                     span.input-group-text {{"document.editor.questionType" | translate}}:
                                 select.custom-select(ng-model='question.type')
+                                    option(value='explanationOnly') {{"document.editor.explanationOnly" | translate}}
                                     option(value='input') {{"document.editor.writing" | translate}}
                                     option(value='select') {{"document.editor.select" | translate}}
                                     option(value='scale') {{"document.editor.scale" | translate}}
                                     option(value='file') {{"document.editor.file" | translate}}
+                                    option(value='teamVote') {{"document.editor.teamVote" | translate}}
                         .col-md-4
                             button.btn.btn-danger(type='button', ng-click='removeQuestion($index)', style="float:right;margin-left:5px;")
                                 i.fas.fa-trash-alt
@@ -221,6 +223,13 @@ block content
                                     .input-group-prepend
                                         span.input-group-text {{"document.editor.most" | translate}}
                                     input.form-control(type='number', ng-model='question.scale.most')
+                            div(ng-if="question.type == 'teamVote'", style="margin-top:10px;")
+                                h5 {{"document.editor.teamVote" | translate}}
+                                h6(style="text-align:center;") {{"survey.league" | translate}}
+                                ui-select(multiple='' ng-model='question.teamVote.league' theme='bootstrap' sortable='true' close-on-select='false' style='width: 100%;')
+                                    ui-select-match(placeholder='Select league...') {{$item.name}}
+                                    ui-select-choices(repeat='league.id as league in leagues | filter: {id: $select.search}')
+                                        div(ng-bind-html='league.name')
 
                     hr(ng-style="{borderTop: '3px solid #' + block.color}")
                     div(style="text-align : center;")

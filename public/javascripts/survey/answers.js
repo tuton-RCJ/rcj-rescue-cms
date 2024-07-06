@@ -123,5 +123,64 @@ app.controller("SurveyAnswersController", ['$scope', '$http', '$translate','$sce
             })
         }
     }
+
+    $scope.downloadExcel = function(){
+        let workbook = new ExcelJS.Workbook();
+        workbook.creator = 'RCJ CMS';
+        workbook.created = new Date();
+        workbook.modified = new Date();
+
+        let sheet = workbook.addWorksheet($scope.langContent($scope.survey.i18n, 'name').toString());
+
+        sheet.getRow(1).getCell(1).value = $scope.competition.name;
+
+        sheet.getColumn('B').width = 20;
+
+        sheet.getRow(3).getCell(1).value = "Code";
+        sheet.getRow(3).getCell(2).value = "Name";
+
+        let col = 4;
+        for (let q of $scope.survey.questions) {
+            if (q.type == "explanationOnly") continue;
+            sheet.getRow(3).getCell(col).value = $scope.langContent(q.i18n, 'title').toString();
+            col++;
+        }
+
+        let row = 4;
+        for(let a of $scope.answers) {
+            sheet.getRow(row).getCell(1).value = a.team.teamCode;
+            sheet.getRow(row).getCell(2).value = a.team.name;
+            col = 4;
+            for (let q of $scope.survey.questions) {
+                if (q.type == "explanationOnly") continue;
+                sheet.getRow(row).getCell(col).value = $scope.getAnswer(a, q);
+                col++;
+            }
+            row ++;
+        }
+
+        workbook.xlsx.writeBuffer( {
+            base64: true
+        })
+        .then( function (xls64) {
+            // build anchor tag and attach file (works in chrome)
+            var a = document.createElement("a");
+            var data = new Blob([xls64], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+            var url = URL.createObjectURL(data);
+            a.href = url;
+            a.download = `${$scope.competition.name} - ${$scope.langContent($scope.survey.i18n, 'name')}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                },
+                0);
+        })
+        .catch(function(error) {
+            console.log(error.message);
+        });
+    }
     
 }]);

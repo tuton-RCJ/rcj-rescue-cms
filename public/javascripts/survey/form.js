@@ -104,24 +104,26 @@ app.controller('SurveyFormController', ['$scope', '$uibModal', '$log', '$http', 
         $http.get(`/api/survey/question/${teamId}/${token}/${survId}`).then(function (response) {
             $scope.survey = response.data;
 
+            $http.get(`/api/survey/teamList/${teamId}/${token}`).then(function (response) {
+                let teamList = response.data
+                console.log(teamList)
+                for (let q of $scope.survey.questions) {
+                    if (q.type == "teamVote") {
+                        q.teamVote.teamList = teamList
+                            .filter(t => t._id != teamId && q.teamVote.league.includes(t.league))
+                            .map(t => `${t.teamCode} ${t.name}`);
+                        console.log(q)
+                    }
+                }
+            })
+            
+
             $http.get(`/api/survey/answer/${teamId}/${token}/${survId}`).then(function (response) {
                 let ans = response.data;
                 $scope.answers = [];
-                if(ans){
-                    for(let a of ans){
-                        $scope.answers[a.questionId] = a.answer;
-                    }
-                }else{
-                    for(let q of $scope.survey.questions){
-                        if(q.type == 'select'){
-                            $scope.answers[q.questionId] = 'option1';
-                        }else if(q.type == 'scale'){
-                            $scope.answers[q.questionId] = q.scale.least;
-                        }else{
-                            $scope.answers[q.questionId] = '';
-                        }
-                    }
-                }        
+                for(let a of ans){
+                    $scope.answers[a.questionId] = a.answer;
+                }
             })
             
             //Check 1st lang

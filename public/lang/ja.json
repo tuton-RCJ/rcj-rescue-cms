@@ -1011,7 +1011,9 @@
             "fileName": "ファイル名",
             "extension": "拡張子はシステムによって自働付加されますので，ここで指定しないでください．",
             "least": "最低",
-            "most": "最高"
+            "most": "最高",
+            "teamVote": "チーム投票",
+            "explanationOnly": "説明のみ（設問なし）"
         },
         "review_editor": {
             "title": "ドキュメント　レビューフォームエディタ",
