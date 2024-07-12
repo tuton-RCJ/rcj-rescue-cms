@@ -22,6 +22,10 @@ const sanitizeFilename = require('sanitize-filename');
 const {escapeRegExp} = require('lodash');
 const competitiondb = require('../../models/competition');
 const {mailQueue} = require("../../queue/mailQueue")
+const mkdirp = require("mkdirp");
+const { match } = require('assert');
+const getDirName = require("path").dirname
+
 
 
 const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -165,6 +169,11 @@ adminRouter.delete('/templates/:fileName', function (req, res, next) {
   });
 });
 
+function writeFile (path, contents, cb) {
+  mkdirp.sync(getDirName(path));
+  fs.writeFile(path, contents, cb);
+}
+
 adminRouter.post('/send', function (req, res, next) {
   const teams = req.body.data;
   let reservation = req.body.reservation;
@@ -189,7 +198,6 @@ adminRouter.post('/send', function (req, res, next) {
       .replace(/<p><br><\/p>/g, '<br>')
       .replace(/<\/p><p>/g, '<br>')
       .replace(/<span class="ql-cursor">﻿<\/span>/, '');
-    let html4text = html;
 
     const regexpHref = /(href=)["|'](.*?)["|']+/g;
 
@@ -198,6 +206,26 @@ adminRouter.post('/send', function (req, res, next) {
       .join('');
 
     let match;
+
+    // Image attachment
+    const regexpSrc = /<img src=["|'](.*?)["|']+/g;
+    let attachments = [];
+    const htmlB = html
+    const destination = `${__dirname}/../../mailAttachment/${team.competition}/${mailId}`;
+    while (match = regexpSrc.exec(htmlB)) {
+      let cid = `${mailId}-${attachments.length}`;
+      attachments.push({
+        'path': match[1],
+        'cid': cid
+      })
+      html = html.replace(match[1], `cid:${cid}`);
+      writeFile(`${destination}/${cid}`,match[1],function(err){
+        if(err) throw err;
+      });
+    }
+
+    let html4text = html;
+
     const replacedURL = [];
     while ((match = regexpHref.exec(html)) !== null) {
       if (match[2].indexOf('/api/mail/click/') == -1) {
@@ -237,7 +265,8 @@ adminRouter.post('/send', function (req, res, next) {
       subject: team.mailData.title.replace("_", ""),
       html,
       text,
-      replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM
+      replyTo: process.env.MAIL_REPLY || process.env.MAIL_FROM,
+      attachments
     };
 
     try {
@@ -360,7 +389,17 @@ adminRouter.get('/sent/:competitionId/:mailId', function (req, res, next) {
           err: err.message,
         });
       }
-      return res.status(200).send({ html: dbMail.html, plain: dbMail.plain });
+      let htmlMail = dbMail.html;
+      const regexpSrc = /<img src=["|']cid:(.*?)["|']+/g;
+      const destination = `${__dirname}/../../mailAttachment/${id}/${mailId}`;
+      let match;
+      while (match = regexpSrc.exec(dbMail.html)) {
+        let cid = match[1]
+        if (fs.existsSync(`${destination}/${cid}`)) {
+          htmlMail = htmlMail.replace(`cid:${match[1]}`, fs.readFileSync(`${destination}/${cid}`, { encoding: "utf-8" }));
+        }
+      }
+      return res.status(200).send({ html: htmlMail, plain: dbMail.plain });
     });
 });
 
@@ -573,7 +612,17 @@ publicRouter.get('/get/:teamId/:token/:mailId', function (req, res, next) {
                 err: err.message,
               });
             }
-            return res.status(200).send({ html: dbMail.html, plain: dbMail.plain });
+            let htmlMail = dbMail.html;
+            const regexpSrc = /<img src=["|']cid:(.*?)["|']+/g;
+            const destination = `${__dirname}/../../mailAttachment/${team.competition}/${mailId}`;
+            let match;
+            while (match = regexpSrc.exec(dbMail.html)) {
+              let cid = match[1]
+              if (fs.existsSync(`${destination}/${cid}`)) {
+                htmlMail = htmlMail.replace(`cid:${match[1]}`, fs.readFileSync(`${destination}/${cid}`, { encoding: "utf-8" }));
+              }
+            }
+            return res.status(200).send({ html: htmlMail, plain: dbMail.plain });
           });
       }
     });

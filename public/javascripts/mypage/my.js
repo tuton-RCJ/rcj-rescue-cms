@@ -102,7 +102,7 @@ app.controller("MyPageController", ['$scope', '$http', '$translate', function ($
     $scope.mailView = function(mail){
         let mailUrl = `/api/mail/get/${teamId}/${token}/${mail.mailId}`;
         $http.get(mailUrl).then(function (response) {
-            let html = response.data.html.replace(/<img[^>]+>/, "");
+            let html = response.data.html;
             let plain = response.data.plain.replace(/\r?\n/g, '<br>');
             Swal.fire({
                 html:'<ul class="nav nav-tabs" id="mailType" role="tablist"><li class="nav-item"><a class="nav-link active" id="html-tab" data-toggle="tab" href="#html" role="tab" aria-controls="html" aria-selected="true">HTML</a></li><li class="nav-item"><a class="nav-link" id="plain-tab" data-toggle="tab" href="#plain" role="tab" aria-controls="plain" aria-selected="false">Plain Text</a></li></ul>'+

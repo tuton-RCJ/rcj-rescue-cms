@@ -46,7 +46,7 @@ backupQueue.process('backup', function(job, done){
   fs.mkdirsSync(path.dirname(dstPath));
 
   jobProgress = 0;
-  const maxCount = 18;
+  const maxCount = 19;
   let outputCount = 0;
   job.progress(0);
   job.update({
@@ -102,6 +102,20 @@ backupQueue.process('backup', function(job, done){
 
   // Copy Suevey Folder
   fs.copy(`./survey/${competitionId}`, `${folderPathTmp}/survey`, (err) => {
+    if(err){
+      done(new Error(err));
+    }else{
+      outputCount ++;
+      jobProgress += 50/maxCount;
+      job.progress(Math.floor(jobProgress));
+      if(outputCount == maxCount){
+        makeZip(job, done, dstPath, folderPathTmp);
+      }
+    }
+  });
+
+  // Copy Suevey Folder
+  fs.copy(`./mailAttachment/${competitionId}`, `${folderPathTmp}/mailAttachment`, (err) => {
     if(err){
       done(new Error(err));
     }else{
@@ -236,7 +250,7 @@ backupQueue.on('failed', function(job, err) {
 backupQueue.process('restore', function(job, done){
   job.progress(1);
   const {folder, user} = job.data;
-  const maxCount = 18;
+  const maxCount = 19;
 
   const extract = onezip.extract(`./tmp/uploads/${folder}.zip`, `./tmp/uploads/${folder}`);
 
@@ -403,6 +417,37 @@ backupQueue.process('restore', function(job, done){
           }
         );
       });
+
+      // Copy MailAttachment Folder
+      if (fs.existsSync(`${base_tmp_path}uploads/${folder}/mailAttachment`)) {
+        fs.copy(`${base_tmp_path}uploads/${folder}/mailAttachment`, `${__dirname}/../mailAttachment/${competition[0]._id}`, (err) => {
+          chmodr(
+            `${__dirname}/../mailAttachment/${competition[0]._id}`,
+            0o777,
+            (err) => {
+              if (err) {
+                done(new Error(err));
+              }else{
+                updated ++;
+                jobProgress += 50/maxCount;
+                job.progress(Math.floor(jobProgress));
+                if(updated == maxCount){
+                  job.progress(100);
+                  done();
+                }
+              }
+            }
+          );
+        });
+      } else {
+        updated ++;
+        jobProgress += 50/maxCount;
+        job.progress(Math.floor(jobProgress));
+        if(updated == maxCount){
+          job.progress(100);
+          done();
+        }
+      }
       
       userdb.user.findById(user._id).exec(function (err, dbUser) {
         if (err) {
