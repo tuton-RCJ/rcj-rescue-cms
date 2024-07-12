@@ -875,7 +875,7 @@
             "item10": "Reservation master setting and reservation information",
             "item11": "Files stored in cabinets",
             "item12": "Questionaries' settings & answers",
-            "notInclude": "Please note that permission settings is not included.",
+            "notInclude": "",
             "exe": "Backup!",
             "time": "Backup time",
             "queue": "Backup queue",

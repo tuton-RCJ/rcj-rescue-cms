@@ -46,7 +46,7 @@ backupQueue.process('backup', function(job, done){
   fs.mkdirsSync(path.dirname(dstPath));
 
   jobProgress = 0;
-  const maxCount = 19;
+  const maxCount = 20;
   let outputCount = 0;
   job.progress(0);
   job.update({
@@ -138,6 +138,35 @@ backupQueue.process('backup', function(job, done){
       done(new Error(err));
     } else {
       fs.writeFile(`${folderPathTmp}/competition.json`, JSON.stringify(data), (err) => {
+        if(err){
+          done(new Error(err));
+        }else{
+          outputCount ++;
+          jobProgress += 50/maxCount;
+          job.progress(Math.floor(jobProgress));
+          if(outputCount == maxCount){
+            makeZip(job, done, dstPath, folderPathTmp);
+          }
+        }
+      });
+    }
+  });
+
+  //User data
+  userdb.user
+  .find()
+  .lean()
+  .exec(function (err, data) {
+    if (err) {
+      done(new Error(err));
+    } else {
+      let users = data.filter(d => 
+        d.superDuperAdmin ||
+        d.competitions.some(dd => 
+          dd.id.toString() == competitionId && dd.accessLevel > 0
+        )
+      )
+      fs.writeFile(`${folderPathTmp}/users.json`, JSON.stringify(users), (err) => {
         if(err){
           done(new Error(err));
         }else{
@@ -250,7 +279,7 @@ backupQueue.on('failed', function(job, err) {
 backupQueue.process('restore', function(job, done){
   job.progress(1);
   const {folder, user} = job.data;
-  const maxCount = 19;
+  const maxCount = 20;
 
   const extract = onezip.extract(`./tmp/uploads/${folder}.zip`, `./tmp/uploads/${folder}`);
 
@@ -311,34 +340,45 @@ backupQueue.process('restore', function(job, done){
       );
 
       function restore(fileName, Model){
-        const json = JSON.parse(
-          fs.readFileSync(
-            `${base_tmp_path}uploads/${folder}/${fileName}.json`,
-            'utf8'
-          )
-        );
-        const bulkOps = json.map(item => ({
-          updateOne: {
-              filter: {_id: item._id},
-              update: item,
-              upsert: true
-          }
-        }));
-        Model.bulkWrite(bulkOps,
-          function (err) {
-            if (err) {
-              done(new Error(err));
-            } else {
-              updated ++;
-              jobProgress += 50/maxCount;
-              job.progress(Math.floor(jobProgress));
-              if(updated == maxCount){
-                job.progress(100);
-                done();
+        let path = `${base_tmp_path}uploads/${folder}/${fileName}.json`
+        if (fs.existsSync(path)) {
+          const json = JSON.parse(
+            fs.readFileSync(
+              path,
+              'utf8'
+            )
+          );
+          const bulkOps = json.map(item => ({
+            updateOne: {
+                filter: {_id: item._id},
+                update: item,
+                upsert: true
+            }
+          }));
+          Model.bulkWrite(bulkOps,
+            function (err) {
+              if (err) {
+                done(new Error(err));
+              } else {
+                updated ++;
+                jobProgress += 50/maxCount;
+                job.progress(Math.floor(jobProgress));
+                if(updated == maxCount){
+                  job.progress(100);
+                  done();
+                }
               }
             }
+          );
+        } else {
+          updated ++;
+          jobProgress += 50/maxCount;
+          job.progress(Math.floor(jobProgress));
+          if(updated == maxCount){
+            job.progress(100);
+            done();
           }
-        );
+        }
       }
 
       restore('team', competitiondb.team);
@@ -354,6 +394,7 @@ backupQueue.process('restore', function(job, done){
       restore('review', documentDb.review);
       restore('survey', surveyDb.survey);
       restore('surveyAnswer', surveyDb.surveyAnswer);
+      restore('users', userdb.user);
 
       // Copy Document Folder
       fs.copy(`${base_tmp_path}uploads/${folder}/documents`, `${__dirname}/../documents/${competition[0]._id}`, (err) => {
