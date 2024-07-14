@@ -192,22 +192,24 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                 for(let b of $scope.review){
                     for(let q of b.questions){
                         let cc = a.comments[q._id];
-                        switch(q.type) {
-                            case 'scale':
-                                if(cc != "") sheet.getRow(row).getCell(col).value = Number(cc);
-                                break;
-                            case 'input':
-                                let d = document.createElement('div');
-                                d.innerHTML = cc;
-                                sheet.getRow(row).getCell(col).value = d.innerText;
-                                break;
-                            case 'select':
-                                let val = q.i18n.find(i=>i.language == $scope.displayLang).options.find(o=>o.value == cc).text;
-                                if(isNaN(Number(val))) sheet.getRow(row).getCell(col).value = val;
-                                else sheet.getRow(row).getCell(col).value = Number(val);
-                                break;
-                            default:
-                                sheet.getRow(row).getCell(col).value = cc;
+                        if (cc != undefined) {
+                            switch(q.type) {
+                                case 'scale':
+                                    if(cc != "") sheet.getRow(row).getCell(col).value = Number(cc);
+                                    break;
+                                case 'input':
+                                    let d = document.createElement('div');
+                                    d.innerHTML = cc;
+                                    sheet.getRow(row).getCell(col).value = d.innerText;
+                                    break;
+                                case 'select':
+                                    let val = q.i18n.find(i=>i.language == $scope.displayLang).options.find(o=>o.value == cc).text;
+                                    if(isNaN(Number(val))) sheet.getRow(row).getCell(col).value = val;
+                                    else sheet.getRow(row).getCell(col).value = Number(val);
+                                    break;
+                                default:
+                                    sheet.getRow(row).getCell(col).value = cc;
+                            }
                         }
                         col ++;
                     }
