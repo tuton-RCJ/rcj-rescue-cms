@@ -45,7 +45,7 @@ module.exports.initLine = async function (run) {
           })
         }
 
-        // Gap
+        // Intersection
         if (m.tileType.intersections > 0) {
           run.tiles[i].scoredItems.push({
             item: "intersection",
@@ -81,6 +81,20 @@ module.exports.initLine = async function (run) {
           })
           checkPointCount++;
         }
+      }
+    }
+
+    // Consider continued ramp tiles as a ramp
+    let rampContinueFlag = false;
+    for (let index = run.tiles.length - 1; index >= 0; index--) {
+      if (run.tiles[index].scoredItems.some(item => item.item == "ramp")) {
+        if (rampContinueFlag) {
+          run.tiles[index].scoredItems.splice(run.tiles[index].scoredItems.findIndex(item => item.item === 'ramp'), 1);
+        } else {
+          rampContinueFlag = true;
+        }
+      } else {
+        rampContinueFlag = false;
       }
     }
 

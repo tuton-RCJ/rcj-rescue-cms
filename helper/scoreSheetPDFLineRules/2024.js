@@ -167,7 +167,7 @@ async function drawRun(doc, config, scoringRun) {
         x += base_size_x;
         y = 35;
       }
-      const t = Object.create(tile);
+      const t = structuredClone(tile);
       t.nowIndex = index;
       tiles.push(t);
     }
@@ -179,7 +179,7 @@ async function drawRun(doc, config, scoringRun) {
       tile.items.speedbumps ||
       tile.items.rampPoints
     ) {
-      const t = Object.create(tile);
+      const t = structuredClone(tile);
       t.nowIndex = index;
       tiles.push(t);
       y += base_size_y;
@@ -190,6 +190,28 @@ async function drawRun(doc, config, scoringRun) {
     }
 
     index++;
+  }
+
+  // Remove continued ramps
+  let lastRampIndex = -1;
+  for (let index = tiles.length - 1; index >= 0; index--) {
+    let tile = tiles[index];
+    if (tile.items.rampPoints) {
+      if ((lastRampIndex - 1) == tile.nowIndex) {
+        console.log("REMOVE " + tile.nowIndex)
+        // Remove the ramp scoring
+        tile.items.rampPoints = false;
+        if (!(tile.tileType.gaps ||
+          tile.tileType.intersections ||
+          tile.tileType.seesaw ||
+          tile.items.obstacles ||
+          tile.items.speedbumps ||
+          tile.items.rampPoints)) {
+            tiles.splice(index, 1);
+        }
+      }
+      lastRampIndex = tile.nowIndex;
+    }
   }
 
   y += base_size_y; // LoP after final checkpoint
