@@ -63,8 +63,6 @@ html(ng-app="ddApp")
           i.fas.fa-step-forward(aria-hidden='true')  : {{LoPs_total}} times
         .col-8
           i.fas.fa-ambulance(aria-hidden='true' style="color:#e74c3c;") &nbsp;
-          span.badge.badge-warning(ng-show='evacuationLevel == 1') Level 1
-          span.badge.badge-danger(ng-show='evacuationLevel == 2') Level 2
           span &nbsp;
           .img-thumbnail(style="padding:0;display: inline-block;margin-right:5px;" ng-repeat="victim in victim_list" ng-style="{backgroundColor: evacZoneColor(victim)}")
             img(ng-src='/images/{{victimImgPath(victim)}}', style="height:20px;")             
