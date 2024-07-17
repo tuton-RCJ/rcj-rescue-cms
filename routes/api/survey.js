@@ -926,7 +926,7 @@ publicRouter.get('/answer/:teamId/:token/:survId/file/:questionId', function (re
                     res.end('Cloud not make stream')
                 })
                 let head = {
-                  'Content-Disposition': `attachment; filename=${dbTeam._id}-${originalFileName}`
+                  'Content-Disposition': `attachment; filename=${dbTeam.teamCode}-${dbTeam.name}-${originalFileName}`
                 }
                 res.writeHead(200, head);
                 stream.pipe(res);

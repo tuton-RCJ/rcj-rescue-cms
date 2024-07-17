@@ -217,6 +217,42 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
                 row ++;
             }
 
+            let sheet2 = workbook.addWorksheet('EvaluationScore');
+            sheet2.getRow(1).getCell(1).value = $scope.competition.name;
+
+            sheet2.getColumn('B').width = 20;
+
+            sheet2.getRow(3).getCell(1).value = "Code";
+            sheet2.getRow(3).getCell(2).value = "Name";
+            sheet2.getRow(3).getCell(3).value = "Region";
+            sheet2.getRow(3).getCell(4).value = "Penalty";
+
+            // Block title & Question title
+            row = 3;
+            col = 6;
+            lastCol = 6;
+            for(let b of $scope.teams[0].details){
+                sheet2.getRow(row).getCell(col).value = $sce.valueOf($scope.blockTitle[b.blockId]);
+                sheet2.getRow(row).getCell(col + 1).value = $sce.valueOf($scope.blockTitle[b.blockId]) + " (Normalized)";
+                col += 2;
+            }
+            
+            row ++;
+            for(let team of $scope.teams){
+                sheet2.getRow(row).getCell(1).value = team.teamCode;
+                sheet2.getRow(row).getCell(2).value = team.name;
+                sheet2.getRow(row).getCell(3).value = team.country;
+                sheet2.getRow(row).getCell(4).value = team.document.penalty;
+
+                col = 6;
+                for (let b of team.details) {
+                    sheet2.getRow(row).getCell(col).value = b.score;
+                    sheet2.getRow(row).getCell(col + 1).value = b.normalizedScore
+                    col +=2;
+                }
+                row ++;
+            }
+
             workbook.xlsx.writeBuffer( {
                 base64: true
             })
@@ -241,5 +277,4 @@ app.controller('DocumentResultController', ['$scope', '$uibModal', '$log', '$htt
             });
         });
     }
-    
 }]);
