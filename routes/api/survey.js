@@ -865,6 +865,10 @@ publicRouter.post('/answer/:teamId/:token/:survId/file/:questionId', function (r
   });
 });
 
+const normalizeString = (str) => {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '');
+}
+
 publicRouter.get('/answer/:teamId/:token/:survId/file/:questionId', function (req, res, next) {
   const { teamId, token, survId, questionId } = req.params;
 
@@ -926,7 +930,7 @@ publicRouter.get('/answer/:teamId/:token/:survId/file/:questionId', function (re
                     res.end('Cloud not make stream')
                 })
                 let head = {
-                  'Content-Disposition': `attachment; filename=${dbTeam.teamCode}-${dbTeam.name}-${originalFileName}`
+                  'Content-Disposition': `attachment; filename=${dbTeam.teamCode}-${normalizeString(dbTeam.name)}-${originalFileName}`
                 }
                 res.writeHead(200, head);
                 stream.pipe(res);
