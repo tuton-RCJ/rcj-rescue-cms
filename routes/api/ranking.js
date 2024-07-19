@@ -784,11 +784,19 @@ async function getTechnicalChallengeScore(competitionId, leagueId) {
     .exec()).filter(d => d.team != null);
   let maxScore = Math.max(...data.map(d => d.score));
 
-  return data.map((d) => ({
+  if (maxScore == 0) {
+    return data.map((d) => ({
+      teamId: d.team._id,
+      rawScore: d.score,
+      score: 1
+    }));
+  } else {
+    return data.map((d) => ({
       teamId: d.team._id,
       rawScore: d.score,
       score: d.score / maxScore
-  }));
+    }));
+  }
 }
 
 publicRouter.all('*', function (req, res, next) {
