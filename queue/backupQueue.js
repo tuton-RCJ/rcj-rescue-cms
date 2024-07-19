@@ -47,7 +47,7 @@ backupQueue.process('backup', function(job, done){
   fs.mkdirsSync(path.dirname(dstPath));
 
   jobProgress = 0;
-  const maxCount = 20;
+  const maxCount = 21;
   let outputCount = 0;
   job.progress(0);
   job.update({
@@ -281,7 +281,7 @@ backupQueue.on('failed', function(job, err) {
 backupQueue.process('restore', function(job, done){
   job.progress(1);
   const {folder, user} = job.data;
-  const maxCount = 20;
+  const maxCount = 21;
 
   const extract = onezip.extract(`./tmp/uploads/${folder}.zip`, `./tmp/uploads/${folder}`);
 
