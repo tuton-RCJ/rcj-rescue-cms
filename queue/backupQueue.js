@@ -9,6 +9,7 @@ const lineMapDb = require('../models/lineMap');
 const lineRunDb = require('../models/lineRun');
 const mazeMapDb = require('../models/mazeMap');
 const mazeRunDb = require('../models/mazeRun');
+const simRunDb = require('../models/simRun');
 const documentDb = require('../models/document');
 const mailDb = require('../models/mail');
 const reservationDb = require('../models/reservation');
@@ -215,6 +216,7 @@ backupQueue.process('backup', function(job, done){
   backup('lineRun', lineRunDb.lineRun);
   backup('mazeMap', mazeMapDb.mazeMap);
   backup('mazeRun', mazeRunDb.mazeRun);
+  backup('simRum', simRunDb.simRun);
   backup('mail', mailDb.mail);
   backup('reservation', reservationDb.reservation);
   backup('survey', surveyDb.survey);
@@ -389,6 +391,7 @@ backupQueue.process('restore', function(job, done){
       restore('lineRun', lineRunDb.lineRun);
       restore('mazeMap', mazeMapDb.mazeMap);
       restore('mazeRun', mazeRunDb.mazeRun);
+      restore('simRun', simRunDb.simRun);
       restore('mail', mailDb.mail);
       restore('reservation', reservationDb.reservation);
       restore('review', documentDb.review);

@@ -396,7 +396,7 @@ adminRouter.post('/bulk', function (req, res) {
             email: team.email,
           });
 
-          newTeam.save(function (err, data) {
+          newTeam.save(function (err, createdTeam) {
             if (err) {
               logger.error(err);
               if (!responseSent) {
@@ -407,18 +407,33 @@ adminRouter.post('/bulk', function (req, res) {
                 });
               }
             } else {
-              const path = `${__dirname}/../../documents/${dbComp._id}/${data._id}`;
-              mkdirp.sync(path);
-              count--;
-              if (count <= 0) {
-                if (!responseSent) {
-                  responseSent = true;
-                  res.location(`/api/teams/${data._id}`);
-                  res.status(201).send({
-                    message: 'New teams have been saved',
-                  });
+              // TEMP 2024 IMPL
+              // Create TechnicalChallenge Data
+              const newTechnicalChallenge = new competitiondb.technicalChallenge({
+                competition: dbComp._id,
+                team: createdTeam._id,
+                score: 0
+              });
+              newTechnicalChallenge.save(function (err, data) {
+                if (err) {
+                  logger.error(err);
+                } else {
+                  path = `${__dirname}/../../cabinet/${dbComp._id}/${createdTeam._id}`;
+                  mkdirp.sync(path);
+                  path = `${__dirname}/../../documents/${dbComp._id}/${createdTeam._id}`;
+                  mkdirp.sync(path);
+                  count--;
+                  if (count <= 0) {
+                    if (!responseSent) {
+                      responseSent = true;
+                      res.location(`/api/teams/${createdTeam._id}`);
+                      res.status(201).send({
+                        message: 'New teams have been saved',
+                      });
+                    }
+                  }
                 }
-              }
+              });
             }
           });
         }

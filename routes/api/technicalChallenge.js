@@ -107,7 +107,44 @@ privateRouter.get('/:competitionId/:leagueId', function (req, res, next) {
     });
 });
 
+adminRouter.get('/recovery/:competitionId', function (req, res) {
+  const competitionId = req.params.competitionId;
 
+  competitiondb.team
+    .find({
+      competition: competitionId
+    })
+    .exec(function (err, dbTeams) {
+      if (err) {
+        logger.error(err);
+      } else if (dbTeams) {
+        for (let team of dbTeams) {
+          competitiondb.technicalChallenge
+            .findOne({
+              team: team._id
+            })
+            .exec(function (err, dbTC) {
+              if (dbTC == null) {
+                console.log("RECOVERY for " + team._id);
+                const newTechnicalChallenge = new competitiondb.technicalChallenge({
+                  competition: competitionId,
+                  team: team._id,
+                  score: 0
+                });
+                newTechnicalChallenge.save(function (err, data) {
+                  if (err) {
+                    logger.error(err);
+                  }
+                });
+              }
+            });
+        }
+        res.status(200).send({
+          msg: 'Recovery done'
+        });
+      }
+    });
+});
 
 publicRouter.all('*', function (req, res, next) {
   next();
