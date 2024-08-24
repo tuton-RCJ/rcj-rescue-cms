@@ -1,4 +1,4 @@
-# ロボカップジュニア RoboCupJunior CMS 2023
+# ロボカップジュニア RoboCupJunior CMS 2024
 ### Competition Management System
 #### (former Rescue Scoring System)
 This is a Competition Management System used in RoboCupJunior's rescue line & maze competitions in word wide.
@@ -11,8 +11,8 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 これは，ロボカップジュニアレスキュー競技で用いられる大会管理システムです．  
 
 #### 対応ルール
-* International RoboCupJunior Rescue Committee により発行された2023ルール / [Line](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueLine2023Rules.pdf) / [Maze](https://junior.robocup.org/wp-content/uploads/2023/05/RCJRescueMaze2023Rules.pdf)
-* 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2023ルール / [レスキュー・ライン・エントリー](https://drive.google.com/file/d/1IYhlUrF7h3xu1rkToTjPjyYoZ9viGTuY/view) / [レスキュー・メイズ・エントリー](https://drive.google.com/file/d/1uMUyGcmFgs-j8imhE3vgOHX1gyz4r_J8/view?usp=sharing)
+* International RoboCupJunior Rescue Committee により発行された2024ルール
+* 日本のレスキュー技術委員会により発行されたレスキュー・ライン・エントリー2024ルール
 --
 
 
@@ -22,7 +22,7 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 * ユーザー管理機能を強化
 * マップの回転機能を追加
 * インタビュー機能を追加
-* 国際2023ルールに対応
+* 国際2024ルールに対応
 * ラインのタイルセットの在庫管理に対応
 * 大会データーのバックアップ/リストアに対応
 * トラブル発生時のハンドオーバーに対応
@@ -104,6 +104,10 @@ Please refer to the [English version README](https://github.com/rrrobo/rcj-rescu
 * ロボカップジュニア ジャパンオープン2023 名古屋
 * Torneo Mexicano de Robótica 2023 (メキシコ)
 * RoboCup 2023 Bordeaux France
+
+### 2024年ルール対応版
+* RoboCup Junior Japan Open 2024 Nagoya
+* RoboCup 2024 Eindhoven
 
 ## 使用方法
 ### Dockerを利用（推奨）
