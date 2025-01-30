@@ -1,5 +1,5 @@
 # ロボカップジュニア RoboCupJunior CMS 2024
-## これはこちらのリポジトリをフォークしたものです。
+## これは[こちら](https://github.com/robocup-junior/rcj-rescue-cms)のリポジトリをフォークしたものです。
 ### Competition Management System
 #### (former Rescue Scoring System)
 This is a Competition Management System used in RoboCupJunior's rescue line & maze competitions in word wide.
