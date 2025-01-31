@@ -11,7 +11,7 @@ env('process.env');
 
 mongoose.Promise = global.Promise;
 mongoose.set('strictQuery', true);
-mongoose.connect(process.env.DB_CONNECT_STR, { useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(process.env.DB_CONNECT_STR, { useNewUrlParser: true});
 var db = mongoose.connection;
 
 db.on('error', function (err) {
