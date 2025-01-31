@@ -9,6 +9,15 @@ const fs = require("fs");
 const http = require('http');
 
 env('process.env');
+
+const redisUrl = process.env.REDIS_URL || "";
+const redisMatch = redisUrl.match(/^redis:\/\/([^:]+):(\d+)$/);
+if (redisMatch) {
+  process.env.REDIS_HOST = redisMatch[1];
+  process.env.REDIS_PORT = redisMatch[2];
+}
+
+
 //Load package json
 const packageJson = require('./package.json');
 process.env.cms_version = packageJson.version;
