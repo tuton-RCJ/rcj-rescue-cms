@@ -10,6 +10,7 @@ var env = require('node-env-file');
 env('process.env');
 
 mongoose.Promise = global.Promise;
+mongoose.set('strictQuery', true);
 mongoose.connect(process.env.DB_CONNECT_STR, { useNewUrlParser: true, useUnifiedTopology: true});
 var db = mongoose.connection;
 
